@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?pde version="3.1"?>
+
+<product name="DepAn" id="com.google.devtools.depan.DepAn" application="com.google.devtools.depan.application" useFeatures="false">
+
+   <aboutInfo>
+      <image path="/DepanApp/icons/branding/depan-logo-315x110.gif"/>
+      <text>
+         DepAn - A direct manipulation tool for the visualization, analysis, and refactoring of dependencies in large applications.
+
+Version 0.0.3
+
+Contributors:
+- Yohann Coppel
+- Lee Carver
+      </text>
+   </aboutInfo>
+
+   <configIni use="default"/>
+
+   <launcherArgs>
+      <vmArgs>-Xmx1024M</vmArgs>
+   </launcherArgs>
+
+   <windowImages i16="/DepanApp/icons/branding/depan-icon-16x16.gif" i32="/DepanApp/icons/branding/depan-icon-32x32.gif" i48="/DepanApp/icons/branding/depan-icon-48x48.gif" i64="/DepanApp/icons/branding/depan-icon-64x64.gif"/>
+
+   <splash
+      location="com.google.devtools.depan"
+      startupProgressRect="5,275,445,15"
+      startupMessageRect="7,252,445,20"
+      startupForegroundColor="000000" />
+   <launcher name="DepAn">
+      <linux icon="/DepanApp/icons/branding/depan-logo-315x110.xpm"/>
+      <solaris/>
+      <win useIco="false">
+         <bmp/>
+      </win>
+   </launcher>
+
+
+   <vm>
+   </vm>
+
+   <plugins>
+      <plugin id="com.google.devtools.depan"/>
+      <plugin id="com.google.devtools.depan.core"/>
+      <plugin id="com.google.devtools.depan.filesystem"/>
+      <plugin id="com.google.devtools.depan.java"/>
+      <plugin id="com.google.devtools.depan.java.bytecode"/>
+      <plugin id="com.ibm.icu"/>
+      <plugin id="org.eclipse.core.commands"/>
+      <plugin id="org.eclipse.core.contenttype"/>
+      <plugin id="org.eclipse.core.databinding"/>
+      <plugin id="org.eclipse.core.expressions"/>
+      <plugin id="org.eclipse.core.filebuffers"/>
+      <plugin id="org.eclipse.core.filesystem"/>
+      <plugin id="org.eclipse.core.filesystem.linux.x86" fragment="true"/>
+      <plugin id="org.eclipse.core.jobs"/>
+      <plugin id="org.eclipse.core.net"/>
+      <plugin id="org.eclipse.core.resources"/>
+      <plugin id="org.eclipse.core.resources.compatibility" fragment="true"/>
+      <plugin id="org.eclipse.core.runtime"/>
+      <plugin id="org.eclipse.core.runtime.compatibility.registry" fragment="true"/>
+      <plugin id="org.eclipse.equinox.app"/>
+      <plugin id="org.eclipse.equinox.common"/>
+      <plugin id="org.eclipse.equinox.preferences"/>
+      <plugin id="org.eclipse.equinox.registry"/>
+      <plugin id="org.eclipse.help"/>
+      <plugin id="org.eclipse.jface"/>
+      <plugin id="org.eclipse.jface.databinding"/>
+      <plugin id="org.eclipse.jface.text"/>
+      <plugin id="org.eclipse.osgi"/>
+      <plugin id="org.eclipse.swt"/>
+      <plugin id="org.eclipse.swt.gtk.linux.x86" fragment="true"/>
+      <plugin id="org.eclipse.text"/>
+      <plugin id="org.eclipse.ui"/>
+      <plugin id="org.eclipse.ui.editors"/>
+      <plugin id="org.eclipse.ui.forms"/>
+      <plugin id="org.eclipse.ui.ide"/>
+      <plugin id="org.eclipse.ui.navigator"/>
+      <plugin id="org.eclipse.ui.navigator.resources"/>
+      <plugin id="org.eclipse.ui.views"/>
+      <plugin id="org.eclipse.ui.views.properties.tabbed"/>
+      <plugin id="org.eclipse.ui.workbench"/>
+      <plugin id="org.eclipse.ui.workbench.texteditor"/>
+      <plugin id="org.eclipse.update.configurator"/>
+      <plugin id="org.eclipse.update.core"/>
+      <plugin id="org.eclipse.update.core.linux" fragment="true"/>
+      <plugin id="org.eclipse.update.ui"/>
+   </plugins>
+
+</product>

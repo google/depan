@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="com.google.devtools.depan.eclipse.sourceplugin">
+      <languagespecific
+            class="com.google.devtools.depan.filesystem.FileSystemPlugin"
+            id="com.google.devtools.depan.filesystem"
+            source="java">
+      </languagespecific>
+   </extension>
+</plugin>

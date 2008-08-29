@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension-point
+         id="com.google.devtools.depan.eclipse.sourceplugin"
+         name="com.google.devtools.depan.eclipse.sourceplugin"
+         schema="schema/com.google.devtools.depan.eclipse.sourceplugin.exsd">
+   </extension-point>
+
+   <extension
+         id="application"
+         point="org.eclipse.core.runtime.applications">
+      <application>
+         <run
+               class="com.google.devtools.depan.eclipse.Application">
+         </run>
+      </application>
+   </extension>
+
+   <!-- ================ PRODUCT ==================== -->
+
+   <extension
+         id="DepAn"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="com.google.devtools.depan.application"
+            name="DepAn">
+         <property
+               name="appName"
+               value="DepAn">
+         </property>
+         <property
+               name="startupForegroundColor"
+               value="000000">
+         </property>
+         <property
+               name="startupMessageRect"
+               value="7,252,445,20">
+         </property>
+         <property
+               name="startupProgressRect"
+               value="5,275,445,15">
+         </property>
+         <property
+               name="preferenceCustomization"
+               value="plugin_customization.ini">
+         </property>
+         <property
+               name="aboutImage"
+               value="icons/branding/depan-logo-315x110.gif">
+         </property>
+         <property
+               name="windowImages"
+               value="icons/branding/depan-icon-16x16.gif,icons/branding/depan-icon-32x32.gif,icons/branding/depan-icon-64x64.gif">
+         </property>
+         <property
+               name="aboutText"
+               value="DepAn - A direct manipulation tool for the visualization, analysis, and refactoring of dependencies in large applications.&#x0A;&#x0A;Version 0.0.3&#x0A;&#x0A;Contributors:&#x0A;- Yohann Coppel&#x0A;- Lee Carver">
+         </property>
+      </product>
+   </extension>
+
+   <!-- ========================================================= -->
+
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="com.google.devtools.depan.eclipse.Perspective"
+            icon="icons/branding/depan-icon-16x16.gif"
+            id="com.google.devtools.depan.eclipse.perspective"
+            name="DepAn Perspective">
+      </perspective>
+   </extension>
+
+   <!-- ================ PREFERENCES =============== -->
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="com.google.devtools.depan.eclipse.preferences.ColorSelection"
+            id="com.google.devtools.depan.eclipse.preferences.colors"
+            name="Colors"/>
+      <page
+            class="com.google.devtools.depan.eclipse.preferences.LabelPreferences"
+            id="com.google.devtools.depan.eclipse.preferences.labels"
+            name="Labels"/>
+      <page
+            class="com.google.devtools.depan.eclipse.preferences.NodeOptions"
+            id="com.google.devtools.depan.eclipse.preferences.nodeoptions"
+            name="Node Rendering options"/>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer class="com.google.devtools.depan.eclipse.preferences.ColorSelectionInitializer"/>
+      <initializer class="com.google.devtools.depan.eclipse.preferences.LabelPreferencesInitializer"/>
+      <initializer class="com.google.devtools.depan.eclipse.preferences.NodeOptionsInitializer"/>
+   </extension>
+
+   <!-- =================== VIEWS =============================== -->
+
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            id="com.google.devtools.depan"
+            name="DepAn Views"/>
+      <view
+            category="com.google.devtools.depan"
+            class="org.eclipse.ui.navigator.CommonNavigator"
+            id="com.google.devtools.depan.eclipse.views.NavigatorView"
+            name="Project Explorer"/>
+      <view
+            category="com.google.devtools.depan"
+            class="com.google.devtools.depan.eclipse.views.SatelliteView"
+            id="com.google.devtools.depan.eclipse.views.SatelliteView"
+            name="Satellite View"/>
+      <view
+            category="com.google.devtools.depan"
+            class="com.google.devtools.depan.eclipse.views.RelationPicker"
+            id="com.google.devtools.depan.eclipse.views.RelationPicker"
+            name="Relation picker"/>
+      <view
+            category="com.google.devtools.depan"
+            class="com.google.devtools.depan.eclipse.views.NodeEditor"
+            id="com.google.devtools.depan.eclipse.views.NodeEditor"
+            name="Node editor"/>
+      <view
+            category="com.google.devtools.depan"
+            class="com.google.devtools.depan.eclipse.views.EdgeEditor"
+            id="com.google.devtools.depan.eclipse.views.EdgeEditor"
+            name="Edge editor"/>
+      <view
+            category="com.google.devtools.depan"
+            class="com.google.devtools.depan.eclipse.views.SelectionEditor"
+            id="com.google.devtools.depan.eclipse.views.SelectionEditor"
+            name="Selection editor"/>
+      <view
+            category="com.google.devtools.depan"
+            class="com.google.devtools.depan.eclipse.views.SelectionOperations"
+            id="com.google.devtools.depan.eclipse.views.SelectionOperations"
+            name="Selection operations"/>
+      <view
+            category="com.google.devtools.depan"
+            class="com.google.devtools.depan.eclipse.views.SubLayoutEditor"
+            id="com.google.devtools.depan.eclipse.views.SubLayoutEditor"
+            name="Sub Layouts"/>
+      <view
+            category="com.google.devtools.depan"
+            class="com.google.devtools.depan.eclipse.views.Tools"
+            id="com.google.devtools.depan.eclipse.views.Tools"
+            name="Tools"/>
+   </extension>
+
+   <!-- =============== WIZARDS ================================= -->
+
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+            id="com.google.devtools.depan"
+            name="DepAn Wizards"/>
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <wizard
+            category="com.google.devtools.depan"
+            class="com.google.devtools.depan.eclipse.wizards.NewNamedRelationshipSetWizard"
+            icon="icons/sample.gif"
+            id="com.google.devtools.depan.eclipse.wizards.NewNamedRelationshipSetWizard"
+            name="New named set of relationships"/>
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <wizard
+            category="com.google.devtools.depan"
+            project="true"
+            finalPerspective="com.google.devtools.depan.eclipse.perspective"
+            class="com.google.devtools.depan.eclipse.natures.NewDepanProjectWizard"
+            icon="icons/branding/depan-icon-16x16.gif"
+            id="com.google.devtools.depan.eclipse.natures.NewDepanProjectWizard"
+            name="DepAn Project"/>
+   </extension>
+
+   <!-- ========================================================= -->
+
+   <extension
+         point="org.eclipse.ui.navigator.viewer">
+      <viewer
+            viewerId="com.google.devtools.depan.eclipse.views.NavigatorView">
+      </viewer>
+
+      <viewerContentBinding viewerId="com.google.devtools.depan.eclipse.views.NavigatorView">
+         <includes>
+            <contentExtension pattern="org.eclipse.ui.navigator.resourceContent"/>
+         </includes>
+      </viewerContentBinding>
+
+      <viewerActionBinding viewerId="com.google.devtools.depan.eclipse.views.NavigatorView">
+         <includes>
+            <actionExtension
+                  pattern="org.eclipse.ui.navigator.resources.*"/>
+            <actionExtension
+                  pattern="org.eclipse.ui.navigator.resources.NewActions" />
+            <actionExtension
+                  pattern="org.eclipse.ui.navigator.resources.PropertiesActionProvider" />
+         </includes>
+      </viewerActionBinding>
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.elementFactories">
+      <factory
+	      class="com.google.devtools.depan.eclipse.NavigatorRoot"
+	      id="com.google.devtools.depan.eclipse.NavigatorRoot" />
+   </extension>
+
+   <!-- ====================== EDITORS ========================== -->
+
+   <extension point="org.eclipse.ui.editors">
+      <editor id="com.google.devtools.depan.eclipse.editors.ViewEditor"
+            name="View Editor"
+            extensions="dpanv"
+            icon="icons/sample.gif"
+            class="com.google.devtools.depan.eclipse.editors.ViewEditor"/>
+      <editor id="com.google.devtools.depan.eclipse.editors.GraphEditor"
+            name="Graph Editor"
+            extensions="dpang"
+            icon="icons/sample.gif"
+            class="com.google.devtools.depan.eclipse.editors.GraphEditor"/>
+      <editor id="com.google.devtools.depan.eclipse.editors.RemapEditor"
+            name="Remap Editor"
+            extensions="dpanr"
+            icon="icons/sample.gif"
+            class="com.google.devtools.depan.eclipse.editors.RemapEditor"/>
+      <editor id="com.google.devtools.depan.eclipse.editors.RelationshipSetEditor"
+            name="Relationship set editor"
+            extensions="dpans"
+            icon="icons/sample.gif"
+            class="com.google.devtools.depan.eclipse.editors.NamedRelationshipEditor"/>
+   </extension>
+
+   <extension
+         point = "org.eclipse.ui.editorActions">
+      <editorContribution
+            id="com.google.devtools.depan.eclipse.actions.GraphEditor"
+            targetID="com.google.devtools.depan.eclipse.editors.GraphEditor">
+         <action id="com.google.devtool.depan.eclipse.actions.graph.CreateView"
+               label="Create view"
+               class="com.google.devtools.depan.eclipse.actions.CreateView"/>
+      </editorContribution>
+      <editorContribution
+            id="com.google.devtools.depan.eclipse.actions.ViewEditor"
+            targetID="com.google.devtools.depan.eclipse.editors.ViewEditor">
+         <menu
+               id="com.google.devtools.depan.eclipse.actions.view"
+               label="&amp;Options"
+               path="additions" >
+            <separator name="basic"/>
+         </menu>
+         <action id="com.google.devtools.depan.eclipse.actions.view.RootHighlight"
+               label="Highlight root"
+               menubarPath="com.google.devtools.depan.eclipse.actions.view/basic"
+               toolbarPath="additions"
+               tooltip="Highlight root nodes"
+               style="toggle"
+               class="com.google.devtools.depan.eclipse.actions.ViewEditorActionDelegate"
+               icon="icons/flag_red.png"/>
+         <action id="com.google.devtools.depan.eclipse.actions.view.StrokeHighlight"
+               label="Stroke Highlight"
+               menubarPath="com.google.devtools.depan.eclipse.actions.view/basic"
+               toolbarPath="additions"
+               style="toggle"
+               tooltip="Stroke Highlight on selection"
+               class="com.google.devtools.depan.eclipse.actions.ViewEditorActionDelegate"
+               icon="icons/link_go.png"
+               hoverIcon="icons/link_go.png"/>
+         <action id="com.google.devtools.depan.eclipse.actions.view.Shape"
+               label="Enable node shapes"
+               menubarPath="com.google.devtools.depan.eclipse.actions.view/basic"
+               toolbarPath="additions"
+               style="toggle"
+               tooltip="Enable node shapes"
+               class="com.google.devtools.depan.eclipse.actions.ViewEditorActionDelegate"
+               icon="icons/plugin.png"/>
+         <action id="com.google.devtools.depan.eclipse.actions.view.StretchRatio"
+               label="Enable node ratio"
+               menubarPath="com.google.devtools.depan.eclipse.actions.view/basic"
+               toolbarPath="additions"
+               style="toggle"
+               tooltip="Enable node ratio"
+               class="com.google.devtools.depan.eclipse.actions.ViewEditorActionDelegate"
+               icon="icons/shape_handles.png"/>
+	 <action id="com.google.devtools.depan.eclipse.actions.view.Size"
+               label="Enable node sizes"
+               menubarPath="com.google.devtools.depan.eclipse.actions.view/basic"
+               toolbarPath="additions"
+               style="toggle"
+               tooltip="Enable node sizes"
+               class="com.google.devtools.depan.eclipse.actions.ViewEditorActionDelegate"
+               icon="icons/lightning.png"/>
+      </editorContribution>
+      <editorContribution
+            id="com.google.devtools.depan.eclipse.actions.ViewEditorCont"
+            targetID="com.google.devtools.depan.eclipse.editors.ViewEditor">
+         <menu
+               id="com.google.devtools.depan.eclipse.actions.edit"
+               label="&amp;Edit"
+               path="edit" >
+            <separator name="basic"/>
+         </menu>
+         <action id="com.google.devtools.depan.eclipse.actions.view.Screenshot"
+               label="&amp;Take a screenshot"
+               menubarPath="com.google.devtools.depan.eclipse.actions.edit/basic"
+               style="push"
+               tooltip="Take a screenshot of the view, and save it to a file"
+               class="com.google.devtools.depan.eclipse.actions.ViewEditorActionDelegate"/>
+         <action id="com.google.devtools.depan.eclipse.actions.view.SelectAll"
+               label="&amp;Select all"
+               menubarPath="com.google.devtools.depan.eclipse.actions.edit/basic"
+               style="push"
+               tooltip="Select all nodes in the current graph."
+               class="com.google.devtools.depan.eclipse.actions.ViewEditorActionDelegate"/>
+      </editorContribution>
+   </extension>
+
+   <extension point="org.eclipse.ui.actionSets">
+      <actionSet label="Plugins Action Set" visible="true" id="com.google.devtools.depan.eclipse.plugins.actionSet">
+         <action class="com.google.devtools.depan.eclipse.plugins.ListPluginsAction"
+               label="&amp;List Plugins" tooltip="Lists All Installed Plugins"
+               menubarPath="com.google.devtools.depan.eclipse.pluginMenu/listGroup"
+               id="com.google.devtools.depan.eclipse.plugins.ListPluginsAction"/>
+         <menu
+               id="com.google.devtools.depan.eclipse.pluginMenu"
+               label="&amp;Plugins">
+            <separator name="listGroup"/>
+         </menu>
+      </actionSet>
+   </extension>
+   <extension
+         id="DepAnNature"
+         name="DepAn"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="com.google.devtools.depan.eclipse.natures.DepAnNature">
+         </run>
+      </runtime>
+   </extension>
+</plugin>
+

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry exported="true" kind="lib" path="collections-generic-4.01.jar"/>
+	<classpathentry exported="true" kind="lib" path="colt-1.2.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="joda-time-1.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="jung-algorithms-2.0-alpha2.jar"/>
+	<classpathentry exported="true" kind="lib" path="jung-api-2.0-alpha2.jar"/>
+	<classpathentry exported="true" kind="lib" path="jung-graph-impl-2.0-alpha2.jar"/>
+	<classpathentry exported="true" kind="lib" path="xstream-1.2.2.jar"/>
+	<classpathentry kind="output" path="build"/>
+</classpath>

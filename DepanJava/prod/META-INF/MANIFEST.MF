@@ -1,0 +1,20 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: DepanJavaPlugin
+Bundle-SymbolicName: com.google.devtools.depan.java;singleton:=true
+Bundle-Version: 1.0.1
+Bundle-Vendor: Google Inc.
+Export-Package: com.google.devtools.depan.java,
+ com.google.devtools.depan.java.elements,
+ com.google.devtools.depan.java.graph,
+ org.objectweb.asm,
+ org.objectweb.asm.signature
+Require-Bundle: org.eclipse.core.resources,
+ org.eclipse.core.runtime,
+ org.eclipse.jface.text,
+ org.eclipse.ui,
+ com.google.devtools.depan.core,
+ com.google.devtools.depan,
+ com.google.devtools.depan.filesystem
+Bundle-ClassPath: .,
+ asm-3.0.jar

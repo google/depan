@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: DepanFileSystem Plug-in
+Bundle-SymbolicName: com.google.devtools.depan.filesystem;singleton:=true
+Bundle-Version: 1.0.1
+Require-Bundle: com.google.devtools.depan,
+ com.google.devtools.depan.core,
+ org.eclipse.core.resources,
+ org.eclipse.core.runtime,
+ org.eclipse.jface.text,
+ org.eclipse.ui
+Export-Package: com.google.devtools.depan.filesystem,
+ com.google.devtools.depan.filesystem.eclipse,
+ com.google.devtools.depan.filesystem.eclipse.editors,
+ com.google.devtools.depan.filesystem.elements,
+ com.google.devtools.depan.filesystem.graph
+Bundle-Vendor: Google Inc.
