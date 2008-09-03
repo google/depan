@@ -108,9 +108,15 @@ public class GraphData<F> {
     } else {
       // We must create it now, it will be filled later.
       reverseMap = Maps.newHashMap();
-      allReverseMaps.put(graph, (Map<GraphNode, NodeTreeView.NodeWrapper>) reverseMap);
+      installReverseMap(this);
     }
     updateTreeData(initRelationFinder);
+  }
+
+  // KLUDGE: reverse maps should be a property of the graph/ViewModel editor.
+  @SuppressWarnings("unchecked")
+  private void installReverseMap(GraphData self) {
+    allReverseMaps.put(self.graph, self.reverseMap);
   }
 
   /**
