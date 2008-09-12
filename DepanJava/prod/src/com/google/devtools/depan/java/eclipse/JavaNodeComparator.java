@@ -16,8 +16,6 @@
 
 package com.google.devtools.depan.java.eclipse;
 
-import com.google.devtools.depan.filesystem.elements.DirectoryElement;
-import com.google.devtools.depan.filesystem.elements.FileElement;
 import com.google.devtools.depan.java.JavaElementDispatcher;
 import com.google.devtools.depan.java.elements.FieldElement;
 import com.google.devtools.depan.java.elements.InterfaceElement;
@@ -40,7 +38,6 @@ public class JavaNodeComparator implements Comparator<Element> {
   private JavaNodeComparator() {
   }
 
-  @SuppressWarnings("unchecked")
   private static boolean isJavaElement(Object element) {
     return (element instanceof JavaElement);
   }

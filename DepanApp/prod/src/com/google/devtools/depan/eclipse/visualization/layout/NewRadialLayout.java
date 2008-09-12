@@ -110,6 +110,7 @@ public class NewRadialLayout extends NewTreeLayout {
      */
     @Override
     protected void assignNode(GraphNode node, int level, int offset) {
+      // logAssignNode(node, level, offset);
       // No node assignments in dry run.
     }
   }
@@ -165,17 +166,6 @@ public class NewRadialLayout extends NewTreeLayout {
       // logAssign(node, level, offset, xPos, yPos);
       Point2D point = new Point2D.Double(xPos, yPos);
       locations.get(node).setLocation(point);
-    }
-
-    /**
-     * Debugging support to display assignments for nodes.
-     */
-    @SuppressWarnings("unused")
-    private void logAssign(
-        GraphNode node, int level, int offset, double xPos, double yPos) {
-      System.out.println(node
-          + ": [" + level + ", " + offset + "]"
-          + " @(" + xPos + ", " + yPos + ")");
     }
   }
 }

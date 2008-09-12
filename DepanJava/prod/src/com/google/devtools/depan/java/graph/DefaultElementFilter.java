@@ -17,8 +17,6 @@
 package com.google.devtools.depan.java.graph;
 
 import com.google.devtools.depan.eclipse.plugins.ElementTransformer;
-import com.google.devtools.depan.filesystem.elements.DirectoryElement;
-import com.google.devtools.depan.filesystem.elements.FileElement;
 import com.google.devtools.depan.filesystem.elements.FileSystemElement;
 import com.google.devtools.depan.java.JavaElementDispatcher;
 import com.google.devtools.depan.java.elements.FieldElement;

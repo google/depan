@@ -16,13 +16,10 @@
 
 package com.google.devtools.depan.eclipse.trees;
 
-import com.google.devtools.depan.eclipse.utils.RelationshipSelectorListener;
-import com.google.devtools.depan.graph.api.DirectedRelationFinder;
-import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.model.RelationshipSet;
 
 import org.eclipse.core.runtime.PlatformObject;
+import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.model.BaseWorkbenchContentProvider;
@@ -37,8 +34,7 @@ import java.util.Calendar;
  *
  * @author ycoppel@google.com (Yohann Coppel)
  */
-public class NodeTreeView<E>
-    implements RelationshipSelectorListener{
+public class NodeTreeView<E> {
 
   protected TreeViewer tree;
   private GraphData<E> data;
@@ -47,9 +43,7 @@ public class NodeTreeView<E>
     NodeViewAdapterFactory.register();
   }
 
-  public NodeTreeView(
-      Composite parent, int style, NodeTreeProvider<E> provider) {
-    this.data = new GraphData<E>(provider);
+  public NodeTreeView(Composite parent, int style) {
     initWidget(parent, style);
   }
 
@@ -59,38 +53,37 @@ public class NodeTreeView<E>
     tree.setContentProvider(new BaseWorkbenchContentProvider());
   }
 
-  public NodeWrapperRoot<E> init(
-      GraphModel graph, DirectedRelationFinder relationFinder) {
-    data.initTreeData(graph, relationFinder);
+  public void updateData(GraphData<E> data) {
+    this.data = data;
+    updateTree();
+    updateExpandState();
+    //$ NEEDED??
+    tree.refresh();
+  }
+  
+  private void updateTree() {
     System.out.println("Compute roots...");
-    NodeWrapperRoot<E> roots = computeRoots();
+    NodeWrapperRoot<E> roots = data.getHierarchyRoots();
     System.out.println("  DONE");
     System.out.println("Set Input...");
     long l = Calendar.getInstance().getTimeInMillis();
     tree.setInput(roots);
     long l2 = Calendar.getInstance().getTimeInMillis() - l;
     System.out.println("  DONE " + (l2 / 1000.0));
-    return roots;
   }
 
-  public void reset(
-      NodeWrapperRoot<E> root,
-      GraphModel graph, DirectedRelationFinder relationFinder) {
-    data.initTreeData(graph, relationFinder);
-    tree.setInput(root);
+  private void updateExpandState() {
+    TreePath[] expandState = data.getExpandState();
+    if (expandState.length > 0) {
+      getTreeViewer().setExpandedTreePaths(expandState);
+    } else {
+      getTreeViewer().expandAll();
+      data.saveExpandState(getTreeViewer().getExpandedTreePaths());
+    }
   }
 
   public TreeViewer getTreeViewer() {
     return tree;
-  }
-
-  private NodeWrapperRoot<E> computeRoots() {
-    return data.computeRoots();
-  }
-
-  public void setInput(NodeWrapperRoot<E> input) {
-    tree.setInput(input);
-    tree.refresh();
   }
 
   /**
@@ -148,13 +141,4 @@ public class NodeTreeView<E>
   public static class NodeWrapperRoot<E> extends PlatformObject {
     public NodeWrapper<E>[] roots = null;
   }
-
-  /* (non-Javadoc)
-   * @see com.google.devtools.depan.eclipse.utils.RelationshipSelectorListener#selectedSetChanged(com.google.devtools.depan.relationship.RelationshipSet)
-   */
-  public void selectedSetChanged(RelationshipSet set) {
-    data.updateTreeData(set);
-    setInput(computeRoots());
-  }
-
 }

@@ -18,15 +18,18 @@ package com.google.devtools.depan.eclipse.editors;
 
 import com.google.devtools.depan.collect.Sets;
 import com.google.devtools.depan.eclipse.trees.CheckNodeTreeView;
+import com.google.devtools.depan.eclipse.trees.GraphData;
 import com.google.devtools.depan.eclipse.trees.NodeTreeProvider;
 import com.google.devtools.depan.eclipse.trees.NodeTreeView.NodeWrapper;
 import com.google.devtools.depan.eclipse.utils.DefaultRelationshipSet;
 import com.google.devtools.depan.eclipse.utils.LayoutSelector;
+import com.google.devtools.depan.eclipse.utils.RelationshipSelectorListener;
 import com.google.devtools.depan.eclipse.utils.RelationshipSetSelector;
 import com.google.devtools.depan.eclipse.visualization.layout.Layouts;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
+import com.google.devtools.depan.model.RelationshipSet;
 import com.google.devtools.depan.model.ResourceCache;
 import com.google.devtools.depan.model.interfaces.GraphListener;
 import com.google.devtools.depan.view.EdgeDisplayProperty;
@@ -66,6 +69,7 @@ public class GraphEditor
     extends MultiPageEditorPart
     implements TCreator<ViewModel>,
         NodeTreeProvider<GraphNode>,
+        RelationshipSelectorListener,
         GraphListener {
 
   private GraphModel graph = null;
@@ -81,6 +85,8 @@ public class GraphEditor
    * Selector for named relationships sets.
    */
   private RelationshipSetSelector relationshipSetselector = null;
+
+  private HierarchyCache<GraphNode> hierarchies;
 
   /////////////////////////////////////
   // Access state
@@ -153,11 +159,12 @@ public class GraphEditor
 
     // tree --------------------
     System.out.println("Initialize tree...");
+    RelationshipSet relSet = relationshipSetselector.getSelection();
     checkNodeTreeView = new CheckNodeTreeView<GraphNode>(
-        composite, SWT.VIRTUAL | SWT.FULL_SELECTION | SWT.BORDER,
-        graph, relationshipSetselector.getSelection(), this);
+        composite, SWT.VIRTUAL | SWT.FULL_SELECTION | SWT.BORDER);
+    selectedSetChanged(relSet);
     System.out.println("  DONE");
-    relationshipSetselector.addChangeListener(checkNodeTreeView);
+    relationshipSetselector.addChangeListener(this);
 
     tree = checkNodeTreeView.getCheckboxTreeViewer();
     tree.getTree().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -284,9 +291,10 @@ public class GraphEditor
 
     System.out.println("  DONE");
 
+    hierarchies = new HierarchyCache<GraphNode>(this, graph);
     if (null != checkNodeTreeView) {
       System.out.println("Initialize graph...");
-      checkNodeTreeView.init(graph, DefaultRelationshipSet.SET);
+      selectedSetChanged(DefaultRelationshipSet.SET);
       System.out.println("  DONE");
     }
 
@@ -320,7 +328,6 @@ public class GraphEditor
    */
   @Override
   public boolean isSaveAsAllowed() {
-    // TODO Auto-generated method stub
     return false;
   }
 
@@ -386,5 +393,11 @@ public class GraphEditor
   public void edgePropertyChanged(
       GraphEdge edge, EdgeDisplayProperty property) {
     // No actions needed on edge changes.
+  }
+
+  @Override
+  public void selectedSetChanged(RelationshipSet relSet) {
+    GraphData<GraphNode> hierarchy = hierarchies.getHierarchy(relSet);
+    checkNodeTreeView.updateData(hierarchy);
   }
 }

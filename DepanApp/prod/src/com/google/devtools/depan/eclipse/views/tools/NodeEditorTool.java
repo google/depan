@@ -19,6 +19,7 @@ package com.google.devtools.depan.eclipse.views.tools;
 import com.google.devtools.depan.collect.Maps;
 import com.google.devtools.depan.eclipse.editors.NodeWrapperTreeSorter;
 import com.google.devtools.depan.eclipse.editors.ViewEditor;
+import com.google.devtools.depan.eclipse.trees.GraphData;
 import com.google.devtools.depan.eclipse.trees.NodeTreeProvider;
 import com.google.devtools.depan.eclipse.trees.NodeTreeView;
 import com.google.devtools.depan.eclipse.trees.NodeTreeView.NodeWrapper;
@@ -31,6 +32,7 @@ import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.utils.Tools;
 import com.google.devtools.depan.eclipse.views.NodeEditorLabelProvider;
 import com.google.devtools.depan.eclipse.views.ViewSelectionListenerTool;
+import com.google.devtools.depan.graph.api.DirectedRelationFinder;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.RelationshipSet;
 import com.google.devtools.depan.util.StringUtils;
@@ -67,16 +69,6 @@ import java.util.Map;
 public class NodeEditorTool extends ViewSelectionListenerTool
     implements ICellModifier, NodeTreeProvider<NodeDisplayProperty>,
     RelationshipSelectorListener {
-
-  /**
-   * We store all the trees for now, which allows quick switch when changing
-   * from one view to another. If it's too memory consuming, we could change
-   * that easily.
-   */
-  private Map<ViewModel, NodeWrapperRoot<NodeDisplayProperty>> trees =
-      Maps.newHashMap();
-
-  private Map<ViewModel, TreePath[]> expandedElements = Maps.newHashMap();
 
   /**
    * Node Tree View handling the TreeViewer, and the data inside.
@@ -121,7 +113,9 @@ public class NodeEditorTool extends ViewSelectionListenerTool
   @Override
   public void setEditor(ViewEditor viewEditor) {
     if (hasEditor()) {
-      saveTreeExpandState();
+      GraphData<NodeDisplayProperty> hierarchy = getEditorHierarchy();
+      hierarchy.saveExpandState(
+          nodeTreeView.getTreeViewer().getExpandedTreePaths());
     }
 
     super.setEditor(viewEditor);
@@ -138,7 +132,7 @@ public class NodeEditorTool extends ViewSelectionListenerTool
     relationshipSetselector.addChangeListener(this);
 
     nodeTreeView = new NodeTreeView<NodeDisplayProperty>(baseComposite,
-        SWT.VIRTUAL | SWT.FULL_SELECTION | SWT.BORDER, this);
+        SWT.VIRTUAL | SWT.FULL_SELECTION | SWT.BORDER);
 
     GridLayout grid = new GridLayout(1, false);
     baseComposite.setLayout(grid);
@@ -271,66 +265,31 @@ public class NodeEditorTool extends ViewSelectionListenerTool
    */
   protected void refresh() {
     // TODO(leeca): how can this tool be active and not have a valid editor?
-    if (null == getEditor()) {
+    if (!hasEditor()) {
       return;
     }
-    if (null == getViewModel()) {
-      return;
-    }
-    if (!trees.containsKey(getViewModel())) {
-      // the first time we open this editor, get/save the root nodes:
-      NodeWrapperRoot<NodeDisplayProperty> root =
-          nodeTreeView.init(getViewModel().getGraph(),
-              relationshipSetselector.getSelection());
-      trees.put(getViewModel(), root);
-      nodeTreeView.getTreeViewer().expandAll();
-      saveTreeExpandState();
-    } else {
-      NodeWrapperRoot<NodeDisplayProperty> root = trees.get(getViewModel());
-      nodeTreeView.reset(root, getViewModel().getGraph(),
-          relationshipSetselector.getSelection());
-      nodeTreeView.getTreeViewer().setExpandedTreePaths(
-          expandedElements.get(getViewModel()));
-    }
+
+    GraphData<NodeDisplayProperty> hierarchy = getEditorHierarchy();
+    nodeTreeView.updateData(hierarchy);
   }
 
-  /**
-   * save the current state of the tree for expanded / collapsed nodes.
-   */
-  private void saveTreeExpandState() {
-    // TODO(leeca): how can this tool be active and not have a valid editor?
-    if ((null == getEditor()) || (null == getView())
-        || (null == getViewModel())) {
-      return;
-    }
-    expandedElements.put(
-      getViewModel(), nodeTreeView.getTreeViewer().getExpandedTreePaths());
+  private GraphData<NodeDisplayProperty> getEditorHierarchy() {
+    RelationshipSet relSet = relationshipSetselector.getSelection();
+    DirectedRelationFinder relFinder = relSet;
+    GraphData<NodeDisplayProperty> hierarchy = getEditor().getHierarchy(relFinder);
+    return hierarchy;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see com.google.devtools.depan.eclipse.trees.NodeTreeProvider
-   *      #getObject(com.google.devtools.depan.graph.api.Node)
-   */
+  @Override
   public NodeDisplayProperty getObject(GraphNode node) {
     return getViewModel().getNodeDisplayProperty(node);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see com.google.devtools.depan.eclipse.views.Tool
-   *      #editorClosed(com.google.devtools.depan.eclipse.editors.ViewEditor)
-   */
   @Override
   public void editorClosed(ViewEditor viewEditor) {
-    if (expandedElements.containsKey(viewEditor)) {
-      expandedElements.remove(viewEditor);
-    }
-    if (trees.containsKey(viewEditor)) {
-      trees.remove(viewEditor);
-    }
+    GraphData<NodeDisplayProperty> hierarchy = getEditorHierarchy();
+    hierarchy.saveExpandState(
+        nodeTreeView.getTreeViewer().getExpandedTreePaths());
     super.editorClosed(viewEditor);
   }
 
@@ -382,8 +341,9 @@ public class NodeEditorTool extends ViewSelectionListenerTool
     if (null != prop) {
       // set the property
       prop.setSelected(value);
-      NodeWrapper<NodeDisplayProperty> nodeWrapper = nodeTreeView
-          .getNodeWrapper(node);
+      NodeWrapper<NodeDisplayProperty> nodeWrapper =
+          nodeTreeView.getNodeWrapper(node);
+
       if (null != nodeWrapper) {
         // update the value in the table. this might be faster than updating
         // all the list at the end. because a selection generally doesn't
@@ -446,11 +406,6 @@ public class NodeEditorTool extends ViewSelectionListenerTool
 
   @Override
   public void selectedSetChanged(RelationshipSet set) {
-    // when the relationship set changes, the tree roots are likely to change
-    // so we reset them here.
-    if (trees.containsKey(getViewModel())) {
-      trees.remove(getViewModel());
-    }
     refresh();
   }
 }

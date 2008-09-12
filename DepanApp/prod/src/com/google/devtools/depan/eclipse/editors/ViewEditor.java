@@ -23,6 +23,8 @@ import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.LabelPos
 import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeColors;
 import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeShape;
 import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeSize;
+import com.google.devtools.depan.eclipse.trees.GraphData;
+import com.google.devtools.depan.eclipse.trees.NodeTreeProvider;
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.utils.Tools;
 import com.google.devtools.depan.eclipse.visualization.View;
@@ -33,6 +35,7 @@ import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeSizePlug
 import com.google.devtools.depan.graph.api.DirectedRelationFinder;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphNode;
+import com.google.devtools.depan.view.NodeDisplayProperty;
 import com.google.devtools.depan.view.PersistAsText;
 import com.google.devtools.depan.view.PersistentView;
 import com.google.devtools.depan.view.SimpleViewModelListener;
@@ -75,7 +78,8 @@ import java.net.URISyntaxException;
  *
  */
 public class ViewEditor extends MultiPageEditorPart
-    implements IPreferenceChangeListener {
+    implements IPreferenceChangeListener,
+    NodeTreeProvider<NodeDisplayProperty> {
 
   public static final String ID =
       "com.google.devtools.depan.eclipse.editors.ViewEditor";
@@ -89,6 +93,10 @@ public class ViewEditor extends MultiPageEditorPart
   // Initialization data - for use only during editor activation
   private ViewModel initViewModel = null;
   private Layouts initViewLayout = null;
+
+  // Transient GraphView data
+  // If this persists, it should probably move to ViewModel type.
+  private HierarchyCache<NodeDisplayProperty> hierarchies;
 
   /**
    * Dirty state.
@@ -136,6 +144,11 @@ public class ViewEditor extends MultiPageEditorPart
   protected void createPages() {
     createPage0();
     createPage1();
+
+    // this.view is not configured until createPage0(), so this is almost
+    // the earliest that the hierarchy cache can be set up.
+    hierarchies =new HierarchyCache<NodeDisplayProperty>(
+        this, getViewModel().getGraph());
   }
 
   private void createPage0() {
@@ -270,6 +283,10 @@ public class ViewEditor extends MultiPageEditorPart
    */
   @Override
   public void dispose() {
+    if (null != hierarchies) {
+      hierarchies = null;
+    }
+
     if (null != viewModelListener) {
       getViewModel().unRegisterListener(viewModelListener);
       viewModelListener = null;
@@ -492,4 +509,12 @@ public class ViewEditor extends MultiPageEditorPart
     setDirtyState(true);
   }
 
+  public GraphData<NodeDisplayProperty> getHierarchy(DirectedRelationFinder relFinder) {
+    return hierarchies.getHierarchy(relFinder);
+  }
+
+  @Override
+  public NodeDisplayProperty getObject(GraphNode node) {
+    return getViewModel().getNodeDisplayProperty(node);
+  }
 }

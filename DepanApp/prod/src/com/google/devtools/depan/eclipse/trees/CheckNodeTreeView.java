@@ -16,9 +16,6 @@
 
 package com.google.devtools.depan.eclipse.trees;
 
-import com.google.devtools.depan.graph.api.DirectedRelationFinder;
-import com.google.devtools.depan.model.GraphModel;
-
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.model.BaseWorkbenchContentProvider;
@@ -31,12 +28,8 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
  */
 public class CheckNodeTreeView<E> extends NodeTreeView<E> {
 
-  public CheckNodeTreeView(
-      Composite parent, int style,
-      GraphModel graph, DirectedRelationFinder relationFinder,
-      NodeTreeProvider<E> provider) {
-    super(parent, style, provider);
-    init(graph, relationFinder);
+  public CheckNodeTreeView(Composite parent, int style) {
+    super(parent, style);
   }
 
   @Override

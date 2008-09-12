@@ -105,6 +105,7 @@ public abstract class HierarchicalLayoutTool {
     if (allreadyDone.contains(root)) {
       return;
     }
+    allreadyDone.add(root);
 
     int nextLevel = level + 1;
     int childLeft = getCurrOffset(nextLevel);
@@ -123,7 +124,6 @@ public abstract class HierarchicalLayoutTool {
       assignNode(root, level, getCurrOffset(level));
       incrCurrOffset(level);
     }
-    allreadyDone.add(root);
   }
 
   /**
@@ -151,6 +151,13 @@ public abstract class HierarchicalLayoutTool {
   protected abstract void assignNode(GraphNode node, int level, int offset);
 
   /**
+   * Debugging support to display assignments for nodes.
+   */
+  protected void logAssignNode(GraphNode node, int level, int offset) {
+    System.err.println("[" + level + ", " + offset + "]: " + node);
+  }
+
+  /**
    * Provide the current nodes set of children in a principled order.
    * <p>
    * The organic ordering of TreeModel.getSuccessors() has little meaning,
@@ -169,6 +176,12 @@ public abstract class HierarchicalLayoutTool {
     List<GraphNode> leafs = Lists.newArrayList();
     List<GraphNode> inners = Lists.newArrayList();
     for (GraphNode node : treeData.getSuccessors(root)) {
+
+      // Don't include nodes that are already placed.
+      if (allreadyDone.contains(node)) {
+        continue;
+      }
+
       Collection<GraphNode> nodeChildren = treeData.getSuccessors(node);
       if (nodeChildren.size() < 1) {
         leafs.add(node);
