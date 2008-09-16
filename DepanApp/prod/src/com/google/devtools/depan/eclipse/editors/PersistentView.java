@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.view;
+package com.google.devtools.depan.eclipse.editors;
 
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.model.ResourceCache;
+import com.google.devtools.depan.view.ViewModel;
 
 import org.apache.commons.collections15.Transformer;
 
@@ -43,9 +43,13 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 /**
+ * Handles serialization of the ViewEditors (e.g. .dpanv files).
+ * This includes the view model, the underlying GraphModel, and all
+ * rendering properties.
+ * 
  * @author ycoppel@google.com (Yohann Coppel)
- *
  */
+// TODO(leeca): Persist all appropriate rendering properties.
 public class PersistentView implements Transformer<GraphNode, Point2D> {
 
   /**
@@ -73,7 +77,7 @@ public class PersistentView implements Transformer<GraphNode, Point2D> {
   private Map<String, Point2DDouble> locations = null;
   private ViewModel view;
   private String name;
-  
+
   /**
    * URI for the filename of the graph associated with this view.
    */
@@ -84,11 +88,11 @@ public class PersistentView implements Transformer<GraphNode, Point2D> {
     this.parentUri = parentUri;
     setLocations();
   }
-  
+
   private PersistentView() {
     locations = null;
   }
-  
+
   public ViewModel getViewModel() {
     return view;
   }
@@ -110,14 +114,13 @@ public class PersistentView implements Transformer<GraphNode, Point2D> {
 
   public void save(URI uri) {
     try {
-      ZipOutputStream out = new ZipOutputStream(new FileOutputStream(new File(
-          uri)));
+      ZipOutputStream out = new ZipOutputStream(
+          new FileOutputStream(new File(uri)));
       out.setLevel(Deflater.DEFAULT_COMPRESSION);
-      
       out.putNextEntry(new ZipEntry(GRAPHASSOCIATE));
       out.write(parentUri.toString().getBytes());
       out.closeEntry();
-      
+
       // save locations
       out.putNextEntry(new ZipEntry(LOCATIONSFILE));
       ObjectOutputStream objOut = new ObjectOutputStream(out);
@@ -128,7 +131,8 @@ public class PersistentView implements Transformer<GraphNode, Point2D> {
       }
       out.closeEntry();
       objOut.close();
-      
+
+      // All persistent properties have been serialized.
       out.close();
 
     } catch (IOException e) {
@@ -136,15 +140,13 @@ public class PersistentView implements Transformer<GraphNode, Point2D> {
       e.printStackTrace();
     }
   }
-    
+
   /**
    * Load a view previously saved at the given URI.
    * @param uri
    * @return a PersistentView containing the view, or null if loading failed.
    */
   public static PersistentView load (URI uri) {
-//    System.out.println("PersistentView.load()");
-//    XStream xstream = setupXStream();
     PersistentView reloaded = new PersistentView();
     reloaded.locations = new HashMap<String, Point2DDouble>();
 
@@ -176,7 +178,7 @@ public class PersistentView implements Transformer<GraphNode, Point2D> {
     reloaded.view.clearDirty();
     return reloaded;
   }
-  
+
   public Point2D transform(GraphNode node) {
     if (locations.containsKey(node.getId().toString())) {
       return locations.get(node.getId().toString()).getPoint();
@@ -185,7 +187,6 @@ public class PersistentView implements Transformer<GraphNode, Point2D> {
     }
   }
 
-  @SuppressWarnings("unchecked")
   private static void loadLocations(
       PersistentView persist, ObjectInputStream in) {
     try {
@@ -203,7 +204,7 @@ public class PersistentView implements Transformer<GraphNode, Point2D> {
       e1.printStackTrace();
     }
   }
-  
+
   private static void loadGraphAssociate(
       PersistentView reloaded, InputStream in) {
     StringBuilder b = new StringBuilder();

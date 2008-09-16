@@ -30,7 +30,6 @@ import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.RelationshipSet;
-import com.google.devtools.depan.model.ResourceCache;
 import com.google.devtools.depan.model.interfaces.GraphListener;
 import com.google.devtools.depan.view.EdgeDisplayProperty;
 import com.google.devtools.depan.view.NodeDisplayProperty;
@@ -285,7 +284,7 @@ public class GraphEditor
     // load the graph
     uri = ((IFileEditorInput) input).getFile().getRawLocationURI();
 
-    System.out.println("Reading file...");
+    System.out.println("Reading " + uri);
 
     graph = ResourceCache.fetchGraphModel(uri);
 

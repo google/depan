@@ -127,7 +127,6 @@ public class NewGraphPage extends WizardPage {
     });
 
     // fill is just a place holder, it is not modified.
-    @SuppressWarnings("unused")
     Label fill = new Label(container, SWT.NULL);
 
     // group for selecting jar file or Directory as input
@@ -308,7 +307,7 @@ public class NewGraphPage extends WizardPage {
         containerText.setText(container.getFullPath().toString());
       }
     }
-    fileText.setText("newfile.dpang");
+    fileText.setText("Java.dpang");
     enable(true);
   }
 

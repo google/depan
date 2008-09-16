@@ -37,7 +37,6 @@ import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.view.NodeDisplayProperty;
 import com.google.devtools.depan.view.PersistAsText;
-import com.google.devtools.depan.view.PersistentView;
 import com.google.devtools.depan.view.SimpleViewModelListener;
 import com.google.devtools.depan.view.ViewModel;
 import com.google.devtools.depan.view.ViewModelListener;
