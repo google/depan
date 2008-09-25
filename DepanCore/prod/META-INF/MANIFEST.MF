@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: DepanCore Plug-in
+Bundle-Name: DepanCore
 Bundle-SymbolicName: com.google.devtools.depan.core;singleton:=true
 Bundle-Version: 1.0.3
 Bundle-Vendor: Google Inc.

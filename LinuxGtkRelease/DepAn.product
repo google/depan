@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?pde version="3.1"?>
+<?pde version="3.4"?>
 
-<product name="DepAn" id="com.google.devtools.depan.DepAn" application="com.google.devtools.depan.application" useFeatures="false">
+<product name="DepAn" id="com.google.devtools.depan.DepAn" application="com.google.devtools.depan.application" version="0.0.1" useFeatures="true">
 
    <aboutInfo>
       <image path="/DepanApp/icons/branding/depan-logo-315x110.gif"/>
@@ -13,10 +13,12 @@ Version 0.0.3
 Contributors:
 - Yohann Coppel
 - Lee Carver
+- Tugrul Ince
       </text>
    </aboutInfo>
 
-   <configIni use="default"/>
+   <configIni use="default">
+   </configIni>
 
    <launcherArgs>
       <vmArgs>-Xmx1024M</vmArgs>
@@ -88,5 +90,9 @@ Contributors:
       <plugin id="org.eclipse.update.core.linux" fragment="true"/>
       <plugin id="org.eclipse.update.ui"/>
    </plugins>
+
+   <features>
+      <feature id="Depan_linux.gtk" version="0.0.1"/>
+   </features>
 
 </product>

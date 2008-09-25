@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: DepanFileSystem Plug-in
+Bundle-Name: DepanFileSystem
 Bundle-SymbolicName: com.google.devtools.depan.filesystem;singleton:=true
 Bundle-Version: 1.0.1
 Require-Bundle: com.google.devtools.depan,
