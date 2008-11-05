@@ -63,6 +63,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.SaveAsDialog;
@@ -170,25 +171,13 @@ public class ViewEditor extends MultiPageEditorPart
 
   protected String edgeToolTip(GraphEdge edge) {
     final String str = edge.toString();
-    Display display = PlatformUI.getWorkbench().getDisplay();
-    display.asyncExec(new Runnable() {
-      public void run() {
-        getEditorSite().getActionBars().getStatusLineManager()
-        .setMessage("" + str);
-      }
-    });
+    updateStatusLine(str);
     return str;
   }
 
   protected String vertexToolTip(GraphNode node) {
     final String str = node.toString();
-    Display display = PlatformUI.getWorkbench().getDisplay();
-    display.asyncExec(new Runnable() {
-      public void run() {
-        getEditorSite().getActionBars().getStatusLineManager()
-        .setMessage("" + str);
-      }
-    });
+    updateStatusLine(str);
     return str;
   }
 
@@ -515,5 +504,47 @@ public class ViewEditor extends MultiPageEditorPart
   @Override
   public NodeDisplayProperty getObject(GraphNode node) {
     return getViewModel().getNodeDisplayProperty(node);
+  }
+
+  /**
+   * Provide the application's Display (i.e. the event loop)
+   * @return application's Display
+   */
+  private static Display getWorkbenchDisplay() {
+    return PlatformUI.getWorkbench().getDisplay();
+  }
+
+  /**
+   * Post an update on the status line.
+   * @param statusText text to display on status line
+   */
+  private void updateStatusLine(final String statusText) {
+    getWorkbenchDisplay().asyncExec(new Runnable() {
+      public void run() {
+        getEditorSite().getActionBars().getStatusLineManager()
+            .setMessage(statusText);
+      }
+    });
+  }
+
+  /**
+   * Activate a new ViewEditor.
+   * This is an asynchronous active, as the new editor will execute separately
+   * from the other workbench windows.
+   * 
+   * @param config ViewEditor configuration options.
+   */
+  public static void startViewEditor(final ViewEditorInput config) {
+    getWorkbenchDisplay().asyncExec(new Runnable() {
+      public void run() {
+        IWorkbenchPage page = PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow().getActivePage();
+        try {
+          page.openEditor(config, ViewEditor.ID);
+        } catch (PartInitException e) {
+          e.printStackTrace();
+        }
+      }
+    });
   }
 }

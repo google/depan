@@ -51,9 +51,7 @@ import org.eclipse.swt.widgets.List;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IFileEditorInput;
-import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.MultiPageEditorPart;
 
 import java.io.File;
@@ -347,18 +345,7 @@ public class GraphEditor
    */
   public void create(ViewModel view, Layouts layout) {
     final ViewEditorInput input = new ViewEditorInput(view, layout, uri);
-
-    getContainer().getDisplay().asyncExec(new Runnable() {
-      public void run() {
-        IWorkbenchPage pge = PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getActivePage();
-        try {
-          pge.openEditor(input, ViewEditor.ID);
-        } catch (PartInitException e) {
-          e.printStackTrace();
-        }
-      }
-    });
+    ViewEditor.startViewEditor(input);
     updateList();
   }
 

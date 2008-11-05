@@ -25,7 +25,6 @@ import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.utils.Sasher;
 import com.google.devtools.depan.eclipse.utils.TableContentProvider;
 import com.google.devtools.depan.eclipse.views.ViewSelectionListenerTool;
-import com.google.devtools.depan.eclipse.visualization.View;
 import com.google.devtools.depan.eclipse.visualization.layout.Layouts;
 import com.google.devtools.depan.filters.PathMatcher;
 import com.google.devtools.depan.graph.basic.MultipleDirectedRelationFinder;
@@ -46,10 +45,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
 
 import java.util.Collection;
 
@@ -71,8 +66,6 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
   private CCombo modeChoice = null;
 
   private CCombo layoutChoice = null;
-
-  private Composite parentWidget = null;
 
   /**
    * The picker where users can specify what filters to apply to the selected
@@ -126,7 +119,6 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
 
   @Override
   public Control setupComposite(Composite parent) {
-    this.parentWidget = parent;
     // create components
     Composite baseComposite = new Composite(parent, SWT.NONE);
 
@@ -328,28 +320,7 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
         newView, getLayoutChoice(),
         getEditor().getParentUri());
 
-    // open the editor GUI.
-    parentWidget.getDisplay().asyncExec(new Runnable() {
-      public void run() {
-        IWorkbenchPage pge = PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getActivePage();
-        try {
-          IEditorPart openEditor = pge.openEditor(input, ViewEditor.ID);
-          if (openEditor instanceof ViewEditor
-              && layoutChoice.getSelectionIndex() > 0) {
-            Layouts l = getLayoutChoice();
-            View view = ((ViewEditor) openEditor).getView();
-            view.applyLayout(l, relationshipPicker.getRelationShips());
-          }
-        } catch (PartInitException e) {
-          e.printStackTrace();
-        } catch (IllegalArgumentException ex) {
-          // bad layout. don't do anything for the layout, but still finish
-          // the creation of the view.
-          System.err.println("Bad layout.");
-        }
-      }
-    });
+    ViewEditor.startViewEditor(input);
   }
 
   /**
