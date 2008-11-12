@@ -66,7 +66,14 @@ import java.util.Collection;
  *
  * @author tugrul@google.com (Tugrul Ince)
  */
-public class PathExpressionEditorTool extends Composite {
+public class PathExpressionEditorTool
+    implements SelectionEditorTool.NodeSelectorPart {
+
+  /**
+   * The composite UI element that controls the screen space.
+   */
+  private Composite control;
+
   /**
    * The table that lists all selected <code>PathMatcherTerm</code>s.
    */
@@ -138,6 +145,21 @@ public class PathExpressionEditorTool extends Composite {
     new EditColTableDef(COL_CUMULATIVE, true, COL_CUMULATIVE, 120)
   };
 
+  public PathExpressionEditorTool() {
+  }
+
+  // TODO(leeca): rename PathMatcher class to NodeSelector
+  @Override
+  public PathMatcher getNodeSelector() {
+    PathExpression result = new PathExpression();
+    for (int i = 0; i < pathMatchers.getTable().getItemCount(); i++) {
+      PathMatcherTerm matchers =
+          (PathMatcherTerm) pathMatchers.getElementAt(i);
+      result.addPathMatcher(matchers);
+    }
+    return result;
+  }
+
   /**
    * Constructs a Path Expression Editor that is itself a
    * <code>Composite</code>.
@@ -146,20 +168,18 @@ public class PathExpressionEditorTool extends Composite {
    * @param style An integer value that determines the style of this Composite
    * through SWT constants
    */
-  public PathExpressionEditorTool(Composite parent, int style) {
-    super(parent, style);
-
-    setLayout(new GridLayout(4, false));
-    relationshipPicker = new RelationshipPicker();
+  public Composite createControl(Composite parent, int style) {
+    control = new Composite(parent, style);
+    control.setLayout(new GridLayout(4, false));
 
     // Column 1: Matcher picking area
-    Control relationshipPickerControl = relationshipPicker.getControl(this);
-    relationshipPickerControl.setLayoutData(
+    relationshipPicker = new RelationshipPicker();
+    Control relationsPanel = relationshipPicker.getControl(control);
+    relationsPanel.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, false, true));
 
     // Column 2: Matcher/path expression actions
-    Composite column2 = new Composite(this, SWT.NONE);
-
+    Composite column2 = new Composite(control, SWT.NONE);
     column2.setLayout(new GridLayout(1, false));
     GridData gridData = new GridData(SWT.FILL, SWT.FILL, false, true);
     gridData.verticalAlignment = GridData.CENTER;
@@ -178,10 +198,10 @@ public class PathExpressionEditorTool extends Composite {
     cumulative = createButton(column2, CUMULATIVE_BUTTON_LABEL, SWT.CHECK);
 
     // Column 3: Current path expression display
-    setupPathMatchersList(this);
+    setupPathMatchersList(control);
 
     // Column 4: Path expression actions
-    Composite column4 = new Composite(this, SWT.NONE);
+    Composite column4 = new Composite(control, SWT.NONE);
     column4.setLayout(new GridLayout(1, false));
     gridData = new GridData(SWT.FILL, SWT.FILL, false, true);
     gridData.verticalAlignment = GridData.CENTER;
@@ -236,6 +256,8 @@ public class PathExpressionEditorTool extends Composite {
         loadPathExpression();
       }
     });
+
+    return control;
   }
 
   /**
@@ -450,7 +472,7 @@ public class PathExpressionEditorTool extends Composite {
     }
 
     // pop up a dialog box so that user can select a filename and location
-    SaveAsDialog saveas = new SaveAsDialog(getShell());
+    SaveAsDialog saveas = new SaveAsDialog(control.getShell());
     if (saveas.open() == SaveAsDialog.OK) {
       IPath filePath = saveas.getResult();
       String fullPath = FILE_PREFIX
@@ -483,7 +505,7 @@ public class PathExpressionEditorTool extends Composite {
    */
   private void loadPathExpression() {
     // ask for the file path
-    FileDialog loadFileDialog = new FileDialog(getShell());
+    FileDialog loadFileDialog = new FileDialog(control.getShell());
     loadFileDialog.setText("Select a File to Load a Path Expression");
     loadFileDialog.setFilterPath(Platform.getLocation().toOSString());
     String filePath = loadFileDialog.open();

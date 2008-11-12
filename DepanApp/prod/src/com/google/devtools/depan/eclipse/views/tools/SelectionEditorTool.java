@@ -16,18 +16,16 @@
 
 package com.google.devtools.depan.eclipse.views.tools;
 
-import com.google.devtools.depan.collect.Sets;
+import com.google.devtools.depan.collect.Lists;
 import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.editors.ViewEditorInput;
 import com.google.devtools.depan.eclipse.utils.NodeLabelProvider;
-import com.google.devtools.depan.eclipse.utils.RelationshipPicker;
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.utils.Sasher;
 import com.google.devtools.depan.eclipse.utils.TableContentProvider;
 import com.google.devtools.depan.eclipse.views.ViewSelectionListenerTool;
 import com.google.devtools.depan.eclipse.visualization.layout.Layouts;
 import com.google.devtools.depan.filters.PathMatcher;
-import com.google.devtools.depan.graph.basic.MultipleDirectedRelationFinder;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.view.ViewModel;
 
@@ -46,7 +44,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 
-import java.util.Collection;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Tool for expanding a selection with a set of relationships, and create a new
@@ -58,43 +58,95 @@ import java.util.Collection;
 public class SelectionEditorTool extends ViewSelectionListenerTool {
 
   private TableContentProvider<GraphNode> selectedNodesContent = null;
-  private TableContentProvider<GraphNode> previewListContent = null;
-
-  private TableViewer previewList;
   private TableViewer selectedNodes;
+
+  private TableContentProvider<GraphNode> previewListContent = null;
+  private TableViewer previewList;
+
+  private CCombo layoutChoice = null;
+  private static final String LAYOUT_KEEP = "Keep positions";
 
   private CCombo modeChoice = null;
 
-  private CCombo layoutChoice = null;
-
-  /**
-   * The picker where users can specify what filters to apply to the selected
-   * nodes.
-   */
-  private RelationshipPicker relationshipPicker = null;
-
-  /**
-   * Provides the interface to create a Path Expression using a list of
-   * filters.
-   */
-  private PathExpressionEditorTool pathExpressionEditor = null;
+  // Define a static list of selection modes that are used in the UI
+  // TODO(leeca): Maybe turn into extensible list
+  private static final List<SelectionMode> 
+      SELECTION_MODES = Arrays.asList(
+          SelectionMode.INCLUDE_MODEL, SelectionMode.INCLUDE_SELECTED,
+          SelectionMode.RESULTS_ONLY, SelectionMode.NEW_ONLY);
 
   /**
    * Holds the relationship picker and the path expression editor.
    */
-  private TabFolder tabFolder = null;
+  private TabFolder selectorTab = null;
 
-  // some strings used in the UI.
-  private static final String MODE_EXTENDS = "Extend graph";
-  private static final String MODE_SELECTED = "Selected + New nodes";
-  private static final String MODE_RESULTS = "Only nodes in results";
-  private static final String MODE_NEW = "Only new nodes";
-  private static final String LAYOUT_KEEP = "Keep positions";
+  /** List of node selectors installed in the selector tab */
+  private List<NodeSelectorPart> selectorTabParts = Lists.newArrayList();
 
   /**
-   * Recursively apply the extension with selected relations.
+   * How should discovered nodes be merged with the current selection
+   * set.
    */
-  private boolean recursiveSearch = false;
+  // TODO(leeca): Have PathExpressions use these modes between steps?
+  private static enum SelectionMode {
+    INCLUDE_MODEL("Extend graph") {
+      @Override
+      public void updatePendingList(SelectionEditorTool context) {
+        // Include all nodes in current view
+        for (GraphNode node : context.getViewModel().getNodes()) {
+          context.previewListContent.add(node);
+        }
+      }
+    },
+    INCLUDE_SELECTED("Selected + New nodes") {
+      @Override
+      public void updatePendingList(SelectionEditorTool context) {
+        // Add any currently selected nodes
+        for (GraphNode node : context.getSelectedNodes()) {
+          context.previewListContent.add(node);
+        }
+      }
+    },
+    RESULTS_ONLY("Only nodes in results") {
+      @Override
+      public void updatePendingList(SelectionEditorTool context) {
+        // Do nothing, just show nodes in the result set
+      }
+    },
+    NEW_ONLY("Only new nodes") {
+      @Override
+      public void updatePendingList(SelectionEditorTool context) {
+        // Remove selected nodes, we just what the new nodes
+        for (GraphNode node : context.getSelectedNodes()) {
+          context.previewListContent.remove(node);
+        }
+      }
+    };
+
+    private final String label;
+
+    private SelectionMode(String label) {
+      this.label = label;
+    }
+
+    abstract public void updatePendingList(SelectionEditorTool context);
+
+    public String getLabel() {
+      return label;
+    }
+  }
+
+  /**
+   * A UI Part that allows a user to configure a PathMatcher.
+   */
+  public static interface NodeSelectorPart {
+    Composite createControl(Composite Parent, int style);
+
+    /**
+     * @return
+     */
+    PathMatcher getNodeSelector();
+  }
 
   @Override
   public Image getIcon() {
@@ -128,30 +180,23 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
 
     // create the tab folder that will hold relationshipPicker and
     // pathExpressionEditor
-    tabFolder = new TabFolder(innerSash, SWT.BORDER);
+    selectorTab = new TabFolder(innerSash, SWT.BORDER);
+    selectorTabParts = Lists.newArrayList();
 
-    // this panel holds the RelationshipPicker object and a check box that
-    // determines recursiveness.
-    Composite relationshipPickerPanel = new Composite(tabFolder, SWT.NONE);
-    relationshipPickerPanel.setLayout(new GridLayout());
+    NodeSelectorPart relationPickerPart = new RelationNodeSelectorPart();
+    installNodeSelectorTab("Relation Picker Tool", relationPickerPart);
 
-    relationshipPicker = new RelationshipPicker();
-    Control relationTable =
-        relationshipPicker.getControl(relationshipPickerPanel);
-    relationTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-    final Button recursiveSelect =
-        new Button(relationshipPickerPanel, SWT.CHECK);
-
-    pathExpressionEditor = new PathExpressionEditorTool(tabFolder, SWT.NONE);
-
-    // Create tabs
-    createTabItem(tabFolder, "Relation Picker Tool", relationshipPickerPanel);
-    createTabItem(tabFolder, "Path Expression Tool", pathExpressionEditor);
+    NodeSelectorPart pathPickerPart = new PathExpressionEditorTool();
+    installNodeSelectorTab("Path Expression Tool", pathPickerPart);
 
     Control previewListControl = setupPreviewList(outerSash);
 
+    // Create and configure the Selection Mode controls
     new Label(baseComposite, SWT.NONE).setText("Creation mode");
-    modeChoice = new CCombo(baseComposite, SWT.READ_ONLY | SWT.BORDER);
+    modeChoice = createModeCombo(baseComposite,
+        SELECTION_MODES, SelectionMode.INCLUDE_SELECTED);
+    modeChoice.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+
     new Label(baseComposite, SWT.NONE).setText("Apply layout");
     layoutChoice = new CCombo(baseComposite, SWT.READ_ONLY | SWT.BORDER);
 
@@ -159,13 +204,6 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
     Button preview = new Button(actionButtons, SWT.PUSH);
     Button justSelect = new Button(actionButtons, SWT.PUSH);
     Button doit = new Button(actionButtons, SWT.PUSH);
-
-    // mode
-    // warning: if you change the order of the combo items, change the indexes
-    // in preview() !
-    modeChoice.setItems(
-        new String[] {MODE_EXTENDS, MODE_SELECTED, MODE_RESULTS, MODE_NEW});
-    modeChoice.select(0);
 
     // layouts
     // warning: if you change the order of the combo items, change the indexes
@@ -178,20 +216,11 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
 
     // the middle table (relationTable occupies 50% of all space, both
     // top (selectedNodes) and bottom (previewList) share the 50% left.
-    innerSash.init(selectedNodesControl, tabFolder, SWT.HORIZONTAL, 25);
+    innerSash.init(selectedNodesControl, selectorTab, SWT.HORIZONTAL, 25);
     outerSash.init(innerSash, previewListControl, SWT.HORIZONTAL, 75);
     int minSasherSize = 20;
     innerSash.setLimit(minSasherSize);
     outerSash.setLimit(2 * minSasherSize);
-
-    // actions buttons
-    recursiveSelect.setText("Recursive apply expansion");
-    recursiveSelect.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        recursiveSearch = recursiveSelect.getSelection();
-      }
-    });
 
     preview.setText("Preview");
     preview.addSelectionListener(new SelectionAdapter() {
@@ -226,10 +255,6 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
     actionButtons.setLayout(new GridLayout(3, true));
     outerSash.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
-    recursiveSelect.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
-    modeChoice.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false));
     layoutChoice.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, false));
     actionButtons.setLayoutData(
@@ -244,24 +269,37 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
     return baseComposite;
   }
 
-  /**
-   * Creates a new <code>TabItem</code> that is owned by <code>owner</code>, has
-   * given label and contains the specified control.
-   *
-   * @param owner Owner this <code>TabItem</code> belongs to.
-   * @param label Text displayed on the tab.
-   * @param content The <code>Control</code> that will be shown in this tab.
-   * @return The new <code>TabItem</code>.
-   */
-  private TabItem createTabItem(
-      TabFolder owner, String label, Control content) {
-    TabItem newTabItem = new TabItem(owner, SWT.NONE);
-    newTabItem.setText(label);
-    newTabItem.setControl(content);
-    return newTabItem;
+  private static CCombo createModeCombo(Composite parent,
+        List<SelectionMode> modeChoices, SelectionMode initialMode) {
+    CCombo modeControl = new CCombo(parent, SWT.READ_ONLY | SWT.BORDER);
+    for (SelectionMode mode : modeChoices) {
+      modeControl.add(mode.getLabel());
+    }
+
+    int modeIndex = modeChoices.indexOf(initialMode);
+    modeControl.select(modeIndex >=0 ? modeIndex : 0);
+    return modeControl;
   }
 
-  @SuppressWarnings("unchecked")
+  /**
+   * Install a new node selector part into the selectors tab.
+   * 
+   * @param label text for tab
+   * @param selectorPart source of UI and node selector
+   */
+  private void installNodeSelectorTab(
+      String label, NodeSelectorPart selectorPart) {
+    Composite selectionControl =
+        selectorPart.createControl(selectorTab, SWT.NONE);
+    selectionControl.setLayoutData(
+        new GridData(SWT.FILL, SWT.FILL, true, true));
+
+    TabItem tabItem = new TabItem(selectorTab, SWT.NONE);
+    tabItem.setText(label);
+    tabItem.setControl(selectionControl);
+    selectorTabParts.add(selectorPart);
+  }
+
   private Control setupPreviewList(Composite parent) {
     // control
     previewList = new TableViewer(parent, SWT.BORDER | SWT.V_SCROLL);
@@ -275,7 +313,6 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
     return previewList.getTable();
   }
 
-  @SuppressWarnings("unchecked")
   private Control setupSelectedNodesContent(Composite parent) {
     // component
     selectedNodes = new TableViewer(parent, SWT.BORDER | SWT.V_SCROLL);
@@ -291,7 +328,6 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
 
     return selectedNodes.getTable();
   }
-
 
   /**
    * Select in the currently selected view the resulting nodes.
@@ -324,67 +360,42 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
   }
 
   /**
-   * Creates and returns the associated <code>PathMatcher</code> object
-   * depending on which tab is selected.
+   * Obtains a node selector instance based on the current selectorTab.
    *
-   * @return <code>PathMatcher</code> object that will filter the nodes in the
-   * view.
+   * @return <code>PathMatcher</code> that generates a set of new nodes
    */
-  private PathMatcher getPathMatcherModel() {
-    int selectionIndex = tabFolder.getSelectionIndex();
-    if (tabFolder.getItem(selectionIndex).getControl() !=
-        pathExpressionEditor) {
-      relationshipPicker.createPathMatcherModel(recursiveSearch);
-      return relationshipPicker.getPathMatcherModel();
-    }
-    // it has to be PathExpression then!
-    pathExpressionEditor.createPathMatcherModel();
-    return pathExpressionEditor.getPathMatcherModel();
+  // TODO(leeca): rename PathMatcher class to NodeSelector
+  private PathMatcher getNodeSelector() {
+    int selectionIndex = selectorTab.getSelectionIndex();
+    return selectorTabParts.get(selectionIndex).getNodeSelector();
   }
 
   protected void refreshPreview() {
-    MultipleDirectedRelationFinder finder =
-        relationshipPicker.getRelationShips();
-
-    Collection<GraphNode> newSet =
-        Sets.newHashSet(selectedNodesContent.getObjects());
-
-    newSet = getPathMatcherModel().nextMatch(
-        getViewModel().getParentGraph(), newSet);
-
     previewListContent.clear();
-    for (GraphNode node : newSet) {
+
+    for (GraphNode node : computeSelectorNodes()) {
       previewListContent.add(node);
     }
 
-    // add other nodes if necessary
-    if (modeChoice.getSelectionIndex() == 0) {
-      // combine. Add all nodes from current view
-      for (GraphNode node : getViewModel().getNodes()) {
-        previewListContent.add(node);
-      }
-    } else if (modeChoice.getSelectionIndex() == 1) {
-      // add selected nodes
-      for (GraphNode node : selectedNodesContent.getObjects()) {
-        previewListContent.add(node);
-      }
-    } else if (modeChoice.getSelectionIndex() == 2) {
-      // do nothing, just show nodes in the result set.
-    } else if (modeChoice.getSelectionIndex() == 3) {
-      // remove selected nodes, we just want new nodes
-      for (GraphNode node : selectedNodesContent.getObjects()) {
-        previewListContent.remove(node);
-      }
-    }
+    SelectionMode mode = SELECTION_MODES.get(modeChoice.getSelectionIndex());
+    mode.updatePendingList(this);
+
     previewList.refresh(false);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see com.google.devtools.depan.eclipse.views.ViewSelectionListenerTool
-   *      #emptySelection()
-   */
+  private Iterable<GraphNode> computeSelectorNodes() {
+    PathMatcher nodeSelector = getNodeSelector();
+    Set<GraphNode> currSelection = getSelectedNodes();
+
+    // TODO(leeca): Source graph model should be baked into node selector
+    return nodeSelector.nextMatch(
+        getViewModel().getParentGraph(), currSelection);
+  }
+
+  private Set<GraphNode> getSelectedNodes() {
+    return selectedNodesContent.getObjects();
+  }
+
   @Override
   public void emptySelection() {
     selectedNodesContent.clear();
@@ -426,5 +437,4 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
     selectedNodesContent.clear();
     updateSelectedAdd(selection);
   }
-
 }
