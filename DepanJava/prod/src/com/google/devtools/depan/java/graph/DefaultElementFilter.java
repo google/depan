@@ -26,6 +26,7 @@ import com.google.devtools.depan.java.elements.PackageElement;
 import com.google.devtools.depan.java.elements.TypeElement;
 import com.google.devtools.depan.model.Element;
 import com.google.devtools.depan.model.GraphNode;
+import com.google.devtools.depan.model.builder.ElementFilter;
 
 import java.util.Collection;
 
@@ -45,8 +46,8 @@ import java.util.Collection;
  * @author ycoppel@google.com (Yohann Coppel)
  *
  */
-public class DefaultElementFilter  extends JavaElementDispatcher<Boolean>
-implements ElementTransformer<Boolean>, ElementFilter {
+public class DefaultElementFilter extends JavaElementDispatcher<Boolean>
+    implements ElementTransformer<Boolean>, ElementFilter {
 
   /**
    * Whitelist of package name for used to filter TypeElement, InterfaceElement

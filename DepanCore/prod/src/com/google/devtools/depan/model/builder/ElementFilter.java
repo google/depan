@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.java.graph;
+package com.google.devtools.depan.model.builder;
 
 import com.google.devtools.depan.model.GraphNode;
 
@@ -31,5 +31,16 @@ public interface ElementFilter {
    * @param node element to filter.
    * @return true if the element passes the test.
    */
-  public boolean passFilter(GraphNode node);
+  boolean passFilter(GraphNode node);
+
+  /**
+   * Common filter to accept all nodes
+   */
+  static final ElementFilter ALL_NODES = new ElementFilter() {
+
+    @Override
+    public boolean passFilter(GraphNode node) {
+      return true;
+    }
+  };
 }

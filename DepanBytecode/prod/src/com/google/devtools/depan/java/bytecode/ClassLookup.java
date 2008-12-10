@@ -19,6 +19,7 @@ package com.google.devtools.depan.java.bytecode;
 import com.google.devtools.depan.filesystem.elements.DirectoryElement;
 import com.google.devtools.depan.java.bytecode.impl.ClassDepLister;
 import com.google.devtools.depan.java.graph.JavaRelation;
+import com.google.devtools.depan.model.builder.DependenciesListener;
 import com.google.devtools.depan.util.FileListerListener;
 
 import org.objectweb.asm.ClassReader;

@@ -6,9 +6,10 @@
       <wizard
             category="com.google.devtools.depan"
             class="com.google.devtools.depan.java.bytecode.eclipse.NewGraphWizard"
+            finalPerspective="com.google.devtools.depan.eclipse.perspective"
             icon="icons/eclipse/jcu_obj.png"
             id="com.google.devtools.depan.java.bytecode.eclipse.NewGraphWizard"
-            name="New Java analysis">
+            name="New Java Analysis">
       </wizard>
    </extension>
 </plugin>

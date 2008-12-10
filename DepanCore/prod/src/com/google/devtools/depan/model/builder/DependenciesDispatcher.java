@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.java.bytecode;
+package com.google.devtools.depan.model.builder;
 
 import com.google.devtools.depan.graph.api.Relation;
-import com.google.devtools.depan.java.graph.ElementFilter;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphNode;
+import com.google.devtools.depan.model.builder.DependenciesListener;
 import com.google.devtools.depan.model.interfaces.GraphBuilder;
 
 /**
@@ -45,24 +45,34 @@ public class DependenciesDispatcher implements DependenciesListener {
   /**
    * The filter for incoming elements.
    */
-  private ElementFilter filter = null;
+  private final ElementFilter filter;
 
   /**
    * GraphBuilder to finally create the graph.
    */
-  private GraphBuilder graphBuilder = null;
+  private final GraphBuilder graphBuilder;
 
   /**
-   * Constructor. Construct a DependenciesDispatcher using the given
-   * ElementFilter, ElementToNodeMapper and GraphBuilder.
+   * Construct a DependenciesDispatcher using the given
+   * ElementFilter, and GraphBuilder.
    *
    * @param filter ElementFilter to check which Element to insert into the
    *        graph.
    * @param gb Graph builder which create the graph.
    */
-  public DependenciesDispatcher(ElementFilter filter, GraphBuilder gb) {
+  public DependenciesDispatcher(ElementFilter filter, GraphBuilder builder) {
     this.filter = filter;
-    this.graphBuilder = gb;
+    this.graphBuilder = builder;
+  }
+
+  /**
+   * Construct a DependenciesDispatcher without filtering for
+   * the given GraphBuilder.
+   *
+   * @param gb Graph builder which create the graph.
+   */
+  public DependenciesDispatcher(GraphBuilder builder) {
+    this(ElementFilter.ALL_NODES, builder);
   }
 
   /**
@@ -96,8 +106,7 @@ public class DependenciesDispatcher implements DependenciesListener {
    * @return true if the element passes the filter, or if no filter were
    *         specified (filter is null). false otherwise.
    */
-  private boolean passFilter(GraphNode e) {
-    if (null == filter) return true;
+  protected boolean passFilter(GraphNode e) {
     return filter.passFilter(e);
   }
 

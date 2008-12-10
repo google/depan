@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.java.bytecode;
+package com.google.devtools.depan.model.builder;
 
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.model.GraphNode;
