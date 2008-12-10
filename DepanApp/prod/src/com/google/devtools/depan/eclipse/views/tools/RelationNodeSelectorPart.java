@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.eclipse.views.tools;
 
+import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.utils.RelationshipPicker;
 import com.google.devtools.depan.filters.PathMatcher;
 
@@ -45,7 +46,8 @@ public class RelationNodeSelectorPart
   }
 
   @Override
-  public Composite createControl(Composite parent, int style) {
+  public Composite createControl(
+      Composite parent, int style, ViewEditor viewEditor) {
     control = new Composite(parent, style);
     control.setLayout(new GridLayout());
 
@@ -68,5 +70,10 @@ public class RelationNodeSelectorPart
     });
 
     return control;
+  }
+
+  @Override
+  public void updateControl(ViewEditor viewEditor) {
+    // TODO Get control state from view
   }
 }

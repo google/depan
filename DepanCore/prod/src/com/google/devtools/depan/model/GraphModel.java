@@ -300,6 +300,69 @@ public class GraphModel extends BasicGraph<String> {
   }
 
   /**
+   * Create a map for each {@code headNode} to it's count of forward (departing)
+   * edges in the {@code RelationSet}.  Even nodes with zero edge counts are
+   * included.
+   *
+   * @param headNodes nodes to compute edge count
+   * @param relations relations to use for edge count
+   * @return {@code Map} of each node to its edge count
+   */
+  public Map<GraphNode, Integer> getForwardRelationCount(
+    Collection<GraphNode> headNodes, RelationshipSet relations) {
+    Map<GraphNode, Integer> result = populateRelationCount(headNodes);
+
+    for (GraphEdge edge : getEdges()) {
+      if (headNodes.contains(edge.getHead())
+          && relations.matchForward(edge.getRelation())) {
+        GraphNode head = edge.getHead();
+        result.put(head, result.get(head) + 1);
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Create a map for each {@code tailNode} to it's count of reverse (arriving)
+   * edges in the {@code RelationSet}.  Even nodes with zero edge counts are
+   * included.
+   *
+   * @param headNodes nodes to compute edge count
+   * @param relations relations to use for edge count
+   * @return {@code Map} of each node to its edge count
+   */
+  public Map<GraphNode, Integer> getReverseRelationCount(
+    Collection<GraphNode> tailNodes, RelationshipSet relations) {
+    Map<GraphNode, Integer> result = populateRelationCount(tailNodes);
+
+    for (GraphEdge edge : getEdges()) {
+      if (tailNodes.contains(edge.getTail())
+          && relations.matchBackward(edge.getRelation())) {
+        GraphNode tail = edge.getTail();
+        result.put(tail, result.get(tail) + 1);
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Populate a map of nodes to edge counts with zero as the count for every
+   * node.  This ensures that nodes with no edges are included, and avoids a
+   * test to check if the node is already in the result set.
+   * 
+   * @param nodes collection of nodes to include in set
+   * @return map of all input nodes to the count zero
+   */
+  private Map<GraphNode, Integer> populateRelationCount(
+      Collection<GraphNode> nodes) {
+    Map<GraphNode, Integer> result = Maps.newHashMap();
+    for (GraphNode node : nodes) {
+      result.put(node, 0);
+    }
+    return result;
+  }
+
+  /**
    * register the given {@link ViewModel} as a view for this graph.
    *
    * @param view

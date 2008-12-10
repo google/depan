@@ -16,11 +16,14 @@
 
 package com.google.devtools.depan.model.testing;
 
+import com.google.devtools.depan.collect.Sets;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.model.ElementVisitor;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.interfaces.GraphBuilder;
+
+import java.util.Set;
 
 /**
  * @author <a href='mailto:leeca@google.com'>Lee Carver</a>
@@ -35,24 +38,28 @@ public class TestUtils {
     private final String name;
     private final String args;
     private final String type;
+
     MethodElement(String name, String args, String type) {
       this.name = name;
       this.args = args;
       this.type = type;
     }
+
     @Override
     public String friendlyString() {
-      return type +" "+name+"("+args+")";
+      return type + " " + name + "(" + args + ")";
     }
+
     @Override
     public void accept(ElementVisitor visitor) {
     }
+
     @Override
     public String getId() {
-      return name+"("+type+")";
+      return name + "(" + args + ")" + type;
     }
   }
-  
+
   public static GraphNode[] buildComplete(
       GraphModel graph, int degree, Relation relation) {
     GraphNode nodes[] = new GraphNode[degree];
@@ -70,6 +77,15 @@ public class TestUtils {
     }
     
     return nodes;
+  }
+
+  public static Set<GraphNode> toSet(GraphNode[] nodes) {
+    Set<GraphNode> result = Sets.newHashSet();
+    for (GraphNode node : nodes) {
+      result.add(node);
+    }
+
+    return result;
   }
 
   /**

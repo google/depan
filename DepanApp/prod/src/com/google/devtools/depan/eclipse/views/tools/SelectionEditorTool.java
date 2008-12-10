@@ -45,6 +45,7 @@ import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -140,10 +141,18 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
    * A UI Part that allows a user to configure a PathMatcher.
    */
   public static interface NodeSelectorPart {
-    Composite createControl(Composite Parent, int style);
+    Composite createControl(Composite Parent, int style, ViewEditor viewEditor);
 
     /**
-     * @return
+     * Reset the node selector to the choices defined in the {@code ViewEditor}.
+     * @param viewEditor
+     */
+    void updateControl(ViewEditor viewEditor);
+
+    /**
+     * Provide a node selector that corresponds to the current values in the UI.
+     * 
+     * @return node selector derived from the UI's values.
      */
     PathMatcher getNodeSelector();
   }
@@ -171,20 +180,23 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
 
   @Override
   public Control setupComposite(Composite parent) {
-    // create components
+    // Create components
     Composite baseComposite = new Composite(parent, SWT.NONE);
 
     Sasher outerSash = new Sasher(baseComposite, SWT.NONE);
     Sasher innerSash = new Sasher(outerSash, SWT.NONE);
     Control selectedNodesControl = setupSelectedNodesContent(innerSash);
 
-    // create the tab folder that will hold relationshipPicker and
-    // pathExpressionEditor
+    // Create the tab folder that will hold the various node selectors
     selectorTab = new TabFolder(innerSash, SWT.BORDER);
     selectorTabParts = Lists.newArrayList();
 
     NodeSelectorPart relationPickerPart = new RelationNodeSelectorPart();
     installNodeSelectorTab("Relation Picker Tool", relationPickerPart);
+
+    NodeSelectorPart relationCountEditor = 
+        new RelationCountNodeSelectorTool.SelectorPart();
+    installNodeSelectorTab("Relation Count Tool", relationCountEditor);
 
     NodeSelectorPart pathPickerPart = new PathExpressionEditorTool();
     installNodeSelectorTab("Path Expression Tool", pathPickerPart);
@@ -290,7 +302,7 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
   private void installNodeSelectorTab(
       String label, NodeSelectorPart selectorPart) {
     Composite selectionControl =
-        selectorPart.createControl(selectorTab, SWT.NONE);
+        selectorPart.createControl(selectorTab, SWT.NONE, getEditor());
     selectionControl.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, true));
 
@@ -383,8 +395,23 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
     previewList.refresh(false);
   }
 
+  @Override
+  protected void updateControls() {
+    int activeTab = selectorTab.getSelectionIndex();
+    if (activeTab >= 0) {
+      selectorTabParts.get(activeTab).updateControl(getEditor());
+    }
+
+    super.updateControls();
+  }
+
+
   private Iterable<GraphNode> computeSelectorNodes() {
     PathMatcher nodeSelector = getNodeSelector();
+    if (null == nodeSelector) {
+      return Collections.emptyList();
+    }
+
     Set<GraphNode> currSelection = getSelectedNodes();
 
     // TODO(leeca): Source graph model should be baked into node selector

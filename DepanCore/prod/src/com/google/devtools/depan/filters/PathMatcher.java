@@ -20,6 +20,7 @@ import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 
 import java.util.Collection;
+
 /**
  * Determines a set of nodes that satisfy given criteria for a collection of 
  * starting nodes.
@@ -37,7 +38,7 @@ public interface PathMatcher {
    */
   Collection<GraphNode> nextMatch(
       GraphModel graph, Collection<GraphNode> input);
-  
+
   /**
    * Returns the display name for this object.
    * 

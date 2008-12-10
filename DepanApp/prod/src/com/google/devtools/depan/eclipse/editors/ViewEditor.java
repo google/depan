@@ -27,6 +27,7 @@ import com.google.devtools.depan.eclipse.trees.GraphData;
 import com.google.devtools.depan.eclipse.trees.NodeTreeProvider;
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.utils.Tools;
+import com.google.devtools.depan.eclipse.views.tools.RelationCount;
 import com.google.devtools.depan.eclipse.visualization.View;
 import com.google.devtools.depan.eclipse.visualization.layout.Layouts;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeColorPlugin;
@@ -104,6 +105,12 @@ public class ViewEditor extends MultiPageEditorPart
   private boolean isDirty = true;
 
   private ViewModelListener viewModelListener;
+
+  /////////////////////////////////////
+  // Tool/view data
+
+  private RelationCount.Settings relationCountData =
+    new RelationCount.Settings();
 
   /////////////////////////////////////
   // Basic Getters and Setters
@@ -504,6 +511,10 @@ public class ViewEditor extends MultiPageEditorPart
   @Override
   public NodeDisplayProperty getObject(GraphNode node) {
     return getViewModel().getNodeDisplayProperty(node);
+  }
+
+  public RelationCount.Settings getRelationCountData() {
+    return relationCountData;
   }
 
   /**
