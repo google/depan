@@ -39,7 +39,7 @@ function main {
   svn switch "${TRUNK}"
   if [[ "$(confirm)" == 'y' ]]; then
     svn delete "${clientUrl}" \
-      -m "'Releasing committed review branch ${clientName} r${revision}'"
+      -m "Releasing committed review branch ${clientName} r${revision}"
   fi
 }
 
