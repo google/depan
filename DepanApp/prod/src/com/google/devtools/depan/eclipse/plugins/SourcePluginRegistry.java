@@ -310,4 +310,24 @@ public class SourcePluginRegistry {
     }
     return relations;
   }
+
+  /**
+   * Create the list of known Element kinds.  Ideally, this should use
+   * ElementKindDescriptors obtained directly from the plugins.
+   * 
+   * @return collection of all element descriptors from all plugins
+   */
+  public static Collection<PrimitiveElementKindDescriptor>
+      getElementKindDescriptors() {
+    Collection<PrimitiveElementKindDescriptor> elementKinds = Lists.newArrayList();
+    for (SourcePlugin plugin : SourcePluginRegistry.getInstances()) {
+      for (Class<? extends Element> elementClass 
+          : plugin.getElementClasses()) {
+        elementKinds.add(
+            new PrimitiveElementKindDescriptor(elementClass, plugin));
+      }
+    }
+    return elementKinds;
+  }
+
 }

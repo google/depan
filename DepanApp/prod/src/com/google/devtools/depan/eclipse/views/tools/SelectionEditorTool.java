@@ -192,11 +192,15 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
     selectorTabParts = Lists.newArrayList();
 
     NodeSelectorPart relationPickerPart = new RelationNodeSelectorPart();
-    installNodeSelectorTab("Relation Picker Tool", relationPickerPart);
+    installNodeSelectorTab("Relation Path Selector", relationPickerPart);
 
     NodeSelectorPart relationCountEditor = 
         new RelationCountNodeSelectorTool.SelectorPart();
-    installNodeSelectorTab("Relation Count Tool", relationCountEditor);
+    installNodeSelectorTab("Relation Count Selector", relationCountEditor);
+
+    NodeSelectorPart nodeKindEditor = 
+        new ElementKindSelectorTool.SelectorPart();
+   installNodeSelectorTab("Node Kind Selector", nodeKindEditor);
 
     NodeSelectorPart pathPickerPart = new PathExpressionEditorTool();
     installNodeSelectorTab("Path Expression Tool", pathPickerPart);
