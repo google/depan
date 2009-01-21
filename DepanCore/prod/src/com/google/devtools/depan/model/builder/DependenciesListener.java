@@ -20,8 +20,10 @@ import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.model.GraphNode;
 
 /**
- * Listener used when running into the class file, field, or method; when
- * dependencies are found, the appropriate callback is called...
+ * Listener used to add dependencies to a GraphModel, typically used while
+ * analyzing a dependency source.  This allows filtering of dependencies
+ * that refer to entities outside the scope of the analaysis, detection of
+ * duplicate nodes, and avoidance of duplicate dependencies.
  *
  * @author ycoppel@google.com (Yohann Coppel)
  *

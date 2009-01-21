@@ -65,23 +65,28 @@ public class DoubleElementEditorChooser extends Composite {
   public DoubleElementEditorChooser(Composite parent, int style) {
     super(parent, style);
     stackLayout = new StackLayout();
-    
-    // for each plugin
+
+    // Install editors for every Element type known to every plugin
     for (SourcePlugin p : SourcePluginRegistry.getInstances()) {
       // get the transformer for an Element to an ElementEditor
       ElementClassTransformer<Class<? extends ElementEditor>> transformer =
           p.getElementEditorProvider();
-      // for each type of elements
+
+      // Install the editor for every known (and valid) class from the plugin
       for (Class<? extends Element> e : p.getElementClasses()) {
         // get the associated editor class
         Class<? extends ElementEditor> editorClass = transformer.transform(e);
-        // instantiate the editor
-        DoubleElementEditor editor =
-          new DoubleElementEditor(this, SWT.NONE, editorClass);
-        editors.put(editorClass, editor);
+
+        // Ignore classes that have no editor
+        if (null != editorClass) {
+          // instantiate the editor
+          DoubleElementEditor editor =
+              new DoubleElementEditor(this, SWT.NONE, editorClass);
+          editors.put(editorClass, editor);
+        }
       }
     }
-    
+
     noEditor = new Composite(this, SWT.NONE);
     stackLayout.topControl = noEditor;
 

@@ -33,6 +33,12 @@ import java.util.Comparator;
  */
 public class JavaNodeComparator implements Comparator<Element> {
 
+  public static final int CATEGORY_PACKAGE = 3;
+  public static final int CATEGORY_INTERFACE = 4;
+  public static final int CATEGORY_TYPE = 5;
+  public static final int CATEGORY_FIELD = 6;
+  public static final int CATEGORY_METHOD = 7;
+
   public final static JavaNodeComparator INSTANCE = new JavaNodeComparator();
 
   private JavaNodeComparator() {
@@ -56,23 +62,23 @@ public class JavaNodeComparator implements Comparator<Element> {
     final JavaElementDispatcher<Integer> d = new JavaElementDispatcher<Integer>() {
       @Override
       public Integer match(MethodElement e) {
-        return 7;
+        return CATEGORY_METHOD;
       }
       @Override
       public Integer match(FieldElement e) {
-        return 6;
+        return CATEGORY_FIELD;
       }
       @Override
       public Integer match(TypeElement e) {
-        return 5;
+        return CATEGORY_TYPE;
       }
       @Override
       public Integer match(InterfaceElement e) {
-        return 4;
+        return CATEGORY_INTERFACE;
       }
       @Override
       public Integer match(PackageElement e) {
-        return 3;
+        return CATEGORY_PACKAGE;
       }
     };
     return d.match(node);

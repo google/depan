@@ -42,7 +42,7 @@ public class ResourceCache implements IResourceChangeListener {
   /////////////////////////////////////
   // GraphModel cache
   private static ResourceCache INSTANCE = new ResourceCache();
-  
+
   static {
     IWorkspace workspace = ResourcesPlugin.getWorkspace();
     INSTANCE.attachWorkspace(workspace);

@@ -34,7 +34,7 @@ public abstract class FileSystemResources {
    */
   public static final String PLUGIN_ID = "com.google.devtools.depan.filesystem";
 
-  private static Bundle bundle = Platform.getBundle(PLUGIN_ID);
+  private static final Bundle BUNDLE = Platform.getBundle(PLUGIN_ID);
 
   /**
    * {@link ImageDescriptor} for <code>DirectoryElement</code>s.
@@ -84,7 +84,7 @@ public abstract class FileSystemResources {
    * @return URL for the given path.
    */
   protected static URL getResource(String path) {
-    return FileSystemResources.bundle.getResource(path);
+    return BUNDLE.getResource(path);
   }
 
   /**
