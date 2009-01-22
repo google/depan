@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.4"?>
 
-<product name="DepAn" id="com.google.devtools.depan.DepAn" application="com.google.devtools.depan.application" version="0.0.1" useFeatures="true">
+<product name="DepAn" id="com.google.devtools.depan.DepAn" application="com.google.devtools.depan.application" version="0.0.2" useFeatures="true">
 
    <aboutInfo>
       <image path="/DepanApp/icons/branding/depan-logo-315x110.gif"/>
@@ -38,7 +38,6 @@ Contributors:
          <bmp/>
       </win>
    </launcher>
-
 
    <vm>
    </vm>

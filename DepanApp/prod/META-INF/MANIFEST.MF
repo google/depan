@@ -18,8 +18,6 @@ Require-Bundle: org.eclipse.core.runtime,
  com.google.devtools.depan.core
 Eclipse-LazyStart: true
 Bundle-ClassPath: .,
- jung-swt-rendering-2.0-alpha2.jar,
- jung-swt-visualization-2.0-alpha2.jar,
  jogl.jar,
  gluegen-rt.jar
 Export-Package: com.google.devtools.depan.eclipse.cm,

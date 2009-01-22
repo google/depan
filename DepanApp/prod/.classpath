@@ -3,8 +3,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry exported="true" kind="lib" path="jung-swt-visualization-2.0-alpha2.jar"/>
-	<classpathentry exported="true" kind="lib" path="jung-swt-rendering-2.0-alpha2.jar"/>
 	<classpathentry exported="true" kind="lib" path="jogl.jar"/>
 	<classpathentry exported="true" kind="lib" path="gluegen-rt.jar"/>
 	<classpathentry kind="output" path="build"/>

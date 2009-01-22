@@ -38,6 +38,12 @@ import java.io.IOException;
  */
 public class NewFileSystemWizard extends AbstractAnalysisWizard {
 
+  /**
+   * Eclipse extension identifier for this wizard.
+   */
+  public static final String ANALYSIS_WIZARD_ID =
+      "com.google.devtools.depan.filesystem.eclipse.NewFileSystemWizard";
+
   public NewFileSystemPage page;
 
   private String prefixPath;

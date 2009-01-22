@@ -28,6 +28,7 @@ import com.google.devtools.depan.filesystem.eclipse.FileSystemImageTransformer;
 import com.google.devtools.depan.filesystem.eclipse.FileSystemNodeComparator;
 import com.google.devtools.depan.filesystem.eclipse.FileSystemNodePainter;
 import com.google.devtools.depan.filesystem.eclipse.FileSystemShapeTransformer;
+import com.google.devtools.depan.filesystem.eclipse.NewFileSystemWizard;
 import com.google.devtools.depan.filesystem.elements.DirectoryElement;
 import com.google.devtools.depan.filesystem.elements.FileElement;
 import com.google.devtools.depan.filesystem.graph.FileSystemRelation;
@@ -42,7 +43,6 @@ import org.eclipse.swt.graphics.Image;
 
 import java.awt.Color;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 
 /**
@@ -53,6 +53,12 @@ import java.util.Comparator;
  * @author tugrul@google.com (Tugrul Ince)
  */
 public class FileSystemPlugin implements SourcePlugin {
+
+  /**
+   * List of Analysis wizards to include in the DepAn perspective.
+   */
+  private static final Collection<String> ANALYSIS_WIZARD_IDS;
+
   /**
    * Collection of classes of element types.
    */
@@ -77,6 +83,9 @@ public class FileSystemPlugin implements SourcePlugin {
       new RelationshipSetAdapter("Filesystem Containers");
 
   static {
+    ANALYSIS_WIZARD_IDS = Lists.newArrayList();
+    ANALYSIS_WIZARD_IDS.add(NewFileSystemWizard.ANALYSIS_WIZARD_ID);
+
     classes = Lists.newArrayList();
     classes.add(DirectoryElement.class);
     classes.add(FileElement.class);
@@ -166,11 +175,8 @@ public class FileSystemPlugin implements SourcePlugin {
     return FileSystemConfig.getInstance();
   }
 
-  /**
-   * Filesystem does not yet have it's own graph builder.
-   */
   @Override
   public Collection<String> getNewAnalysisIds() {
-    return Collections.emptySet();
+    return ANALYSIS_WIZARD_IDS;
   }
 }

@@ -22,8 +22,8 @@
   <property name="javacVerbose" value="false"/>
   <property name="logExtension" value=".log"/>
   <property name="compilerArg" value=""/>
-  <property name="javacSource" value="1.3"/>
-  <property name="javacTarget" value="1.2"/>
+  <property name="javacSource" value="1.6"/>
+  <property name="javacTarget" value="1.6"/>
   <condition property="dir_bootclasspath" value="${java.home}/../Classes">
     <os family="mac"/>
   </condition>
@@ -98,8 +98,6 @@
       <pathelement path="${thirdPartyRoot}/jung/colt-1.2.0.jar"/>
       <pathelement path="${thirdPartyRoot}/jung/jung-api-2.0-alpha2.jar"/>
       <pathelement path="${thirdPartyRoot}/jung/collections-generic-4.01.jar"/>
-      <pathelement path="${thirdPartyRoot}/jung/jung-swt-rendering-2.0-alpha2.jar"/>
-      <pathelement path="${thirdPartyRoot}/jung/jung-swt-visualization-2.0-alpha2.jar"/>
       <pathelement path="${thirdPartyRoot}/xstream/xstream-1.2.2/xstream-1.2.2.jar"/>
       <pathelement path="../../DepanCore/prod/build"/>
       <pathelement path="../../DepanApp/prod/build"/>
@@ -110,7 +108,6 @@
       <compilerarg line="${compilerArg}" compiler="${build.compiler}"/>
       <classpath refid="@dot.classpath" />
       <src path="src/"      />
-      <compilerarg value="@${basedir}/javaCompiler...args" compiler="org.eclipse.jdt.core.JDTCompilerAdapter"/>
       <compilerarg line="-log '${temp.folder}/@dot.bin${logExtension}'" compiler="org.eclipse.jdt.core.JDTCompilerAdapter"/>
     </javac>
     <!-- Copy necessary resources -->

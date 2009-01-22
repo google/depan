@@ -27,24 +27,14 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>jogl.jar</name>
-			<type>1</type>
-			<locationURI>THIRD_PARTY_HOME/jogl/lib/jogl.jar</locationURI>
-		</link>
-		<link>
-			<name>jung-swt-visualization-2.0-alpha2.jar</name>
-			<type>1</type>
-			<locationURI>THIRD_PARTY_HOME/jung/jung-swt-visualization-2.0-alpha2.jar</locationURI>
-		</link>
-		<link>
-			<name>jung-swt-rendering-2.0-alpha2.jar</name>
-			<type>1</type>
-			<locationURI>THIRD_PARTY_HOME/jung/jung-swt-rendering-2.0-alpha2.jar</locationURI>
-		</link>
-		<link>
 			<name>gluegen-rt.jar</name>
 			<type>1</type>
 			<locationURI>THIRD_PARTY_HOME/jogl/lib/gluegen-rt.jar</locationURI>
+		</link>
+		<link>
+			<name>jogl.jar</name>
+			<type>1</type>
+			<locationURI>THIRD_PARTY_HOME/jogl/lib/jogl.jar</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>
