@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: DepanJavaScript
+Bundle-SymbolicName: com.google.devtools.depan.javascript;singleton:=true
+Bundle-Version: 0.0.1
+Bundle-Vendor: Google Inc.
+Require-Bundle: com.google.devtools.depan,
+ com.google.devtools.depan.core,
+ com.google.devtools.depan.filesystem,
+ com.google.devtools.depan.java,
+ org.eclipse.jface,
+ org.eclipse.core.runtime
+Export-Package: com.google.devtools.depan.javascript.graph

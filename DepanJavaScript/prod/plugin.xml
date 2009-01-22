@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="com.google.devtools.depan.eclipse.sourceplugin">
+      <languagespecific
+            class="com.google.devtools.depan.javascript.JavaScriptPlugin"
+            description="Graph elements for JavaScript dependencies"
+            id="com.google.devtools.depan.javascript"
+            source="java">
+      </languagespecific>
+   </extension>
+
+</plugin>
