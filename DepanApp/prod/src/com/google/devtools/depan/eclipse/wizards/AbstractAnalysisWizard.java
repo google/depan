@@ -18,7 +18,6 @@ package com.google.devtools.depan.eclipse.wizards;
 
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.XmlPersistentGraph;
-import com.google.devtools.depan.util.ProgressListener;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -38,7 +37,7 @@ import java.lang.reflect.InvocationTargetException;
 /**
  * A standard framework for implementing an DepAn analysis wizard.
  * With the accompanying {@link AbstractAnalysisPage}, new forms of
- * dependancy analysis can be implemented in two simple steps:
+ * dependency analysis can be implemented in two simple steps:
  * <ol>
  * <li>Create an source control to accept the users input.</li>
  * <li>Create a generateAnalysisGraph() method to generate the result.</li>
@@ -46,11 +45,9 @@ import java.lang.reflect.InvocationTargetException;
  * Other routine steps, especially persistence, is handled by this class.
  */
 public abstract class AbstractAnalysisWizard extends Wizard
-    implements INewWizard, ProgressListener {
+    implements INewWizard {
 
   private ISelection selection;
-
-  private IProgressMonitor progressMonitor;
 
   /**
    * Constructor for NewGraphWizard.
@@ -63,15 +60,6 @@ public abstract class AbstractAnalysisWizard extends Wizard
   @Override
   public void init(IWorkbench workbench, IStructuredSelection sel) {
     this.selection = sel;
-  }
-
-  /**
-   * Callable by {@code QuickProgressListener} to show increments steps
-   */
-  @Override
-  public void progress(String curentJob, int n, int total) {
-    progressMonitor
-        .setTaskName("Loading " + n + "/" + total + ": " + curentJob);
   }
 
   /**

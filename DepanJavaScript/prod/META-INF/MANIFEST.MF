@@ -10,4 +10,5 @@ Require-Bundle: com.google.devtools.depan,
  com.google.devtools.depan.java,
  org.eclipse.jface,
  org.eclipse.core.runtime
-Export-Package: com.google.devtools.depan.javascript.graph
+Export-Package: com.google.devtools.depan.javascript,
+ com.google.devtools.depan.javascript.graph

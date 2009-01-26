@@ -78,7 +78,7 @@ public class NewGraphPage extends AbstractAnalysisPage {
 
     // Outer composite for both the class path group and the
     // filter definition group
-    Composite result = new Composite(parent, SWT.NONE | SWT.BORDER);
+    Composite result = new Composite(parent, SWT.NONE);
 
     GridLayout layout = new GridLayout(1, true);
     layout.marginHeight = 0;

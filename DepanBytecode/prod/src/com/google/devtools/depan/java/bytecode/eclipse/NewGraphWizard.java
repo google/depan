@@ -18,6 +18,7 @@ package com.google.devtools.depan.java.bytecode.eclipse;
 
 import com.google.devtools.depan.collect.Lists;
 import com.google.devtools.depan.eclipse.wizards.AbstractAnalysisWizard;
+import com.google.devtools.depan.eclipse.wizards.ProgressListenerMonitor;
 import com.google.devtools.depan.java.bytecode.ClassLookup;
 import com.google.devtools.depan.java.bytecode.JarFileLister;
 import com.google.devtools.depan.java.graph.DefaultElementFilter;
@@ -27,6 +28,7 @@ import com.google.devtools.depan.model.builder.DependenciesListener;
 import com.google.devtools.depan.model.builder.ElementFilter;
 import com.google.devtools.depan.util.FileLister;
 import com.google.devtools.depan.util.FileListerListener;
+import com.google.devtools.depan.util.ProgressListener;
 import com.google.devtools.depan.util.QuickProgressListener;
 
 import org.eclipse.core.resources.IFile;
@@ -113,7 +115,10 @@ public class NewGraphWizard extends AbstractAnalysisWizard {
       JarFileLister fl;
       try {
         fl = new JarFileLister(classPathFile, cl);
-        fl.setProgressListener(new QuickProgressListener(this, 300));
+        ProgressListener baseProgress = new ProgressListenerMonitor(monitor);
+        ProgressListener quickProgress = new QuickProgressListener(
+            baseProgress, 300);
+        fl.setProgressListener(quickProgress);
         fl.start();
       } catch (ZipException e) {
         e.printStackTrace();
