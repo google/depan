@@ -71,11 +71,11 @@
     <path id="@dot.classpath">
       <pathelement path="${thirdPartyRoot}/jung/collections-generic-4.01.jar"/>
       <pathelement path="${thirdPartyRoot}/jung/colt-1.2.0.jar"/>
-      <pathelement path="${thirdPartyRoot}/jung/jung-algorithms-2.0-alpha2.jar"/>
-      <pathelement path="${thirdPartyRoot}/jung/jung-api-2.0-alpha2.jar"/>
-      <pathelement path="${thirdPartyRoot}/jung/jung-graph-impl-2.0-alpha2.jar"/>
+      <pathelement path="${thirdPartyRoot}/jung/jung-algorithms-2.0-beta1.jar"/>
+      <pathelement path="${thirdPartyRoot}/jung/jung-api-2.0-beta1.jar"/>
+      <pathelement path="${thirdPartyRoot}/jung/jung-graph-impl-2.0-beta1.jar"/>
       <pathelement path="${thirdPartyRoot}/joda-time/joda-time-1.4/joda-time-1.4.jar"/>
-      <pathelement path="${thirdPartyRoot}/xstream/xstream-1.2.2/xstream-1.2.2.jar"/>
+      <pathelement path="${thirdPartyRoot}/xstream/xstream-1.3/xstream-1.3.jar"/>
     </path>
     <!-- compile the source code -->
     <javac destdir="${temp.folder}/@dot.bin" failonerror="${javacFailOnError}" verbose="${javacVerbose}" debug="${javacDebugInfo}" includeAntRuntime="no" bootclasspath="${bundleBootClasspath}" source="${bundleJavacSource}" target="${bundleJavacTarget}"    >
@@ -144,12 +144,12 @@
       <fileset dir="${thirdPartyRoot}/jung/">
         <include name="collections-generic-4.01.jar"/>
         <include name="colt-1.2.0.jar"/>
-        <include name="jung-algorithms-2.0-alpha2.jar"/>
-        <include name="jung-api-2.0-alpha2.jar"/>
-        <include name="jung-graph-impl-2.0-alpha2.jar"/>
+        <include name="jung-algorithms-2.0-beta1.jar"/>
+        <include name="jung-api-2.0-beta1.jar"/>
+        <include name="jung-graph-impl-2.0-beta1.jar"/>
       </fileset>
-      <fileset dir="${thirdPartyRoot}/xstream/xstream-1.2.2/">
-        <include name="xstream-1.2.2.jar"/>
+      <fileset dir="${thirdPartyRoot}/xstream/xstream-1.3/">
+        <include name="xstream-1.3.jar"/>
       </fileset>
       <fileset dir="${thirdPartyRoot}/joda-time/joda-time-1.4">
         <include name="joda-time-1.4.jar"/>

@@ -89,16 +89,16 @@
       <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.jface_3.4.0.I20080606-1300.jar"/>
       <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.core.commands_3.4.0.I20080509-2000.jar"/>
       <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.ui.workbench_3.4.0.I20080606-1300.jar"/>
-      <pathelement path="${thirdPartyRoot}/asm/asm-3.0/lib/asm-3.0.jar"/>
+      <pathelement path="${thirdPartyRoot}/asm/asm-3.1/lib/asm-3.1.jar"/>
       <pathelement path="${thirdPartyRoot}/joda-time/joda-time-1.4/joda-time-1.4.jar"/>
       <pathelement path="${thirdPartyRoot}/jogl/lib/gluegen-rt.jar"/>
       <pathelement path="${thirdPartyRoot}/jogl/lib/jogl.jar"/>
-      <pathelement path="${thirdPartyRoot}/jung/jung-algorithms-2.0-alpha2.jar"/>
-      <pathelement path="${thirdPartyRoot}/jung/jung-graph-impl-2.0-alpha2.jar"/>
+      <pathelement path="${thirdPartyRoot}/jung/jung-algorithms-2.0-beta1.jar"/>
+      <pathelement path="${thirdPartyRoot}/jung/jung-graph-impl-2.0-beta1.jar"/>
       <pathelement path="${thirdPartyRoot}/jung/colt-1.2.0.jar"/>
-      <pathelement path="${thirdPartyRoot}/jung/jung-api-2.0-alpha2.jar"/>
+      <pathelement path="${thirdPartyRoot}/jung/jung-api-2.0-beta1.jar"/>
       <pathelement path="${thirdPartyRoot}/jung/collections-generic-4.01.jar"/>
-      <pathelement path="${thirdPartyRoot}/xstream/xstream-1.2.2/xstream-1.2.2.jar"/>
+      <pathelement path="${thirdPartyRoot}/xstream/xstream-1.3/xstream-1.3.jar"/>
       <pathelement path="../../DepanCore/prod/build"/>
       <pathelement path="../../DepanApp/prod/build"/>
       <pathelement path="../../DepanFileSystem/prod/bin"/>
@@ -168,8 +168,8 @@
         <include name="icons/"/>
         <include name="about.html"/>
       </fileset>
-      <fileset dir="${thirdPartyRoot}/asm/asm-3.0/lib/">
-        <include name="asm-3.0.jar"/>
+      <fileset dir="${thirdPartyRoot}/asm/asm-3.1/lib/">
+        <include name="asm-3.1.jar"/>
       </fileset>
     </copy>
   </target>

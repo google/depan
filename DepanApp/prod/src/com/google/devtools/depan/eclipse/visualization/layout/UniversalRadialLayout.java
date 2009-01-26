@@ -115,10 +115,15 @@ public class UniversalRadialLayout extends UniversalTreeLayout {
   }
 
   @Override
-  public Point2D getLocation(GraphNode v) {
-    return transform(v);
+  public double getX(GraphNode v) {
+    return transform(v).getX();
   }
-
+  
+  @Override
+  public double getY(GraphNode v) {
+    return transform(v).getY();
+  }
+  
   public Dimension getCurrentSize() {
     return size;
   }

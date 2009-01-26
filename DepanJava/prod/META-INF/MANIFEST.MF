@@ -18,4 +18,4 @@ Require-Bundle: org.eclipse.core.resources,
  com.google.devtools.depan,
  com.google.devtools.depan.filesystem
 Bundle-ClassPath: .,
- asm-3.0.jar
+ asm-3.1.jar

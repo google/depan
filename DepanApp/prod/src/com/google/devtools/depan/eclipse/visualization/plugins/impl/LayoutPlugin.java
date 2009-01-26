@@ -16,9 +16,6 @@
 
 package com.google.devtools.depan.eclipse.visualization.plugins.impl;
 
-import java.awt.geom.Point2D;
-import java.util.Map;
-
 import com.google.devtools.depan.eclipse.visualization.View;
 import com.google.devtools.depan.eclipse.visualization.layout.Layouts;
 import com.google.devtools.depan.eclipse.visualization.ogl.EdgeRenderingProperty;
@@ -29,8 +26,11 @@ import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.view.ViewModel;
 
-import edu.uci.ics.jung.algorithms.IterativeContext;
 import edu.uci.ics.jung.algorithms.layout.AbstractLayout;
+import edu.uci.ics.jung.algorithms.util.IterativeContext;
+
+import java.awt.geom.Point2D;
+import java.util.Map;
 
 /**
  * Plugin applying a new layout in case of layout change.
@@ -176,12 +176,13 @@ public class LayoutPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
     max[1] = Double.MIN_VALUE;
     // compute the min and max values for each coordinate of all points
     for (GraphNode n : viewModel.getNodes()) {
-      Point2D p = newLayout.getLocation(n);
-      min[0] = Math.min(min[0], p.getX());
-      min[1] = Math.min(min[1], p.getY());
-      max[0] = Math.max(max[0], p.getX());
-      max[1] = Math.max(max[1], p.getY());
-      layout.put(n, p);
+      double x = newLayout.getX(n);
+      double y = newLayout.getY(n);
+      min[0] = Math.min(min[0], x);
+      min[1] = Math.min(min[1], y);
+      max[0] = Math.max(max[0], x);
+      max[1] = Math.max(max[1], y);
+      layout.put(n, new Point2D.Double(x, y));
     }
     // scale everything to [-0.5:0.5] range
     // find the range for each dimension
