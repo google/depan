@@ -15,6 +15,8 @@
             value="/opt"/>
   <property name="thirdPartyRoot"
             value="../../../../third_party/"/>
+  <property name="joglDir"
+            value="${thirdPartyRoot}/jogl/jogl-1.1.0-linux-i586/lib/"/>
 
   <!-- Compiler settings. -->
   <property name="javacFailOnError" value="false"/>
@@ -91,14 +93,14 @@
       <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.ui.workbench_3.4.0.I20080606-1300.jar"/>
       <pathelement path="${thirdPartyRoot}/asm/asm-3.1/lib/asm-3.1.jar"/>
       <pathelement path="${thirdPartyRoot}/joda-time/joda-time-1.4/joda-time-1.4.jar"/>
-      <pathelement path="${thirdPartyRoot}/jogl/lib/gluegen-rt.jar"/>
-      <pathelement path="${thirdPartyRoot}/jogl/lib/jogl.jar"/>
       <pathelement path="${thirdPartyRoot}/jung/jung-algorithms-2.0-beta1.jar"/>
       <pathelement path="${thirdPartyRoot}/jung/jung-graph-impl-2.0-beta1.jar"/>
       <pathelement path="${thirdPartyRoot}/jung/colt-1.2.0.jar"/>
       <pathelement path="${thirdPartyRoot}/jung/jung-api-2.0-beta1.jar"/>
       <pathelement path="${thirdPartyRoot}/jung/collections-generic-4.01.jar"/>
-      <pathelement path="${thirdPartyRoot}/xstream/xstream-1.3/xstream-1.3.jar"/>
+      <pathelement path="${thirdPartyRoot}/xstream/xstream-1.3/lib/xstream-1.3.jar"/>
+      <pathelement path="${joglDir}/gluegen-rt.jar"/>
+      <pathelement path="${joglDir}/jogl.jar"/>
       <pathelement path="../../DepanCore/prod/build"/>
       <pathelement path="../../DepanApp/prod/build"/>
       <pathelement path="../../DepanFileSystem/prod/bin"/>
