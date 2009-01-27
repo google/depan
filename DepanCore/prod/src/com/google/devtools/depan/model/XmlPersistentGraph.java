@@ -17,6 +17,8 @@
 package com.google.devtools.depan.model;
 
 
+import com.google.devtools.depan.graph.basic.BasicGraph;
+
 import com.thoughtworks.xstream.alias.ClassMapper;
 import com.thoughtworks.xstream.converters.ConverterLookup;
 import com.thoughtworks.xstream.converters.DataHolder;
@@ -155,13 +157,27 @@ public class XmlPersistentGraph extends XmlPersistentObject<GraphModel> {
         result.addEdge((GraphEdge) element);
         edgeCnt++;
       } else if (element instanceof GraphNode) {
-        result.addNode((GraphNode) element);
+        addNode(result, element);
         nodeCnt++;
       }
       // Ignore other objects in stream
     }
 
     return result;
+  }
+
+  /**
+   * Add the node to the graph if it is not present.  Report and ignore
+   * and duplicate nodes that occur.
+   * @param result
+   * @param element
+   */
+  private void addNode(final GraphModel result, Object element) {
+    try {
+      result.addNode((GraphNode) element);
+    } catch (BasicGraph.DuplicateNodeException errNode) {
+      System.err.println(errNode.getMessage());
+    }
   }
 
   private void setXstreamMarshallContext(GraphModel graph) {

@@ -39,6 +39,29 @@ public class BasicGraph<T> implements Graph<T> {
 
   private final Set<BasicEdge<? extends T>> edges = Sets.newHashSet();
 
+  public static class DuplicateNodeException
+      extends IllegalArgumentException {
+
+    /**
+     * @param id
+     */
+    public DuplicateNodeException(String nodeId) {
+      super("duplicate node id " + nodeId);
+    }
+  }
+
+  public static class DuplicateEdgeException
+      extends IllegalArgumentException {
+
+    /**
+     * 
+     */
+    public DuplicateEdgeException(String relation, String head, String tail) {
+      super("edge already exists: "
+        + relation + " from " + head + " to " + tail + ".");
+    }
+  }
+
   /**
    * 
    */
@@ -53,7 +76,7 @@ public class BasicGraph<T> implements Graph<T> {
    */
   public void addNode(Node<? extends T> node) {
     if (nodes.containsKey(node.getId())) {
-      throw new IllegalArgumentException("duplicate node id " + node.getId());
+      throw new DuplicateNodeException(node.getId().toString());
     }
 
     nodes.put(node.getId(), (BasicNode<? extends T>) node);
@@ -187,7 +210,8 @@ public class BasicGraph<T> implements Graph<T> {
   public BasicEdge<? extends T> addEdge(Relation relation,
       Node<? extends T> head, Node<? extends T> tail) {
     if (null != findEdge(relation, head, tail)) {
-      throw new IllegalArgumentException("edge already exists");
+      throw new DuplicateEdgeException(
+        relation.toString(), head.toString(), tail.toString());
     }
 
     return installEdge(relation, head, tail);
