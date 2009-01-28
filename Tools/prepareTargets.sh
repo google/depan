@@ -2,6 +2,9 @@
 # Prepare a SVN target list for submission that spans all of the
 # Eclipse projects.
 # The result is written to targets.svn
+set -o nounset
+set -o errexit
+
 statusFile=$(mktemp -t status.XXXXXX)
 compareFile=$(mktemp -t compare.XXXXXX)
 
@@ -29,4 +32,4 @@ cat ${statusFile} | \
 
 # Sanity check: Report uninteresting files
 echo Client files excluded from targets.svn
-comm -23 ${compareFile} targets.svn | xargs svn status
+comm -23 ${compareFile} targets.svn | xargs svn status --non-recursive
