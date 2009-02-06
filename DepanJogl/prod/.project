@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>DepanApp</name>
+	<name>DepanJogl</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -25,4 +25,16 @@
 		<nature>org.eclipse.pde.PluginNature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>gluegen-rt.jar</name>
+			<type>1</type>
+			<locationURI>THIRD_PARTY_HOME/jogl/jogl-1.1.0-linux-i586/lib/gluegen-rt.jar</locationURI>
+		</link>
+		<link>
+			<name>jogl.jar</name>
+			<type>1</type>
+			<locationURI>THIRD_PARTY_HOME/jogl/jogl-1.1.0-linux-i586/lib/jogl.jar</locationURI>
+		</link>
+	</linkedResources>
 </projectDescription>

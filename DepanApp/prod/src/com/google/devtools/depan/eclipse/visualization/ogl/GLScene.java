@@ -263,7 +263,6 @@ public abstract class GLScene {
     int[] viewport = new int[4];
     double[] modelview = new double[16];
     double[] projection = new double[16];
-    double winX, winY;
     double[] wcoord0 = new double[3];
     double[] wcoord1 = new double[3];
 
@@ -271,8 +270,8 @@ public abstract class GLScene {
     gl.glGetDoublev(GL.GL_PROJECTION_MATRIX, projection, 0);
     gl.glGetIntegerv(GL.GL_VIEWPORT, viewport, 0);
 
-    winX = (double) x;
-    winY = (double) viewport[3] - (double) y;
+    double winX = x;
+    double winY = (double) viewport[3] - (double) y;
 
     // UnProject twice, once with z = 0 (zNear), and once with
     // z = 1 (zFar).

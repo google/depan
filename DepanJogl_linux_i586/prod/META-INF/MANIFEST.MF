@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: DepanJogl for Linux i586
+Bundle-SymbolicName: com.google.devtools.depan.jogl_linux_i586
+Bundle-Version: 0.0.1
+Bundle-Vendor: Google Inc.
+Fragment-Host: com.google.devtools.depan.jogl

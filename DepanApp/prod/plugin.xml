@@ -51,11 +51,11 @@
          </property>
          <property
                name="windowImages"
-               value="icons/branding/depan-icon-16x16.gif,icons/branding/depan-icon-32x32.gif,icons/branding/depan-icon-64x64.gif">
+               value="icons/branding/depan-icon-16x16.gif,icons/branding/depan-icon-32x32.gif,icons/branding/depan-icon-48x48.gif,icons/branding/depan-icon-64x64.gif">
          </property>
          <property
                name="aboutText"
-               value="DepAn - A direct manipulation tool for the visualization, analysis, and refactoring of dependencies in large applications.&#x0A;&#x0A;Version 0.0.3&#x0A;&#x0A;Contributors:&#x0A;- Yohann Coppel&#x0A;- Lee Carver">
+               value="DepAn - A direct manipulation tool for the visualization, analysis, and refactoring of dependencies in large applications.&#x0A;&#x0A;Version 0.0.3gg&#x0A;&#x0A;Contributors:&#x0A;- Yohann Coppel&#x0A;- Lee Carver&#x0A;- Tugrul Ince">
          </property>
       </product>
    </extension>

@@ -194,8 +194,8 @@ public class DrawingPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
       property.textIsDirty = false;
     }
 
-    float halfWidth = (float) property.textTexture.getWidth() / 4f;
-    float halfHeight = (float) property.textTexture.getHeight() / 4f;
+    float halfWidth = quarterValue(property.textTexture.getWidth());
+    float halfHeight = quarterValue(property.textTexture.getHeight());
     float centerX = (property.size + halfWidth) * property.textDx;
     float centerY = (property.size * property.ratio + halfHeight)
         * property.textDy;
@@ -219,8 +219,8 @@ public class DrawingPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
     float ty1 = tc.top();
     float tx2 = tc.right();
     float ty2 = tc.bottom();
-    float halfWidth = (float) texture.getWidth() / 4f;
-    float halfHeight = (float) texture.getHeight() / 4f;
+    float halfWidth = quarterValue(texture.getWidth());
+    float halfHeight = quarterValue(texture.getHeight());
     texture.bind();
     texture.enable();
 
@@ -248,6 +248,18 @@ public class DrawingPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
     gl.glPopMatrix();
 
     texture.disable();
+  }
+
+  /**
+   * Return one quarter of an integer value.
+   * This avoids a bunch of scattered warnings about unnecessary casts.
+   * 
+   * @param intValue value to quarter
+   * @return floating value one-quarter of the original integer
+   */
+  private static float quarterValue(int intValue) {
+    float floatValue = intValue;
+    return floatValue / 4.0f;
   }
 
   @Override

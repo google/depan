@@ -15,11 +15,10 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui.navigator,
  org.eclipse.ui.editors,
  org.eclipse.ui.workbench.texteditor,
- com.google.devtools.depan.core
-Eclipse-LazyStart: true
-Bundle-ClassPath: .,
- jogl.jar,
- gluegen-rt.jar
+ com.google.devtools.depan.core,
+ com.google.devtools.depan.jogl
+Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: .
 Export-Package: com.google.devtools.depan.eclipse.cm,
  com.google.devtools.depan.eclipse.editors,
  com.google.devtools.depan.eclipse.plugins,
@@ -27,6 +26,4 @@ Export-Package: com.google.devtools.depan.eclipse.cm,
  com.google.devtools.depan.eclipse.trees,
  com.google.devtools.depan.eclipse.utils,
  com.google.devtools.depan.eclipse.visualization.ogl,
- com.google.devtools.depan.eclipse.wizards,
- javax.media.opengl,
- javax.media.opengl.glu
+ com.google.devtools.depan.eclipse.wizards

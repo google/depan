@@ -56,9 +56,10 @@ public class Star extends OpenGLShape {
 
     Point2D.Float pt;
 
-    // compute each points,
+    // compute each vertex of the star
     for (int p = 0; p < points; ++p) {
-      double angle = p * pi2 / points + rotation;
+      double vertex = p;
+      double angle = vertex * pi2 / points + rotation;
 
       pt = new Point2D.Float(
           (float) (x + Math.cos(angle) * radius),
@@ -67,7 +68,7 @@ public class Star extends OpenGLShape {
       pushPoint(pt);
 
       if (!flat) {
-        double angle2 = (((double) p) + 0.5) * pi2 / points + rotation;
+        double angle2 = (vertex + 0.5) * pi2 / points + rotation;
         pt = new Point2D.Float(
             (float) (x + Math.cos(angle2) * insideRadius),
             (float) (y + Math.sin(angle2) * insideRadius));
