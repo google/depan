@@ -16,9 +16,9 @@ limitations under the License.
 
 package com.google.devtools.depan.view;
 
-import com.google.devtools.depan.collect.Lists;
-import com.google.devtools.depan.collect.Maps;
-import com.google.devtools.depan.collect.Sets;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.devtools.depan.model.GraphNode;
 
 import java.util.Collection;

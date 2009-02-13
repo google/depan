@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.eclipse.trees;
 
-import com.google.devtools.depan.collect.Maps;
+import com.google.common.collect.Maps;
 import com.google.devtools.depan.eclipse.trees.NodeTreeView.NodeWrapper;
 import com.google.devtools.depan.eclipse.trees.NodeTreeView.NodeWrapperRoot;
 import com.google.devtools.depan.graph.api.DirectedRelationFinder;

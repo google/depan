@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.eclipse.views;
 
-import com.google.devtools.depan.collect.Maps;
+import com.google.common.collect.Maps;
 import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.utils.ListeningViewViewPart;
 

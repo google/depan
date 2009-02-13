@@ -4,5 +4,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/DepanCore"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="junit.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/DepanLibraries"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

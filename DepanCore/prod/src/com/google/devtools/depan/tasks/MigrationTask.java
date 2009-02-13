@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.tasks;
 
-import com.google.devtools.depan.collect.Lists;
+import com.google.common.collect.Lists;
 
 import org.joda.time.DateTime;
 

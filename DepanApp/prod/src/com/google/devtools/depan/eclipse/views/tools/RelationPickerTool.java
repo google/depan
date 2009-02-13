@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.eclipse.views.tools;
 
-import com.google.devtools.depan.collect.Lists;
+import com.google.common.collect.Lists;
 import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
 import com.google.devtools.depan.eclipse.plugins.SourcePluginRegistry;
 import com.google.devtools.depan.eclipse.utils.ListContentProvider;

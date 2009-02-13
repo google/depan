@@ -2,7 +2,7 @@
 <feature
       id="Depan_linux.gtk"
       label="Depan [Linux GTK i586]"
-      version="0.0.2"
+      version="0.0.3"
       provider-name="Google Inc.">
 
    <description url="http://code.google.com/p/google-depan">
@@ -479,6 +479,13 @@
          install-size="0"
          version="0.0.0"
          fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="com.google.devtools.depan.libraries"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
          unpack="false"/>
 
 </feature>

@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.filters;
 
-import com.google.devtools.depan.collect.Sets;
+import com.google.common.collect.Sets;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.RelationshipSet;

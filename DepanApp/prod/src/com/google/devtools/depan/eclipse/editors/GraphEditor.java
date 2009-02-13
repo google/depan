@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.eclipse.editors;
 
-import com.google.devtools.depan.collect.Sets;
+import com.google.common.collect.Sets;
 import com.google.devtools.depan.eclipse.trees.CheckNodeTreeView;
 import com.google.devtools.depan.eclipse.trees.GraphData;
 import com.google.devtools.depan.eclipse.trees.NodeTreeProvider;

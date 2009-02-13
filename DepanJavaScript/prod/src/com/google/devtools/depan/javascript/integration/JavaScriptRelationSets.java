@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.javascript.integration;
 
-import com.google.devtools.depan.collect.Lists;
+import com.google.common.collect.Lists;
 import com.google.devtools.depan.filesystem.graph.FileSystemRelation;
 import com.google.devtools.depan.javascript.graph.JavaScriptRelation;
 import com.google.devtools.depan.model.RelationshipSet;

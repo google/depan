@@ -99,6 +99,10 @@ getThirdPartyZip asm -3.1-bin http://download.forge.objectweb.org/asm
 # Get joda-time 1.6
 getThirdPartyZip joda-time -1.6.zip http://downloads.sourceforge.net/joda-time
 
+# For DepanCoreLibs.prod and all other plugins
+# Get Google Collections Library 20090211
+getThirdPartyZip google-collect -snapshot-20090211.zip http://google-collections.googlecode.com/files google-collections
+
 # For DepanCore.prod
 # Get xstream 1.3
 getThirdPartyZip xstream -distribution-1.3-bin.zip http://repository.codehaus.org/com/thoughtworks/xstream/xstream-distribution/1.3

@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.eclipse;
 
-import com.google.devtools.depan.collect.Maps;
+import com.google.common.collect.Maps;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;

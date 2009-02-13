@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.eclipse.utils;
 
-import com.google.devtools.depan.collect.Lists;
+import com.google.common.collect.Lists;
 
 import org.eclipse.jface.viewers.AbstractListViewer;
 import org.eclipse.jface.viewers.IStructuredContentProvider;

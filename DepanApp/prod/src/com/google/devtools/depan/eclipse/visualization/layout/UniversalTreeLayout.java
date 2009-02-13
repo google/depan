@@ -16,8 +16,8 @@
 
 package com.google.devtools.depan.eclipse.visualization.layout;
 
-import com.google.devtools.depan.collect.Maps;
-import com.google.devtools.depan.collect.Sets;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.devtools.depan.graph.api.DirectedRelationFinder;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;

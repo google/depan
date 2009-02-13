@@ -16,8 +16,8 @@
 
 package com.google.devtools.depan.eclipse.views.tools;
 
-import com.google.devtools.depan.collect.Maps;
-import com.google.devtools.depan.collect.Sets;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.utils.EditColTableDef;
 import com.google.devtools.depan.eclipse.utils.Resources;

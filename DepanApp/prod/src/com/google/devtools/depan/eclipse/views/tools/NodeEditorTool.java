@@ -16,14 +16,12 @@
 
 package com.google.devtools.depan.eclipse.views.tools;
 
-import com.google.devtools.depan.collect.Maps;
 import com.google.devtools.depan.eclipse.editors.NodeWrapperTreeSorter;
 import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.trees.GraphData;
 import com.google.devtools.depan.eclipse.trees.NodeTreeProvider;
 import com.google.devtools.depan.eclipse.trees.NodeTreeView;
 import com.google.devtools.depan.eclipse.trees.NodeTreeView.NodeWrapper;
-import com.google.devtools.depan.eclipse.trees.NodeTreeView.NodeWrapperRoot;
 import com.google.devtools.depan.eclipse.utils.DefaultRelationshipSet;
 import com.google.devtools.depan.eclipse.utils.EditColTableDef;
 import com.google.devtools.depan.eclipse.utils.RelationshipSelectorListener;
@@ -37,7 +35,6 @@ import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.RelationshipSet;
 import com.google.devtools.depan.util.StringUtils;
 import com.google.devtools.depan.view.NodeDisplayProperty;
-import com.google.devtools.depan.view.ViewModel;
 import com.google.devtools.depan.view.NodeDisplayProperty.Size;
 
 import org.eclipse.jface.viewers.CellEditor;
@@ -45,7 +42,6 @@ import org.eclipse.jface.viewers.CheckboxCellEditor;
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
 import org.eclipse.jface.viewers.ICellModifier;
 import org.eclipse.jface.viewers.TextCellEditor;
-import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;

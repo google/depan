@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.java.graph;
 
-import com.google.devtools.depan.collect.Lists;
+import com.google.common.collect.Lists;
 import com.google.devtools.depan.model.RelationshipSet;
 import com.google.devtools.depan.model.RelationshipSetAdapter;
 

@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.eclipse.visualization.ogl;
 
-import com.google.devtools.depan.collect.Maps;
+import com.google.common.collect.Maps;
 import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds;
 import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeShape;
 import com.google.devtools.depan.eclipse.visualization.plugins.core.NodeRenderingPlugin;

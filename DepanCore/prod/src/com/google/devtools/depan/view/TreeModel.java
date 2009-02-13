@@ -16,15 +16,15 @@
 
 package com.google.devtools.depan.view;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.devtools.depan.model.GraphNode;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import com.google.devtools.depan.collect.Lists;
-import com.google.devtools.depan.collect.Maps;
-import com.google.devtools.depan.model.GraphNode;
 
 /**
  * @author <a href='mailto:leeca@google.com'>Lee Carver</a>

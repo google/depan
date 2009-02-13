@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: DepanBytecode
 Bundle-SymbolicName: com.google.devtools.depan.java.bytecode;singleton:=true
-Bundle-Version: 1.0.1
+Bundle-Version: 1.0.2
 Bundle-ClassPath: .,
  asm-3.1.jar
 Export-Package: com.google.devtools.depan.java.bytecode,
@@ -16,5 +16,6 @@ Require-Bundle: org.eclipse.core.resources,
  com.google.devtools.depan.core,
  com.google.devtools.depan,
  com.google.devtools.depan.java,
- com.google.devtools.depan.filesystem
+ com.google.devtools.depan.filesystem,
+ com.google.devtools.depan.libraries
 Bundle-Vendor: Google Inc.

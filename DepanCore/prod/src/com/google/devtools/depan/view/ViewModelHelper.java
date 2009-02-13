@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.view;
 
-import com.google.devtools.depan.collect.Sets;
+import com.google.common.collect.Sets;
 
 import java.util.Set;
 

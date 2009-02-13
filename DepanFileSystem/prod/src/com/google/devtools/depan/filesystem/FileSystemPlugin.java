@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.filesystem;
 
-import com.google.devtools.depan.collect.Lists;
+import com.google.common.collect.Lists;
 import com.google.devtools.depan.eclipse.plugins.ElementClassTransformer;
 import com.google.devtools.depan.eclipse.plugins.ElementTransformer;
 import com.google.devtools.depan.eclipse.plugins.SourcePlugin;

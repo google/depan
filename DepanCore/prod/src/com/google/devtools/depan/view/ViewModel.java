@@ -16,24 +16,24 @@
 
 package com.google.devtools.depan.view;
 
-import java.awt.geom.Point2D;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.apache.commons.collections15.Transformer;
-
-import com.google.devtools.depan.collect.Lists;
-import com.google.devtools.depan.collect.Maps;
-import com.google.devtools.depan.collect.Sets;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.devtools.depan.graph.api.DirectedRelationFinder;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.interfaces.GraphBuilder;
 import com.google.devtools.depan.util.BinaryOperators;
+
+import org.apache.commons.collections15.Transformer;
+
+import java.awt.geom.Point2D;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A ViewModel is the class handling the drawing of a subgraph.
@@ -487,7 +487,7 @@ public class ViewModel
     getCollapser().collapse(master, picked, erase);
 
     fireCollapseChanged(
-        Sets.newSingleton(getCollapser().getCollapseData(master)),
+        Collections.singleton(getCollapser().getCollapseData(master)),
         Collections.<CollapseData>emptyList(),
         author);
   }
@@ -513,7 +513,7 @@ public class ViewModel
 
     fireCollapseChanged(
         Collections.<CollapseData>emptyList(),
-        Sets.newSingleton(removedGroup),
+        Collections.singleton(removedGroup),
         author);
   }
 

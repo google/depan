@@ -16,9 +16,9 @@
 
 package com.google.devtools.depan.eclipse.visualization.ogl;
 
-import com.google.devtools.depan.collect.Lists;
-import com.google.devtools.depan.collect.Maps;
-import com.google.devtools.depan.collect.Sets;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds;
 import com.google.devtools.depan.eclipse.visualization.SelectionChangeListener;
 import com.google.devtools.depan.eclipse.visualization.View;

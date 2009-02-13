@@ -40,7 +40,6 @@ Contributors:
       </win>
    </launcher>
 
-
    <vm>
    </vm>
 
@@ -48,7 +47,7 @@ Contributors:
    </plugins>
 
    <features>
-      <feature id="Depan_linux.gtk" version="0.0.2"/>
+      <feature id="Depan_linux.gtk" version="0.0.3"/>
    </features>
 
 </product>

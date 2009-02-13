@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.graph.basic;
 
-import com.google.devtools.depan.collect.Sets;
+import com.google.common.collect.Sets;
 import com.google.devtools.depan.filters.PathMatcher;
 import com.google.devtools.depan.graph.api.DirectedRelation;
 import com.google.devtools.depan.graph.api.DirectedRelationFinder;

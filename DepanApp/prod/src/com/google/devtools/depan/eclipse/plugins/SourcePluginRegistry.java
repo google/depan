@@ -16,8 +16,8 @@
 
 package com.google.devtools.depan.eclipse.plugins;
 
-import com.google.devtools.depan.collect.Lists;
-import com.google.devtools.depan.collect.Maps;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.devtools.depan.eclipse.utils.ElementEditor;
 import com.google.devtools.depan.eclipse.visualization.ogl.GLEntity;
 import com.google.devtools.depan.graph.api.Relation;

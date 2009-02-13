@@ -17,7 +17,7 @@
 
 package com.google.devtools.depan.view;
 
-import com.google.devtools.depan.collect.Lists;
+import com.google.common.collect.Lists;
 import com.google.devtools.depan.graph.basic.MultipleDirectedRelationFinder;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;

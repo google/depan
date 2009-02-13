@@ -16,9 +16,9 @@
 
 package com.google.devtools.depan.model;
 
-import com.google.devtools.depan.collect.Lists;
-import com.google.devtools.depan.collect.Maps;
-import com.google.devtools.depan.collect.Sets;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.devtools.depan.graph.api.DirectedRelationFinder;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.api.RelationFinder;

@@ -16,15 +16,15 @@
 
 package com.google.devtools.depan.eclipse.visualization.plugins.impl;
 
-import java.util.List;
-
-import com.google.devtools.depan.collect.Lists;
+import com.google.common.collect.Lists;
 import com.google.devtools.depan.eclipse.visualization.ogl.GLPanel;
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeRenderingProperty;
 import com.google.devtools.depan.eclipse.visualization.plugins.core.NodeRenderingPlugin;
 import com.google.devtools.depan.model.GraphNode;
 
 import edu.uci.ics.jung.graph.Graph;
+
+import java.util.List;
 
 /**
  * A plugin that modifies the stroke width and color for nodes.

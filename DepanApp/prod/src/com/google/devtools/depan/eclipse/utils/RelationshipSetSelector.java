@@ -16,10 +16,13 @@
 
 package com.google.devtools.depan.eclipse.utils;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import com.google.devtools.depan.eclipse.Project;
+import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
+import com.google.devtools.depan.eclipse.plugins.SourcePluginRegistry;
+import com.google.devtools.depan.model.RelationshipSet;
+import com.google.devtools.depan.util.XmlPersist;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -39,13 +42,10 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
-import com.google.devtools.depan.collect.Lists;
-import com.google.devtools.depan.collect.Sets;
-import com.google.devtools.depan.eclipse.Project;
-import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
-import com.google.devtools.depan.eclipse.plugins.SourcePluginRegistry;
-import com.google.devtools.depan.model.RelationshipSet;
-import com.google.devtools.depan.util.XmlPersist;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A drop-down widget showing a list of named set of relationships.

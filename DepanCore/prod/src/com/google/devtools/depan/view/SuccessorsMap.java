@@ -16,11 +16,11 @@
 
 package com.google.devtools.depan.view;
 
-import java.util.Map;
-
-import com.google.devtools.depan.collect.Maps;
+import com.google.common.collect.Maps;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphNode;
+
+import java.util.Map;
 
 /**
  * Maintain the successor map for a set of nodes.

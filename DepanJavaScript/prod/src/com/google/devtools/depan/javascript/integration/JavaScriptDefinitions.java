@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.javascript.integration;
 
-import com.google.devtools.depan.collect.Lists;
+import com.google.common.collect.Lists;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.javascript.graph.JavaScriptBuiltinElement;
 import com.google.devtools.depan.javascript.graph.JavaScriptClassElement;

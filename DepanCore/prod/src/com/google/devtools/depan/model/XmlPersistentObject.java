@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.model;
 
-import com.google.devtools.depan.collect.Lists;
+import com.google.common.collect.Lists;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.StaxDriver;

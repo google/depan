@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.java.bytecode.eclipse;
 
-import com.google.devtools.depan.collect.Lists;
+import com.google.common.collect.Lists;
 import com.google.devtools.depan.eclipse.wizards.AbstractAnalysisWizard;
 import com.google.devtools.depan.eclipse.wizards.ProgressListenerMonitor;
 import com.google.devtools.depan.java.bytecode.ClassLookup;

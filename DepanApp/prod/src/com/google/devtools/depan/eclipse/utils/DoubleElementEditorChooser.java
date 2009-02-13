@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.eclipse.utils;
 
-import com.google.devtools.depan.collect.Maps;
+import com.google.common.collect.Maps;
 import com.google.devtools.depan.eclipse.plugins.ElementClassTransformer;
 import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
 import com.google.devtools.depan.eclipse.plugins.SourcePluginRegistry;

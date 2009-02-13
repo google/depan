@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.eclipse.utils;
 
-import com.google.devtools.depan.collect.Lists;
+import com.google.common.collect.Lists;
 import com.google.devtools.depan.eclipse.plugins.ElementKindDescriptor;
 import com.google.devtools.depan.eclipse.plugins.PrimitiveElementKindDescriptor;
 import com.google.devtools.depan.eclipse.plugins.SourcePluginRegistry;

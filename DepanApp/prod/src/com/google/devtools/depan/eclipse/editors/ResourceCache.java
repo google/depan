@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.eclipse.editors;
 
-import com.google.devtools.depan.collect.Maps;
+import com.google.common.collect.Maps;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.XmlPersistentGraph;
 

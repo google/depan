@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.model.testing;
 
-import com.google.devtools.depan.collect.Sets;
+import com.google.common.collect.Sets;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.model.ElementVisitor;
 import com.google.devtools.depan.model.GraphModel;

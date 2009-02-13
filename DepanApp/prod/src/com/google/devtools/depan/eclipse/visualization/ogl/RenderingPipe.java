@@ -16,14 +16,8 @@
 
 package com.google.devtools.depan.eclipse.visualization.ogl;
 
-import java.util.List;
-import java.util.Set;
-
-import javax.media.opengl.GL;
-import javax.media.opengl.glu.GLU;
-
-import com.google.devtools.depan.collect.Lists;
-import com.google.devtools.depan.collect.Sets;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.devtools.depan.eclipse.visualization.View;
 import com.google.devtools.depan.eclipse.visualization.plugins.core.EdgeRenderingPlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.core.NodeRenderingPlugin;
@@ -44,6 +38,12 @@ import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphNode;
 
 import edu.uci.ics.jung.graph.Graph;
+
+import java.util.List;
+import java.util.Set;
+
+import javax.media.opengl.GL;
+import javax.media.opengl.glu.GLU;
 
 /**
  * A class that take care of every rendering plugins.

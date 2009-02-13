@@ -16,8 +16,8 @@
 
 package com.google.devtools.depan.graph.basic;
 
-import com.google.devtools.depan.collect.Maps;
-import com.google.devtools.depan.collect.Sets;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.devtools.depan.graph.api.Edge;
 import com.google.devtools.depan.graph.api.Graph;
 import com.google.devtools.depan.graph.api.Node;
