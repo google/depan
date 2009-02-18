@@ -2,14 +2,12 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: DepanJava
 Bundle-SymbolicName: com.google.devtools.depan.java;singleton:=true
-Bundle-Version: 1.0.2
+Bundle-Version: 1.0.3
 Bundle-Vendor: Google Inc.
 Export-Package: com.google.devtools.depan.java,
  com.google.devtools.depan.java.eclipse,
  com.google.devtools.depan.java.elements,
- com.google.devtools.depan.java.graph,
- org.objectweb.asm,
- org.objectweb.asm.signature
+ com.google.devtools.depan.java.graph
 Require-Bundle: org.eclipse.core.resources,
  org.eclipse.core.runtime,
  org.eclipse.jface.text,

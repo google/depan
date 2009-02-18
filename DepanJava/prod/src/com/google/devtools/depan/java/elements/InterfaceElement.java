@@ -16,8 +16,6 @@
 
 package com.google.devtools.depan.java.elements;
 
-import org.objectweb.asm.Type;
-
 import com.google.devtools.depan.java.JavaElementVisitor;
 
 /**
@@ -25,22 +23,27 @@ import com.google.devtools.depan.java.JavaElementVisitor;
  * name to inuquely identify this element.
  * 
  * @author ycoppel@google.com (Yohann Coppel)
- * 
  */
 public class InterfaceElement extends JavaElement {
 
+  /**
+   * This interface's fully qualified name.
+   */
   private final String fullyQualifiedName;
 
   /**
-   * @param type
+   * @param fullyQualifiedName
    */
-  public InterfaceElement(Type type) {
-    if (type.getSort() == Type.ARRAY) {
-      this.fullyQualifiedName = Type.getObjectType(type.getInternalName())
-          .getClassName();
-    } else {
-      this.fullyQualifiedName = type.getClassName();
-    }
+  public InterfaceElement(String fullyQualifiedName) {
+    super();
+    this.fullyQualifiedName = fullyQualifiedName;
+  }
+
+  /**
+   * @return the fully qualified name of this InterfaceElement.
+   */
+  public String getFullyQualifiedName() {
+    return fullyQualifiedName;
   }
 
   /**
@@ -52,7 +55,7 @@ public class InterfaceElement extends JavaElement {
   public int hashCode() {
     return fullyQualifiedName.hashCode();
   }
-  
+
   /**
    * Two {@link InterfaceElement}s are equals iif their fullyQualifiedName are
    * equals.
@@ -67,35 +70,10 @@ public class InterfaceElement extends JavaElement {
     }
     return super.equals(obj);
   }
-  
+
+  @Override
   public String getId() {
     return fullyQualifiedName;
-  }
-
-  public String getFullyQualifiedName() {
-    return fullyQualifiedName;
-  }
-
-  /**
-   * Creates and return an InterfaceElement given its descriptor from the
-   * bytecode (e.g. "Ljava/lang/String;").
-   * 
-   * @param desc
-   * @return a new InterfaceElement coresponding to the given descriptor.
-   */
-  public static JavaElement fromDescriptor(String desc) {
-    return new InterfaceElement(Type.getType(desc));
-  }
-
-  /**
-   * Creates and return an InterfaceElement given its internalName from the
-   * bytecode (e.g. "java/lang/String").
-   * 
-   * @param internalName
-   * @return a new InterfaceElement coresponding to the given internal name.
-   */
-  public static JavaElement fromInternalName(String internalName) {
-    return new InterfaceElement(Type.getObjectType(internalName));
   }
 
   @Override

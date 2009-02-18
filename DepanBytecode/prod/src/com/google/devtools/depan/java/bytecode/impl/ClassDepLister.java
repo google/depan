@@ -89,12 +89,12 @@ public class ClassDepLister implements ClassVisitor {
    */
   public void visit(int version, int access, String name, String signature,
       String superName, String[] interfaces) {
-    this.mainClass = TypeElement.fromInternalName(name);
-    dl.newDep(TypeElement.fromInternalName(superName), mainClass,
+    this.mainClass = TypeNameUtil.fromInternalName(name);
+    dl.newDep(TypeNameUtil.fromInternalName(superName), mainClass,
         JavaRelation.EXTENDS);
     for (String s : interfaces) {
-      dl.newDep(InterfaceElement.fromInternalName(s), mainClass,
-          JavaRelation.IMPLEMENTS);
+      InterfaceElement element = TypeNameUtil.fromInterfaceName(s);
+      dl.newDep(element, mainClass, JavaRelation.IMPLEMENTS);
     }
     checkAnonymousType(name);
   }
@@ -116,7 +116,7 @@ public class ClassDepLister implements ClassVisitor {
 
       // A digit must follow the $ in the name.
       if (Character.isDigit(name.charAt(name.lastIndexOf('$')+1))) {
-        TypeElement superType = TypeElement.fromInternalName(superClass);
+        TypeElement superType = TypeNameUtil.fromInternalName(superClass);
         dl.newDep(superType, mainClass, JavaRelation.ANONYMOUS_TYPE);
       }
 
@@ -160,7 +160,7 @@ public class ClassDepLister implements ClassVisitor {
    */
   public FieldVisitor visitField(int access, String name, String desc,
       String signature, Object value) {
-    TypeElement type = TypeElement.fromDescriptor(desc);
+    TypeElement type = TypeNameUtil.fromDescriptor(desc);
     FieldElement field = new FieldElement(name, type, mainClass);
 
     // simple className
@@ -196,14 +196,14 @@ public class ClassDepLister implements ClassVisitor {
       // FIXME(ycoppel): probably an enum. What to do ?
       return;
     }
-    TypeElement inner = TypeElement.fromInternalName(name);
+    TypeElement inner = TypeNameUtil.fromInternalName(name);
     if (inner.equals(this.mainClass)) {
       // the visitInnerClass callback is called twice: once when visiting the
       // outer class (A in A$B), and once when visiting the A$B class. we
       // shortcut the second case so we don't add the dependency twice.
       return;
     }
-    TypeElement parent = TypeElement.fromInternalName(outerName);
+    TypeElement parent = TypeNameUtil.fromInternalName(outerName);
     dl.newDep(parent, inner, JavaRelation.INNER_TYPE);
   }
 
@@ -229,12 +229,12 @@ public class ClassDepLister implements ClassVisitor {
 
     // arguments dependencies
     for (Type t : Type.getArgumentTypes(desc)) {
-      dl.newDep(m, TypeElement.fromDescriptor(t.getDescriptor()),
+      dl.newDep(m, TypeNameUtil.fromDescriptor(t.getDescriptor()),
           JavaRelation.TYPE);
     }
 
     // return-type dependency
-    TypeElement type = TypeElement.fromDescriptor(
+    TypeElement type = TypeNameUtil.fromDescriptor(
         Type.getReturnType(desc).getDescriptor());
     dl.newDep(m, type, JavaRelation.READ);
 

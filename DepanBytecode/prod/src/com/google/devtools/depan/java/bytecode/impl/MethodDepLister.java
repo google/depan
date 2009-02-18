@@ -18,7 +18,6 @@ package com.google.devtools.depan.java.bytecode.impl;
 
 import com.google.devtools.depan.java.elements.FieldElement;
 import com.google.devtools.depan.java.elements.MethodElement;
-import com.google.devtools.depan.java.elements.TypeElement;
 import com.google.devtools.depan.java.graph.JavaRelation;
 import com.google.devtools.depan.model.builder.DependenciesListener;
 
@@ -58,8 +57,8 @@ public class MethodDepLister implements MethodVisitor {
       int opcode, String owner, String name, String desc) {
      // FIXME: is it a read ?
      dl.newDep(thisElement,
-         new FieldElement(name, TypeElement.fromDescriptor(desc),
-             TypeElement.fromInternalName(owner)),
+         new FieldElement(name, TypeNameUtil.fromDescriptor(desc),
+           TypeNameUtil.fromInternalName(owner)),
          JavaRelation.READ);
   }
   
@@ -72,7 +71,7 @@ public class MethodDepLister implements MethodVisitor {
   public void visitMethodInsn(
       int opcode, String owner, String name, String desc) {
     dl.newDep(thisElement, new MethodElement(desc, name,
-        TypeElement.fromInternalName(owner)), JavaRelation.CALL);
+      TypeNameUtil.fromInternalName(owner)), JavaRelation.CALL);
   }
 
   /*
@@ -105,7 +104,7 @@ public class MethodDepLister implements MethodVisitor {
    */
   public void visitTypeInsn(int opcode, String type) {
     dl.newDep(
-        thisElement, TypeElement.fromInternalName(type), JavaRelation.TYPE);
+        thisElement, TypeNameUtil.fromInternalName(type), JavaRelation.TYPE);
   }
   
   /*
@@ -122,7 +121,7 @@ public class MethodDepLister implements MethodVisitor {
     if (null == type) {
       return;
     }
-    dl.newDep(thisElement, TypeElement.fromInternalName(type),
+    dl.newDep(thisElement, TypeNameUtil.fromInternalName(type),
         JavaRelation.ERROR_HANDLING);
   }
   

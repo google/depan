@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="com.google.devtools.depan.java" default="build.jars" basedir=".">
+<project name="com.google.devtools.depan.java.bytecode" default="build.jars" basedir=".">
 
   <property name="basews" value="${ws}"/>
   <property name="baseos" value="${os}"/>
   <property name="basearch" value="${arch}"/>
   <property name="basenl" value="${nl}"/>
-  <property name="bundleId" value="com.google.devtools.depan.java"/>
-  <property name="bundleVersion" value="1.0.1"/>
+  <property name="bundleId" value="com.google.devtools.depan.java.bytecode"/>
+  <property name="bundleVersion" value="1.0.3"/>
 
   <!-- Environment variables for external files -->
   <!-- You will probably need to change these to reflect your local
@@ -15,8 +15,6 @@
             value="/opt"/>
   <property name="thirdPartyRoot"
             value="../../../../third_party/"/>
-  <property name="joglDir"
-            value="${thirdPartyRoot}/jogl/jogl-1.1.0-linux-i586/lib/"/>
 
   <!-- Compiler settings. -->
   <property name="javacFailOnError" value="false"/>
@@ -45,7 +43,7 @@
       <isset property="buildTempFolder"/>
     </condition>
     <property name="pluginTemp" value="${basedir}"/>
-<condition property="build.result.folder" value="${pluginTemp}/com.google.devtools.depan.java_1.0.1"    >
+<condition property="build.result.folder" value="${pluginTemp}/com.google.devtools.depan.java.bytecode_${bundleVersion}"   >
       <isset property="buildTempFolder"/>
     </condition>
     <property name="build.result.folder" value="${basedir}"/>
@@ -58,53 +56,77 @@
 
   </target>
 
-  <target name="build.update.jar" depends="init" description="Build the plug-in: com.google.devtools.depan.java for an update site.">
+  <target name="build.update.jar" depends="init" description="Build the plug-in: com.google.devtools.depan.java.bytecode for an update site.">
     <delete dir="${temp.folder}"/>
     <mkdir dir="${temp.folder}"/>
     <antcall target="build.jars"/>
     <antcall target="gather.bin.parts">
       <param name="destination.temp.folder" value="${temp.folder}/"/>
     </antcall>
-    <jar destfile="${plugin.destination}/com.google.devtools.depan.java_1.0.1.jar" basedir="${temp.folder}/com.google.devtools.depan.java_1.0.1" filesetmanifest="merge"/>
+    <jar destfile="${plugin.destination}/com.google.devtools.depan.java.bytecode_${bundleVersion}.jar" basedir="${temp.folder}/com.google.devtools.depan.java.bytecode_${bundleVersion}" filesetmanifest="merge"/>
     <delete dir="${temp.folder}"/>
   </target>
 
-  <target name="@dot" depends="init" unless="@dot" description="Create jar: com.google.devtools.depan.java @dot.">
+  <target name="@dot" depends="init" unless="@dot" description="Create jar: com.google.devtools.depan.java.bytecode @dot.">
     <delete dir="${temp.folder}/@dot.bin"/>
     <mkdir dir="${temp.folder}/@dot.bin"/>
     <path id="@dot.classpath">
       <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.core.resources_3.4.0.v20080604-1400.jar"/>
+      <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.core.resources.compatibility_3.4.0.v20080604-1400.jar"/>
+      <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.ant.core_3.2.0.v20080529.jar"/>
+      <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.core.variables_3.2.100.v20080529-1300.jar"/>
       <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.core.runtime_3.4.0.v20080512.jar"/>
       <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.osgi_3.4.0.v20080605-1900.jar"/>
       <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.equinox.common_3.4.0.v20080421-2006.jar"/>
       <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.core.jobs_3.4.0.v20080512.jar"/>
       <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.core.runtime.compatibility.registry_3.2.200.v20080610/runtime_registry_compatibility.jar"/>
+      <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.core.runtime.compatibility.registry_3.2.200.v20080610"/>
       <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.equinox.registry_3.4.0.v20080516-0950.jar"/>
       <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.equinox.preferences_3.2.200.v20080421-2006.jar"/>
+      <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.core.runtime.compatibility.registry_3.2.200.v20080610/@dot"/>
       <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.core.contenttype_3.3.0.v20080604-1400.jar"/>
+      <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.core.runtime.compatibility.auth_3.2.100.v20070502.jar"/>
       <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.equinox.app_1.1.0.v20080421-2006.jar"/>
-      <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.jface.text_3.4.0.v20080603-2000.jar"/>
-      <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.text_3.4.0.v20080605-1800.jar"/>
+      <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.osgi.services_3.1.200.v20071203.jar"/>
+      <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/javax.servlet_2.4.0.v200806031604.jar"/>
+      <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.core.expressions_3.4.0.v20080603-2000.jar"/>
+      <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.core.filesystem_1.2.0.v20080604-1400.jar"/>
+      <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.core.filesystem.linux.x86_1.2.0.v20080604-1400.jar"/>
       <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.ui_3.4.0.I20080610-1200.jar"/>
       <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.swt_3.4.0.v3448f.jar"/>
       <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.swt.gtk.linux.x86_3.4.0.v3448f.jar"/>
       <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.jface_3.4.0.I20080606-1300.jar"/>
       <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.core.commands_3.4.0.I20080509-2000.jar"/>
       <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.ui.workbench_3.4.0.I20080606-1300.jar"/>
+      <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.ui.workbench.compatibility_3.2.0.I20080509-2000/compatibility.jar"/>
+      <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.ui.workbench.compatibility_3.2.0.I20080509-2000/@dot"/>
+      <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/com.ibm.icu_3.8.1.v20080530.jar"/>
+      <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.help_3.3.100.v20080610.jar"/>
+      <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.jface.databinding_1.2.0.I20080515-2000a.jar"/>
+      <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.core.databinding_1.1.0.I20080527-2000.jar"/>
+      <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.ui.ide_3.4.0.I20080606-1300.jar"/>
+      <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.ui.views_3.3.0.I20080509-2000.jar"/>
+      <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.update.configurator_3.2.200.v20080417.jar"/>
+      <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.update.core_3.2.200.v20080515.jar"/>
+      <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.update.core.linux_3.2.0.v20080422.jar"/>
+      <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.core.net_1.1.0.I20080604.jar"/>
+      <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.core.net.linux.x86_1.0.0.I20080521.jar"/>
+      <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.equinox.security_1.0.0.v20080512-1800.jar"/>
+      <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.update.ui_3.2.100.v20080318.jar"/>
+      <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.ui.forms_3.3.100.v20080611.jar"/>
+      <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.jface.text_3.4.0.v20080603-2000.jar"/>
+      <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.text_3.4.0.v20080605-1800.jar"/>
+      <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.ui.navigator.resources_3.3.100.I20080606-1300.jar"/>
+      <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.ui.navigator_3.3.100.I20080606-1300.jar"/>
+      <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.ui.views.properties.tabbed_3.4.0.I20080527-2000.jar"/>
+      <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.ui.workbench.texteditor_3.4.0.v20080603-2000.jar"/>
+      <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.ui.editors_3.4.0.v20080603-2000.jar"/>
+      <pathelement path="${eclipsePluginsRoot}/eclipse/plugins/org.eclipse.core.filebuffers_3.4.0.v20080603-2000.jar"/>
       <pathelement path="${thirdPartyRoot}/asm/asm-3.1/lib/asm-3.1.jar"/>
-      <pathelement path="${thirdPartyRoot}/google-collections/google-collect-snapshot-20090211/google-collect-snapshot-20090211.jar"/>
-      <pathelement path="${thirdPartyRoot}/joda-time/joda-time-1.4/joda-time-1.4.jar"/>
-      <pathelement path="${thirdPartyRoot}/jung/jung-algorithms-2.0-beta1.jar"/>
-      <pathelement path="${thirdPartyRoot}/jung/jung-graph-impl-2.0-beta1.jar"/>
-      <pathelement path="${thirdPartyRoot}/jung/colt-1.2.0.jar"/>
-      <pathelement path="${thirdPartyRoot}/jung/jung-api-2.0-beta1.jar"/>
-      <pathelement path="${thirdPartyRoot}/jung/collections-generic-4.01.jar"/>
-      <pathelement path="${thirdPartyRoot}/xstream/xstream-1.3/lib/xstream-1.3.jar"/>
-      <pathelement path="${joglDir}/gluegen-rt.jar"/>
-      <pathelement path="${joglDir}/jogl.jar"/>
-      <pathelement path="../../DepanCore/prod/build"/>
-      <pathelement path="../../DepanApp/prod/build"/>
-      <pathelement path="../../DepanFileSystem/prod/bin"/>
+      <pathelement path="../../DepanCore/prod/build/"/>
+      <pathelement path="../../DepanApp/prod/build/"/>
+      <pathelement path="../../DepanJava/prod/build/"/>
+      <pathelement path="../../DepanFileSystem/prod/bin/"/>
     </path>
     <!-- compile the source code -->
     <javac destdir="${temp.folder}/@dot.bin" failonerror="${javacFailOnError}" verbose="${javacVerbose}" debug="${javacDebugInfo}" includeAntRuntime="no" bootclasspath="${bundleBootClasspath}" source="${bundleJavacSource}" target="${bundleJavacTarget}"    >
@@ -147,7 +169,7 @@
     </copy>
   </target>
 
-  <target name="build.jars" depends="init" description="Compile classes and build nested jars for the plug-in: com.google.devtools.depan.java.">
+  <target name="build.jars" depends="init" description="Compile classes and build nested jars for the plug-in: com.google.devtools.depan.java.bytecode.">
     <available property="@dot" file="${build.result.folder}/@dot"/>
     <antcall target="@dot"/>
   </target>
@@ -158,18 +180,19 @@
   </target>
 
   <target name="gather.bin.parts" depends="init" if="destination.temp.folder">
-    <mkdir dir="${destination.temp.folder}/com.google.devtools.depan.java_1.0.1"/>
-    <copy todir="${destination.temp.folder}/com.google.devtools.depan.java_1.0.1" failonerror="true" overwrite="false">
+    <mkdir dir="${destination.temp.folder}/com.google.devtools.depan.java.bytecode_${bundleVersion}"/>
+    <copy todir="${destination.temp.folder}/com.google.devtools.depan.java.bytecode_${bundleVersion}" failonerror="true" overwrite="false">
       <fileset dir="${build.result.folder}/@dot">
         <include name="**"/>
       </fileset>
     </copy>
-    <copy todir="${destination.temp.folder}/com.google.devtools.depan.java_1.0.1" failonerror="true" overwrite="false">
+    <copy todir="${destination.temp.folder}/com.google.devtools.depan.java.bytecode_${bundleVersion}" failonerror="true" overwrite="false">
       <fileset dir="${basedir}">
         <include name="META-INF/"/>
         <include name="plugin.xml"/>
-        <include name="icons/"/>
+        <include name="build/"/>
         <include name="about.html"/>
+        <include name="icons/"/>
       </fileset>
       <fileset dir="${thirdPartyRoot}/asm/asm-3.1/lib/">
         <include name="asm-3.1.jar"/>
@@ -181,10 +204,10 @@
   </target>
 
   <target name="gather.sources" depends="init" if="destination.temp.folder">
-    <mkdir dir="${destination.temp.folder}/com.google.devtools.depan.java_1.0.1"/>
-    <copy file="${build.result.folder}/src.zip" todir="${destination.temp.folder}/com.google.devtools.depan.java_1.0.1" failonerror="false" overwrite="false"/>
+    <mkdir dir="${destination.temp.folder}/com.google.devtools.depan.java.bytecode_${bundleVersion}"/>
+    <copy file="${build.result.folder}/src.zip" todir="${destination.temp.folder}/com.google.devtools.depan.java.bytecode_${bundleVersion}" failonerror="false" overwrite="false"/>
     <antcall target="copy.src.includes">
-      <param name="source.destination.folder" value="${destination.temp.folder}/com.google.devtools.depan.java_1.0.1"/>
+      <param name="source.destination.folder" value="${destination.temp.folder}/com.google.devtools.depan.java.bytecode_${bundleVersion}"/>
     </antcall>
   </target>
 
@@ -201,28 +224,28 @@
   </target>
 
   <target name="gather.logs" depends="init" if="destination.temp.folder">
-    <mkdir dir="${destination.temp.folder}/com.google.devtools.depan.java_1.0.1"/>
-    <copy todir="${destination.temp.folder}/com.google.devtools.depan.java_1.0.1" failonerror="false" overwrite="false">
+    <mkdir dir="${destination.temp.folder}/com.google.devtools.depan.java.bytecode_${bundleVersion}"/>
+    <copy todir="${destination.temp.folder}/com.google.devtools.depan.java.bytecode_${bundleVersion}" failonerror="false" overwrite="false">
       <fileset dir="${temp.folder}">
         <include name="@dot.bin${logExtension}"/>
       </fileset>
     </copy>
   </target>
 
-  <target name="clean" depends="init" description="Clean the plug-in: com.google.devtools.depan.java of all the zips, jars and logs created.">
+  <target name="clean" depends="init" description="Clean the plug-in: com.google.devtools.depan.java.bytecode of all the zips, jars and logs created.">
     <delete dir="${build.result.folder}/@dot"/>
     <delete file="${build.result.folder}/src.zip"/>
-    <delete file="${plugin.destination}/com.google.devtools.depan.java_1.0.1.jar"/>
-    <delete file="${plugin.destination}/com.google.devtools.depan.java_1.0.1.zip"/>
+    <delete file="${plugin.destination}/com.google.devtools.depan.java.bytecode_${bundleVersion}.jar"/>
+    <delete file="${plugin.destination}/com.google.devtools.depan.java.bytecode_${bundleVersion}.zip"/>
     <delete dir="${temp.folder}"/>
   </target>
 
   <target name="refresh" depends="init" if="eclipse.running" description="Refresh this folder.">
-    <eclipse.convertPath fileSystemPath="/usr/local/google/leeca/Depan/depan-public/google-depan/DepanJava/prod" property="resourcePath"/>
+    <eclipse.convertPath fileSystemPath="/usr/local/google/leeca/DepAn/depan-mac/google-depan/DepanBytecode/prod" property="resourcePath"/>
     <eclipse.refreshLocal resource="${resourcePath}" depth="infinite"/>
   </target>
 
-  <target name="zip.plugin" depends="init" description="Create a zip containing all the elements for the plug-in: com.google.devtools.depan.java.">
+  <target name="zip.plugin" depends="init" description="Create a zip containing all the elements for the plug-in: com.google.devtools.depan.java.bytecode.">
     <delete dir="${temp.folder}"/>
     <mkdir dir="${temp.folder}"/>
     <antcall target="build.jars"/>
@@ -238,7 +261,7 @@
         <include name="**/*.bin${logExtension}"/>
       </fileset>
     </delete>
-    <zip destfile="${plugin.destination}/com.google.devtools.depan.java_1.0.1.zip" basedir="${temp.folder}" filesonly="true" whenempty="skip" update="false"/>
+    <zip destfile="${plugin.destination}/com.google.devtools.depan.java.bytecode_${bundleVersion}.zip" basedir="${temp.folder}" filesonly="true" whenempty="skip" update="false"/>
     <delete dir="${temp.folder}"/>
   </target>
 
