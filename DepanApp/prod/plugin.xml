@@ -180,6 +180,18 @@
             name="DepAn Project"/>
    </extension>
 
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <wizard
+            category="com.google.devtools.depan"
+            class="com.google.devtools.depan.eclipse.wizards.NewMergedGraphWizard"
+            finalPerspective="com.google.devtools.depan.eclipse.perspective"
+            icon="icons/or16.png"
+            id="com.google.devtools.depan.eclipse.wizards.NewMergedGraphWizard"
+            name="Merge Dependencies"
+            project="true"/>
+   </extension>
+
    <!-- ========================================================= -->
 
    <extension

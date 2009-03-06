@@ -39,6 +39,11 @@ import java.util.Map;
  */
 public class ResourceCache implements IResourceChangeListener {
 
+  /**
+   * Cache of previously loaded graph models.
+   */
+  private Map<URI, GraphModel> loadedGraphs = Maps.newHashMap();
+
   /////////////////////////////////////
   // GraphModel cache
   private static ResourceCache INSTANCE = new ResourceCache();
@@ -49,12 +54,38 @@ public class ResourceCache implements IResourceChangeListener {
     
   }
 
+  /**
+   * Provide the graph model located at the given URI.
+   * If the URI has already be loaded, the graph model is provided from an
+   * internal cache.  If the URI has not been loaded, read it from the location
+   * and also add it to the internal cache.
+   * 
+   * @param uri location (and cache key) for the graph model
+   * @return graph model provided by the uri
+   */
   public static GraphModel fetchGraphModel(URI uri) {
     return INSTANCE.getGraphModel(uri);
   }
 
-  private Map<URI, GraphModel> loadedGraphs = Maps.newHashMap();
+  /**
+   * Provide the graph model located at the given URI.
+   * If the URI has already be loaded, the graph model is provided from an
+   * internal cache.  If the URI has not been loaded, read it from the location
+   * but do not add it to the internal cache.
+   * 
+   * @param uri location (and cache key) for the graph model
+   * @return graph model provided by the uri
+   */
+  public static GraphModel importGraphModel(URI uri) {
+    return INSTANCE.provideGraphModel(uri);
+  }
 
+  /**
+   * Provide the graph model, adding it to the cache if it isn't there.
+   * 
+   * @param uri location (and cache key) for the graph model
+   * @return graph model provided by the uri
+   */
   protected GraphModel getGraphModel(URI uri) {
     GraphModel result = loadedGraphs.get(uri);
 
@@ -65,6 +96,24 @@ public class ResourceCache implements IResourceChangeListener {
     }
 
     return result;
+  }
+
+  /**
+   * Provide the graph model without adding it to the cache.  If it is in the
+   * cache, use that rather then re-reading it from the URI.
+   * 
+   * @param uri location (and cache key) for the graph model
+   * @return graph model provided by the uri
+   */
+  protected GraphModel provideGraphModel(URI uri) {
+    GraphModel result = loadedGraphs.get(uri);
+
+    if (null != result) {
+      return result;
+    }
+
+    XmlPersistentGraph loader = new XmlPersistentGraph();
+    return loader.load(uri);
   }
 
   protected void attachWorkspace(IWorkspace workspace) {
