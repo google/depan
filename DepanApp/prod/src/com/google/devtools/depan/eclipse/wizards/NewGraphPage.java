@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.eclipse.wizards;
 
-import com.google.devtools.depan.eclipse.utils.WorkspaceProjectSelection;
+import com.google.devtools.depan.eclipse.utils.WorkspaceTools;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
@@ -317,8 +317,8 @@ public class NewGraphPage extends WizardPage {
    * the container field.
    */
   private void handleBrowse() {
-    containerText.setText(WorkspaceProjectSelection.selectProject(
-        getShell(), containerText.getText()));
+    containerText.setText(
+        WorkspaceTools.selectProject(getShell(), containerText.getText()));
   }
 
 

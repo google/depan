@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.eclipse.wizards;
 
-import com.google.devtools.depan.eclipse.utils.WorkspaceProjectSelection;
+import com.google.devtools.depan.eclipse.utils.WorkspaceTools;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
@@ -158,8 +158,8 @@ public class NewNamedRelationshipSetPage extends WizardPage {
    * Browse for a project.
    */
   private void handleBrowse() {
-    container.setText(WorkspaceProjectSelection.selectProject(
-        getShell(), container.getText()));
+    container.setText(
+        WorkspaceTools.selectProject(getShell(), container.getText()));
   }
 
   private void updateStatus(String message) {

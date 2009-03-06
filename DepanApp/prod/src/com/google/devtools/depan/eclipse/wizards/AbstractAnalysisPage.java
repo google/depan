@@ -16,6 +16,9 @@
 
 package com.google.devtools.depan.eclipse.wizards;
 
+import com.google.devtools.depan.eclipse.utils.WorkspaceTools;
+
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.ISelection;
@@ -37,9 +40,9 @@ import org.eclipse.swt.widgets.Label;
  */
 public abstract class AbstractAnalysisPage extends WizardPage {
 
-  private final String defaultFilename;
+  private final ISelection selection;
 
-  private ISelection selection;
+  private final String defaultFilename;
 
   private AnalysisOutputPart outputPart;
 
@@ -50,10 +53,11 @@ public abstract class AbstractAnalysisPage extends WizardPage {
       ISelection selection, String pageLabel, String pageDescription,
       String defaultFilename) {
     super(pageLabel);
-    setTitle(pageLabel);
-    setDescription(pageDescription);
     this.selection = selection;
     this.defaultFilename =  defaultFilename;
+
+    setTitle(pageLabel);
+    setDescription(pageDescription);
   }
 
   @Override
@@ -65,7 +69,10 @@ public abstract class AbstractAnalysisPage extends WizardPage {
     layout.verticalSpacing = 9;
     container.setLayout(layout);
 
-    outputPart = new AnalysisOutputPart(this, selection, defaultFilename);
+    IContainer outputContainer = WorkspaceTools.guessContainer(selection);
+    String outputFilename = WorkspaceTools.guessNewFilename(
+        outputContainer, defaultFilename, 1, 10);
+    outputPart = new AnalysisOutputPart(this, outputContainer, outputFilename);
     Composite outputGroup = outputPart.createControl(container);
     outputGroup.setLayoutData(createHorzFillData());
 

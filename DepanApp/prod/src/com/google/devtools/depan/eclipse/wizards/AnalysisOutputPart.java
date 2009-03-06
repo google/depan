@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.eclipse.wizards;
 
-import com.google.devtools.depan.eclipse.utils.WorkspaceProjectSelection;
+import com.google.devtools.depan.eclipse.utils.WorkspaceTools;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -27,8 +27,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -53,8 +51,8 @@ public class AnalysisOutputPart {
 
   // External context for this part
   private WizardPage containingPage;
-  private ISelection selection;
-  private final String fileNameDefault;
+  private final String defaultFilename;
+  private IContainer outputContainer;
 
   // UI elements
   private Text containerText;
@@ -63,11 +61,11 @@ public class AnalysisOutputPart {
   private String errorMsg;
 
   public AnalysisOutputPart(
-      WizardPage containingPage, ISelection selection,
-      String fileNameDefault) {
+      WizardPage containingPage, IContainer outputContainer,
+      String defaultFilename) {
     this.containingPage = containingPage;
-    this.selection = selection;
-    this.fileNameDefault = fileNameDefault;
+    this.outputContainer = outputContainer;
+    this.defaultFilename = defaultFilename;
   }
 
   /**
@@ -92,6 +90,9 @@ public class AnalysisOutputPart {
 
     containerText = new Text(output, SWT.BORDER | SWT.SINGLE);
     containerText.setLayoutData(fillHorz);
+    if (null != outputContainer) {
+      containerText.setText(outputContainer.getFullPath().toString());
+    }
 
     Button button = new Button(output, SWT.PUSH);
     button.setText("Browse...");
@@ -101,9 +102,9 @@ public class AnalysisOutputPart {
     label.setText("&File name:");
     fileText = new Text(output, SWT.BORDER | SWT.SINGLE);
     fileText.setLayoutData(fillHorz);
+    fileText.setText(defaultFilename);
 
-    // Setup basic values
-    initialize();
+    // Cross-check inputs
     errorMsg = validateInputs();
 
     // Install listeners after initial value assignments
@@ -163,33 +164,6 @@ public class AnalysisOutputPart {
   }
 
   /**
-   * Tests if the current workbench selection is a suitable container to use.
-   * Set the default filename, and select as default Jar as input.
-   */
-  private void initialize() {
-    fileText.setText(fileNameDefault);
-
-    if ((selection == null) || selection.isEmpty()
-        || !(selection instanceof IStructuredSelection)) {
-      return;
-    }
-    IStructuredSelection ssel = (IStructuredSelection) selection;
-    if (ssel.size() > 1) {
-      return;
-    }
-    Object obj = ssel.getFirstElement();
-    if (obj instanceof IResource) {
-      IContainer container;
-      if (obj instanceof IContainer) {
-        container = (IContainer) obj;
-      } else {
-        container = ((IResource) obj).getParent();
-      }
-      containerText.setText(container.getFullPath().toString());
-    }
-  }
-
-  /**
    * Ensure that all inputs are valid.
    */
   private void dialogChanged() {
@@ -240,7 +214,7 @@ public class AnalysisOutputPart {
    * the container field.
    */
   private void handleBrowse() {
-    containerText.setText(WorkspaceProjectSelection.selectProject(
+    containerText.setText(WorkspaceTools.selectProject(
         containingPage.getShell(), getContainerName()));
   }
 
