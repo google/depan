@@ -16,7 +16,6 @@
 
 package com.google.devtools.depan.eclipse.visualization.ogl;
 
-import com.sun.opengl.util.BufferUtil;
 import com.sun.opengl.util.Screenshot;
 
 import org.eclipse.swt.SWT;
@@ -32,6 +31,7 @@ import org.eclipse.swt.widgets.Composite;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.nio.IntBuffer;
+import java.util.logging.Logger;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GLContext;
@@ -44,8 +44,17 @@ import javax.media.opengl.glu.GLU;
  * @author Yohann Coppel
  *
  */
+/**
+ * @author leeca@google.com (Your Name Here)
+ *
+ */
 public abstract class GLScene {
   public static final float FACTOR = 1f;
+  
+  private static final int[] EMPTY_HIT_LIST = new int[0];
+
+  private static final Logger logger =
+      Logger.getLogger(GLScene.class.getName());
 
   private GLCanvas canvas;
   private GLData data;
@@ -115,9 +124,9 @@ public abstract class GLScene {
   private GLContext createGLContext() {
 
     try {
-      System.out.println("Create context...");
+      logger.info("Create context...");
       GLContext result = GLDrawableFactory.getFactory().createExternalGLContext();
-      System.out.println("    Done.");
+      logger.info("    Done.");
 
       return result;
     } catch (Throwable errGl) {
@@ -202,13 +211,12 @@ public abstract class GLScene {
       this.canvas.setCurrent();
     }
     context.makeCurrent();
-    int buffsize = 512;
-    int[] viewPort = new int[4];
-    IntBuffer selectBuffer = BufferUtil.newIntBuffer(buffsize);
-    int hits = 0;
 
+    int[] viewPort = new int[4];
     gl.glGetIntegerv(GL.GL_VIEWPORT, viewPort, 0);
-    gl.glSelectBuffer(buffsize, selectBuffer);
+
+    IntBuffer selectBuffer = getSelectBuffer();
+    gl.glSelectBuffer(selectBuffer.capacity(), selectBuffer);
 
     // setup the view
     gl.glRenderMode(GL.GL_SELECT);
@@ -229,7 +237,7 @@ public abstract class GLScene {
 
     gl.glPopMatrix();
     gl.glFlush();
-    hits = gl.glRenderMode(GL.GL_RENDER);
+    int hits = gl.glRenderMode(GL.GL_RENDER);
     gl.glMatrixMode(GL.GL_MODELVIEW);
 
     context.release();
@@ -238,7 +246,7 @@ public abstract class GLScene {
 
   public void printMousePos(int x, int y) {
     double[] m = getOGLPos(x, y);
-    System.out.println("Mouse " + m[0] + " : " + m[1] + " - " + m[2]);
+    logger.info("Mouse " + m[0] + " : " + m[1] + " - " + m[2]);
   }
 
   public double[] getOGLPos(int x, int y) {
@@ -294,6 +302,19 @@ public abstract class GLScene {
         camera[1] + (-camera[2]) * norm[1], 0f};
     return res;
   }
+
+  /**
+   * Provide an IntBuffer that can be used to select from the current scene.
+   * It should have enough room to allow every OGL entity in the scene to
+   * be selected.
+   * <p>
+   * Ownership of the buffer remains with the provider (e.g. derived class),
+   * and access is thread-safe.  But it should be a good place to dump the OGL
+   * selection data.
+   *
+   * @return IntBuffer to collect OGL selection data
+   */
+  protected abstract IntBuffer getSelectBuffer();
 
   /**
    * Say if the object represented by given id is already selected.
@@ -365,10 +386,13 @@ public abstract class GLScene {
    * @return
    */
   private int[] processHits(int hits, IntBuffer buffer) {
+    if (hits == 0) {
+      return EMPTY_HIT_LIST;
+    }
     if (hits < 0) {
-      System.err.println("too many hits ?");
-      System.err.println("    " + hits + " = " + Integer.toBinaryString(hits));
-      return new int[0];
+      logger.warning("Too many hits!!" +
+          " IntBuffer capacity = " + buffer.capacity());
+      return EMPTY_HIT_LIST;
     }
     int[] hitsResults = new int[hits];
     int offset = 0;
@@ -385,6 +409,7 @@ public abstract class GLScene {
         offset++;
       }
     }
+    System.err.println("hits = " + hits + "; offset = " + offset);
     return hitsResults;
   }
 

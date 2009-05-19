@@ -180,4 +180,22 @@ public class GraphData<F> {
   public void saveExpandState(TreePath[] expandState) {
     this.expandState = expandState;
   }
+
+  /**
+   * Provide the total number of nodes in this tree.
+   *
+   * @return number of nodes in this tree
+   */
+  public int countTreeNodes() {
+    return treeData.countTreeNodes();
+  }
+
+  /**
+   * Provide the number of interior nodes in this tree.
+   *
+   * @return number of nodes in this tree
+   */
+  public int countInteriorNodes() {
+    return treeData.countInteriorNodes();
+  }
 }

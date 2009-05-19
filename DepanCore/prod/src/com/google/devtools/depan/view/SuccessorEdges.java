@@ -58,6 +58,22 @@ public abstract class SuccessorEdges {
   public abstract Collection<GraphEdge> getReverseEdges();
 
   /**
+   * Indicate whether there are any successor edges at all.
+   * This avoids computing the set of successor nodes unless it is needed.
+   * 
+   * @return true iff successor edges are defined
+   */
+  public boolean hasSuccessors() {
+    if (getForwardEdges().size() > 0) {
+      return true;
+    }
+    if (getReverseEdges().size() > 0) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
    * Generate the current Collection of successor Nodes
    * from the Collection of successor Edges.
    * 

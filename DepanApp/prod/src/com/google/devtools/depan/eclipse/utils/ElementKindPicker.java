@@ -92,8 +92,8 @@ public class ElementKindPicker extends Composite {
         new GridData(SWT.LEFT, SWT.CENTER, false, false));
 
     // Initialize the table control
-    elementKindTable = new Table(this,
-        SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
+    elementKindTable = new Table(
+        parent, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
     elementKindTable.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, true));
 

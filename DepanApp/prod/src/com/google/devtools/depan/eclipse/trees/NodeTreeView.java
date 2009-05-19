@@ -36,6 +36,17 @@ import java.util.Calendar;
  */
 public class NodeTreeView<E> {
 
+  /**
+   * Define a generous limit for the number of tree elements to automatically
+   * open for display.  A more refined implementation might offer a user
+   * configured choice, but this prevents the most egregious problems from
+   * over-zealous expansion of tree elements.
+   * 
+   * Approx 8000 nodes takes ~8sec to expand and display.  So a limit of 1000
+   * should keep the initial open time down to ~1sec.
+   */
+  public static final int AUTO_EXPAND_LIMIT = 1000;
+
   protected TreeViewer tree;
   private GraphData<E> data;
 
@@ -76,10 +87,15 @@ public class NodeTreeView<E> {
     TreePath[] expandState = data.getExpandState();
     if (expandState.length > 0) {
       getTreeViewer().setExpandedTreePaths(expandState);
-    } else {
-      getTreeViewer().expandAll();
-      data.saveExpandState(getTreeViewer().getExpandedTreePaths());
+      return;
     }
+    if (data.countTreeNodes() < AUTO_EXPAND_LIMIT) {
+        getTreeViewer().expandAll();
+    }
+    else {
+      getTreeViewer().expandToLevel(1);
+    }
+    data.saveExpandState(getTreeViewer().getExpandedTreePaths());
   }
 
   public TreeViewer getTreeViewer() {

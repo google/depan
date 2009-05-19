@@ -18,12 +18,14 @@ package com.google.devtools.depan.view;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.devtools.depan.model.GraphNode;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 
 /**
@@ -300,5 +302,48 @@ public class TreeModel {
 
     TopoSortState topoState = new TopoSortState();
     return topoState.topoSort(universe);
+  }
+
+  /**
+   * Provide the number of interior nodes in this tree.
+   *
+   * @return number of nodes in this tree
+   */
+  public int countInteriorNodes() {
+    int result = 0;
+
+    for (SuccessorEdges fanout: index.values()) {
+      if (fanout.hasSuccessors()) {
+        ++result;
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Provide the set of nodes in this tree.
+   *
+   * @return nodes in this tree
+   */
+  public Set<GraphNode> computeTreeNodes() {
+    Set<GraphNode> treeNodes = Sets.newHashSet();
+
+    for (Map.Entry<GraphNode, ? extends SuccessorEdges> entry
+        : index.entrySet()) {
+      treeNodes.add(entry.getKey());
+      treeNodes.addAll(entry.getValue().computeSuccessorNodes());
+    }
+
+    return treeNodes;
+  }
+
+  /**
+   * Provide the number of nodes in this tree.
+   *
+   * @return number of nodes in this tree
+   */
+  public int countTreeNodes() {
+    return computeTreeNodes().size();
   }
 }

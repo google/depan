@@ -99,8 +99,8 @@ public class AWTShape extends GLEntity {
   private static void drawShape(GL gl, Shape s) {
     PathIterator it = s.getPathIterator(new AffineTransform(), shapeFlatness);
     float[] lastMoveTo = new float[6];
+    float[] f = new float[6];
     while (!it.isDone()) {
-      float[] f = new float[6];
       int res = it.currentSegment(f);
       switch (res) {
         case PathIterator.SEG_CLOSE:
@@ -124,7 +124,6 @@ public class AWTShape extends GLEntity {
       }
       it.next();
     }
-    gl.glEnd();
   }
 
   //------- Redirect API to the GeneralPath implementation.

@@ -26,13 +26,17 @@ import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.view.ViewModel;
 
+import com.sun.opengl.util.BufferUtil;
+
 import org.eclipse.swt.widgets.Composite;
 
 import java.awt.Color;
+import java.nio.IntBuffer;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  * A class extending {@link GLScene}, that specialize the {@link GLScene} to
@@ -48,16 +52,21 @@ public class GLPanel extends GLScene {
   public static final int ID_MASK     = 0xC0000000; // 2 higher bits as tag
   // 2 higher bits are 0
   public static final int ID_MASK_INV = ID_MASK ^ 0xFFFFFFFF;
+
   /**
    * Mask used to mask edges IDs.
    * 2 higher bits are "10" -> edge
    */
   public static final int EDGE_MASK   = 0x80000000;
+
   /**
    * Mask used to mask nodes IDs.
    * 2 higher bits are "11" -> node
    */
   public static final int NODE_MASK   = 0xC0000000;
+
+  private static final Logger logger =
+      Logger.getLogger(GLPanel.class.getName());
 
   /**
    * Set of {@link NodeRenderingProperty}, one for each {@link GraphNode} to
@@ -72,6 +81,11 @@ public class GLPanel extends GLScene {
   EdgeRenderingProperty[] edgesProperties;
 
   /**
+   * Sufficient space to select every element in this panel.
+   */
+  private IntBuffer selectBuffer;
+
+    /**
    * Rendering pipe.
    */
   RenderingPipe renderer;
@@ -136,6 +150,9 @@ public class GLPanel extends GLScene {
       edgePropMap.put(edge, edgesProperties[i]);
     }
 
+    // Allocate the select buffer needed for these graphic elements.
+    selectBuffer = allocSelectBuffer();
+
     renderer = new RenderingPipe(gl, glu, this, view);
     dryRun();
 
@@ -194,7 +211,7 @@ public class GLPanel extends GLScene {
     boolean caught = renderer.uncaughtKey(keyCode, character, keyCtrlState,
         keyAltState, keyShiftState);
     if (!caught) {
-      System.out.println("Lost key press: " + keyCode + "(" + character + ")");
+      logger.info("Lost key press: " + keyCode + "(" + character + ")");
     }
   }
 
@@ -238,12 +255,26 @@ public class GLPanel extends GLScene {
     return list.toArray(new NodeRenderingProperty[0]);
   }
 
-  private NodeRenderingProperty id2property(int id) {
-    if (!isNodeId(id)) {
+  /**
+   *  check if the given id matches a node and is correct.
+   */
+  private boolean isEdgeId(int id) {
+    if ((id & ID_MASK) != EDGE_MASK) {
+      return false;
+    }
+    int n = id & ID_MASK_INV;
+    if (n < 0 || n >= edgesProperties.length) {
+      return false;
+    }
+    return true;
+  }
+
+  private EdgeRenderingProperty getEdgeRenderer(int id) {
+    if (!isEdgeId(id)) {
       return null;
     }
     int n = id & ID_MASK_INV;
-    return nodesProperties[n];
+    return edgesProperties[n];
   }
 
   /**
@@ -260,10 +291,18 @@ public class GLPanel extends GLScene {
     return true;
   }
 
-  private NodeRenderingProperty[] ids2properties(int[] ids) {
+  private NodeRenderingProperty getNodeRenderer(int id) {
+    if (!isNodeId(id)) {
+      return null;
+    }
+    int n = id & ID_MASK_INV;
+    return nodesProperties[n];
+  }
+
+  private NodeRenderingProperty[] getNodeRenderers(int[] ids) {
     Collection<NodeRenderingProperty> result = Lists.newArrayList();
     for (int id : ids) {
-      NodeRenderingProperty p = id2property(id);
+      NodeRenderingProperty p = getNodeRenderer(id);
       if (null != p) {
         result.add(p);
       }
@@ -271,7 +310,7 @@ public class GLPanel extends GLScene {
     return result.toArray(new NodeRenderingProperty[0]);
   }
 
-  private GraphNode[] properties2nodes(NodeRenderingProperty[] props) {
+  private GraphNode[] getGraphNodes(NodeRenderingProperty[] props) {
     GraphNode[] nodes = new GraphNode[props.length];
     int n = 0;
     for (NodeRenderingProperty prop : props) {
@@ -367,6 +406,22 @@ public class GLPanel extends GLScene {
 
   // complete selection change
 
+  private int countAllPickable() {
+    // Double node properties to account for unpickable text objects
+    // used to label the nodes.
+    return edgesProperties.length + (nodesProperties.length * 2);
+  }
+
+  private IntBuffer allocSelectBuffer() {
+    int pickableCount = countAllPickable();
+    return BufferUtil.newIntBuffer(pickableCount * 6);
+  }
+
+  @Override
+  protected IntBuffer getSelectBuffer() {
+    return selectBuffer;
+  }
+
   public void setSelection(Collection<GraphNode> pickedNodes) {
     NodeRenderingProperty[] props = nodes2properties(pickedNodes);
     // unselect selected nodes
@@ -379,15 +434,45 @@ public class GLPanel extends GLScene {
   protected void setSelection(int[] ids) {
     // unselect selected nodes
     unselect(selection.toArray(new NodeRenderingProperty[0]));
+
+    // Report the selection, if problems
+    logIds(ids);
+
     // select new ones.
-    select(ids2properties(ids));
+    select(getNodeRenderers(ids));
+  }
+
+  private void logIds(int[] ids) {
+    int item = 0;
+    for (int id : ids) {
+      logger.info("item #" + item++ + "; " + idInfo(id));
+    }
+  }
+
+  private String idInfo(int id) {
+    if (0 == id) {
+      // What are these objects?  Unnamed text for node names?
+      return "zero id";
+    }
+
+    NodeRenderingProperty p = getNodeRenderer(id);
+    if (p != null) {
+      return "Node=" + p.node.friendlyString();
+    }
+
+    EdgeRenderingProperty edge = getEdgeRenderer(id);
+    if (edge != null) {
+      return "Edge=" + edge.edge.toString();
+    }
+
+    return "unknown";
   }
 
   // single [un]select: create a notify.
 
   @Override
   protected void select(int id) {
-    selectNotify(id2property(id), true);
+    selectNotify(getNodeRenderer(id), true);
   }
 
   public void select(GraphNode node) {
@@ -396,7 +481,7 @@ public class GLPanel extends GLScene {
 
   @Override
   protected void unselect(int id) {
-    unselectNotify(id2property(id), true);
+    unselectNotify(getNodeRenderer(id), true);
   }
 
   public void unselect(GraphNode node) {
@@ -407,7 +492,7 @@ public class GLPanel extends GLScene {
 
   @Override
   protected void select(int[] ids) {
-    select(ids2properties(ids));
+    select(getNodeRenderers(ids));
   }
 
   private void select(NodeRenderingProperty[] props) {
@@ -419,7 +504,7 @@ public class GLPanel extends GLScene {
 
   @Override
   protected void unselect(int[] ids) {
-    unselect(ids2properties(ids));
+    unselect(getNodeRenderers(ids));
   }
 
   private void unselect(NodeRenderingProperty[] props) {
@@ -433,12 +518,12 @@ public class GLPanel extends GLScene {
   // information retrieval
 
   public GraphNode[] getSelectedNodes() {
-    return properties2nodes(selection.toArray(new NodeRenderingProperty[0]));
+    return getGraphNodes(selection.toArray(new NodeRenderingProperty[0]));
   }
 
   @Override
   protected boolean isSelected(int id) {
-    return selection.contains(id2property(id));
+    return selection.contains(getNodeRenderer(id));
   }
 
   ///////////////////////////////////////////////
@@ -469,7 +554,7 @@ public class GLPanel extends GLScene {
   }
 
   private void notifySelected(NodeRenderingProperty[] props) {
-    selectionListener.notifyAddedToSelection(properties2nodes(props));
+    selectionListener.notifyAddedToSelection(getGraphNodes(props));
   }
 
   private void notifyUnselected(NodeRenderingProperty prop) {
@@ -477,6 +562,6 @@ public class GLPanel extends GLScene {
   }
 
   private void notifyUnselected(NodeRenderingProperty[] props) {
-    selectionListener.notifyRemovedFromSelection(properties2nodes(props));
+    selectionListener.notifyRemovedFromSelection(getGraphNodes(props));
   }
 }
