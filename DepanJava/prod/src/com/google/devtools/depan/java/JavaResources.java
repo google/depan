@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.java.eclipse;
+package com.google.devtools.depan.java;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -27,7 +27,7 @@ import java.net.URL;
  * @author ycoppel@google.com (Yohann Coppel)
  *
  */
-public abstract class Resources {
+public abstract class JavaResources {
 
   public static final String PLUGIN_ID = "com.google.devtools.depan.java";
 

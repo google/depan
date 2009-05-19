@@ -18,12 +18,13 @@ package com.google.devtools.depan.java.eclipse;
 
 import com.google.devtools.depan.eclipse.plugins.ElementTransformer;
 import com.google.devtools.depan.eclipse.utils.Tools;
-import com.google.devtools.depan.java.JavaElementDispatcher;
-import com.google.devtools.depan.java.elements.FieldElement;
-import com.google.devtools.depan.java.elements.InterfaceElement;
-import com.google.devtools.depan.java.elements.MethodElement;
-import com.google.devtools.depan.java.elements.PackageElement;
-import com.google.devtools.depan.java.elements.TypeElement;
+import com.google.devtools.depan.java.JavaResources;
+import com.google.devtools.depan.java.graph.FieldElement;
+import com.google.devtools.depan.java.graph.InterfaceElement;
+import com.google.devtools.depan.java.graph.MethodElement;
+import com.google.devtools.depan.java.graph.PackageElement;
+import com.google.devtools.depan.java.graph.TypeElement;
+import com.google.devtools.depan.java.integration.JavaElementDispatcher;
 import com.google.devtools.depan.model.Element;
 
 import org.eclipse.core.runtime.preferences.DefaultScope;
@@ -43,9 +44,9 @@ public class PreferencesNodePainter extends JavaElementDispatcher<Color>
     implements ElementTransformer<Color> {
 
   IEclipsePreferences preferences =
-    new InstanceScope().getNode(Resources.PLUGIN_ID);
+    new InstanceScope().getNode(JavaResources.PLUGIN_ID);
   IEclipsePreferences defaultsPrefs =
-    new DefaultScope().getNode(Resources.PLUGIN_ID);
+    new DefaultScope().getNode(JavaResources.PLUGIN_ID);
 
   private static final PreferencesNodePainter instance =
       new PreferencesNodePainter();

@@ -14,29 +14,27 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.java.eclipse.editors;
+package com.google.devtools.depan.java.editors;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Text;
 
 import com.google.devtools.depan.eclipse.utils.ElementEditor;
-import com.google.devtools.depan.java.eclipse.Resources;
+import com.google.devtools.depan.java.JavaResources;
 
 /**
- * An editor for FieldElements
+ * An editor for a TypeElement.
+ *
  * @author ycoppel@google.com (Yohann Coppel)
  *
  */
-public class FieldEditor extends ElementEditor {
-  private Label icon;
-  private Text name;
-  private TypeEditor type;
-  private TypeEditor container;
+public class TypeEditor extends ElementEditor {
+  protected Label icon;
+  protected Text fullyQualifiedName;
 
   /**
    * @param parent parent Container.
@@ -44,34 +42,27 @@ public class FieldEditor extends ElementEditor {
    * @param swtTextStyle SWT style for textboxes. Useful to set them
    *        SWT.READ_ONLY for instance.
    */
-  public FieldEditor(Composite parent, Integer style, Integer swtTextStyle) {
+  public TypeEditor(Composite parent, Integer style, Integer swtTextStyle) {
     super(parent, style, swtTextStyle);
     // widgets
     icon = new Label(this, SWT.NONE);
-    name = new Text(this, swtTextStyle);
-    Label labelType = new Label(this, SWT.NONE);
-    type = new TypeEditor(this, SWT.NONE, swtTextStyle);
-    Label labelContainer = new Label(this, SWT.NONE);
-    container = new TypeEditor(this, SWT.NONE, swtTextStyle);
+    Label labelName = new Label(this, SWT.NONE);
+    fullyQualifiedName = new Text(this, swtTextStyle);
 
-    // layout
-    Layout layout = new GridLayout(2, false);
+    // layout stuff
+    GridLayout layout = new GridLayout(3, false);
     this.setLayout(layout);
 
     GridData iconGridData = new GridData(SWT.FILL, SWT.FILL, false, false);
     iconGridData.minimumHeight = 16;
     iconGridData.minimumWidth = 16;
     icon.setLayoutData(iconGridData);
-    name.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-    labelType.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
-    type.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-    labelContainer.setLayoutData(
-        new GridData(SWT.FILL, SWT.CENTER, false, false));
-    container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+    labelName.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+    fullyQualifiedName.setLayoutData(
+        new GridData(SWT.FILL, SWT.FILL, true, false));
 
     // content
-    icon.setImage(Resources.IMAGE_FIELD);
-    labelType.setText("Type");
-    labelContainer.setText("Container");
+    icon.setImage(JavaResources.IMAGE_TYPE);
+    labelName.setText("Fully qualified Name");
   }
 }

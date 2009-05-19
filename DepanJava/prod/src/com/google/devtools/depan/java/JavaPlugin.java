@@ -28,15 +28,15 @@ import com.google.devtools.depan.java.eclipse.NodeIconTransformer;
 import com.google.devtools.depan.java.eclipse.NodeImageTransformer;
 import com.google.devtools.depan.java.eclipse.NodeShapeTransformer;
 import com.google.devtools.depan.java.eclipse.PreferencesNodePainter;
-import com.google.devtools.depan.java.eclipse.editors.ElementEditors;
-import com.google.devtools.depan.java.elements.FieldElement;
-import com.google.devtools.depan.java.elements.InterfaceElement;
-import com.google.devtools.depan.java.elements.MethodElement;
-import com.google.devtools.depan.java.elements.PackageElement;
-import com.google.devtools.depan.java.elements.TypeElement;
-import com.google.devtools.depan.java.graph.BuiltinRelationshipSets;
-import com.google.devtools.depan.java.graph.JavaElements;
+import com.google.devtools.depan.java.editors.ElementEditors;
+import com.google.devtools.depan.java.graph.FieldElement;
+import com.google.devtools.depan.java.graph.InterfaceElement;
 import com.google.devtools.depan.java.graph.JavaRelation;
+import com.google.devtools.depan.java.graph.MethodElement;
+import com.google.devtools.depan.java.graph.PackageElement;
+import com.google.devtools.depan.java.graph.TypeElement;
+import com.google.devtools.depan.java.integration.JavaDefinitions;
+import com.google.devtools.depan.java.integration.JavaRelationSets;
 import com.google.devtools.depan.model.Element;
 import com.google.devtools.depan.model.RelationshipSet;
 import com.google.devtools.depan.model.XmlPersistentObject.Config;
@@ -95,12 +95,12 @@ public class JavaPlugin implements SourcePlugin {
 
   @Override
   public Collection<? extends RelationshipSet> getBuiltinRelationshipSets() {
-    return BuiltinRelationshipSets.builtins;
+    return JavaRelationSets.builtins;
   }
 
   @Override
   public RelationshipSet getDefaultRelationshipSet() {
-    return BuiltinRelationshipSets.CONTAINER;
+    return JavaRelationSets.CONTAINER;
   }
 
   @Override
@@ -137,7 +137,7 @@ public class JavaPlugin implements SourcePlugin {
 
   @Override
   public Config getXMLConfig() {
-    return JavaElements.configXmlPersist;
+    return JavaDefinitions.configXmlPersist;
   }
 
   /**

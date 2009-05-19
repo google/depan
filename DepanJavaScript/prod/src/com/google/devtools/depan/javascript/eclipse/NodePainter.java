@@ -18,8 +18,8 @@ package com.google.devtools.depan.javascript.eclipse;
 
 import com.google.devtools.depan.eclipse.plugins.ElementTransformer;
 import com.google.devtools.depan.eclipse.utils.Tools;
+import com.google.devtools.depan.java.JavaResources;
 import com.google.devtools.depan.java.eclipse.ColorPreferencesIds;
-import com.google.devtools.depan.java.eclipse.Resources;
 import com.google.devtools.depan.javascript.graph.JavaScriptBuiltinElement;
 import com.google.devtools.depan.javascript.graph.JavaScriptClassElement;
 import com.google.devtools.depan.javascript.graph.JavaScriptEnumElement;
@@ -47,9 +47,9 @@ public class NodePainter extends JavaScriptElementDispatcher<Color>
 
   // Steal the Java object preferences
   private final IEclipsePreferences preferences =
-      new InstanceScope().getNode(Resources.PLUGIN_ID);
+      new InstanceScope().getNode(JavaResources.PLUGIN_ID);
   private final IEclipsePreferences defaultsPrefs =
-      new DefaultScope().getNode(Resources.PLUGIN_ID);
+      new DefaultScope().getNode(JavaResources.PLUGIN_ID);
 
   private Color getValue(String key) {
     return Tools.getRgb(preferences.get(key, defaultsPrefs.get(key, "0,0,0")));

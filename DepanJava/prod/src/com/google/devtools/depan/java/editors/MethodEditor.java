@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.java.eclipse.editors;
+package com.google.devtools.depan.java.editors;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -25,7 +25,7 @@ import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Text;
 
 import com.google.devtools.depan.eclipse.utils.ElementEditor;
-import com.google.devtools.depan.java.eclipse.Resources;
+import com.google.devtools.depan.java.JavaResources;
 
 /**
  * An editor for MethodElements.
@@ -63,7 +63,7 @@ public class MethodEditor extends ElementEditor {
         new GridData(SWT.FILL, SWT.CENTER, false, false));
     container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
-    icon.setImage(Resources.IMAGE_METHOD);
+    icon.setImage(JavaResources.IMAGE_METHOD);
     labelSignature.setText("Signature");
     labelContainer.setText("Class");
   }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.java.eclipse.editors;
+package com.google.devtools.depan.java.editors;
 
 import org.eclipse.swt.widgets.Composite;
 

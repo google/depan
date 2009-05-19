@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.java.graph;
+package com.google.devtools.depan.java.integration;
 
 import com.google.common.collect.Lists;
+import com.google.devtools.depan.java.graph.JavaRelation;
 import com.google.devtools.depan.model.RelationshipSet;
 import com.google.devtools.depan.model.RelationshipSetAdapter;
 
@@ -26,7 +27,7 @@ import java.util.Collection;
  * @author ycoppel@google.com (Yohann Coppel)
  *
  */
-public class BuiltinRelationshipSets {
+public class JavaRelationSets {
 
   /**
    * List of all built-in RelationshipSets. Make it easier to iterate.

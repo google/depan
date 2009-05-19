@@ -16,6 +16,8 @@
 
 package com.google.devtools.depan.java.eclipse;
 
+import com.google.devtools.depan.java.JavaResources;
+
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.ColorFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
@@ -38,7 +40,7 @@ public class ColorSelection extends FieldEditorPreferencePage implements
   public ColorSelection() {
     super(GRID);
     preferences = new ScopedPreferenceStore(new InstanceScope(),
-        Resources.PLUGIN_ID);
+        JavaResources.PLUGIN_ID);
     setPreferenceStore(preferences);
   }
 

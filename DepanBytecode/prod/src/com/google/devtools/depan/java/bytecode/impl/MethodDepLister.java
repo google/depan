@@ -16,9 +16,9 @@
 
 package com.google.devtools.depan.java.bytecode.impl;
 
-import com.google.devtools.depan.java.elements.FieldElement;
-import com.google.devtools.depan.java.elements.MethodElement;
+import com.google.devtools.depan.java.graph.FieldElement;
 import com.google.devtools.depan.java.graph.JavaRelation;
+import com.google.devtools.depan.java.graph.MethodElement;
 import com.google.devtools.depan.model.builder.DependenciesListener;
 
 import org.objectweb.asm.AnnotationVisitor;

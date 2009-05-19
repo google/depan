@@ -21,7 +21,6 @@ import com.google.devtools.depan.eclipse.wizards.AbstractAnalysisWizard;
 import com.google.devtools.depan.eclipse.wizards.ProgressListenerMonitor;
 import com.google.devtools.depan.java.bytecode.ClassLookup;
 import com.google.devtools.depan.java.bytecode.JarFileLister;
-import com.google.devtools.depan.java.graph.DefaultElementFilter;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.builder.DependenciesDispatcher;
 import com.google.devtools.depan.model.builder.DependenciesListener;

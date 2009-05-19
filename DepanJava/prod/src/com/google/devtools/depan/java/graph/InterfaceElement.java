@@ -14,32 +14,32 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.java.elements;
+package com.google.devtools.depan.java.graph;
 
-import com.google.devtools.depan.java.JavaElementVisitor;
 
 /**
- * Element representing a type. Fully qualified name is used as unique ID.
+ * Element representing an interface in the code source. Use the fully qualified
+ * name to inuquely identify this element.
  * 
  * @author ycoppel@google.com (Yohann Coppel)
  */
-public class TypeElement extends JavaElement {
+public class InterfaceElement extends JavaElement {
 
   /**
-   * This type's fully qualified name.
+   * This interface's fully qualified name.
    */
   private final String fullyQualifiedName;
 
   /**
    * @param fullyQualifiedName
    */
-  public TypeElement(String fullyQualifiedName) {
+  public InterfaceElement(String fullyQualifiedName) {
     super();
     this.fullyQualifiedName = fullyQualifiedName;
   }
 
   /**
-   * @return the fully qualified name of this TypeElement.
+   * @return the fully qualified name of this InterfaceElement.
    */
   public String getFullyQualifiedName() {
     return fullyQualifiedName;
@@ -54,19 +54,20 @@ public class TypeElement extends JavaElement {
   public int hashCode() {
     return fullyQualifiedName.hashCode();
   }
-  
+
   /**
-   * Two {@link TypeElement}s are equals iif their fullyQualifiedName are
+   * Two {@link InterfaceElement}s are equals iif their fullyQualifiedName are
    * equals.
    * 
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
-  public boolean equals(Object arg0) {
-    if (arg0 instanceof TypeElement) {
-      return ((TypeElement) arg0).fullyQualifiedName.equals(fullyQualifiedName);
+  public boolean equals(Object obj) {
+    if (obj instanceof InterfaceElement) {
+      return ((InterfaceElement) obj).fullyQualifiedName
+          .equals(this.fullyQualifiedName);
     }
-    return super.equals(arg0);
+    return super.equals(obj);
   }
 
   @Override
@@ -76,7 +77,7 @@ public class TypeElement extends JavaElement {
 
   @Override
   public String toString() {
-    return "Type " + fullyQualifiedName;
+    return "Interface " + fullyQualifiedName;
   }
 
   @Override
@@ -91,6 +92,6 @@ public class TypeElement extends JavaElement {
 
   @Override
   public void accept(JavaElementVisitor visitor) {
-    visitor.visitTypeElement(this);
+    visitor.visitInterfaceElement(this);
   }
 }

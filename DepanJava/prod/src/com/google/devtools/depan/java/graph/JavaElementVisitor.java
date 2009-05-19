@@ -1,10 +1,10 @@
 /*
  * Copyright 2007 Google Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -14,26 +14,19 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.java.eclipse.editors;
+package com.google.devtools.depan.java.graph;
 
-import org.eclipse.swt.widgets.Composite;
+import com.google.devtools.depan.model.ElementVisitor;
 
 /**
- * An editor for PackageElements.
- *
  * @author ycoppel@google.com (Yohann Coppel)
  *
  */
-public class PackageEditor extends DirectoryEditor {
+public interface JavaElementVisitor extends ElementVisitor {
 
-  /**
-   * @param parent parent Container.
-   * @param style SWT style for the container.
-   * @param swtTextStyle SWT style for textboxes. Useful to set them
-   *        SWT.READ_ONLY for instance.
-   */
-  public PackageEditor(
-      Composite parent, Integer style, Integer swtTextStyle) {
-    super(parent, style, swtTextStyle);
-  }
+  public void visitFieldElement(FieldElement element);
+  public void visitInterfaceElement(InterfaceElement element);
+  public void visitMethodElement(MethodElement element);
+  public void visitPackageElement(PackageElement element);
+  public void visitTypeElement(TypeElement element);
 }

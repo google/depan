@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.java.elements;
+package com.google.devtools.depan.java.graph;
 
-import com.google.devtools.depan.java.JavaElementVisitor;
 
 /**
  * Element representing a package. the full package name is used as ID.

@@ -6,8 +6,9 @@ Bundle-Version: 1.0.3
 Bundle-Vendor: Google Inc.
 Export-Package: com.google.devtools.depan.java,
  com.google.devtools.depan.java.eclipse,
- com.google.devtools.depan.java.elements,
- com.google.devtools.depan.java.graph
+ com.google.devtools.depan.java.editors,
+ com.google.devtools.depan.java.graph,
+ com.google.devtools.depan.java.integration
 Require-Bundle: org.eclipse.core.resources,
  org.eclipse.core.runtime,
  org.eclipse.jface.text,

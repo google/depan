@@ -17,7 +17,7 @@
 package com.google.devtools.depan.javascript.eclipse;
 
 import com.google.devtools.depan.eclipse.plugins.ElementTransformer;
-import com.google.devtools.depan.java.eclipse.Resources;
+import com.google.devtools.depan.java.JavaResources;
 import com.google.devtools.depan.javascript.graph.JavaScriptBuiltinElement;
 import com.google.devtools.depan.javascript.graph.JavaScriptClassElement;
 import com.google.devtools.depan.javascript.graph.JavaScriptEnumElement;
@@ -42,32 +42,32 @@ public class IconTransformer
 
   @Override
   public ImageDescriptor match(JavaScriptBuiltinElement builtinElement) {
-    return Resources.IMAGE_DESC_FIELD;
+    return JavaResources.IMAGE_DESC_FIELD;
   }
 
   @Override
   public ImageDescriptor match(JavaScriptClassElement classElement) {
-    return Resources.IMAGE_DESC_TYPE;
+    return JavaResources.IMAGE_DESC_TYPE;
   }
 
   @Override
   public ImageDescriptor match(JavaScriptEnumElement enumElement) {
-    return Resources.IMAGE_DESC_TYPE;
+    return JavaResources.IMAGE_DESC_TYPE;
   }
 
   @Override
   public ImageDescriptor match(JavaScriptFieldElement fieldElement) {
-    return Resources.IMAGE_DESC_FIELD;
+    return JavaResources.IMAGE_DESC_FIELD;
   }
 
   @Override
   public ImageDescriptor match(JavaScriptFunctionElement functionElement) {
-    return Resources.IMAGE_DESC_METHOD;
+    return JavaResources.IMAGE_DESC_METHOD;
   }
 
   @Override
   public ImageDescriptor match(JavaScriptVariableElement variableElement) {
-    return Resources.IMAGE_DESC_FIELD;
+    return JavaResources.IMAGE_DESC_FIELD;
   }
 
   @Override

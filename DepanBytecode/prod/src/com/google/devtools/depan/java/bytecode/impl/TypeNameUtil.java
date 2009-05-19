@@ -15,8 +15,8 @@
  */
 package com.google.devtools.depan.java.bytecode.impl;
 
-import com.google.devtools.depan.java.elements.InterfaceElement;
-import com.google.devtools.depan.java.elements.TypeElement;
+import com.google.devtools.depan.java.graph.InterfaceElement;
+import com.google.devtools.depan.java.graph.TypeElement;
 
 import org.objectweb.asm.Type;
 

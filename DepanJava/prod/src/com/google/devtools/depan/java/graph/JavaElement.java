@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.java.elements;
+package com.google.devtools.depan.java.graph;
 
-import com.google.devtools.depan.java.JavaElementVisitor;
 import com.google.devtools.depan.model.GraphNode;
 
 

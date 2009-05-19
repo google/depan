@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.java;
+package com.google.devtools.depan.java.integration;
 
-import com.google.devtools.depan.java.elements.FieldElement;
-import com.google.devtools.depan.java.elements.InterfaceElement;
-import com.google.devtools.depan.java.elements.MethodElement;
-import com.google.devtools.depan.java.elements.PackageElement;
-import com.google.devtools.depan.java.elements.TypeElement;
+import com.google.devtools.depan.java.graph.FieldElement;
+import com.google.devtools.depan.java.graph.InterfaceElement;
+import com.google.devtools.depan.java.graph.JavaElementVisitor;
+import com.google.devtools.depan.java.graph.MethodElement;
+import com.google.devtools.depan.java.graph.PackageElement;
+import com.google.devtools.depan.java.graph.TypeElement;
 import com.google.devtools.depan.model.Element;
 
 /**

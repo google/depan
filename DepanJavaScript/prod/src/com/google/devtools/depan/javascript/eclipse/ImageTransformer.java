@@ -17,7 +17,7 @@
 package com.google.devtools.depan.javascript.eclipse;
 
 import com.google.devtools.depan.eclipse.plugins.ElementTransformer;
-import com.google.devtools.depan.java.eclipse.Resources;
+import com.google.devtools.depan.java.JavaResources;
 import com.google.devtools.depan.javascript.graph.JavaScriptBuiltinElement;
 import com.google.devtools.depan.javascript.graph.JavaScriptClassElement;
 import com.google.devtools.depan.javascript.graph.JavaScriptEnumElement;
@@ -41,32 +41,32 @@ public class ImageTransformer extends JavaScriptElementDispatcher<Image>
 
   @Override
   public Image match(JavaScriptBuiltinElement builtinElement) {
-    return Resources.IMAGE_FIELD;
+    return JavaResources.IMAGE_FIELD;
   }
 
   @Override
   public Image match(JavaScriptClassElement classElement) {
-    return Resources.IMAGE_TYPE;
+    return JavaResources.IMAGE_TYPE;
   }
 
   @Override
   public Image match(JavaScriptEnumElement enumElement) {
-    return Resources.IMAGE_TYPE;
+    return JavaResources.IMAGE_TYPE;
   }
 
   @Override
   public Image match(JavaScriptFieldElement fieldElement) {
-    return Resources.IMAGE_FIELD;
+    return JavaResources.IMAGE_FIELD;
   }
 
   @Override
   public Image match(JavaScriptFunctionElement functionElement) {
-    return Resources.IMAGE_METHOD;
+    return JavaResources.IMAGE_METHOD;
   }
 
   @Override
   public Image match(JavaScriptVariableElement variableElement) {
-    return Resources.IMAGE_FIELD;
+    return JavaResources.IMAGE_FIELD;
   }
 
   @Override

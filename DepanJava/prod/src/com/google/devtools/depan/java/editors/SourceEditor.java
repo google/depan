@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.java.eclipse.editors;
+package com.google.devtools.depan.java.editors;
 
 import org.eclipse.swt.widgets.Composite;
 
-import com.google.devtools.depan.java.eclipse.Resources;
+import com.google.devtools.depan.java.JavaResources;
 
 /**
  * An editor for SourceElements.
@@ -36,6 +36,6 @@ public class SourceEditor extends DirectoryEditor {
    */
   public SourceEditor(Composite parent, Integer style, Integer swtTextStyle) {
     super(parent, style, swtTextStyle);
-    icon.setImage(Resources.IMAGE_SOURCE);
+    icon.setImage(JavaResources.IMAGE_SOURCE);
   }
 }

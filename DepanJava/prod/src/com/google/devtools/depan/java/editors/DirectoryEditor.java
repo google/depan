@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.java.eclipse.editors;
+package com.google.devtools.depan.java.editors;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -25,7 +25,7 @@ import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Text;
 
 import com.google.devtools.depan.eclipse.utils.ElementEditor;
-import com.google.devtools.depan.java.eclipse.Resources;
+import com.google.devtools.depan.java.JavaResources;
 
 /**
  * An editor for a DirectoryElement.
@@ -64,7 +64,7 @@ public class DirectoryEditor extends ElementEditor {
         new GridData(SWT.FILL, SWT.FILL, true, false));
 
     // content
-    icon.setImage(Resources.IMAGE_DIRECTORY);
+    icon.setImage(JavaResources.IMAGE_DIRECTORY);
     labelName.setText("Path");
   }
 }
