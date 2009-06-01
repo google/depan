@@ -14,7 +14,7 @@
  * the License.
  */
 
-package com.google.devtools.depan.filesystem.eclipse;
+package com.google.devtools.depan.filesystem;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;

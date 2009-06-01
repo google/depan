@@ -17,9 +17,9 @@
 package com.google.devtools.depan.filesystem.eclipse;
 
 import com.google.devtools.depan.eclipse.plugins.ElementTransformer;
-import com.google.devtools.depan.filesystem.FileSystemElementDispatcher;
-import com.google.devtools.depan.filesystem.elements.DirectoryElement;
-import com.google.devtools.depan.filesystem.elements.FileElement;
+import com.google.devtools.depan.filesystem.graph.DirectoryElement;
+import com.google.devtools.depan.filesystem.graph.FileElement;
+import com.google.devtools.depan.filesystem.integration.FileSystemElementDispatcher;
 import com.google.devtools.depan.model.Element;
 
 import java.awt.Color;

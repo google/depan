@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.filesystem;
+package com.google.devtools.depan.filesystem.integration;
 
-import com.google.devtools.depan.filesystem.elements.DirectoryElement;
-import com.google.devtools.depan.filesystem.elements.FileElement;
+import com.google.devtools.depan.filesystem.graph.DirectoryElement;
+import com.google.devtools.depan.filesystem.graph.FileElement;
 import com.google.devtools.depan.filesystem.graph.FileSystemRelation;
 import com.google.devtools.depan.model.XmlPersistentObject.Config;
 
@@ -30,22 +30,22 @@ import com.thoughtworks.xstream.XStream;
  *
  * @author tugrul@google.com (Tugrul Ince)
  */
-public class FileSystemConfig implements Config {
+public class FileSystemDefinitions implements Config {
   /**
    * One and only instance of this class.
    */
-  private static FileSystemConfig INSTANCE = new FileSystemConfig();
+  private static FileSystemDefinitions INSTANCE = new FileSystemDefinitions();
 
   /**
    * Returns the singleton instance of this class.
    *
    * @return The singleton instance of this class.
    */
-  public static FileSystemConfig getInstance() {
+  public static FileSystemDefinitions getInstance() {
     return INSTANCE;
   }
 
-  private FileSystemConfig() {
+  private FileSystemDefinitions() {
     // no outside instantiation
   }
 

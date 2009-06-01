@@ -12,7 +12,7 @@ Require-Bundle: com.google.devtools.depan,
  com.google.devtools.depan.libraries
 Export-Package: com.google.devtools.depan.filesystem,
  com.google.devtools.depan.filesystem.eclipse,
- com.google.devtools.depan.filesystem.eclipse.editors,
- com.google.devtools.depan.filesystem.elements,
- com.google.devtools.depan.filesystem.graph
+ com.google.devtools.depan.filesystem.editors,
+ com.google.devtools.depan.filesystem.graph,
+ com.google.devtools.depan.filesystem.integration
 Bundle-Vendor: Google Inc.

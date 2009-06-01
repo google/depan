@@ -22,16 +22,17 @@ import com.google.devtools.depan.eclipse.plugins.ElementTransformer;
 import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
 import com.google.devtools.depan.eclipse.utils.ElementEditor;
 import com.google.devtools.depan.eclipse.visualization.ogl.GLEntity;
-import com.google.devtools.depan.filesystem.eclipse.FileSystemElementEditors;
 import com.google.devtools.depan.filesystem.eclipse.FileSystemIconTransformer;
 import com.google.devtools.depan.filesystem.eclipse.FileSystemImageTransformer;
 import com.google.devtools.depan.filesystem.eclipse.FileSystemNodeComparator;
 import com.google.devtools.depan.filesystem.eclipse.FileSystemNodePainter;
 import com.google.devtools.depan.filesystem.eclipse.FileSystemShapeTransformer;
 import com.google.devtools.depan.filesystem.eclipse.NewFileSystemWizard;
-import com.google.devtools.depan.filesystem.elements.DirectoryElement;
-import com.google.devtools.depan.filesystem.elements.FileElement;
+import com.google.devtools.depan.filesystem.editors.FileSystemElementEditors;
+import com.google.devtools.depan.filesystem.graph.DirectoryElement;
+import com.google.devtools.depan.filesystem.graph.FileElement;
 import com.google.devtools.depan.filesystem.graph.FileSystemRelation;
+import com.google.devtools.depan.filesystem.integration.FileSystemDefinitions;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.model.Element;
 import com.google.devtools.depan.model.RelationshipSet;
@@ -172,7 +173,7 @@ public class FileSystemPlugin implements SourcePlugin {
 
   @Override
   public Config getXMLConfig() {
-    return FileSystemConfig.getInstance();
+    return FileSystemDefinitions.getInstance();
   }
 
   @Override

@@ -14,9 +14,8 @@
  * the License.
  */
 
-package com.google.devtools.depan.filesystem.elements;
+package com.google.devtools.depan.filesystem.graph;
 
-import com.google.devtools.depan.filesystem.FileSystemElementVisitor;
 import com.google.devtools.depan.model.ElementVisitor;
 import com.google.devtools.depan.model.GraphNode;
 

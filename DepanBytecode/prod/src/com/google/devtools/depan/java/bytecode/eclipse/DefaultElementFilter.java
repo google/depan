@@ -17,7 +17,7 @@
 package com.google.devtools.depan.java.bytecode.eclipse;
 
 import com.google.devtools.depan.eclipse.plugins.ElementTransformer;
-import com.google.devtools.depan.filesystem.elements.FileSystemElement;
+import com.google.devtools.depan.filesystem.graph.FileSystemElement;
 import com.google.devtools.depan.java.graph.FieldElement;
 import com.google.devtools.depan.java.graph.InterfaceElement;
 import com.google.devtools.depan.java.graph.MethodElement;

@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.filesystem;
+package com.google.devtools.depan.filesystem.graph;
 
-import com.google.devtools.depan.filesystem.elements.DirectoryElement;
-import com.google.devtools.depan.filesystem.elements.FileElement;
 import com.google.devtools.depan.model.ElementVisitor;
 
 /**

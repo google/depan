@@ -14,9 +14,9 @@
  * the License.
  */
 
-package com.google.devtools.depan.filesystem.eclipse.editors;
+package com.google.devtools.depan.filesystem.editors;
 
-import com.google.devtools.depan.filesystem.eclipse.FileSystemResources;
+import com.google.devtools.depan.filesystem.FileSystemResources;
 
 import org.eclipse.swt.widgets.Composite;
 

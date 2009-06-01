@@ -14,14 +14,12 @@
  * the License.
  */
 
-package com.google.devtools.depan.filesystem.eclipse;
+package com.google.devtools.depan.filesystem.editors;
 
 import com.google.devtools.depan.eclipse.plugins.ElementClassTransformer;
 import com.google.devtools.depan.eclipse.utils.ElementEditor;
-import com.google.devtools.depan.filesystem.eclipse.editors.DirectoryEditor;
-import com.google.devtools.depan.filesystem.eclipse.editors.FileEditor;
-import com.google.devtools.depan.filesystem.elements.DirectoryElement;
-import com.google.devtools.depan.filesystem.elements.FileElement;
+import com.google.devtools.depan.filesystem.graph.DirectoryElement;
+import com.google.devtools.depan.filesystem.graph.FileElement;
 import com.google.devtools.depan.model.Element;
 
 /**

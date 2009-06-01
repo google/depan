@@ -16,8 +16,8 @@
 
 package com.google.devtools.depan.java.bytecode.impl;
 
-import com.google.devtools.depan.filesystem.elements.DirectoryElement;
-import com.google.devtools.depan.filesystem.elements.FileElement;
+import com.google.devtools.depan.filesystem.graph.DirectoryElement;
+import com.google.devtools.depan.filesystem.graph.FileElement;
 import com.google.devtools.depan.java.graph.FieldElement;
 import com.google.devtools.depan.java.graph.InterfaceElement;
 import com.google.devtools.depan.java.graph.JavaRelation;
