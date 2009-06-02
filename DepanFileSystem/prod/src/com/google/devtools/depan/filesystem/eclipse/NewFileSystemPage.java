@@ -179,7 +179,7 @@ public class NewFileSystemPage extends AbstractAnalysisPage {
     }
   }
 
-  private String getPathText() {
+  public String getPathText() {
     return pathEntry.getText();
   }
 

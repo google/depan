@@ -49,6 +49,12 @@ public class SimpleDependencyListener
     this.graphBuilder = builder;
   }
 
+
+  @Override
+  public void newNode(GraphNode orphan) {
+    graphBuilder.mapNode(orphan);
+  }
+
   @Override
   public void newDep(GraphNode parent, GraphNode child, Relation t) {
     GraphNode p = graphBuilder.mapNode(parent);

@@ -31,6 +31,14 @@ import com.google.devtools.depan.model.GraphNode;
 public interface DependenciesListener {
 
   /**
+   * Insert a Node with no dependencies.  Sometimes you just have a node
+   * with no direct connections
+   *
+   * @param orphan un-attached node to add to graph
+   */
+  public void newNode(GraphNode orphan);
+
+  /**
    * Create a dependency of type t between a child and his parent
    *
    * @param parent his parent
