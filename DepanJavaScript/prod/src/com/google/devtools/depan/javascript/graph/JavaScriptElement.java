@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.javascript.graph;
 
+import com.google.devtools.depan.eclipse.utils.DottedNameTools;
 import com.google.devtools.depan.model.ElementVisitor;
 import com.google.devtools.depan.model.GraphNode;
 
@@ -30,6 +31,8 @@ import com.google.devtools.depan.model.GraphNode;
  */
 public abstract class JavaScriptElement extends GraphNode {
 
+  public static final String JAVASCRIPT_ID_PREFIX = "js";
+
   /**
    * Convert a JavaScript style name to its parent name.
    * No everything that shows up in JavaScript analysis is a
@@ -39,12 +42,14 @@ public abstract class JavaScriptElement extends GraphNode {
    * @return the qName of the parent, or empty if no parent is identified
    */
   public static String getParentName(String qName) {
-    int dotSplit = qName.lastIndexOf('.');
-    if (dotSplit < 1) {
-      return "";
-    }
+    return DottedNameTools.getParentNameSegments(qName);
+  }
 
-    return qName.substring(0, dotSplit);
+  public abstract String getJavaScriptId();
+
+  @Override
+  public String getId() {
+    return JAVASCRIPT_ID_PREFIX + ":" + getJavaScriptId();
   }
 
   /**
@@ -54,7 +59,7 @@ public abstract class JavaScriptElement extends GraphNode {
    *     provided if the element has no parent.
    */
   public String getParentName() {
-    return getParentName(getId());
+    return getParentName(getJavaScriptId());
   }
 
   /**
@@ -64,14 +69,7 @@ public abstract class JavaScriptElement extends GraphNode {
    * @return the simple name of a JavaScript element.
    */
   public String getElementName() {
-    String qName = getId();
-
-    int dotSplit = qName.lastIndexOf('.');
-    if (dotSplit < 0) {
-      return qName;
-    }
-
-    return qName.substring(dotSplit + 1);
+    return DottedNameTools.getFinalNameSegment(getJavaScriptId());
   }
 
   /**

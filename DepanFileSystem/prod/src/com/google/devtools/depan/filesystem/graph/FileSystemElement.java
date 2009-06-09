@@ -27,6 +27,15 @@ import com.google.devtools.depan.model.GraphNode;
  */
 public abstract class FileSystemElement extends GraphNode {
 
+  public static final String FILESYSTEM_ID_PREFIX = "fs";
+
+  public abstract String getPath();
+
+  @Override
+  public String getId() {
+    return FILESYSTEM_ID_PREFIX + ":" + getPath();
+  }
+
   /**
    * Accepts a {@link FileSystemElementVisitor} and performs whatever operation
    * that visitor requires.

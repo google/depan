@@ -43,7 +43,7 @@ public class JavaScriptClassElement extends JavaScriptElement {
   }
 
   @Override
-  public String getId() {
+  public String getJavaScriptId() {
     return className;
   }
 }

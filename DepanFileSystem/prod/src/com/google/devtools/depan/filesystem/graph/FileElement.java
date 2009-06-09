@@ -39,6 +39,11 @@ public class FileElement extends FileSystemElement {
     this.filePath = fileName;
   }
 
+  @Override
+  public String getPath() {
+    return filePath;
+  }
+
   /**
    * Uses sourceFile to create a hashCode.
    *
@@ -46,7 +51,7 @@ public class FileElement extends FileSystemElement {
    */
   @Override
   public int hashCode() {
-    return filePath.hashCode();
+    return getPath().hashCode();
   }
 
   /**
@@ -60,7 +65,7 @@ public class FileElement extends FileSystemElement {
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof FileElement) {
-      return ((FileElement) obj).filePath.equals(this.filePath);
+      return getPath().equals(((FileElement) obj).getPath());
     }
     return super.equals(obj);
   }
@@ -72,22 +77,12 @@ public class FileElement extends FileSystemElement {
    */
   @Override
   public String friendlyString() {
-    return new File(filePath).getName();
+    return new File(getPath()).getName();
   }
 
   @Override
   public void accept(FileSystemElementVisitor visitor) {
     visitor.visitFileElement(this);
-  }
-
-  /**
-   * Returns the file path which may be used to uniquely identify this object.
-   *
-   * @return File Path which may be used to uniquely identify this object.
-   */
-  @Override
-  public String getId() {
-    return filePath;
   }
 
   /**
@@ -97,6 +92,6 @@ public class FileElement extends FileSystemElement {
    */
   @Override
   public String toString() {
-    return "Source " + getId();
+    return "Source " + getPath();
   }
 }

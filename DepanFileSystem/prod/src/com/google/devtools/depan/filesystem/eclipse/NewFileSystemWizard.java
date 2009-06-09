@@ -28,8 +28,7 @@ import java.io.IOException;
 
 /**
  * Wizard for converting a file system tree into a DepAn analysis graph.
- */
-/**
+ * 
  * @author <a href="leeca@google.com">Lee Carver</a>
  */
 public class NewFileSystemWizard extends AbstractAnalysisWizard {

@@ -43,7 +43,7 @@ public class JavaScriptFunctionElement extends JavaScriptElement {
   }
 
   @Override
-  public String getId() {
+  public String getJavaScriptId() {
     return functionName;
   }
 }

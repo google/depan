@@ -86,20 +86,21 @@ public class MethodElement extends JavaElement {
     }
     return super.equals(obj);
   }
-  
-  public String getId() {
-    return classElement.getId() + "." + methodName
-        + "(" + methodSignature + ")";
+
+  @Override
+  public String getJavaId() {
+    return getClassElement().getJavaId() + "." + getName()
+        + "(" + getSignature() + ")";
   }
 
   @Override
   public String toString() {
-    return "Method " + getId();
+    return "Method " + getJavaId();
   }
 
   @Override
   public String friendlyString() {
-    return classElement.friendlyString() + "." + methodName;
+    return getClassElement().friendlyString() + "." + getName();
   }
 
   public TypeElement getClassElement() {

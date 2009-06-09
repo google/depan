@@ -43,7 +43,7 @@ public class JavaScriptFieldElement extends JavaScriptElement {
   }
 
   @Override
-  public String getId() {
+  public String getJavaScriptId() {
     return enumName;
   }
 }

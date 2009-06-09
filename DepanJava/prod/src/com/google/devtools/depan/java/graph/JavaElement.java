@@ -39,13 +39,22 @@ import com.google.devtools.depan.model.GraphNode;
  */
 public abstract class JavaElement extends GraphNode {
 
+  public static final String JAVA_ID_PREFIX = "java";
+
+  public abstract String getJavaId();
+
+  @Override
+  public String getId() {
+    return JAVA_ID_PREFIX + ":" + getJavaId();
+  }
+
   /**
    * Accept an ElementVisitor.
    * 
    * @param visitor
    */
   public abstract void accept(JavaElementVisitor visitor);
-  
+
   @Override
   public void accept(com.google.devtools.depan.model.ElementVisitor visitor) {
     if (visitor instanceof JavaElementVisitor) {

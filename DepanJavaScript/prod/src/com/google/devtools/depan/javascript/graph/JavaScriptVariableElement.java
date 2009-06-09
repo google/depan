@@ -41,7 +41,7 @@ public class JavaScriptVariableElement extends JavaScriptElement {
   }
 
   @Override
-  public String getId() {
+  public String getJavaScriptId() {
     return variableName;
   }
 }

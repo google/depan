@@ -16,6 +16,8 @@
 
 package com.google.devtools.depan.java.graph;
 
+import com.google.devtools.depan.eclipse.utils.DottedNameTools;
+
 
 /**
  * Element representing an interface in the code source. Use the fully qualified
@@ -34,7 +36,6 @@ public class InterfaceElement extends JavaElement {
    * @param fullyQualifiedName
    */
   public InterfaceElement(String fullyQualifiedName) {
-    super();
     this.fullyQualifiedName = fullyQualifiedName;
   }
 
@@ -71,23 +72,18 @@ public class InterfaceElement extends JavaElement {
   }
 
   @Override
-  public String getId() {
-    return fullyQualifiedName;
+  public String getJavaId() {
+    return getFullyQualifiedName();
   }
 
   @Override
   public String toString() {
-    return "Interface " + fullyQualifiedName;
+    return "Interface " + getFullyQualifiedName();
   }
 
   @Override
   public String friendlyString() {
-    if (fullyQualifiedName.contains(".")) {
-      return fullyQualifiedName.substring(
-          fullyQualifiedName.lastIndexOf('.') + 1, fullyQualifiedName.length());
-    } else {
-      return fullyQualifiedName;
-    }
+    return DottedNameTools.getFinalNameSegment(getFullyQualifiedName());
   }
 
   @Override

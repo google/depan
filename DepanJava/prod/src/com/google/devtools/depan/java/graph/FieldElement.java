@@ -27,17 +27,17 @@ package com.google.devtools.depan.java.graph;
 public class FieldElement extends JavaElement {
 
   /**
-   * field name.
+   * Name of field.
    */
   private final String name;
 
   /**
-   * pointer to this variable type.
+   * Type of field.
    */
   private final TypeElement type;
 
   /**
-   * pointer to this variable container class.
+   * Class that container's this field
    */
   private final TypeElement containerClass;
 
@@ -47,8 +47,8 @@ public class FieldElement extends JavaElement {
    * @param type variable's type
    * @param containerClass variable's container class
    */
-  public FieldElement(String name, TypeElement type,
-      TypeElement containerClass) {
+  public FieldElement(
+      String name, TypeElement type, TypeElement containerClass) {
     this.name = name;
     this.type = type;
     this.containerClass = containerClass;
@@ -84,23 +84,21 @@ public class FieldElement extends JavaElement {
     return super.equals(obj);
   }
   
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.google.deptool.bytecodevisitor.interfaces.Element#getId()
-   */
-  public String getId() {
-    return containerClass.getId() + "." + name + "/" + type.getId();
+
+  @Override
+  public String getJavaId() {
+    return getContainerClass().getJavaId() + "." + name
+        + "/" + getType().getJavaId();
   }
 
   @Override
   public String toString() {
-    return "Field " + getId();
+    return "Field " + getJavaId();
   }
 
   @Override
   public String friendlyString() {
-    return containerClass.friendlyString() + "." + name;
+    return getContainerClass().friendlyString() + "." + name;
   }
 
   /**

@@ -62,18 +62,14 @@ public class PackageElement extends JavaElement {
     return super.equals(obj);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.google.devtools.depan.bytecodevisitor.interfaces.Element #getId()
-   */
-  public String getId() {
-    return packageName;
+  @Override
+  public String getJavaId() {
+    return getPackageName();
   }
 
   @Override
   public String toString() {
-    return "Package " + getId();
+    return "Package " + getJavaId();
   }
 
   @Override

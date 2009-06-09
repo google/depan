@@ -45,7 +45,7 @@ public class JavaScriptBuiltinElement extends JavaScriptElement {
   }
 
   @Override
-  public String getId() {
+  public String getJavaScriptId() {
     return builtinName;
   }
 }

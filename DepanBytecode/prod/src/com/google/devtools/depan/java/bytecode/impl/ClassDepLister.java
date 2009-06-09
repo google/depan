@@ -259,13 +259,14 @@ public class ClassDepLister implements ClassVisitor {
   public void visitSource(String source, String debug) {
     if (this.mainClass.getFullyQualifiedName().contains("$")) {
       // this is an inner class. We use the visitInnerClass() callback instead.
-    } else {
-      // this is a main class.
-      File sourceFile = new File(path.getId(), source);
-      FileElement se = new FileElement(sourceFile.getPath());
-      dl.newDep(path, se, JavaRelation.FILE);
-      dl.newDep(se, mainClass, JavaRelation.CLASS);
+      return;
     }
+
+    // this is a main class.
+    File sourceFile = new File(path.getPath(), source);
+    FileElement se = new FileElement(sourceFile.getPath());
+    dl.newDep(path, se, JavaRelation.FILE);
+    dl.newDep(se, mainClass, JavaRelation.CLASS);
   }
 
 }

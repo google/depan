@@ -40,6 +40,11 @@ public class DirectoryElement extends FileSystemElement {
     this.path = path;
   }
 
+  @Override
+  public String getPath() {
+    return path;
+  }
+
   /**
    * Returns the directory name of this object.
    *
@@ -47,23 +52,12 @@ public class DirectoryElement extends FileSystemElement {
    */
   @Override
   public String friendlyString() {
-    return new File(path).getName();
+    return new File(getPath()).getName();
   }
 
   @Override
   public void accept(FileSystemElementVisitor visitor) {
     visitor.visitDirectoryElement(this);
-  }
-
-  /**
-   * Returns the absolute path which may be used to uniquely identify this
-   * object.
-   *
-   * @return Absolute Path which may be used to uniquely identify this object.
-   */
-  @Override
-  public String getId() {
-    return this.path;
   }
 
   /**
@@ -73,7 +67,7 @@ public class DirectoryElement extends FileSystemElement {
    */
   @Override
   public int hashCode() {
-    return path.hashCode();
+    return getPath().hashCode();
   }
 
   /**
@@ -82,7 +76,7 @@ public class DirectoryElement extends FileSystemElement {
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof DirectoryElement) {
-      return ((DirectoryElement) obj).path.equals(this.path);
+      return getPath().equals(((DirectoryElement) obj).getPath());
     }
     return super.equals(obj);
   }
@@ -94,6 +88,6 @@ public class DirectoryElement extends FileSystemElement {
    */
   @Override
   public String toString() {
-    return "Dir " + getId();
+    return "Dir " + getPath();
   }
 }
