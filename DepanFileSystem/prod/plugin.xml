@@ -15,7 +15,7 @@
             category="com.google.devtools.depan"
             class="com.google.devtools.depan.filesystem.eclipse.NewFileSystemWizard"
             finalPerspective="com.google.devtools.depan.eclipse.perspective"
-            icon="icons/eclipse/packagefolder_obj.png"
+            icon="icons/eclipse/folder_obj.png"
             id="com.google.devtools.depan.filesystem.eclipse.NewFileSystemWizard"
             name="New File System Analysis">
       </wizard>

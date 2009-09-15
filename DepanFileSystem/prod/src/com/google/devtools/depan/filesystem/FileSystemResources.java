@@ -40,7 +40,7 @@ public abstract class FileSystemResources {
    * {@link ImageDescriptor} for <code>DirectoryElement</code>s.
    */
   public static final ImageDescriptor IMAGE_DESC_DIRECTORY =
-      getImageDescriptor("icons/eclipse/packagefolder_obj.png");
+      getImageDescriptor("icons/eclipse/folder_obj.png");
 
   /**
    * {@link ImageDescriptor} for <code>FileElement</code>s.
