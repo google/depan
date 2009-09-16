@@ -70,4 +70,3 @@ public class DirectoryEditor extends ElementEditor {
     labelName.setText("Path");
   }
 }
-

@@ -134,6 +134,6 @@ public class PackageTreeBuilder {
       return new PackageElement("<unnamed>");
     }
 
-    return new PackageElement(packagePath.substring(1).replace('/', '.'));
+    return new PackageElement(packagePath.replace('/', '.'));
   }
 }

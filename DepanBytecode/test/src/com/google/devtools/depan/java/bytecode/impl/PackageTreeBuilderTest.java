@@ -51,7 +51,7 @@ public class PackageTreeBuilderTest extends TestCase {
 
   public void testBasic() {
     PackageTreeBuilder packageBuilder = new PackageTreeBuilder(builder);
-    File packageFile = new File("/com/google/depan/view");
+    File packageFile = new File("com/google/depan/view");
     File treeFile = new File("/a/b/c/com/google/depan/view");
 
     PackageElement packageNode = packageBuilder.installPackageTree(
@@ -70,7 +70,7 @@ public class PackageTreeBuilderTest extends TestCase {
 
   public void testPerverse() {
     PackageTreeBuilder packageBuilder = new PackageTreeBuilder(builder);
-    File packageFile = new File("/com/google/depan/view");
+    File packageFile = new File("com/google/depan/view");
     File treeFile = new File("/blix/blax");
 
     PackageElement packageNode = packageBuilder.installPackageTree(

@@ -34,25 +34,25 @@ public abstract class JavaResources {
   private static Bundle bundle = Platform.getBundle(PLUGIN_ID);
 
   // icons
-  public static final ImageDescriptor IMAGE_DESC_DIRECTORY =
-      getImageDescriptor("icons/eclipse/packagefolder_obj.png");
-  public static final ImageDescriptor IMAGE_DESC_SOURCE =
-      getImageDescriptor("icons/eclipse/jcu_obj.png");
   public static final ImageDescriptor IMAGE_DESC_FIELD =
       getImageDescriptor("icons/eclipse/field_public_obj.png");
+  public static final ImageDescriptor IMAGE_DESC_INTERFACE =
+      getImageDescriptor("icons/eclipse/int_obj.png");
   public static final ImageDescriptor IMAGE_DESC_METHOD =
       getImageDescriptor("icons/eclipse/methpub_obj.png");
+  public static final ImageDescriptor IMAGE_DESC_PACKAGE =
+      getImageDescriptor("icons/eclipse/package_obj.png");
   public static final ImageDescriptor IMAGE_DESC_TYPE =
       getImageDescriptor("icons/eclipse/class_obj.png");
 
-  public static final Image IMAGE_DIRECTORY =
-      getImage(IMAGE_DESC_DIRECTORY);
-  public static final Image IMAGE_SOURCE =
-      getImage(IMAGE_DESC_SOURCE);
   public static final Image IMAGE_FIELD =
       getImage(IMAGE_DESC_FIELD);
+  public static final Image IMAGE_INTERFACE =
+      getImage(IMAGE_DESC_INTERFACE);
   public static final Image IMAGE_METHOD =
       getImage(IMAGE_DESC_METHOD);
+  public static final Image IMAGE_PACKAGE =
+      getImage(IMAGE_DESC_PACKAGE);
   public static final Image IMAGE_TYPE =
       getImage(IMAGE_DESC_TYPE);
 

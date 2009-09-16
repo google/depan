@@ -16,6 +16,8 @@
 
 package com.google.devtools.depan.java.editors;
 
+import com.google.devtools.depan.filesystem.editors.DirectoryEditor;
+
 import org.eclipse.swt.widgets.Composite;
 
 /**

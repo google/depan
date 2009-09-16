@@ -57,12 +57,12 @@ public class NodeIconTransformer extends JavaElementDispatcher<ImageDescriptor>
 
   @Override
   public ImageDescriptor match(InterfaceElement e) {
-    return com.google.devtools.depan.eclipse.utils.Resources.IMAGE_DESC_DEFAULT;
+    return JavaResources.IMAGE_DESC_INTERFACE;
   }
 
   @Override
   public ImageDescriptor match(PackageElement e) {
-    return com.google.devtools.depan.eclipse.utils.Resources.IMAGE_DESC_DEFAULT;
+    return JavaResources.IMAGE_DESC_PACKAGE;
   }
 
   @Override
