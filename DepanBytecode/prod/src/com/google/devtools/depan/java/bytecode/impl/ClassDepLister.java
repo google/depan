@@ -236,9 +236,27 @@ public class ClassDepLister implements ClassVisitor {
     // TODO(leeca): Add short-circuit early exit if package is already defined.
     // This would avoid a fair bit of unnecessary object creation.
     File packageFile = new File(typePath).getParentFile();
-    File treeFile = new File(fileNode.getPath()).getParentFile();
+    if (null == packageFile) {
+      return new PackageElement("<unnamed>");
+    }
+    File treeFile = createTreeFile();
     PackageTreeBuilder packageBuilder = new PackageTreeBuilder(dl);
 
-    return packageBuilder.installPackageTree( packageFile, treeFile);
+    return packageBuilder.installPackageTree(packageFile, treeFile);
+  }
+
+  /**
+   * Define the tree for the file node, even if it doesn't have a directory.
+   * This can happen for class files at the top of the analysis tree, such as
+   * classes in the unnamed package at the top of a Jar file.
+   *
+   * @return valid directory tree reference
+   */
+  private File createTreeFile() {
+    File result = new File(fileNode.getPath()).getParentFile();
+    if (null == result) {
+      return new File("");
+    }
+    return result;
   }
 }
