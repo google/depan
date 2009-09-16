@@ -51,8 +51,8 @@ public class SimpleDependencyListener
 
 
   @Override
-  public void newNode(GraphNode orphan) {
-    graphBuilder.mapNode(orphan);
+  public GraphNode newNode(GraphNode orphan) {
+    return graphBuilder.mapNode(orphan);
   }
 
   @Override

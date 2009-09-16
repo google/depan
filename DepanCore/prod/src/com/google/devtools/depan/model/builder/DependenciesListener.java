@@ -36,7 +36,7 @@ public interface DependenciesListener {
    *
    * @param orphan un-attached node to add to graph
    */
-  public void newNode(GraphNode orphan);
+  public GraphNode newNode(GraphNode orphan);
 
   /**
    * Create a dependency of type t between a child and his parent

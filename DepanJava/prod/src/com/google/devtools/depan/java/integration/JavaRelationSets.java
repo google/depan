@@ -17,6 +17,7 @@
 package com.google.devtools.depan.java.integration;
 
 import com.google.common.collect.Lists;
+import com.google.devtools.depan.filesystem.graph.FileSystemRelation;
 import com.google.devtools.depan.java.graph.JavaRelation;
 import com.google.devtools.depan.model.RelationshipSet;
 import com.google.devtools.depan.model.RelationshipSetAdapter;
@@ -38,7 +39,7 @@ public class JavaRelationSets {
    * Container relationships.
    */
   public static final RelationshipSetAdapter CONTAINER =
-      new RelationshipSetAdapter("Containers");
+      new RelationshipSetAdapter("Java Containers");
 
   /**
    *
@@ -80,7 +81,7 @@ public class JavaRelationSets {
    * A set matching all relations in both directions.
    */
   public static final RelationshipSetAdapter ALL =
-      new RelationshipSetAdapter("All");
+      new RelationshipSetAdapter("All Java");
 
   /**
    * A set matching no relations.
@@ -90,10 +91,12 @@ public class JavaRelationSets {
 
   static {
     // container relationships
-    CONTAINER.addOrReplaceRelation(JavaRelation.DIRECTORY, true, true);
+    CONTAINER.addOrReplaceRelation(
+        FileSystemRelation.CONTAINS_DIR, true, true);
+    CONTAINER.addOrReplaceRelation(
+        FileSystemRelation.CONTAINS_FILE, true, true);
     CONTAINER.addOrReplaceRelation(JavaRelation.CLASS, true, true);
     CONTAINER.addOrReplaceRelation(JavaRelation.CLASSFILE, true, true);
-    CONTAINER.addOrReplaceRelation(JavaRelation.FILE, true, true);
     CONTAINER.addOrReplaceRelation(JavaRelation.PACKAGE, true, true);
     CONTAINER.addOrReplaceRelation(JavaRelation.LOCAL_VARIABLE, true, true);
     CONTAINER.addOrReplaceRelation(JavaRelation.INNER_TYPE, true, true);

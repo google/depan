@@ -16,12 +16,12 @@
 
 package com.google.devtools.depan.java.bytecode.impl;
 
-import com.google.devtools.depan.filesystem.graph.DirectoryElement;
 import com.google.devtools.depan.filesystem.graph.FileElement;
 import com.google.devtools.depan.java.graph.FieldElement;
 import com.google.devtools.depan.java.graph.InterfaceElement;
 import com.google.devtools.depan.java.graph.JavaRelation;
 import com.google.devtools.depan.java.graph.MethodElement;
+import com.google.devtools.depan.java.graph.PackageElement;
 import com.google.devtools.depan.java.graph.TypeElement;
 import com.google.devtools.depan.model.builder.DependenciesListener;
 
@@ -44,14 +44,18 @@ import java.io.File;
  * {@link DependenciesListener}.
  *
  * @author ycoppel@google.com (Yohann Coppel)
- *
  */
 public class ClassDepLister implements ClassVisitor {
 
   /**
    * {@link DependenciesListener} called when a dependency is found.
    */
-  private DependenciesListener dl;
+  private final DependenciesListener dl;
+
+  /**
+   * File element for source code.
+   */
+  private final FileElement fileNode;
 
   /**
    * class currently read class. (typically the class A when the file A.java is
@@ -59,37 +63,26 @@ public class ClassDepLister implements ClassVisitor {
    */
   private TypeElement mainClass = null;
 
-  /**
-   * The class' package currently read.
-   */
-//  private PackageElement currentPackage = null;
-  // FIXME(ycoppel): packages are not correctly handled right now.
-
-  /**
-   * Pointer to the directory containing the file currently read.
-   */
-  private DirectoryElement path;
 
   /**
    * constructor for new {@link ClassDepLister}.
    *
-   * @param dl {@link DependenciesListener} implementing callbacks.
-   * @param path path to the directory containing the explored file.
+   * @param dl {@link DependenciesListener} implementing callbacks
+   * @param fileNode node for the .class file containing this class
    */
-  public ClassDepLister(DependenciesListener dl, DirectoryElement path) {
+  public ClassDepLister(DependenciesListener dl, FileElement fileNode) {
     this.dl = dl;
-    this.path = path;
+    this.fileNode = fileNode;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.objectweb.asm.ClassVisitor#visit(int, int, java.lang.String,
-   *      java.lang.String, java.lang.String, java.lang.String[])
-   */
+  @Override
   public void visit(int version, int access, String name, String signature,
       String superName, String[] interfaces) {
-    this.mainClass = TypeNameUtil.fromInternalName(name);
+    mainClass = TypeNameUtil.fromInternalName(name);
+
+    PackageElement packageNode = installPackageForTypeName(name);
+    dl.newDep(packageNode, mainClass, JavaRelation.CLASS);
+
     dl.newDep(TypeNameUtil.fromInternalName(superName), mainClass,
         JavaRelation.EXTENDS);
     for (String s : interfaces) {
@@ -119,45 +112,25 @@ public class ClassDepLister implements ClassVisitor {
         TypeElement superType = TypeNameUtil.fromInternalName(superClass);
         dl.newDep(superType, mainClass, JavaRelation.ANONYMOUS_TYPE);
       }
-
     }
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.objectweb.asm.ClassVisitor#visitAnnotation(java.lang.String,
-   *      boolean)
-   */
+  @Override
   public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
     return null;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.objectweb.asm.ClassVisitor
-   *      #visitAttribute(org.objectweb.asm.Attribute)
-   */
+  @Override
   public void visitAttribute(Attribute attr) {
     // TODO(ycoppel): Auto-generated method stub
     // System.err.println(attr.type);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.objectweb.asm.ClassVisitor#visitEnd()
-   */
+  @Override
   public void visitEnd() {
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.objectweb.asm.ClassVisitor#visitField(int, java.lang.String,
-   *      java.lang.String, java.lang.String, java.lang.Object)
-   */
+  @Override
   public FieldVisitor visitField(int access, String name, String desc,
       String signature, Object value) {
     TypeElement type = TypeNameUtil.fromDescriptor(desc);
@@ -181,23 +154,18 @@ public class ClassDepLister implements ClassVisitor {
     return new FieldDepLister();
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.objectweb.asm.ClassVisitor#visitInnerClass(java.lang.String,
-   *      java.lang.String, java.lang.String, int)
-   */
+  @Override
   public void visitInnerClass(String name, String outerName, String innerName,
       int access) {
     if ((null == outerName) || (null == innerName)) {
       //System.out.println("visitInnerClass()" + name + " - "
       //    + outerName + " - " + innerName + " - " + access + " @ "
-      //    + this.mainClass);
+      //    + mainClass);
       // FIXME(ycoppel): probably an enum. What to do ?
       return;
     }
     TypeElement inner = TypeNameUtil.fromInternalName(name);
-    if (inner.equals(this.mainClass)) {
+    if (inner.equals(mainClass)) {
       // the visitInnerClass callback is called twice: once when visiting the
       // outer class (A in A$B), and once when visiting the A$B class. we
       // shortcut the second case so we don't add the dependency twice.
@@ -207,17 +175,12 @@ public class ClassDepLister implements ClassVisitor {
     dl.newDep(parent, inner, JavaRelation.INNER_TYPE);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.objectweb.asm.ClassVisitor#visitMethod(int, java.lang.String,
-   *      java.lang.String, java.lang.String, java.lang.String[])
-   */
+  @Override
   public MethodVisitor visitMethod(int access, String name, String desc,
       String signature, String[] exceptions) {
 
     // the method itself
-    MethodElement m = new MethodElement(desc, name, this.mainClass);
+    MethodElement m = new MethodElement(desc, name, mainClass);
 
     JavaRelation r = null;
     if ((Opcodes.ACC_STATIC & access) != 0) {
@@ -225,7 +188,7 @@ public class ClassDepLister implements ClassVisitor {
     } else {
       r = JavaRelation.MEMBER_METHOD;
     }
-    dl.newDep(this.mainClass, m, r);
+    dl.newDep(mainClass, m, r);
 
     // arguments dependencies
     for (Type t : Type.getArgumentTypes(desc)) {
@@ -241,12 +204,7 @@ public class ClassDepLister implements ClassVisitor {
     return new MethodDepLister(dl, m);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.objectweb.asm.ClassVisitor#visitOuterClass(java.lang.String,
-   *      java.lang.String, java.lang.String)
-   */
+  @Override
   public void visitOuterClass(String owner, String name, String desc) {
     // nothing to do. We use the visitInnerClass callback instead.
   }
@@ -256,17 +214,31 @@ public class ClassDepLister implements ClassVisitor {
    * If the mainClass is not a top-level class, assume it is an inner
    * class and its immediate container is not a source file.
    */
+  @Override
   public void visitSource(String source, String debug) {
-    if (this.mainClass.getFullyQualifiedName().contains("$")) {
+    if (mainClass.getFullyQualifiedName().contains("$")) {
       // this is an inner class. We use the visitInnerClass() callback instead.
       return;
     }
 
-    // this is a main class.
-    File sourceFile = new File(path.getPath(), source);
-    FileElement se = new FileElement(sourceFile.getPath());
-    dl.newDep(path, se, JavaRelation.FILE);
-    dl.newDep(se, mainClass, JavaRelation.CLASS);
+    // Link the main class to it's containing file
+    dl.newDep(fileNode, mainClass, JavaRelation.CLASSFILE);
   }
 
+  /**
+   * Install a package hierarchy and a matching directory hierarchy for
+   * the full path name of the type.
+   * 
+   * @param typePath full path name of a type
+   * @return PackageElement that contains the type
+   */
+  private PackageElement installPackageForTypeName(String typePath) {
+    // TODO(leeca): Add short-circuit early exit if package is already defined.
+    // This would avoid a fair bit of unnecessary object creation.
+    File packageFile = new File(typePath).getParentFile();
+    File treeFile = new File(fileNode.getPath()).getParentFile();
+    PackageTreeBuilder packageBuilder = new PackageTreeBuilder(dl);
+
+    return packageBuilder.installPackageTree( packageFile, treeFile);
+  }
 }

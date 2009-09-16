@@ -19,79 +19,100 @@ package com.google.devtools.depan.java.graph;
 import com.google.devtools.depan.graph.api.Relation;
 
 /**
- * Some dependencies types. A type can eventually have more than one superType.
- * However, No loops are allowed in the graph.
+ * The kinds of relations recognized among Java elements.
+ * Relations among source code artifacts (directories, files) are realized
+ * using the FileSystem relations.
  *
  * @author ycoppel@google.com (Yohann Coppel)
  *
  */
 public enum JavaRelation implements Relation {
   // "Use" relationships
-  CALL("caller", "called"),
-  READ("reader", "read"),
-  TYPE("user", "uses"),
+  CALL("caller", "called", "calls", "called by"),
+  READ("reader", "read", "reads", "supplies"),
+  TYPE("user", "uses", "type references", "used by"),
 
   // "Container" relationships
-  DIRECTORY("directory", "subdirectory"),
-  FILE("directory", "file"),
-  PACKAGE("package", "subpackage"),
-  CLASS("package", "class"),
-  CLASSFILE("file", "class"),
-  INNER_TYPE("type", "innertype"),
-  LOCAL_VARIABLE("variable", "method"),
-  ANONYMOUS_TYPE("parent", "anonymous"),
+  PACKAGEDIR("directory", "package", "contains package", "from directory"),
+  CLASSFILE("file", "class", "contains class", "from file"),
+  PACKAGE("package", "subpackage", "contains package", "subpackage of"),
+  CLASS("package", "class", "contains class", "in package"),
+  INNER_TYPE("type", "innertype", "contain type", "in type"),
+  LOCAL_VARIABLE("variable", "method", "contain variable", "has variable"),
+  ANONYMOUS_TYPE("parent", "anonymous", "contains type", "in type"),
 
   // Instance member relationships
-  MEMBER_TYPE("type", "membertype"),
-  MEMBER_METHOD("type", "method"),
-  MEMBER_FIELD("type", "field"),
+  MEMBER_TYPE("type", "membertype", "has member type", "member type of"),
+  MEMBER_METHOD("type", "method", "has member method", "member method of"),
+  MEMBER_FIELD("type", "field", "has member field", "member field of"),
 
   // Static member relationships
-  STATIC_TYPE("type", "staticMethod"),
-  STATIC_METHOD("type", "staticMethod"),
-  STATIC_FIELD("type", "staticField"),
+  STATIC_TYPE("type", "staticType", "has static type", "static type of"),
+  STATIC_METHOD("type", "staticMethod", "has static method", "static method of"),
+  STATIC_FIELD("type", "staticField", "has static field", "static field of"),
 
   // "Use" relationships
-  WRITE("writer", "writen"),
-  EXTENDS("super", "extends"),
-  IMPLEMENTS("realize", "implements"),
+  WRITE("writer", "writen", "writes", "written by"),
+  EXTENDS("super", "derived", "extends", "derived from"),
+  IMPLEMENTS("realize", "implements", "implements", "implemented by"),
 
   // "Extension" relationships
-  INTERFACE_EXTENDS("interfaceRealize", "interfaceImplements"),
-  METHOD_OVERLOAD("overloader", "overloaded"),
-  METHOD_OVERRIDE("overridder", "overriden"),
-  ERROR_HANDLING("try", "catch"),
+  INTERFACE_EXTENDS("interfaceRealize", "interfaceImplements", "realizes", "implementes"),
+  METHOD_OVERLOAD("overloader", "overloaded", "overloads", "overloaded by"),
+  METHOD_OVERRIDE("overridder", "overriden", "overrides", "overriden by"),
+  ERROR_HANDLING("try", "catch", "handles", "handled by"),
   ;
 
   /**
-   * name of the element on the left of the relation.
+   * Role of the head object for the relation.
    */
-  public final String forwardName;
+  private final String headRole;
+
   /**
-   * name of the element on the right side of the relation.
+   * Role of the tail object for the relation.
    */
-  public final String reverseName;
+  private final String tailRole;
+
+  /**
+   * Name of the relation in the forward direction.
+   */
+  private final String forwardName;
+
+  /**
+   * Name of the relation in the reverse direction.
+   */
+  private final String reverseName;
 
   /**
    * Constructor for a new Relation.
    * @param forwardName name of the left hand side element.
    * @param reverseName name of the right hand side element.
    */
-   private JavaRelation(String reverseName, String forwardName) {
+  private JavaRelation(
+      String headRole, String tailRole,
+      String reverseName, String forwardName) {
+    this.headRole = headRole;
+    this.tailRole = tailRole;
     this.forwardName = forwardName;
     this.reverseName = reverseName;
   }
 
-  /* (non-Javadoc)
-   * @see com.google.devtools.depan.graph.api.Relation#getForwardName()
-   */
+  // TODO: @Override
+  public String getHeadRole() {
+    return headRole;
+  }
+
+  // TODO: @Override
+  public String getTailRole() {
+    return tailRole;
+  }
+
+  @Override
   public String getForwardName() {
     return forwardName;
   }
 
-  /* (non-Javadoc)
-   * @see com.google.devtools.depan.graph.api.Relation#getReverseName()
-   */
+  @Override
   public String getReverseName() {
     return reverseName;
   }

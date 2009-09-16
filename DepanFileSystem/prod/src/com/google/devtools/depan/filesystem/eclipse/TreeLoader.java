@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.devtools.depan.filesystem.eclipse;
 
 import com.google.devtools.depan.filesystem.graph.DirectoryElement;
@@ -30,7 +31,7 @@ import java.util.logging.Logger;
  */
 public class TreeLoader {
 
-  private static Logger logger =
+  private static final Logger logger =
       Logger.getLogger(TreeLoader.class.getName());
 
   private final DependenciesListener builder;
@@ -45,55 +46,107 @@ public class TreeLoader {
   }
 
   public void analyzeTree(String treePath) throws IOException {
+    beginAnalysis(treePath);
+    processRoot(treePath);
+    finishAnalysis(treePath);
+  }
+
+  protected DependenciesListener getBuilder() {
+    return builder;
+  }
+
+  /**
+   * Indicates the beginning of a tree traversal.
+   * 
+   * @param treePath directory tree being traversed
+   */
+  protected void beginAnalysis(String treePath) {
+  }
+
+  /**
+   * Indicates the completion of a tree traversal.
+   * 
+   * @param treePath directory tree that was traversed
+   */
+  protected void finishAnalysis(String treePath) {
+  }
+
+  /**
+   * Provides a {@code FileElement} for a discovered file.
+   * 
+   * @param treeFile path name to file within the analysis tree
+   * @throws IOException
+   */
+  protected FileElement visitFile(File treeFile) throws IOException {
+    return createFile(treeFile);
+  }
+
+  /**
+   * Provides a {@code DirectoryElement} for a discovered directory.
+   * 
+   * @param treeFile path name to directory within the analysis tree
+   * @throws IOException
+   */
+  protected DirectoryElement visitDirectory(File treeFile) throws IOException {
+    DirectoryElement parentNode = createDirectory(treeFile);
+    return parentNode;
+  }
+
+  /**
+   * Process the root of the tree specially, since none of the elements
+   * have relations with containers.
+   * 
+   * @param treePath
+   * @throws IOException
+   */
+  private void processRoot(String treePath) throws IOException {
     File treeFile = new File(treePath);
 
     // If it is just a file, it's pretty uninteresting - one node
     if (treeFile.isFile()) {
-      getBuilder().newNode(createFile(treeFile));
+      FileElement fileNode = visitFile(treeFile);
+      getBuilder().newNode(fileNode);
       return;
     }
 
     // If it's a directory, traverse the full tree
     if (treeFile.isDirectory()) {
-      DirectoryElement parentNode = createDirectory(treeFile);
-      traverseTree(getBuilder(), parentNode, treeFile);
+      DirectoryElement parentNode = visitDirectory(treeFile);
+      traverseTree(parentNode, treeFile);
+      return;
     }
 
     // Hmmm .. something unexpected
     logger.info("Unable to load tree from " + treePath);
   }
 
-  private DependenciesListener getBuilder() {
-    return builder;
-  }
-
-  private void traverseTree(
-      DependenciesListener builder, GraphNode rootNode, File rootFile) {
+  private void traverseTree(GraphNode rootNode, File rootFile) {
 
     // TODO(leeca):  Based on performance, maybe revise to sort into
     // lists of files and directories, and process each type in batches.
     for (File child : rootFile.listFiles()) {
-      buildChild(builder, rootNode, child);
+      buildChild(rootNode, child);
     }
   }
 
   /**
-   * @param builder
-   * @param rootNode
-   * @param child
+   * Handle a single child for a node.  If it is a directory, the directory's
+   * children are processed recursively.
+   * 
+   * @param rootNode Node for the parent directory
+   * @param child a child element of the parent directory
    */
-  private void buildChild(
-      DependenciesListener builder, GraphNode rootNode, File child) {
+  private void buildChild(GraphNode rootNode, File child) {
     try {
       if (child.isFile()) {
-        GraphNode file = createFile(child);
-        builder.newDep(rootNode, file, FileSystemRelation.CONTAINS_FILE);
+        GraphNode file = visitFile(child);
+        getBuilder().newDep(rootNode, file, FileSystemRelation.CONTAINS_FILE);
         return;
       }
       if (child.isDirectory()) {
-        GraphNode dir = createDirectory(child);
-        builder.newDep(rootNode, dir, FileSystemRelation.CONTAINS_DIR);
-        traverseTree(builder, dir, child);
+        GraphNode dir = visitDirectory(child);
+        getBuilder().newDep(rootNode, dir, FileSystemRelation.CONTAINS_DIR);
+        traverseTree(dir, child);
         return;
       }
       logger.warning(
@@ -115,12 +168,15 @@ public class TreeLoader {
   }
 
   /**
-   * @param directory
-   * @return
+   * Tidy up the path for elements, mostly by removing the prefix path if
+   * it is present.
+   * 
+   * @param elementPath path to file system element
+   * @return canonical name for element
    * @throws IOException
    */
-  private String getElementPath(File directory) throws IOException {
-    String dirPath = directory.getCanonicalPath();
+  private String getElementPath(File elementPath) throws IOException {
+    String dirPath = elementPath.getCanonicalPath();
     if (dirPath.startsWith(prefixPath)) {
       return dirPath.substring(prefixPath.length());
     }

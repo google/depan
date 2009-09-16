@@ -19,14 +19,11 @@ package com.google.devtools.depan.java.bytecode.eclipse;
 import com.google.common.collect.Lists;
 import com.google.devtools.depan.eclipse.wizards.AbstractAnalysisWizard;
 import com.google.devtools.depan.eclipse.wizards.ProgressListenerMonitor;
-import com.google.devtools.depan.java.bytecode.ClassLookup;
-import com.google.devtools.depan.java.bytecode.JarFileLister;
+import com.google.devtools.depan.filesystem.eclipse.TreeLoader;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.builder.DependenciesDispatcher;
 import com.google.devtools.depan.model.builder.DependenciesListener;
 import com.google.devtools.depan.model.builder.ElementFilter;
-import com.google.devtools.depan.util.FileLister;
-import com.google.devtools.depan.util.FileListerListener;
 import com.google.devtools.depan.util.ProgressListener;
 import com.google.devtools.depan.util.QuickProgressListener;
 
@@ -37,7 +34,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.zip.ZipException;
+import java.util.logging.Logger;
+import java.util.zip.ZipFile;
 
 /**
  * Wizard for converting a set of Java {@code .class} files into a DepAn
@@ -45,6 +43,11 @@ import java.util.zip.ZipException;
  * or a directory tree.
  */
 public class NewGraphWizard extends AbstractAnalysisWizard {
+
+  private static final Logger logger =
+      Logger.getLogger(NewGraphWizard.class.getName());
+
+  private final ClassAnalysisStats analysisStats = new ClassAnalysisStats();
 
   private NewGraphPage page;
 
@@ -84,11 +87,11 @@ public class NewGraphWizard extends AbstractAnalysisWizard {
    * Create an analysis graph by analyzing the .class files on the classpath.
    */
   @Override
-  protected GraphModel generateAnalysisGraph(IProgressMonitor monitor) {
+  protected GraphModel generateAnalysisGraph(IProgressMonitor monitor)
+      throws IOException {
 
     // Step 1) Create the GraphModel to hold the analysis results
     String classPath = page.getClassPath();
-    File classPathFile = new File(classPath);
     String directoryFilter = page.getDirectoryFilter();
     String packageFilter = page.getPackageFilter();
 
@@ -102,37 +105,73 @@ public class NewGraphWizard extends AbstractAnalysisWizard {
 
     // TODO(leeca): Extend UI to allow lists of directories.
     Collection<String> directoryWhitelist = splitFilter(directoryFilter);
-    FileListerListener cl = new ClassLookup(directoryWhitelist, builder);
 
     monitor.worked(1);
 
     // Step 2) Read in the class files, depending on the source
     monitor.setTaskName("Load Classes...");
 
-    if (classPath.endsWith(".jar")
-        || classPath.endsWith(".zip")) {
-      JarFileLister fl;
-      try {
-        fl = new JarFileLister(classPathFile, cl);
-        ProgressListener baseProgress = new ProgressListenerMonitor(monitor);
-        ProgressListener quickProgress = new QuickProgressListener(
-            baseProgress, 300);
-        fl.setProgressListener(quickProgress);
-        fl.start();
-      } catch (ZipException e) {
-        e.printStackTrace();
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
+    ProgressListener baseProgress = new ProgressListenerMonitor(monitor);
+    ProgressListener quickProgress = new QuickProgressListener(
+        baseProgress, 300);
+
+    if (classPath.endsWith(".jar") || classPath.endsWith(".zip")) {
+      readZipFile(classPath, builder, quickProgress);
     } else {
-      FileLister fl = new FileLister(classPathFile, cl);
-      fl.start();
+      readTree(classPath, builder, quickProgress);
     }
+
+    logger.info(
+        analysisStats.getClassesLoaded() + "/" + analysisStats.getClassesTotal()
+        + " classes loaded. " + analysisStats.getClassesFailed() + " failed.");
 
     monitor.worked(1);
 
     // Done
     return result;
+  }
+
+  /**
+   * Build Java dependencies from a Jar file.
+   * 
+   * @param classPath path to Jar file
+   * @param builder destination of discovered dependencies
+   * @param progress indicator for user interface
+   * @throws IOException
+   */
+  private void readZipFile(
+      String classPath, DependenciesListener builder,
+      ProgressListener progress) throws IOException {
+
+    ClassFileReader reader = new ClassFileReader(analysisStats);
+    ZipFile zipFile = new ZipFile(classPath);
+    JarFileLister jarReader =
+        new JarFileLister(zipFile, builder, reader, progress);
+    jarReader.start();
+  }
+
+  /**
+   * Build Java dependencies from a file system tree.
+   * 
+   * @param classPath root of directory tree
+   * @param builder destination of discovered dependencies
+   * @param progress indicator for user interface
+   * @throws IOException
+   */
+  private void readTree(
+      String classPath, DependenciesListener builder,
+      ProgressListener progress) throws IOException {
+
+    // TODO(leeca): Instead of just assuming one level of path retention,
+    // let the user decide like in NewFileSystemWizard.  But first, that needs
+    // to be cleaned up and refactored.
+    String treePrefix = new File(classPath).getParent();
+
+    ClassFileReader reader = new ClassFileReader(analysisStats);
+
+    TreeLoader loader =
+        new ClassTreeLoader(treePrefix, builder, reader, progress);
+    loader.analyzeTree(classPath);
   }
 
   /**
