@@ -16,10 +16,10 @@
 
 package com.google.devtools.depan.filesystem.integration;
 
+import com.google.devtools.depan.eclipse.persist.XStreamFactory.Config;
 import com.google.devtools.depan.filesystem.graph.DirectoryElement;
 import com.google.devtools.depan.filesystem.graph.FileElement;
 import com.google.devtools.depan.filesystem.graph.FileSystemRelation;
-import com.google.devtools.depan.model.XmlPersistentObject.Config;
 
 import com.thoughtworks.xstream.XStream;
 

@@ -17,8 +17,8 @@
 package com.google.devtools.depan.eclipse.editors;
 
 import com.google.common.collect.Maps;
+import com.google.devtools.depan.eclipse.persist.GraphModelXmlPersist;
 import com.google.devtools.depan.model.GraphModel;
-import com.google.devtools.depan.model.XmlPersistentGraph;
 
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
@@ -90,7 +90,7 @@ public class ResourceCache implements IResourceChangeListener {
     GraphModel result = loadedGraphs.get(uri);
 
     if (null == result) {
-      XmlPersistentGraph loader = new XmlPersistentGraph();
+      GraphModelXmlPersist loader = new GraphModelXmlPersist();
       result = loader.load(uri);
       loadedGraphs.put(uri, result);
     }
@@ -112,7 +112,7 @@ public class ResourceCache implements IResourceChangeListener {
       return result;
     }
 
-    XmlPersistentGraph loader = new XmlPersistentGraph();
+    GraphModelXmlPersist loader = new GraphModelXmlPersist();
     return loader.load(uri);
   }
 

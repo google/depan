@@ -17,6 +17,7 @@
 package com.google.devtools.depan.javascript.integration;
 
 import com.google.common.collect.Lists;
+import com.google.devtools.depan.eclipse.persist.XStreamFactory.Config;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.javascript.graph.JavaScriptBuiltinElement;
 import com.google.devtools.depan.javascript.graph.JavaScriptClassElement;
@@ -26,7 +27,6 @@ import com.google.devtools.depan.javascript.graph.JavaScriptFunctionElement;
 import com.google.devtools.depan.javascript.graph.JavaScriptRelation;
 import com.google.devtools.depan.javascript.graph.JavaScriptVariableElement;
 import com.google.devtools.depan.model.Element;
-import com.google.devtools.depan.model.XmlPersistentObject.Config;
 
 import com.thoughtworks.xstream.XStream;
 

@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.model;
+package com.google.devtools.depan.eclipse.persist;
 
 import com.google.common.collect.Lists;
 import com.google.devtools.depan.filters.PathMatcherTerm;
+
+import com.thoughtworks.xstream.XStream;
 
 import java.io.EOFException;
 import java.io.File;
@@ -36,8 +38,20 @@ import java.util.List;
  *
  * @author tugrul@google.com (Tugrul Ince)
  */
-public class XmlPersistentPathExpression
-    extends XmlPersistentObject<PathMatcherTerm[]> {
+// TODO(leeca): This should be revised to persist a PathExpression,
+// probably via a PathExpressionConverter.  But that's a bigger step, so
+// I'm just inlining XmlPersistentObject so there are not other uses of
+// that class.
+public class XmlPersistentPathExpression {
+  /**
+   * The object that converts the object to XML.
+   */
+  protected XStream xstream;
+
+  public XmlPersistentPathExpression() {
+    this.xstream = XStreamFactory.newStaxXStream();
+  }
+
   /**
    * Loads an array of {@link PathMatcherTerm}s that is stored at the given
    * location.
@@ -46,7 +60,6 @@ public class XmlPersistentPathExpression
    * @return An array of {@link PathMatcherTerm}s that is read from the given
    * location.
    */
-  @Override
   public PathMatcherTerm[] load(URI uri) {
     try {
       InputStreamReader src = new FileReader(new File(uri));
@@ -101,7 +114,6 @@ public class XmlPersistentPathExpression
    * persistent storage.
    * @throws IOException if exception occurs during writing.
    */
-  @Override
   public void save(URI uri, PathMatcherTerm[] terms) throws IOException {
     OutputStreamWriter source = null;
     ObjectOutputStream objs = null;

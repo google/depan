@@ -18,6 +18,7 @@ package com.google.devtools.depan.eclipse.views.tools;
 
 import com.google.common.collect.Sets;
 import com.google.devtools.depan.eclipse.editors.ViewEditor;
+import com.google.devtools.depan.eclipse.persist.XmlPersistentPathExpression;
 import com.google.devtools.depan.eclipse.plugins.SourcePluginRegistry;
 import com.google.devtools.depan.eclipse.utils.EditColTableDef;
 import com.google.devtools.depan.eclipse.utils.RelationshipPicker;
@@ -28,7 +29,6 @@ import com.google.devtools.depan.filters.PathMatcher;
 import com.google.devtools.depan.filters.PathMatcherTerm;
 import com.google.devtools.depan.graph.basic.MultipleDirectedRelationFinder;
 import com.google.devtools.depan.model.RelationshipSetAdapter;
-import com.google.devtools.depan.model.XmlPersistentPathExpression;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;

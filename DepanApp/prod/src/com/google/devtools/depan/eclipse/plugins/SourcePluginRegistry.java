@@ -22,7 +22,8 @@ import com.google.devtools.depan.eclipse.utils.ElementEditor;
 import com.google.devtools.depan.eclipse.visualization.ogl.GLEntity;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.model.Element;
-import com.google.devtools.depan.model.XmlPersistentObject;
+
+import com.thoughtworks.xstream.XStream;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -283,21 +284,25 @@ public class SourcePluginRegistry {
     return INSTANCE.transformers.values();
   }
 
-  /**
-   * helper method to configure {@link XmlPersistentObject} with plugin
-   * informations.
-   */
-  public static void setupXMLConfig() {
-    // TODO Ideally, DepanCore should accept some of this responsibility
-    // - perhaps an Extension point to receive serialization advisors.
-    for (SourcePlugin p : SourcePluginRegistry.getInstances()) {
-      XmlPersistentObject.addConfig(p.getXMLConfig());
-    }
+  private static void ensurePluginClassLoader() {
     if (null == INSTANCE.pluginClassLoader) {
       INSTANCE.pluginClassLoader =
           new PluginClassLoader(INSTANCE.entries.values());
     }
-    XmlPersistentObject.addConfig(INSTANCE.pluginClassLoader);
+  }
+
+  /**
+   * Configure an {@code XStream} instance with all the plug specific details.
+   * 
+   * @param xstream instance to configure
+   */
+  public static void configXmlPersist(XStream xstream) {
+    for (SourcePlugin p : SourcePluginRegistry.getInstances()) {
+      p.getXMLConfig().config(xstream);
+    }
+
+    ensurePluginClassLoader();
+    INSTANCE.pluginClassLoader.config(xstream);
   }
 
   /**
@@ -329,5 +334,4 @@ public class SourcePluginRegistry {
     }
     return elementKinds;
   }
-
 }

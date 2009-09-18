@@ -17,7 +17,7 @@
 package com.google.devtools.depan.eclipse.plugins;
 
 import com.google.common.collect.Lists;
-import com.google.devtools.depan.model.XmlPersistentObject.Config;
+import com.google.devtools.depan.eclipse.persist.XStreamFactory.Config;
 
 import com.thoughtworks.xstream.XStream;
 

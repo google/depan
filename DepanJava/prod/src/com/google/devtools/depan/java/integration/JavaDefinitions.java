@@ -16,13 +16,13 @@
 
 package com.google.devtools.depan.java.integration;
 
+import com.google.devtools.depan.eclipse.persist.XStreamFactory.Config;
 import com.google.devtools.depan.java.graph.FieldElement;
 import com.google.devtools.depan.java.graph.InterfaceElement;
 import com.google.devtools.depan.java.graph.JavaRelation;
 import com.google.devtools.depan.java.graph.MethodElement;
 import com.google.devtools.depan.java.graph.PackageElement;
 import com.google.devtools.depan.java.graph.TypeElement;
-import com.google.devtools.depan.model.XmlPersistentObject.Config;
 
 import com.thoughtworks.xstream.XStream;
 

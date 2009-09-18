@@ -22,6 +22,7 @@ Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Export-Package: com.google.devtools.depan.eclipse.cm,
  com.google.devtools.depan.eclipse.editors,
+ com.google.devtools.depan.eclipse.persist,
  com.google.devtools.depan.eclipse.plugins,
  com.google.devtools.depan.eclipse.preferences,
  com.google.devtools.depan.eclipse.trees,

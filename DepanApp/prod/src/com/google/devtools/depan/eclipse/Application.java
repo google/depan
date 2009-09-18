@@ -16,16 +16,15 @@
 
 package com.google.devtools.depan.eclipse;
 
-import com.google.devtools.depan.eclipse.plugins.SourcePluginRegistry;
-
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 
 /**
- * @author ycoppel@google.com (Yohann Coppel) This class controls all aspects of
- *         the application's execution
+ * This class controls all aspects of the application's execution.
+ *
+ * @author ycoppel@google.com (Yohann Coppel)
  */
 public class Application implements IApplication {
 
@@ -33,10 +32,8 @@ public class Application implements IApplication {
   public Object start(IApplicationContext context) throws Exception {
     Display display = PlatformUI.createDisplay();
     try {
-      setupPluginConfigurations();
-      
-      int returnCode = PlatformUI.createAndRunWorkbench(display,
-          new ApplicationWorkbenchAdvisor());
+      int returnCode = PlatformUI.createAndRunWorkbench(
+          display, new ApplicationWorkbenchAdvisor());
       if (returnCode == PlatformUI.RETURN_RESTART) {
         return IApplication.EXIT_RESTART;
       }
@@ -44,13 +41,6 @@ public class Application implements IApplication {
     } finally {
       display.dispose();
     }
-  }
-
-  /**
-   * Sets up plugin configurations so that loads and save would not fail.
-   */
-  private void setupPluginConfigurations() {
-    SourcePluginRegistry.setupXMLConfig();
   }
 
   @Override
