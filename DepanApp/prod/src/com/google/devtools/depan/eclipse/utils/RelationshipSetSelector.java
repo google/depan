@@ -16,13 +16,15 @@
 
 package com.google.devtools.depan.eclipse.utils;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.devtools.depan.eclipse.Project;
+import com.google.devtools.depan.eclipse.persist.GraphModelConverter;
+import com.google.devtools.depan.eclipse.persist.ObjectXmlPersist;
 import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
 import com.google.devtools.depan.eclipse.plugins.SourcePluginRegistry;
 import com.google.devtools.depan.model.RelationshipSet;
-import com.google.devtools.depan.util.XmlPersist;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -42,10 +44,12 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  * A drop-down widget showing a list of named set of relationships.
@@ -60,6 +64,9 @@ import java.util.Set;
  */
 public class RelationshipSetSelector extends CompositeRowControl
     implements ViewerObjectToString, IResourceChangeListener {
+
+  private static final Logger logger =
+      Logger.getLogger(RelationshipSetSelector.class.getName());
 
   /**
    * 
@@ -350,9 +357,10 @@ public class RelationshipSetSelector extends CompositeRowControl
               && ("dpans".equals(resource.getFileExtension()))) {
             loadResource(resource);
           }
-          // we a file is saved, its project, and even the workspace root
+          // When a file is saved, its project, and even the workspace root
           // are resources which are also modified. we need to look into them
-          // to finally get the file. returning true make the visitor recursive.
+          // to finally get the file. Returning true makes the visitor
+          // recursive.
           return true;
         }
       
@@ -370,9 +378,7 @@ public class RelationshipSetSelector extends CompositeRowControl
    * @param resource the resource to load
    */
   private void loadResource(IResource resource) {
-    // load the file
-    XmlPersist<Collection<RelationshipSet>> data =
-        XmlPersist.load(resource.getLocationURI());
+    Collection<RelationshipSet> sets = fetchRelationshipSets(resource);
 
     // path for this resource
     String path = resource.getFullPath().toString();
@@ -381,7 +387,7 @@ public class RelationshipSetSelector extends CompositeRowControl
     Set<ContentNameProvider> existing = Sets.newHashSet();
 
     // add all the RelationshipSet to the list (with their name)
-    for (RelationshipSet rel : data.getObject()) {
+    for (RelationshipSet rel : sets) {
       SavedContentNameProvider nameProvider =
           new SavedContentNameProvider(path, rel);
 
@@ -408,6 +414,37 @@ public class RelationshipSetSelector extends CompositeRowControl
     for (ContentNameProvider contentNameProvider : toRemove) {
       relationshipSets.remove(contentNameProvider);
     }
+  }
+
+  /**
+   * Attempt to load the relationships, returning an empty collection
+   * if there are any failures.
+   * 
+   * @param resource
+   * @return
+   */
+  private Collection<RelationshipSet> fetchRelationshipSets(
+      IResource resource) {
+    try {
+      ObjectXmlPersist persist = new ObjectXmlPersist();
+      Collection<RelationshipSet> sets =
+          loadRelationshipSets(persist, resource);
+      return sets;
+    } catch (IOException e) {
+      logger.warning(
+          "Failed to load relationshipSets from " + resource.getLocationURI());
+      return ImmutableList.of();
+    }
+  }
+
+  /**
+   * Isolate unchecked conversion.
+   */
+  @SuppressWarnings("unchecked")
+  private Collection<RelationshipSet> loadRelationshipSets(
+      ObjectXmlPersist persist, IResource resource) throws IOException {
+    return (Collection<RelationshipSet>) persist.load(
+        resource.getLocationURI());
   }
 
   /////////////////////////////////////

@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.eclipse.editors;
 
+import com.google.devtools.depan.eclipse.persist.ObjectXmlPersist;
 import com.google.devtools.depan.eclipse.utils.ModificationListener;
 import com.google.devtools.depan.eclipse.utils.RelationshipPicker;
 import com.google.devtools.depan.eclipse.utils.RelationshipPickerHelper;
@@ -23,7 +24,6 @@ import com.google.devtools.depan.eclipse.utils.TableContentProvider;
 import com.google.devtools.depan.graph.api.DirectedRelation;
 import com.google.devtools.depan.model.RelationshipSet;
 import com.google.devtools.depan.model.RelationshipSetAdapter;
-import com.google.devtools.depan.util.XmlPersist;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -47,28 +47,23 @@ import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
 
 /**
  * @author ycoppel@google.com (Yohann Coppel)
- *
  */
 public class NamedRelationshipEditor extends EditorPart implements
     ModificationListener<DirectedRelation, Boolean> {
 
   public static final String ID =
-    "com.google.devtools.depan.eclipse.editors.RelationshipSetEditor";
+      "com.google.devtools.depan.eclipse.editors.RelationshipSetEditor";
 
   /**
    * Existing sets of relationship.
    */
   private Collection<RelationshipSet> sets;
-
-  /**
-   * Persistence object for the sets.
-   */
-  private XmlPersist<Collection<RelationshipSet>> persistance;
 
   /**
    * List of sets.
@@ -101,42 +96,32 @@ public class NamedRelationshipEditor extends EditorPart implements
    */
   private IFile file;
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.ui.part.EditorPart
-   *      #doSave(org.eclipse.core.runtime.IProgressMonitor)
-   */
   @Override
   public void doSave(IProgressMonitor monitor) {
-    persistance.save(sets);
-    setDirtyState(false);
-
-    // touch the file, to notify listeners about the changes
     try {
+      ObjectXmlPersist persist = new ObjectXmlPersist();
+      persist.save(file.getRawLocationURI(), sets);
+
+      setDirtyState(false);
+
+      // touch the file, to notify listeners about the changes
       file.touch(monitor);
     } catch (CoreException e) {
       e.printStackTrace();
+    } catch (IOException errIo) {
+      monitor.setCanceled(true);
+      throw new RuntimeException(
+          "Unable to save named relationship to " + file.getRawLocationURI(),
+          errIo);
     }
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.ui.part.EditorPart#doSaveAs()
-   */
   @Override
   public void doSaveAs() {
     // no ways to save as right now.
     // see #isSaveAsAllowed()
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.ui.part.EditorPart #init(org.eclipse.ui.IEditorSite,
-   *      org.eclipse.ui.IEditorInput)
-   */
   @Override
   public void init(IEditorSite site, IEditorInput input)
       throws PartInitException {
@@ -144,23 +129,39 @@ public class NamedRelationshipEditor extends EditorPart implements
     setInput(input);
     // only accept a file as input.
     if (input instanceof IFileEditorInput) {
-      // get the URI
-      IFileEditorInput fileInput = (IFileEditorInput) input;
-      URI uri = fileInput.getFile().getRawLocationURI();
-      // load the file and retreive its content in sets.
-      persistance = XmlPersist.load(uri);
-      sets = persistance.getObject();
-      setDirtyState(false);
-      this.file = fileInput.getFile();
+      try {
+        // get the URI
+        IFileEditorInput fileInput = (IFileEditorInput) input;
+        file = fileInput.getFile();
+
+        // load the file and retrieve its content in sets.
+        ObjectXmlPersist persist = new ObjectXmlPersist();
+        sets = loadNamedRelationship(persist, file.getRawLocationURI());
+
+        setDirtyState(false);
+      } catch (IOException errIo) {
+        throw new PartInitException(
+            "Unable to load named relationship from "
+            + file.getRawLocationURI(), errIo);
+      }
     } else {
       throw new PartInitException(
       "Input for editor is not suitable for the NamedRelationshipEditor");
     }
-
   }
 
   /**
-   * set the dirtyState for <code>this</code> editor.
+   * Isolate unchecked conversion.
+   */
+  @SuppressWarnings("unchecked")
+  private Collection<RelationshipSet> loadNamedRelationship(
+      ObjectXmlPersist persist, URI fromUri) throws IOException {
+    return (Collection<RelationshipSet>) persist.load(fromUri);
+  }
+
+  /**
+   * Set the dirtyState for <code>this</code> editor.
+   * 
    * @param dirty
    */
   public void setDirtyState(boolean dirty) {
@@ -170,32 +171,16 @@ public class NamedRelationshipEditor extends EditorPart implements
     }
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.ui.part.EditorPart#isDirty()
-   */
   @Override
   public boolean isDirty() {
     return this.isDirty;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.ui.part.EditorPart#isSaveAsAllowed()
-   */
   @Override
   public boolean isSaveAsAllowed() {
     return false;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.ui.part.WorkbenchPart
-   *      #createPartControl(org.eclipse.swt.widgets.Composite)
-   */
   @Override
   public void createPartControl(Composite parent) {
     Composite container = new Composite(parent, SWT.NONE);
@@ -301,22 +286,11 @@ public class NamedRelationshipEditor extends EditorPart implements
     }
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
-   */
   @Override
   public void setFocus() {
-
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see com.google.devtools.depan.eclipse.utils.ModificationListener
-   *      #modify(java.lang.Object, java.lang.String, java.lang.Object)
-   */
+  @Override
   public void modify(DirectedRelation element, String property, Boolean value) {
     if (null == this.selectedSet) {
       return;
@@ -328,5 +302,4 @@ public class NamedRelationshipEditor extends EditorPart implements
       this.selectedSet.setMatchBackward(element.getRelation(), value);
     }
   }
-
 }

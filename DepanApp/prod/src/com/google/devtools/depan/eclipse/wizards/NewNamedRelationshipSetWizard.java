@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.eclipse.wizards;
 
-import com.google.devtools.depan.util.XmlPersist;
+import com.google.devtools.depan.eclipse.persist.ObjectXmlPersist;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -36,6 +36,7 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 
@@ -56,11 +57,6 @@ public class NewNamedRelationshipSetWizard extends Wizard
     setNeedsProgressMonitor(true);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.jface.wizard.Wizard#performFinish()
-   */
   @Override
   public boolean performFinish() {
     final String containerName = page.getContainerName();
@@ -70,8 +66,11 @@ public class NewNamedRelationshipSetWizard extends Wizard
           throws InvocationTargetException {
         try {
           doFinish(containerName, filename, monitor);
-        } catch (CoreException e) {
-          throw new InvocationTargetException(e);
+        } catch (CoreException errCore) {
+          throw new InvocationTargetException(errCore);
+        } catch (IOException errIo) {
+          throw new InvocationTargetException(errIo,
+              "Unable to save Named Relationship to " + filename);
         } finally {
           monitor.done();
         }
@@ -98,8 +97,9 @@ public class NewNamedRelationshipSetWizard extends Wizard
    * @param monitor a {@link IProgressMonitor} to track advancement.
    * @throws CoreException if the container doesn't exists.
    */
-  private void doFinish(String containerName, String filename,
-      IProgressMonitor monitor) throws CoreException {
+  private void doFinish(
+      String containerName, String filename, IProgressMonitor monitor)
+      throws CoreException, IOException {
     monitor.beginTask("Creating " + filename, 1);
 
     monitor.setTaskName("Creating file...");
@@ -114,7 +114,8 @@ public class NewNamedRelationshipSetWizard extends Wizard
     final IFile file = container.getFile(new Path(filename));
 
     // save the builtins relationships as an "example" in the file.
-    XmlPersist.save(Collections.EMPTY_LIST, file.getLocationURI());
+    ObjectXmlPersist persist = new ObjectXmlPersist();
+    persist.save(file.getLocationURI(), Collections.EMPTY_LIST);
 
     monitor.worked(1);
   }
@@ -125,25 +126,14 @@ public class NewNamedRelationshipSetWizard extends Wizard
     throw new CoreException(status);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.jface.wizard.Wizard#addPages()
-   */
   @Override
   public void addPages() {
     page = new NewNamedRelationshipSetPage(selection);
     addPage(page);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.ui.IWorkbenchWizard #init(org.eclipse.ui.IWorkbench,
-   *      org.eclipse.jface.viewers.IStructuredSelection)
-   */
+  @Override
   public void init(IWorkbench workbench, IStructuredSelection select) {
     this.selection = select;
   }
-
 }

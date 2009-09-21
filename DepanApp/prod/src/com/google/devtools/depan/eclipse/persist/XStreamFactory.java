@@ -36,11 +36,38 @@ import com.thoughtworks.xstream.io.xml.StaxDriver;
 public class XStreamFactory {
 
   /**
+   * Sharable {@code XStream}, suitable for most cases where the standard
+   * DepAn configurations are appropriate.
+   */
+  private static XStream sharedXStream;
+
+  /**
+   * Prevent instantiation of this namespace class
+   */
+  private XStreamFactory() {
+  }
+
+  /**
    * Interface for objects that need to configure properties of the
    * {@code XStream} instances.
    */
   public interface Config {
     void config(XStream xstream);
+  }
+
+  /**
+   * Provide a shared XStream instance that is initialized to use the StAX
+   * XML parser and the DepAn configurations.  This can be used to avoid
+   * expensive configuration processes of separate XStreams, but no added
+   * configuration changes should be made.
+   * 
+   * @return DepAn configured XStream
+   */
+  public static synchronized XStream getSharedXStream() {
+    if (null == sharedXStream) {
+      sharedXStream = new XStream(new StaxDriver());
+    }
+    return sharedXStream;
   }
 
   /**
@@ -50,9 +77,9 @@ public class XStreamFactory {
    * @return DepAn configured XStream
    */
   public static XStream newStaxXStream() {
-     XStream result = new XStream(new StaxDriver());
-     configureXStream(result);
-     return result;
+    XStream result = new XStream(new StaxDriver());
+    configureXStream(result);
+    return result;
   }
 
   /**

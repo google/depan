@@ -16,10 +16,10 @@
 
 package com.google.devtools.depan.eclipse.wizards;
 
+import com.google.devtools.depan.eclipse.persist.ObjectXmlPersist;
 import com.google.devtools.depan.eclipse.utils.DefaultRelationshipSet;
 import com.google.devtools.depan.graph.api.DirectedRelationFinder;
 import com.google.devtools.depan.model.RelationshipSet;
-import com.google.devtools.depan.util.XmlPersist;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -35,6 +35,7 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -68,11 +69,6 @@ public class NewRelationshipSetWizard extends Wizard implements INewWizard {
     this.finder = finder;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.jface.wizard.Wizard#performFinish()
-   */
   @Override
   public boolean performFinish() {
     final String filename = page.getFilename();
@@ -81,9 +77,10 @@ public class NewRelationshipSetWizard extends Wizard implements INewWizard {
       public void run(IProgressMonitor monitor) {
         try {
           doFinish(filename, setname, monitor);
-        } catch (CoreException e) {
-          // TODO Auto-generated catch block
-          e.printStackTrace();
+        } catch (CoreException errCore) {
+          throw new RuntimeException(errCore);
+        } catch (IOException errIo) {
+          throw new RuntimeException(errIo);
         } finally {
           monitor.done();
         }
@@ -111,7 +108,7 @@ public class NewRelationshipSetWizard extends Wizard implements INewWizard {
    * @param monitor a {@link IProgressMonitor} to track advancement.
    */
   private void doFinish(String fileName, String setName,
-      IProgressMonitor monitor) throws CoreException {
+      IProgressMonitor monitor) throws IOException, CoreException {
     monitor.beginTask("Creating " + setName, 1);
 
     monitor.setTaskName("Creating file...");
@@ -136,13 +133,23 @@ public class NewRelationshipSetWizard extends Wizard implements INewWizard {
    * @param file the existing file
    * @param setName the set name
    */
-  private void addToSet(IFile file, String setName) throws CoreException {
-    XmlPersist<Collection<RelationshipSet>> persist =
-        XmlPersist.load(file.getLocationURI());
+  private void addToSet(IFile file, String setName)
+      throws IOException, CoreException {
+    ObjectXmlPersist persist = new ObjectXmlPersist();
+    Collection<RelationshipSet> updateSet = loadRelationshipSet(persist, file);
     RelationshipSet set = DefaultRelationshipSet.SET;
-    persist.getObject().add(set);
-    persist.save();
+    updateSet.add(set);
+    persist.save(file.getLocationURI(), updateSet);
     file.refreshLocal(IResource.DEPTH_ZERO, null);
+  }
+
+  /**
+   * Isolate unchecked conversion.
+   */
+  @SuppressWarnings("unchecked")
+  private Collection<RelationshipSet> loadRelationshipSet(
+      ObjectXmlPersist persist, IFile file) throws IOException {
+    return (Collection<RelationshipSet>) persist.load(file.getLocationURI());
   }
 
   /**
@@ -151,34 +158,26 @@ public class NewRelationshipSetWizard extends Wizard implements INewWizard {
    * @param file a new file
    * @param setName the set name
    */
-  private void newFileAndSet(IFile file, String setName) throws CoreException {
+  private void newFileAndSet(IFile file, String setName)
+      throws IOException, CoreException {
     RelationshipSet set = DefaultRelationshipSet.SET;
 
     Collection<RelationshipSet> collection = new ArrayList<RelationshipSet>();
     collection.add(set);
 
     // save data in the file
-    XmlPersist.save(collection, file.getLocationURI());
+    ObjectXmlPersist persist = new ObjectXmlPersist();
+    persist.save(file.getLocationURI(), collection);
     file.refreshLocal(IResource.DEPTH_ZERO, null);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.jface.wizard.Wizard#addPages()
-   */
   @Override
   public void addPages() {
     page = new NewRelationshipSetPage();
     addPage(page);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.ui.IWorkbenchWizard #init(org.eclipse.ui.IWorkbench,
-   *      org.eclipse.jface.viewers.IStructuredSelection)
-   */
+  @Override
   public void init(IWorkbench iworkbench, IStructuredSelection selection) {
   }
 

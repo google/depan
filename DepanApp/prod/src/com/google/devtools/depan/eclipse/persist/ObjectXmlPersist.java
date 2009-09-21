@@ -30,6 +30,14 @@ import java.net.URI;
  * Handle persistence of object to and from XML files.
  * This should correctly serialize any DepAn object that contains plugin
  * defined nodes and edges.
+ * <p>
+ * As tempting as it appears to re-write this with generics, simple approaches
+ * fail to provide advantages due to erasure.  Adding a generic class to the
+ * type fails to provide the necessary information to correctly cast the
+ * results from {@code #load(URI)}.  The compiler will accept the cast, but
+ * it doesn't do the right thing.  It could work if the constructor actually
+ * accepted a type token (e.g. {@code Blix.class}), but that's a more heavy
+ * handed implementation.
  * 
  * @author <a href="leeca@google.com">Lee Carver</a>
  */
@@ -39,21 +47,37 @@ public class ObjectXmlPersist {
    */
   protected final XStream xstream;
 
+  /**
+   * Create a serializer using the provided XStream.
+   * The {@code XStreamFactory} class can synthesize an appropriate
+   * {@code XStream} for most purposes.
+   * 
+   * @param xstream {@code XStream }to use for serialization
+   */
   public ObjectXmlPersist(XStream xstream) {
     this.xstream = xstream;
   }
 
   /**
-   * Create a instance that uses the StAX XStream driver.  This is preferred,
-   * especially for large objects (e.g. {@code GraphModel}s), since it uses
-   * much less ignorable white-space.  It also has the advantage that an XML
-   * declaration is automatically written at the top of the file, so the
-   * resulting output is actually valid XML.
+   * Create a instance that uses the shared StAX XStream driver.  The StAX
+   * driver is preferred, especially for large objects 
+   * (e.g. {@code GraphModel}s), since it uses much less ignorable white-space.
+   * It also has the advantage that an XML declaration is automatically written
+   * at the top of the file, so the resulting output is actually valid XML.
+   * Finally, reusing the shared XStream instance reduces the configuration
+   * costs of multiple XStreams.
    */
   public ObjectXmlPersist() {
-    this(XStreamFactory.newStaxXStream());
+    this(XStreamFactory.getSharedXStream());
   }
 
+  /**
+   * Load an object from the provided URI.
+   * 
+   * @param uri location of persistent object
+   * @return object fro location
+   * @throws IOException
+   */
   public Object load(URI uri) throws IOException {
     InputStreamReader src = null;
 
@@ -67,6 +91,13 @@ public class ObjectXmlPersist {
     }
   }
 
+  /**
+   * Save an object to the provided URI.
+   * 
+   * @param uri location for persistent representation
+   * @param item object to persist
+   * @throws IOException
+   */
   public void save(URI uri, Object item) throws IOException {
     OutputStreamWriter dst = null;
 

@@ -16,11 +16,11 @@
 
 package com.google.devtools.depan.eclipse.editors;
 
+import com.google.devtools.depan.eclipse.persist.ObjectXmlPersist;
 import com.google.devtools.depan.eclipse.utils.Tools;
 import com.google.devtools.depan.tasks.MigrationGroup;
 import com.google.devtools.depan.tasks.MigrationRule;
 import com.google.devtools.depan.tasks.MigrationTask;
-import com.google.devtools.depan.util.XmlPersist;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.graphics.Color;
@@ -33,6 +33,7 @@ import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.MultiPageEditorPart;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -52,7 +53,6 @@ public class RemapEditor extends MultiPageEditorPart
   /**
    * Persistence object for the {@link MigrationTask}.
    */
-  private XmlPersist<MigrationTask> xmlMigrationTask;
   private MigrationTask migrationTask;
 
   /**
@@ -65,6 +65,8 @@ public class RemapEditor extends MultiPageEditorPart
    */
   private Collection<MigrationTaskListener> taskListeners =
       new ArrayList<MigrationTaskListener>();
+
+  private URI uri;
 
   /* (non-Javadoc)
    * @see org.eclipse.ui.part.MultiPageEditorPart#createPages()
@@ -136,36 +138,39 @@ public class RemapEditor extends MultiPageEditorPart
     super.init(site, input);
 
     if (input instanceof IFileEditorInput) {
-      URI uri = ((IFileEditorInput) input).getFile().getLocationURI();
-      xmlMigrationTask = XmlPersist.load(uri);
-      migrationTask = xmlMigrationTask.getObject();
-      this.setPartName(migrationTask.getName());
+      try {
+        uri = ((IFileEditorInput) input).getFile().getLocationURI();
+        ObjectXmlPersist persist = new ObjectXmlPersist();
+        migrationTask = loadMigrationTask(persist);
+        this.setPartName(migrationTask.getName());
+      } catch (IOException errIo) {
+        throw new PartInitException("Unable to load migration task from " + uri, errIo);
+      }
     }
-
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.ui.part.EditorPart
-   *      #doSave(org.eclipse.core.runtime.IProgressMonitor)
-   */
+  private MigrationTask loadMigrationTask(ObjectXmlPersist persist)
+      throws IOException {
+    return (MigrationTask) persist.load(uri);
+  }
+
   @Override
   public void doSave(IProgressMonitor monitor) {
-    xmlMigrationTask.save();
-    setDirtyState(false);
+    try {
+      ObjectXmlPersist persist = new ObjectXmlPersist();
+      persist.save(uri, migrationTask);
+      setDirtyState(false);
+    } catch (IOException errIo) {
+      monitor.setCanceled(true);
+      throw new RuntimeException(
+          "Unable to save migration task to " + uri, errIo);
+    }
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.ui.part.EditorPart#doSaveAs()
-   */
   @Override
   public void doSaveAs() {
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.ui.part.EditorPart#isSaveAsAllowed()
-   */
   @Override
   public boolean isSaveAsAllowed() {
     return true;
@@ -176,20 +181,11 @@ public class RemapEditor extends MultiPageEditorPart
     firePropertyChange(IEditorPart.PROP_DIRTY);
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.ui.part.MultiPageEditorPart#isDirty()
-   */
   @Override
   public boolean isDirty() {
     return this.isDirty;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see com.google.devtools.depan.eclipse.editors.MigrationTaskListener
-   *      #dataUpdated()
-   */
   public void dataUpdated(Object source) {
     setDirtyState(true);
     for (MigrationTaskListener listener : taskListeners) {
@@ -197,12 +193,7 @@ public class RemapEditor extends MultiPageEditorPart
     }
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see com.google.devtools.depan.eclipse.editors.MigrationTaskListener
-   *      #groupUpdated(com.google.devtools.depan.tasks.MigrationGroup)
-   */
+  @Override
   public void groupUpdated(Object source, MigrationGroup group) {
     setDirtyState(true);
     for (MigrationTaskListener listener : taskListeners) {
@@ -210,12 +201,7 @@ public class RemapEditor extends MultiPageEditorPart
     }
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see com.google.devtools.depan.eclipse.editors.MigrationTaskListener
-   *      #groupsListUpdated()
-   */
+  @Override
   public void groupsListUpdated(Object source) {
     setDirtyState(true);
     for (MigrationTaskListener listener : taskListeners) {
@@ -223,12 +209,7 @@ public class RemapEditor extends MultiPageEditorPart
     }
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see com.google.devtools.depan.eclipse.editors.MigrationTaskListener
-   *      #ruleListUpdated(com.google.devtools.depan.tasks.MigrationGroup)
-   */
+  @Override
   public void ruleListUpdated(Object source, MigrationGroup group) {
     setDirtyState(true);
     for (MigrationTaskListener listener : taskListeners) {
@@ -236,14 +217,7 @@ public class RemapEditor extends MultiPageEditorPart
     }
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see com.google.devtools.depan.eclipse.editors.MigrationTaskListener
-   *      #ruleUpdated(java.lang.Object,
-   *      com.google.devtools.depan.tasks.MigrationGroup,
-   *      com.google.devtools.depan.tasks.MigrationRule)
-   */
+  @Override
   public void ruleUpdated(Object source, MigrationGroup group,
       MigrationRule<?> rule) {
     setDirtyState(true);
