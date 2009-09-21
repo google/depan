@@ -66,6 +66,7 @@ public class XStreamFactory {
   public static synchronized XStream getSharedXStream() {
     if (null == sharedXStream) {
       sharedXStream = new XStream(new StaxDriver());
+      configureXStream(sharedXStream);
     }
     return sharedXStream;
   }
