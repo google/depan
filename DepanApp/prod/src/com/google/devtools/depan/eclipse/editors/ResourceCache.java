@@ -20,6 +20,8 @@ import com.google.common.collect.Maps;
 import com.google.devtools.depan.eclipse.persist.GraphModelXmlPersist;
 import com.google.devtools.depan.model.GraphModel;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
@@ -27,6 +29,7 @@ import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 
 import java.net.URI;
 import java.util.Map;
@@ -34,6 +37,10 @@ import java.util.Map;
 /**
  * Cache large resources (mostly .dpang files) so we don't have to reload
  * them on every reference.
+ * <p>
+ * Uses workspace relative IPaths obtained from the IFile as keys for the
+ * loaded GraphModels.  Uses raw resource URIs obtained from the IFile if
+ * the graph needs to be loaded.
  *
  * @author <a href='mailto:leeca@google.com'>Lee Carver</a>
  */
@@ -42,7 +49,7 @@ public class ResourceCache implements IResourceChangeListener {
   /**
    * Cache of previously loaded graph models.
    */
-  private Map<URI, GraphModel> loadedGraphs = Maps.newHashMap();
+  private Map<IPath, GraphModel> loadedGraphs = Maps.newHashMap();
 
   /////////////////////////////////////
   // GraphModel cache
@@ -51,48 +58,76 @@ public class ResourceCache implements IResourceChangeListener {
   static {
     IWorkspace workspace = ResourcesPlugin.getWorkspace();
     INSTANCE.attachWorkspace(workspace);
-    
+  }
+
+  protected GraphModel retrieveGraphModel(IFile file) {
+    return loadedGraphs.get(file.getFullPath());
+  }
+
+  protected void installGraphModel(IFile file, GraphModel graph) {
+    loadedGraphs.put(file.getFullPath(), graph);
+  }
+
+  public static GraphModel loadGraphModel(IFile file) {
+    GraphModelXmlPersist loader = new GraphModelXmlPersist();
+    return loader.load(file.getRawLocationURI());
+  }
+
+  public static void saveGraphModel(IFile file, GraphModel graph)
+      throws CoreException {
+    GraphModelXmlPersist loader = new GraphModelXmlPersist();
+    loader.save(file.getRawLocationURI(), graph);
+    file.refreshLocal(IResource.DEPTH_ZERO, null);
   }
 
   /**
-   * Provide the graph model located at the given URI.
-   * If the URI has already be loaded, the graph model is provided from an
-   * internal cache.  If the URI has not been loaded, read it from the location
-   * and also add it to the internal cache.
+   * Provide the graph model located for the given file.
+   * If the file has already be loaded, the graph model is provided from an
+   * internal cache.  If the file has not been loaded, read it from the
+   * location and also add it to the internal cache.
    * 
-   * @param uri location (and cache key) for the graph model
-   * @return graph model provided by the uri
+   * @param file location for the graph model
+   * @return graph model obtained from the location
    */
-  public static GraphModel fetchGraphModel(URI uri) {
-    return INSTANCE.getGraphModel(uri);
+  public static GraphModel fetchGraphModel(IFile file) {
+    return INSTANCE.getGraphModel(file);
   }
 
   /**
-   * Provide the graph model located at the given URI.
-   * If the URI has already be loaded, the graph model is provided from an
-   * internal cache.  If the URI has not been loaded, read it from the location
+   * Provide the graph model located at the given file.
+   * If the files has already be loaded, the graph model is provided from an
+   * internal cache.  If the file has not been loaded, read it from the location
    * but do not add it to the internal cache.
    * 
    * @param uri location (and cache key) for the graph model
    * @return graph model provided by the uri
    */
-  public static GraphModel importGraphModel(URI uri) {
-    return INSTANCE.provideGraphModel(uri);
+  public static GraphModel importGraphModel(IFile file) {
+    return INSTANCE.provideGraphModel(file);
+  }
+
+  /**
+   * Write a new graph model into both the file system and the cache.
+   * @param file location for the graph model
+   * @param graph graph to save
+   */
+  public static void storeGraphModel(IFile file, GraphModel graph)
+      throws CoreException {
+    INSTANCE.insertGraphModel(file, graph);
   }
 
   /**
    * Provide the graph model, adding it to the cache if it isn't there.
    * 
-   * @param uri location (and cache key) for the graph model
-   * @return graph model provided by the uri
+   * @param file location for the graph model
+   * @return graph model provided by the location
    */
-  protected GraphModel getGraphModel(URI uri) {
-    GraphModel result = loadedGraphs.get(uri);
+  protected GraphModel getGraphModel(IFile file) {
+    GraphModel result = retrieveGraphModel(file);
 
     if (null == result) {
-      GraphModelXmlPersist loader = new GraphModelXmlPersist();
-      result = loader.load(uri);
-      loadedGraphs.put(uri, result);
+      result = loadGraphModel(file);
+      installGraphModel(file, result);
     }
 
     return result;
@@ -102,18 +137,28 @@ public class ResourceCache implements IResourceChangeListener {
    * Provide the graph model without adding it to the cache.  If it is in the
    * cache, use that rather then re-reading it from the URI.
    * 
-   * @param uri location (and cache key) for the graph model
-   * @return graph model provided by the uri
+   * @param file location for the graph model
+   * @return graph model provided by the location
    */
-  protected GraphModel provideGraphModel(URI uri) {
-    GraphModel result = loadedGraphs.get(uri);
+  protected GraphModel provideGraphModel(IFile file) {
+    GraphModel result = retrieveGraphModel(file);
 
     if (null != result) {
       return result;
     }
 
-    GraphModelXmlPersist loader = new GraphModelXmlPersist();
-    return loader.load(uri);
+    return loadGraphModel(file);
+  }
+
+  /**
+   * Write a new graph model into both the file system and the cache.
+   * @param file location for the graph model
+   * @param graph graph to save
+   */
+  protected void insertGraphModel(IFile file, GraphModel graph)
+      throws CoreException {
+    saveGraphModel(file, graph);
+    installGraphModel(file, graph);
   }
 
   protected void attachWorkspace(IWorkspace workspace) {

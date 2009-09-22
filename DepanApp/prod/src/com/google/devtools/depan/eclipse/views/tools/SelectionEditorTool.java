@@ -370,7 +370,7 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
     // and the ViewEditorInput
     final ViewEditorInput input = new ViewEditorInput(
         newView, getLayoutChoice(),
-        getEditor().getParentUri());
+        getEditor().getParentFile());
 
     ViewEditor.startViewEditor(input);
   }

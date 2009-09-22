@@ -98,7 +98,7 @@ public class NewMergedGraphWizard extends AbstractAnalysisWizard {
       String graphName = graphResource.getName();
       monitor.setTaskName("Loading dependency graph " + graphName + "...");
       GraphModel nextGraph =
-          ResourceCache.importGraphModel(graphResource.getLocationURI());
+          ResourceCache.importGraphModel((IFile) graphResource);
       monitor.worked(1);
 
       monitor.setTaskName("Merging dependency graph " + graphName + "...");

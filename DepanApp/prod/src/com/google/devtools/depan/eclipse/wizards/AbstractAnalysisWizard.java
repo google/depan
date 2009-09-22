@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.eclipse.wizards;
 
+import com.google.devtools.depan.eclipse.editors.ResourceCache;
 import com.google.devtools.depan.eclipse.persist.GraphModelXmlPersist;
 import com.google.devtools.depan.model.GraphModel;
 
@@ -170,10 +171,8 @@ public abstract class AbstractAnalysisWizard extends Wizard
 
     monitor.setTaskName("Writing file...");
 
-    GraphModelXmlPersist persist = new GraphModelXmlPersist();
-    persist.save(file.getLocationURI(), graph);
+    ResourceCache.storeGraphModel(file, graph);
 
-    file.refreshLocal(IResource.DEPTH_ZERO, null);
     monitor.worked(1);
   }
 }

@@ -19,11 +19,10 @@ package com.google.devtools.depan.eclipse.editors;
 import com.google.devtools.depan.eclipse.visualization.layout.Layouts;
 import com.google.devtools.depan.view.ViewModel;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
-
-import java.net.URI;
 
 /**
  * @author ycoppel@google.com (Yohann Coppel)
@@ -33,12 +32,12 @@ public class ViewEditorInput implements IEditorInput {
 
   private final ViewModel view;
   private final Layouts layout;
-  private final URI parentUri;
+  private final IFile parentFile;
 
-  public ViewEditorInput(ViewModel view, Layouts layout, URI parentUri) {
+  public ViewEditorInput(ViewModel view, Layouts layout, IFile parentFile) {
     this.view = view;
     this.layout = layout;
-    this.parentUri = parentUri;
+    this.parentFile = parentFile;
   }
 
   public ViewModel getView() {
@@ -49,61 +48,37 @@ public class ViewEditorInput implements IEditorInput {
     return layout;
   }
 
-  public URI getParentUri() {
-    return parentUri;
+  public IFile getParentFile() {
+    return parentFile;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.ui.IEditorInput#exists()
-   */
+  @Override
   public boolean exists() {
     return false;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.ui.IEditorInput#getImageDescriptor()
-   */
+  @Override
   public ImageDescriptor getImageDescriptor() {
     return null;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.ui.IEditorInput#getName()
-   */
+  @Override
   public String getName() {
     return view.getName();
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.ui.IEditorInput#getPersistable()
-   */
+  @Override
   public IPersistableElement getPersistable() {
     // TODO Auto-generated method stub
     return null;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.ui.IEditorInput#getToolTipText()
-   */
+  @Override
   public String getToolTipText() {
     return view.getName();
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
-   */
+  @Override
   // warning suppressed because Class should be parameterized. however the
   // implemented method doesn't use parameter here.
   @SuppressWarnings("unchecked")

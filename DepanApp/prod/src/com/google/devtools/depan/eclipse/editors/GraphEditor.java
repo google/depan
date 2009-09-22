@@ -35,6 +35,7 @@ import com.google.devtools.depan.view.EdgeDisplayProperty;
 import com.google.devtools.depan.view.NodeDisplayProperty;
 import com.google.devtools.depan.view.ViewModel;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
@@ -54,13 +55,11 @@ import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.MultiPageEditorPart;
 
-import java.io.File;
-import java.net.URI;
 import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  * @author ycoppel@google.com (Yohann Coppel)
- *
  */
 public class GraphEditor
     extends MultiPageEditorPart
@@ -69,8 +68,11 @@ public class GraphEditor
         RelationshipSelectorListener,
         GraphListener {
 
+  private static final Logger logger =
+      Logger.getLogger(GraphEditor.class.getName());
+
   private GraphModel graph = null;
-  private URI uri = null;
+  private IFile file = null;
   private CheckboxTreeViewer tree = null;
   private List associatedViews = null;
   private Binop<ViewModel> binop = null;
@@ -280,23 +282,23 @@ public class GraphEditor
     }
 
     // load the graph
-    uri = ((IFileEditorInput) input).getFile().getRawLocationURI();
+    file = ((IFileEditorInput) input).getFile();
 
-    System.out.println("Reading " + uri);
+    logger.info("Reading " + file.getRawLocationURI());
 
-    graph = ResourceCache.fetchGraphModel(uri);
+    graph = ResourceCache.fetchGraphModel(file);
 
-    System.out.println("  DONE");
+    logger.info("  DONE");
 
     hierarchies = new HierarchyCache<GraphNode>(this, graph);
     if (null != checkNodeTreeView) {
-      System.out.println("Initialize graph...");
+      logger.info("Initialize graph...");
       selectedSetChanged(DefaultRelationshipSet.SET);
-      System.out.println("  DONE");
+      logger.info("  DONE");
     }
 
     // set the title to the filename, excepted the file extension
-    String title = new File(uri).getName();
+    String title = file.getName();
     title = title.substring(0, title.lastIndexOf('.'));
     this.setPartName(title);
   }
@@ -344,7 +346,7 @@ public class GraphEditor
    * @param layout Initial layout for visualization
    */
   public void create(ViewModel view, Layouts layout) {
-    final ViewEditorInput input = new ViewEditorInput(view, layout, uri);
+    final ViewEditorInput input = new ViewEditorInput(view, layout, file);
     ViewEditor.startViewEditor(input);
     updateList();
   }

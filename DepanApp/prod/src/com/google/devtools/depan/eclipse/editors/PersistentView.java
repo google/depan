@@ -21,6 +21,9 @@ import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.view.ViewModel;
 
 import org.apache.commons.collections15.Transformer;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.ResourcesPlugin;
 
 import java.awt.Point;
 import java.awt.geom.Point2D;
@@ -101,6 +104,13 @@ public class PersistentView implements Transformer<GraphNode, Point2D> {
     return parentUri;
   }
 
+  // TODO(leeca): Just temporary, until we get better serialized Views
+  public IFile getParentFile() {
+    IWorkspace workspace = ResourcesPlugin.getWorkspace();
+    IFile[] files =  workspace.getRoot().findFilesForLocationURI(getParentUri());
+    return files[0];
+  }
+
   public void setLocations() {
     if (null == locations) {
       locations = new HashMap<String, Point2DDouble>(); 
@@ -171,7 +181,7 @@ public class PersistentView implements Transformer<GraphNode, Point2D> {
         return null;
     }
     if (null == reloaded.parentUri || null == reloaded.name) return null;
-    GraphModel graph = ResourceCache.fetchGraphModel(reloaded.parentUri);
+    GraphModel graph = ResourceCache.fetchGraphModel(reloaded.getParentFile());
     reloaded.view = new ViewModel(reloaded.name, graph);
     reloaded.view.setStringNodes(reloaded.locations.keySet());
     reloaded.view.setLocations(reloaded.view.getNodes(), reloaded);

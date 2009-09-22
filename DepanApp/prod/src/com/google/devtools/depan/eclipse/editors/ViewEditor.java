@@ -88,8 +88,8 @@ public class ViewEditor extends MultiPageEditorPart
   private View view = null;
 
   // Persistence information - where to write this view
-  private URI uri = null;
-  private URI parentUri = null;
+  private IFile graphFile = null;
+  private IFile parentFile = null;
 
   // Initialization data - for use only during editor activation
   private ViewModel initViewModel = null;
@@ -123,8 +123,8 @@ public class ViewEditor extends MultiPageEditorPart
     return view;
   }
 
-  public URI getParentUri() {
-    return parentUri;
+  public IFile getParentFile() {
+    return parentFile;
   }
 
   public void setDirtyState(boolean dirty) {
@@ -237,15 +237,15 @@ public class ViewEditor extends MultiPageEditorPart
 
     if (input instanceof ViewEditorInput) {
       ViewEditorInput editorInput = (ViewEditorInput) input;
-      uri = null; // not yet saved
-      parentUri =  editorInput.getParentUri();
+      graphFile = null; // not yet saved
+      parentFile =  editorInput.getParentFile();
       initViewModel = editorInput.getView();
       initViewLayout = editorInput.getLayout();
       setDirtyState(true);
     } else if (input instanceof IFileEditorInput) {
-      uri = ((IFileEditorInput) input).getFile().getRawLocationURI();
-      PersistentView persist = PersistentView.load(uri);
-      parentUri = persist.getParentUri();
+      graphFile = ((IFileEditorInput) input).getFile();
+      PersistentView persist = PersistentView.load(graphFile.getRawLocationURI());
+      parentFile = persist.getParentFile();
       initViewModel = persist.getViewModel();
       initViewLayout = null; // use static layout
       setDirtyState(false);
@@ -432,15 +432,16 @@ public class ViewEditor extends MultiPageEditorPart
   @Override
   public void doSave(IProgressMonitor monitor) {
     // Of there are any file problems, do this as a Save As ..
-    if ((null == parentUri) || (null == uri)) {
+    if ((null == parentFile) || (null == graphFile)) {
       doSaveAs();
     }
 
     monitor.setTaskName("Writing file...");
-    PersistentView persist = new PersistentView(getViewModel(), parentUri);
+    PersistentView persist =
+        new PersistentView(getViewModel(), parentFile.getRawLocationURI());
 
     persist.setLocations();
-    persist.save(uri);
+    persist.save(graphFile.getRawLocationURI());
     setDirtyState(false);
     monitor.done();
   }
@@ -460,7 +461,8 @@ public class ViewEditor extends MultiPageEditorPart
 
     // If text output is requested, use it.
     if (saveUri.toString().endsWith(".txt")) {
-      PersistAsText textSaver = new PersistAsText(getViewModel(), parentUri);
+      PersistAsText textSaver =
+          new PersistAsText(getViewModel(), parentFile.getRawLocationURI());
       textSaver.save(saveUri);
       setDirtyState(false);
       return;
@@ -468,11 +470,12 @@ public class ViewEditor extends MultiPageEditorPart
 
     // Otherwise, save using the binary format
     saveUri = getDpanvUri(saveUri);
-    PersistentView binSaver = new PersistentView(getViewModel(), parentUri);
+    PersistentView binSaver =
+        new PersistentView(getViewModel(), parentFile.getRawLocationURI());
     binSaver.setLocations();
     binSaver.save(saveUri);
     setDirtyState(false);
-    uri = saveUri;
+    graphFile = file;
   }
 
   /**
