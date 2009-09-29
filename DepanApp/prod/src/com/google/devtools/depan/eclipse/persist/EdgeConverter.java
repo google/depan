@@ -38,7 +38,7 @@ import com.thoughtworks.xstream.mapper.Mapper;
  */
 public class EdgeConverter implements Converter {
 
-  public static final String EDGE_DEF_TAG = "edge-ref";
+  public static final String EDGE_DEF_TAG = "graph-edge";
 
   private static final String TAIL_TAG = "tail";
   private static final String HEAD_TAG = "head";
