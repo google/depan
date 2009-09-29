@@ -144,6 +144,10 @@ public class EdgeDisplayProperty {
     this.color = lineColor;
   }
 
+  /**
+   * Create a new edge display property by cloning an existing one.
+   * @param current
+   */
   public EdgeDisplayProperty(EdgeDisplayProperty current) {
     this(current.getLineStyle(), current.getArrowhead(), current.getColor());
   }
