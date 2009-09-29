@@ -17,7 +17,6 @@
 package com.google.devtools.depan.eclipse.views.tools;
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.utils.EditColTableDef;
 import com.google.devtools.depan.eclipse.utils.Resources;
@@ -27,7 +26,6 @@ import com.google.devtools.depan.eclipse.views.ViewEditorTool;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.util.StringUtils;
 import com.google.devtools.depan.view.EdgeDisplayProperty;
-import com.google.devtools.depan.view.ViewModel;
 import com.google.devtools.depan.view.EdgeDisplayProperty.ArrowheadStyle;
 import com.google.devtools.depan.view.EdgeDisplayProperty.LineStyle;
 
@@ -47,7 +45,6 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 
 import java.awt.Color;
-import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -93,14 +90,33 @@ public class EdgeEditorTool extends ViewEditorTool implements ICellModifier {
   /**
    * The content provider of table that stores {@link EdgeEditorTerm} objects.
    */
-  private TableContentProvider<EdgeEditorTerm> edgeTableContent;
+  private TableContentProvider<GraphEdge> edgeTableContent;
 
   /**
-   * Hash map that contains a list of {@link EdgeEditorTerm} objects for each
-   * {@link ViewModel}.
+   * Source of information about display properties of an edge.  This is
+   * cleared whenever we change editors.
    */
-  private Map<ViewModel, Collection<EdgeEditorTerm>> lists =
-      Maps.newHashMap();
+  private Map<GraphEdge, EdgeDisplayProperty> knownEdges = null;
+
+  private EdgeDisplayProperty getDisplayProperty(GraphEdge edge) {
+    EdgeDisplayProperty result = knownEdges.get(edge);
+    if (null != result) {
+      return result;
+    }
+    result = getEditor().getEdgeProperty(edge);
+    if (null == result) {
+      result = new EdgeDisplayProperty();
+    }
+    knownEdges.put(edge, result);
+    return result;
+  }
+
+  private EdgeDisplayProperty getMutableDisplayProperty(GraphEdge edge) {
+    EdgeDisplayProperty current = getDisplayProperty(edge);
+    EdgeDisplayProperty result = new EdgeDisplayProperty(current);
+    knownEdges.put(edge, result);
+    return result;
+  }
 
   @Override
   public boolean canModify(Object element, String property) {
@@ -109,25 +125,27 @@ public class EdgeEditorTool extends ViewEditorTool implements ICellModifier {
 
   @Override
   public Object getValue(Object element, String property) {
-    if (element instanceof EdgeEditorTerm) {
-      EdgeEditorTerm term = (EdgeEditorTerm) element;
+    if (element instanceof GraphEdge) {
+      GraphEdge edge = (GraphEdge) element;
       if (property.equals(COL_SOURCE)) {
-        return term.getSourceName();
+        return edge.getHead().friendlyString();
       }
       if (property.equals(COL_RELATION)) {
-        return term.getRelationName();
+        return edge.getRelation().toString();
       }
       if (property.equals(COL_TARGET)) {
-        return term.getTargetName();
+        return edge.getTail().friendlyString();
       }
+
+      EdgeDisplayProperty edgeProps = getDisplayProperty(edge);
       if (property.equals(COL_LINE_STYLE)) {
-        return term.getDisplayProperty().getLineStyle().ordinal();
+        return edgeProps.getLineStyle().ordinal();
       }
       if (property.equals(COL_ARROWHEAD)) {
-        return term.getDisplayProperty().getArrowhead().ordinal();
+        return edgeProps.getArrowhead().ordinal();
       }
       if (property.equals(COL_LINE_COLOR)) {
-        Color edgeColor = term.getDisplayProperty().getColor();
+        Color edgeColor = edgeProps.getColor();
         if (edgeColor != null) {
           return edgeColor.toString();
         }
@@ -143,30 +161,27 @@ public class EdgeEditorTool extends ViewEditorTool implements ICellModifier {
       return;
     }
     Object modifiedObject = ((TableItem) element).getData();
-    if (!(modifiedObject instanceof EdgeEditorTerm)) {
+    if (!(modifiedObject instanceof GraphEdge)) {
       return;
     }
 
-    EdgeEditorTerm term = (EdgeEditorTerm) modifiedObject;
-    GraphEdge edge = term.edge;
+    GraphEdge edge = (GraphEdge) modifiedObject;
+    EdgeDisplayProperty edgeProps = getMutableDisplayProperty(edge);
 
     if (property.equals(COL_LINE_STYLE) && (value instanceof Integer)) {
-      term.getDisplayProperty().setLineStyle(
-          LineStyle.values()[(Integer) value]);
+      edgeProps.setLineStyle(LineStyle.values()[(Integer) value]);
     } else if (property.equals(COL_ARROWHEAD) && (value instanceof Integer)) {
-      term.getDisplayProperty().setArrowhead(
-          ArrowheadStyle.values()[(Integer) value]);
+      edgeProps.setArrowhead(ArrowheadStyle.values()[(Integer) value]);
     } else if (property.equals(COL_LINE_COLOR) && (value instanceof String)) {
       Color newColor = StringUtils.stringToColor((String) value);
-      term.getDisplayProperty().setColor(newColor);
+      edgeProps.setColor(newColor);
     }
 
     // Update listeners and the table
-    getViewModel().getGraph().fireEdgePropertyChange(
-        edge, term.getDisplayProperty());
-    edgeTable.update(term, new String[] {property});
+    getEditor().setEdgeProperty(edge, edgeProps);
+    edgeTable.update(element, new String[] {property});
   }
-  
+
   /**
    * Creates the interface for this <code>EdgeEditorTool</code> and places it on
    * the given <code>Composite</code>.
@@ -178,7 +193,7 @@ public class EdgeEditorTool extends ViewEditorTool implements ICellModifier {
   public Control setupComposite(Composite parent) {
     // Create a table viewer and its content provider
     edgeTable = new TableViewer(parent, SWT.BORDER | SWT.V_SCROLL);
-    edgeTableContent = new TableContentProvider<EdgeEditorTerm>();
+    edgeTableContent = new TableContentProvider<GraphEdge>();
     edgeTableContent.initViewer(edgeTable);
 
     // set up label provider
@@ -236,121 +251,23 @@ public class EdgeEditorTool extends ViewEditorTool implements ICellModifier {
    */
   @Override
   public void setEditor(ViewEditor viewEditor) {
+    if (viewEditor != getEditor()) {
+      knownEdges = Maps.newHashMap();
+    }
     super.setEditor(viewEditor);
-    if (null == getViewModel()) {
+    if (null == getEditor()) {
       return;
     }
 
-    Collection<EdgeEditorTerm> edgeTerms;
-    if (!lists.containsKey(getViewModel())) {
-      Collection<GraphEdge> edges = viewEditor.getViewModel().getEdges();
-      edgeTerms = Sets.newHashSet();
-      for (GraphEdge edge : edges) {
-        EdgeEditorTerm term = new EdgeEditorTerm(edge);
-        edgeTerms.add(term);
-      }
-      // the first time we open this editor, get/save the root nodes:
-      lists.put(getViewModel(), edgeTerms);
-    } else {
-      edgeTerms = lists.get(getViewModel());
-    }
-
-    // remove all existing entries from the table
+    // Reset the table by removing everything and adding all the edges.
     edgeTable.getTable().removeAll();
-    // add all edges that exist on this graph
-    edgeTable.add(edgeTerms.toArray());
+    edgeTable.add(viewEditor.getViewGraph().getEdges().toArray());
   }
-
-  /**
-   * Stores a {@link GraphEdge} and an {@link EdgeDisplayProperty} object
-   * associated with this edge.
-   */
-  private static class EdgeEditorTerm {
-
-    /**
-     * {@link GraphEdge} object this term uses.
-     */
-    private GraphEdge edge;
-
-    /**
-     * {@link EdgeDisplayProperty} object associated with the edge stored this
-     * object.
-     */
-    private EdgeDisplayProperty displayProperty;
-
-    /**
-     * Constructs an <code>EdgeEditorTerm</code> with the given
-     * {@link GraphEdge} and display properties.
-     *
-     * @param edge {@link GraphEdge} object that is associated with this term.
-     * @param lineStyle {@link LineStyle} of the given edge.
-     * @param arrowhead {@link ArrowheadStyle} of the given edge.
-     * @param lineColor <code>Color</code> of the given edge.
-     */
-    public EdgeEditorTerm(GraphEdge edge, LineStyle lineStyle,
-        ArrowheadStyle arrowhead, Color lineColor) {
-      this.edge = edge;
-      this.displayProperty =
-          new EdgeDisplayProperty(lineStyle, arrowhead, lineColor);
-    }
-
-    /**
-     * Constructs an <code>EdgeEditorTerm</code> with the given
-     * {@link GraphEdge} and default display properties.
-     *
-     * @param edge {@link GraphEdge} object that is associated with this term.
-     */
-    public EdgeEditorTerm(GraphEdge edge) {
-      this.edge = edge;
-      this.displayProperty = new EdgeDisplayProperty();
-    }
-
-    /**
-     * Returns the <code>String</code> representation of the source node of this
-     * edge.
-     *
-     * @return <code>String</code> representation of the source node of this
-     * edge.
-     */
-    public String getSourceName() {
-      return edge.getHead().friendlyString();
-    }
-
-    /**
-     * Returns the <code>String</code> representation of the relation of this
-     * edge.
-     *
-     * @return <code>String</code> representation of the relation of this edge.
-     */
-    public String getRelationName() {
-      return edge.getRelation().toString();
-    }
-
-    /**
-     * Returns the <code>String</code> representation of the target node of this
-     * edge.
-     *
-     * @return <code>String</code> representation of the target node of this
-     * edge.
-     */
-    public String getTargetName() {
-      return edge.getTail().friendlyString();
-    }
-
-    /**
-     * Returns the display property of the associated edge.
-     *
-     * @return Display property of the associated edge.
-     */
-    public EdgeDisplayProperty getDisplayProperty() {
-      return displayProperty;
-    }
-  } // end class EdgeEditorTerm
 
   /**
    * Label Provider for {@link EdgeEditorTerm} objects.
    */
-  private static class EdgeEditorLabelProvider extends LabelProvider
+  private class EdgeEditorLabelProvider extends LabelProvider
       implements ITableLabelProvider {
 
     /**
@@ -377,25 +294,24 @@ public class EdgeEditorTool extends ViewEditorTool implements ICellModifier {
      */
     @Override
     public String getColumnText(Object element, int columnIndex) {
-      if (element instanceof EdgeEditorTerm) {
-        EdgeEditorTerm item = (EdgeEditorTerm) element;
+      if (element instanceof GraphEdge) {
+        GraphEdge edge = (GraphEdge) element;
+        EdgeDisplayProperty edgeProps = getDisplayProperty(edge);
         switch (columnIndex) {
         case 0:
           // return the displayName of the path matcher term, trim just in case
-          return item.getSourceName();
+          return edge.getHead().friendlyString();
         case 1:
-          return item.getRelationName();
+          return edge.getRelation().toString();
         case 2:
-          return item.getTargetName();
+          return edge.getTail().friendlyString();
         case 3:
-          return item.getDisplayProperty().getLineStyle().getDisplayName()
-              .toLowerCase();
+          return edgeProps.getLineStyle().getDisplayName().toLowerCase();
         case 4:
-          return item.getDisplayProperty().getArrowhead().getDisplayName()
-              .toLowerCase();
+          return edgeProps.getArrowhead().getDisplayName().toLowerCase();
         case 5:
-          if (item.getDisplayProperty().getColor() != null) {
-            return Tools.getRgb(item.getDisplayProperty().getColor());
+          if (edgeProps.getColor() != null) {
+            return Tools.getRgb(edgeProps.getColor());
           }
         }
       }

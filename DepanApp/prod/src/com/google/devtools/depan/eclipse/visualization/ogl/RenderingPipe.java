@@ -18,7 +18,7 @@ package com.google.devtools.depan.eclipse.visualization.ogl;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.google.devtools.depan.eclipse.visualization.View;
+import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.visualization.plugins.core.EdgeRenderingPlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.core.NodeRenderingPlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.core.Plugin;
@@ -28,6 +28,7 @@ import com.google.devtools.depan.eclipse.visualization.plugins.impl.EdgeIncludeP
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.EdgeLabelPlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.FactorPlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.LayoutPlugin;
+import com.google.devtools.depan.eclipse.visualization.plugins.impl.LayoutShortcutsPlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeColorPlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeLabelPlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeShapePlugin;
@@ -40,6 +41,7 @@ import com.google.devtools.depan.model.GraphNode;
 import edu.uci.ics.jung.graph.Graph;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.media.opengl.GL;
@@ -69,6 +71,7 @@ public class RenderingPipe {
   private Plugin[] plugins;
 
   // plugins
+  private LayoutShortcutsPlugin shortcuts;
   private LayoutPlugin layout;
   private CollapsePlugin collapse;
   private NodeColorPlugin<GraphEdge> nodeColors;
@@ -84,17 +87,17 @@ public class RenderingPipe {
   private EdgeIncludePlugin edgeInclude;
 
 
-  public RenderingPipe(GL gl, GLU glu, GLPanel panel, View view) {
-    Graph<GraphNode, GraphEdge> graph = view.getJungGraph();
-    layout = new LayoutPlugin(view);
-    nodeColors =
-        new NodeColorPlugin<GraphEdge>(graph, view.getNodeImportanceMap());
+  public RenderingPipe(GL gl, GLU glu, GLPanel panel,
+      ViewEditor editor, Map<GraphNode, Double> nodeRanking) {
+    Graph<GraphNode, GraphEdge> graph = editor.getJungGraph();
+    shortcuts = new LayoutShortcutsPlugin(editor);
+    layout = new LayoutPlugin(editor.getNodeLocations());
+    nodeColors = new NodeColorPlugin<GraphEdge>(graph, nodeRanking);
     edgeColors = new EdgeColorPlugin();
     stepper = new SteperPlugin();
     drawing = new DrawingPlugin(gl, panel);
     factor = new FactorPlugin(gl, glu, panel.getGrip());
-    nodeSize =
-        new NodeSizePlugin<GraphEdge>(graph, view.getNodeImportanceMap());
+    nodeSize = new NodeSizePlugin<GraphEdge>(graph, nodeRanking);
     nodeStroke = new NodeStrokePlugin<GraphEdge>(panel, graph);
     nodeShape = new NodeShapePlugin<GraphEdge>(graph);
     nodeLabel = new NodeLabelPlugin();
@@ -134,6 +137,7 @@ public class RenderingPipe {
     edgesP.add(drawing);
 
     ////////// all plugins.
+    pluginsSet.add(shortcuts);
     pluginsSet.addAll(nodesP);
     pluginsSet.addAll(edgesP);
 
@@ -256,6 +260,4 @@ public class RenderingPipe {
   public CollapsePlugin getCollapsePlugin() {
     return collapse;
   }
-
 }
-

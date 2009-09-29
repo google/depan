@@ -53,7 +53,6 @@ import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 
 import java.awt.Color;
-import java.util.Map;
 
 /**
  * Tool for Node edition. Associate to each node a {@link NodeDisplayProperty}
@@ -251,7 +250,7 @@ public class NodeEditorTool extends ViewSelectionListenerTool
       p.setColor(newColor);
     }
     // notify the listeners about this change
-    getViewModel().getGraph().fireNodePropertyChange(node, p);
+    getEditor().setNodeProperty(node, p);
     // update the column / line we just modified
     nodeTreeView.getTreeViewer().update(o, new String[] {property});
   }
@@ -272,13 +271,14 @@ public class NodeEditorTool extends ViewSelectionListenerTool
   private GraphData<NodeDisplayProperty> getEditorHierarchy() {
     RelationshipSet relSet = relationshipSetselector.getSelection();
     DirectedRelationFinder relFinder = relSet;
-    GraphData<NodeDisplayProperty> hierarchy = getEditor().getHierarchy(relFinder);
+    GraphData<NodeDisplayProperty> hierarchy =
+        getEditor().getHierarchy(relFinder);
     return hierarchy;
   }
 
   @Override
   public NodeDisplayProperty getObject(GraphNode node) {
-    return getViewModel().getNodeDisplayProperty(node);
+    return getEditor().getNodeProperty(node);
   }
 
   @Override
@@ -289,38 +289,6 @@ public class NodeEditorTool extends ViewSelectionListenerTool
     super.editorClosed(viewEditor);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see com.google.devtools.depan.model.interfaces.GraphListener
-   *      #selectionChanged(com.google.devtools.depan.graph.api.Node, int,
-   *      java.lang.Object)
-   */
-  public void selectionChanged(
-      GraphNode newSelection, boolean state, Object author) {
-    if (!getViewModel().containsNode(newSelection)) {
-      return;
-    }
-
-    NodeDisplayProperty prop =
-        getViewModel().getNodeDisplayProperty(newSelection);
-    if (null != prop) {
-      prop.setSelected(state);
-    }
-    NodeWrapper<NodeDisplayProperty> nodeWrapper =
-        nodeTreeView.getNodeWrapper(newSelection);
-    if (null != nodeWrapper) {
-      nodeTreeView.getTreeViewer().update(
-          nodeWrapper, new String[] { COL_SELECTED });
-    }
-  }
-
-  /*
-   * (non-Javadoc)
-   *
-   * @see com.google.devtools.depan.eclipse.views.ViewSelectionListenerTool
-   *      #emptySelection()
-   */
   @Override
   public void emptySelection() {
     refresh();
@@ -333,7 +301,7 @@ public class NodeEditorTool extends ViewSelectionListenerTool
    * @param value the selection value.
    */
   private void setSelectedState(GraphNode node, boolean value) {
-    NodeDisplayProperty prop = getViewModel().getNodeDisplayProperty(node);
+    NodeDisplayProperty prop = getEditor().getNodeProperty(node);
     if (null != prop) {
       // set the property
       prop.setSelected(value);
@@ -382,13 +350,11 @@ public class NodeEditorTool extends ViewSelectionListenerTool
    */
   @Override
   public void updateSelectionTo(GraphNode[] selection) {
-    Map<GraphNode, NodeDisplayProperty> propertyMap =
-        getViewModel().propertyMap;
-    for (Map.Entry<GraphNode, NodeDisplayProperty> entry
-        : propertyMap.entrySet()) {
-      entry.getValue().setSelected(false);
-      NodeWrapper<NodeDisplayProperty> nodeWrapper = nodeTreeView
-          .getNodeWrapper(entry.getKey());
+    for (GraphNode node : getEditor().getViewGraph().getNodes()) {
+      NodeDisplayProperty nodeProps = getEditor().getNodeProperty(node);
+      nodeProps.setSelected(false);
+      NodeWrapper<NodeDisplayProperty> nodeWrapper =
+          nodeTreeView.getNodeWrapper(node);
       if (null != nodeWrapper) {
         // update the value in the table. this might be faster than updating
         // all the list at the end. because a selection generally doesn't
@@ -405,4 +371,3 @@ public class NodeEditorTool extends ViewSelectionListenerTool
     refresh();
   }
 }
-

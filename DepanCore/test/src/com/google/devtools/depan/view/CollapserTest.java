@@ -32,7 +32,8 @@ import java.util.Collection;
  *
  * @author <a href='mailto:leeca@google.com'>Lee Carver</a>
  */
-public class ViewModelTest extends TestCase {
+// TODO(leeca): Rewrite without
+public class CollapserTest extends TestCase {
 
   @Override
   protected void setUp() throws Exception {
@@ -52,11 +53,10 @@ public class ViewModelTest extends TestCase {
    * @param nodeCnt expected number of exposed nodes
    * @param edgeCnt expected number of exposed edges
    */
-  private static void assertExposedGraph(
-      ViewModel testView, int nodeCnt, int edgeCnt) {
-    GraphModel exposedGraph = testView.getExposedGraph();
-    assertEquals(nodeCnt, exposedGraph.getNodes().size());
-    assertEquals(edgeCnt, exposedGraph.getEdges().size());
+  private static void assertGraphNodesEdges(
+      GraphModel testGraph, int nodeCnt, int edgeCnt) {
+    assertEquals(nodeCnt, testGraph.getNodes().size());
+    assertEquals(edgeCnt, testGraph.getEdges().size());
   }
 
   /**
@@ -67,18 +67,6 @@ public class ViewModelTest extends TestCase {
     GraphModel testGraph = new GraphModel();
     GraphNode srcNodes[] =
         TestUtils.buildComplete(testGraph, 5, SampleRelation.sampleRelation);
-
-    ViewModel testView = new ViewModel("test", testGraph);
-    testView.setNodes(srcNodes);  // This also populates all edges
-
-    // Semantic properties of a new ViewModel
-    assertTrue(testView.getDirty());
-    assertEquals("test", testView.getName());
-
-    assertEquals(5, testView.getNodes().size());
-    assertEquals(10, testView.getEdges().size());
-
-    assertExposedGraph(testView, 5, 10);
   }
 
   /**
@@ -86,23 +74,21 @@ public class ViewModelTest extends TestCase {
    * the least 2 significant nodes into a collapsed node.
    */
   public void testCollapse() {
+    Collapser collapser = new Collapser();
     GraphModel testGraph = new GraphModel();
     GraphNode srcNodes[] =
         TestUtils.buildComplete(testGraph, 5, SampleRelation.sampleRelation);
 
-    ViewModel testView = new ViewModel("test", testGraph);
-    testView.setNodes(srcNodes);  // This also populates all edges
-
-    assertExposedGraph(testView, 5, 10);
+    assertGraphNodesEdges(testGraph, 5, 10);
 
     // Do a simple collapse
     GraphNode master = srcNodes[3];
     Collection<GraphNode> collapsed = Lists.newArrayList();
     collapsed.add(master);
     collapsed.add(srcNodes[4]);
-    testView.collapse(master, collapsed, false, null);
+    collapser.collapse(master, collapsed, true);
 
-    assertExposedGraph(testView, 4, 9);
+    assertGraphNodesEdges(collapser.buildExposedGraph(testGraph), 4, 9);
   }
 
   /**
@@ -112,32 +98,28 @@ public class ViewModelTest extends TestCase {
    * from step 1
    */
   public void testNestedCollapse() {
+    Collapser collapser = new Collapser();
     GraphModel testGraph = new GraphModel();
     GraphNode srcNodes[] =
         TestUtils.buildComplete(testGraph, 5, SampleRelation.sampleRelation);
 
-    ViewModel testView = new ViewModel("test", testGraph);
-    testView.setNodes(srcNodes);  // This also populates all edges
-
-    assertExposedGraph(testView, 5, 10);
+    assertGraphNodesEdges(testGraph, 5, 10);
 
     // Do a simple collapse
     GraphNode masterOne = srcNodes[3];
     Collection<GraphNode> collapseOne = Lists.newArrayList();
     collapseOne.add(masterOne);
     collapseOne.add(srcNodes[4]);
-    testView.collapse(masterOne, collapseOne, false, null);
-
-    assertExposedGraph(testView, 4, 9);
+    collapser.collapse(masterOne, collapseOne, true);
+    assertGraphNodesEdges(collapser.buildExposedGraph(testGraph), 4, 9);
 
     // Collapse this master into a new master
     GraphNode masterTwo = srcNodes[2];
     Collection<GraphNode> collapseTwo = Lists.newArrayList();
     collapseTwo.add(masterOne);
     collapseTwo.add(masterTwo);
-    testView.collapse(masterTwo, collapseTwo, false, null);
-
-    assertExposedGraph(testView, 3, 7);
+    collapser.collapse(masterTwo, collapseTwo, false);
+    assertGraphNodesEdges(collapser.buildExposedGraph(testGraph), 3, 7);
   }
 
 
@@ -151,14 +133,12 @@ public class ViewModelTest extends TestCase {
    * collapse group does not change if the input variables are altered.
    */
   public void testDoubleCollapse() {
+    Collapser collapser = new Collapser();
     GraphModel testGraph = new GraphModel();
     GraphNode srcNodes[] =
         TestUtils.buildComplete(testGraph, 5, SampleRelation.sampleRelation);
 
-    ViewModel testView = new ViewModel("test", testGraph);
-    testView.setNodes(srcNodes);  // This also populates all edges
-
-    assertExposedGraph(testView, 5, 10);
+    assertGraphNodesEdges(testGraph, 5, 10);
 
     // Allocate a re-usable master and picked lists
     GraphNode master;
@@ -168,47 +148,48 @@ public class ViewModelTest extends TestCase {
     master = srcNodes[3];
     picked.add(master);
     picked.add(srcNodes[4]);
-    testView.collapse(master, picked, false, null);
-
-    assertExposedGraph(testView, 4, 9);
+    collapser.collapse(master, picked, false);
+    assertGraphNodesEdges(collapser.buildExposedGraph(testGraph), 4, 9);
 
     // Reuse the collapse variables for a new operation
     master = srcNodes[1];
     picked.clear();
     picked.add(master);
     picked.add(srcNodes[2]);
-    testView.collapse(master, picked, false, null);
-
-    assertExposedGraph(testView, 3, 8);
+    collapser.collapse(master, picked, false);
+    assertGraphNodesEdges(collapser.buildExposedGraph(testGraph), 3, 8);
   }
 
   public void testAutoCollapse() {
+    Collapser collapser = new Collapser();
     GraphModel testGraph = new GraphModel();
     GraphNode srcNodes[] =
         TestUtils.buildComplete(testGraph, 5, SampleRelation.sampleRelation);
 
-    ViewModel testView = new ViewModel("test", testGraph);
-    testView.setNodes(srcNodes);  // This also populates all edges
-
-    assertExposedGraph(testView, 5, 10);
+    assertGraphNodesEdges(testGraph, 5, 10);
 
     MultipleDirectedRelationFinder finder =
       new MultipleDirectedRelationFinder();
     finder.addRelation(SampleRelation.sampleRelation, true, false);
-    testView.autoCollapse(finder, null);
-    assertExposedGraph(testView, 1, 0);
+    TreeModel treeData = new TreeModel(
+        testGraph.computeSuccessorHierarchy(finder));
+
+    Collection<CollapseData> collapseChanges =
+        collapser.collapseTree(testGraph, treeData);
+
+    assertGraphNodesEdges(collapser.buildExposedGraph(testGraph), 1, 0);
 
     // Uncollapse each, and check nodes and edges
-    testView.uncollapse(srcNodes[0], false, null);
-    assertExposedGraph(testView, 2, 4);
+    collapser.uncollapse(srcNodes[0], false);
+    assertGraphNodesEdges(collapser.buildExposedGraph(testGraph), 2, 4);
 
-    testView.uncollapse(srcNodes[1], false, null);
-    assertExposedGraph(testView, 3, 7);
+    collapser.uncollapse(srcNodes[1], false);
+    assertGraphNodesEdges(collapser.buildExposedGraph(testGraph), 3, 7);
 
-    testView.uncollapse(srcNodes[2], false, null);
-    assertExposedGraph(testView, 4, 9);
+    collapser.uncollapse(srcNodes[2], false);
+    assertGraphNodesEdges(collapser.buildExposedGraph(testGraph), 4, 9);
 
-    testView.uncollapse(srcNodes[3], false, null);
-    assertExposedGraph(testView, 5, 10);
+    collapser.uncollapse(srcNodes[3], false);
+    assertGraphNodesEdges(collapser.buildExposedGraph(testGraph), 5, 10);
   }
 }

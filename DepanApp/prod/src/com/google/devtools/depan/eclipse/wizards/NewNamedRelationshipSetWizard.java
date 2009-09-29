@@ -17,6 +17,7 @@
 package com.google.devtools.depan.eclipse.wizards;
 
 import com.google.devtools.depan.eclipse.persist.ObjectXmlPersist;
+import com.google.devtools.depan.eclipse.persist.XStreamFactory;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -114,7 +115,9 @@ public class NewNamedRelationshipSetWizard extends Wizard
     final IFile file = container.getFile(new Path(filename));
 
     // save the builtins relationships as an "example" in the file.
-    ObjectXmlPersist persist = new ObjectXmlPersist();
+    // TODO(leeca):  Is this configured with the correct XStream flavor?
+    ObjectXmlPersist persist =
+        new ObjectXmlPersist(XStreamFactory.getSharedRefXStream());
     persist.save(file.getLocationURI(), Collections.EMPTY_LIST);
 
     monitor.worked(1);

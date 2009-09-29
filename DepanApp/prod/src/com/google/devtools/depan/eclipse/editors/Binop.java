@@ -52,8 +52,8 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
  *
  * @param <T> types you want to combine with binary operations.
  */
-public class Binop<T extends BinaryOperators<T>> extends Composite implements
-    IAdapterFactory {
+public class Binop<T extends BinaryOperators<T>>
+    extends Composite implements IAdapterFactory {
 
   private T obj1 = null;
   private T obj2 = null;
@@ -72,7 +72,11 @@ public class Binop<T extends BinaryOperators<T>> extends Composite implements
    */
   @SuppressWarnings("hiding")
   public enum Operators {
-    AND("&"), OR("|"), XOR("^"), NOT("!");
+    AND("&"),
+    OR("|"),
+    XOR("^"),
+    NOT("!");
+
     private String repr;
 
     private Operators(String repr) {
@@ -514,5 +518,4 @@ public class Binop<T extends BinaryOperators<T>> extends Composite implements
   public Class[] getAdapterList() {
     return new Class[] {IWorkbenchAdapter.class};
   }
-
 }

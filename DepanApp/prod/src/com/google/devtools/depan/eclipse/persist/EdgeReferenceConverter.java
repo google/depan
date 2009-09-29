@@ -34,25 +34,26 @@ import com.thoughtworks.xstream.mapper.Mapper;
  * assumes that the {@code UnmarshallingContext} as an {@code GraphModel} entry
  * that can be retrieved by the {@code GraphModel.class} key.
  * 
- * @author Original lost in the mists of time
+ * @author <a href="mailto:leeca@google.com">Lee Carver</a>
  */
-public class EdgeConverter implements Converter {
+public class EdgeReferenceConverter implements Converter {
 
-  public static final String EDGE_DEF_TAG = "edge-ref";
+  public static final String EDGE_REF_TAG = "edge-ref";
 
-  private static final String TAIL_TAG = "tail";
-  private static final String HEAD_TAG = "head";
   private static final String RELATION_TAG = "relation";
+  private static final String HEAD_TAG = "head";
+  private static final String TAIL_TAG = "tail";
+
   private final Mapper mapper;
 
-  public EdgeConverter(Mapper mapper) {
+  public EdgeReferenceConverter(Mapper mapper) {
     this.mapper = mapper;
   }
 
   @Override
   @SuppressWarnings("unchecked")  // Parent type uses raw type Class
   public boolean canConvert(Class type) {
-    return GraphEdge.class.equals(type);
+    return GraphEdge.class.isAssignableFrom(type);
   }
 
   @Override
@@ -108,11 +109,10 @@ public class EdgeConverter implements Converter {
       GraphNode tail = unmarshallGraphNode(reader, context, graph);
       reader.moveUp();
 
-      GraphEdge result = new GraphEdge(head, tail, relation);
+      GraphEdge result = (GraphEdge) graph.findEdge(relation, head, tail);
       return result;
     } catch (RuntimeException err) {
-      // TODO Auto-generated catch block
-      err.printStackTrace();
+      // TODO(leeca): Add some error diagnostics, or eliminate as dead code.
       throw err;
     }
   }
@@ -127,7 +127,8 @@ public class EdgeConverter implements Converter {
   }
 
   private GraphNode unmarshallGraphNode(
-      HierarchicalStreamReader reader, UnmarshallingContext context, GraphModel graph) {
+      HierarchicalStreamReader reader, UnmarshallingContext context,
+      GraphModel graph) {
     String nodeId = reader.getValue();
     GraphNode result = (GraphNode) graph.findNode(nodeId);
     if (null == result) {

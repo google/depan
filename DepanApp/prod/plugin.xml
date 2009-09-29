@@ -230,7 +230,7 @@
    <extension point="org.eclipse.ui.editors">
       <editor id="com.google.devtools.depan.eclipse.editors.ViewEditor"
             name="View Editor"
-            extensions="dpanv"
+            extensions="dvi"
             icon="icons/sample.gif"
             class="com.google.devtools.depan.eclipse.editors.ViewEditor"/>
       <editor id="com.google.devtools.depan.eclipse.editors.GraphEditor"

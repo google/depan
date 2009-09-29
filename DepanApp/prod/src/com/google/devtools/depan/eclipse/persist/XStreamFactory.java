@@ -31,15 +31,20 @@ import com.thoughtworks.xstream.io.xml.StaxDriver;
  * construct it yourself and then configure it with
  * {@link #configureXStream(XStream)}.
  * 
- * @author <a href="leeca@google.com">Lee Carver</a>
+ * @author <a href="mailto:leeca@google.com">Lee Carver</a>
  */
 public class XStreamFactory {
 
   /**
-   * Sharable {@code XStream}, suitable for most cases where the standard
-   * DepAn configurations are appropriate.
+   * Sharable {@code XStream}, suitable for persistence of {@code GraphModel}s.
    */
-  private static XStream sharedXStream;
+  private static XStream sharedGraphXStream;
+
+  /**
+   * Sharable {@code XStream}, suitable for persistence with references to
+   * {@code GraphModel} elements.
+   */
+  private static XStream sharedRefXStream;
 
   /**
    * Prevent instantiation of this namespace class
@@ -57,42 +62,55 @@ public class XStreamFactory {
 
   /**
    * Provide a shared XStream instance that is initialized to use the StAX
-   * XML parser and the DepAn configurations.  This can be used to avoid
+   * XML parser and to persist {@code GraphModel}s.  This can be used to avoid
    * expensive configuration processes of separate XStreams, but no added
    * configuration changes should be made.
    * 
-   * @return DepAn configured XStream
+   * @return XStream configured for persistence of {@code GraphModel}s.
    */
-  public static synchronized XStream getSharedXStream() {
-    if (null == sharedXStream) {
-      sharedXStream = new XStream(new StaxDriver());
-      configureXStream(sharedXStream);
+  public static synchronized XStream getSharedGraphXStream() {
+    if (null == sharedGraphXStream) {
+      sharedGraphXStream = newStaxXStream();
+      configureGraphXStream(sharedGraphXStream);
     }
-    return sharedXStream;
+    return sharedGraphXStream;
   }
 
   /**
-   * Provide an XStream instance that is initialized to use the StAX XML parser
-   * and the DepAn configurations.
+   * Provide a shared XStream instance that is initialized to use the StAX
+   * XML parser and to persist references to {@code GraphModel} elements..
+   * This can be used to avoid expensive configuration processes of separate
+   * XStreams, but no added configuration changes should be made.
    * 
-   * @return DepAn configured XStream
+   * @return XStream configured for references to {@code GraphModel} elements.
+   */
+  public static synchronized XStream getSharedRefXStream() {
+    if (null == sharedRefXStream) {
+      sharedRefXStream = newStaxXStream();
+      configureRefXStream(sharedRefXStream);
+    }
+    return sharedRefXStream;
+  }
+
+  /**
+   * Provide an XStream instance that is initialized to use the StAX XML
+   * toolkit.  The returned instance will still need to be configured
+   * for DepAn.
+   * 
+   * @return StAX configured XStream
    */
   public static XStream newStaxXStream() {
     XStream result = new XStream(new StaxDriver());
-    configureXStream(result);
     return result;
   }
 
   /**
-   * Provide an XStream instance that has all the default initializations plus
-   * the DepAn configurations.  With XStream 3.1, this will normally use
-   * the XPP XML parser.
-   * 
-   * @return DepAn configured XStream
+   * Provide a default XStream instance.  With XStream 3.1, this will normally
+   * use the XPP XML toolkit.  The returned instance will still need to be
+   * configured for DepAn.
    */
   public static XStream newBaseXStream() {
     XStream result = new XStream();
-    configureXStream(result);
     return result;
   }
 
@@ -110,9 +128,25 @@ public class XStreamFactory {
    * 
    * @param xstream instance to configure
    */
-  public static void configureXStream(XStream xstream) {
+  public static void configureGraphXStream(XStream xstream) {
     xstream.setMode(XStream.NO_REFERENCES);
-    GraphElements.CONFIG_XML_PERSIST.config(xstream);
+    GraphElements.GRAPH_XML_PERSIST.config(xstream);
     SourcePluginRegistry.configXmlPersist(xstream);
+  }
+
+  /**
+   * Configure an XStream instance with all the specializations necessary
+   * for references to {@code GraphModel} elements.
+   * 
+   * @param xstream instance to configure
+   */
+  public static void configureRefXStream(XStream xstream) {
+    // Basic configuration, class loaders, and plug-in specific types.
+    // For reference XStreams, we don't need the plug-ins' Node types, but we
+    // do need the class loaders and the plug-ins' Relation types.
+    configureGraphXStream(xstream);
+
+    // Add in reference converters as the favored converters.
+    GraphElements.REF_XML_PERSIST.config(xstream);
   }
 }

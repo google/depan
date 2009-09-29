@@ -144,6 +144,10 @@ public class EdgeDisplayProperty {
     this.color = lineColor;
   }
 
+  public EdgeDisplayProperty(EdgeDisplayProperty current) {
+    this(current.getLineStyle(), current.getArrowhead(), current.getColor());
+  }
+
   /**
    * Returns the <code>Color</code> of associated edge.
    *

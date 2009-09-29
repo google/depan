@@ -16,17 +16,23 @@
 
 package com.google.devtools.depan.eclipse.persist;
 
+import com.google.devtools.depan.eclipse.editors.GraphModelReference;
+import com.google.devtools.depan.eclipse.editors.ViewDocument;
+import com.google.devtools.depan.eclipse.editors.ViewPreferences;
 import com.google.devtools.depan.eclipse.persist.XStreamFactory.Config;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
+import com.google.devtools.depan.model.GraphNode;
 
 import com.thoughtworks.xstream.XStream;
+
+import java.awt.geom.Point2D;
 
 /**
  * Define how {@code GraphModel} elements effect the {@code XStream}
  * persistence.
  *
- * @author <a href="leeca@google.com">Lee Carver</a>
+ * @author <a href="mailto:leeca@google.com">Lee Carver</a>
  */
 public class GraphElements {
 
@@ -36,12 +42,40 @@ public class GraphElements {
   private GraphElements() {
   }
 
-  public static final Config CONFIG_XML_PERSIST = new Config() {
+  public static final Config GRAPH_XML_PERSIST = new Config() {
     public void  config(XStream xstream) {
-      xstream.alias("graph-model", GraphModel.class);
-      xstream.alias("graph-edge", GraphEdge.class);
-      xstream.registerConverter(new EdgeConverter(xstream.getMapper()));
+
+      xstream.alias(GraphModelConverter.GRAPH_DEF_TAG, GraphModel.class);
       xstream.registerConverter(new GraphModelConverter(xstream.getMapper()));
+
+      xstream.alias(EdgeConverter.EDGE_DEF_TAG, GraphEdge.class);
+      xstream.registerConverter(new EdgeConverter(xstream.getMapper()));
+    }
+  };
+
+  public static final Config REF_XML_PERSIST = new Config() {
+    public void  config(XStream xstream) {
+
+      xstream.alias(
+          GraphModelReferenceConverter.GRAPH_REF_TAG,
+          GraphModelReference.class);
+      xstream.registerConverter(
+          new GraphModelReferenceConverter(xstream.getMapper()));
+
+      xstream.aliasType(EdgeReferenceConverter.EDGE_REF_TAG, GraphEdge.class);
+      xstream.registerConverter(
+          new EdgeReferenceConverter(xstream.getMapper()));
+
+      xstream.aliasType(NodeReferenceConverter.NODE_REF_TAG, GraphNode.class);
+      xstream.registerConverter(new NodeReferenceConverter());
+
+      xstream.alias(ViewDocumentConverter.VIEW_INFO_TAG, ViewDocument.class);
+      xstream.registerConverter(new ViewDocumentConverter(xstream.getMapper()));
+
+      xstream.alias("view-prefs", ViewPreferences.class);
+
+      xstream.aliasType(Point2DConverter.POS_TAG, Point2D.class);
+      xstream.registerConverter(new Point2DConverter(xstream.getMapper()));
     }
   };
 }

@@ -20,7 +20,6 @@ import com.google.devtools.depan.graph.api.DirectedRelationFinder;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.view.ViewModel;
 
 import edu.uci.ics.jung.algorithms.layout.AbstractLayout;
 import edu.uci.ics.jung.graph.Graph;
@@ -38,7 +37,7 @@ public class NewTreeLayout extends
     AbstractLayout<GraphNode, GraphEdge> {
 
   /** The source of nodes for layout. */
-  protected ViewModel viewModel;
+  protected GraphModel graphModel;
 
   /** The set of relations that define the hierarchy. */
   protected DirectedRelationFinder relations;
@@ -52,9 +51,9 @@ public class NewTreeLayout extends
    * @param size available rendering space (ignored)
    */
   protected NewTreeLayout(Graph<GraphNode, GraphEdge> graph,
-      ViewModel viewModel, DirectedRelationFinder relations, Dimension size) {
+      GraphModel graphModel, DirectedRelationFinder relations, Dimension size) {
     super(graph, size);
-    this.viewModel = viewModel;
+    this.graphModel = graphModel;
     this.relations = relations;
   }
 
@@ -63,8 +62,7 @@ public class NewTreeLayout extends
    */
   @Override
   public void initialize() {
-    LayoutTool layoutTool =
-        new LayoutTool(viewModel.getExposedGraph(), relations);
+    LayoutTool layoutTool = new LayoutTool(graphModel, relations);
     layoutTool.layoutTree();
   }
 

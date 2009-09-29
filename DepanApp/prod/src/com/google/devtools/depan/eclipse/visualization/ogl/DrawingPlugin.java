@@ -283,4 +283,3 @@ public class DrawingPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
     return false;
   }
 }
-

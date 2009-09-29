@@ -17,6 +17,7 @@
 package com.google.devtools.depan.eclipse.wizards;
 
 import com.google.devtools.depan.eclipse.persist.ObjectXmlPersist;
+import com.google.devtools.depan.eclipse.persist.XStreamFactory;
 import com.google.devtools.depan.eclipse.utils.DefaultRelationshipSet;
 import com.google.devtools.depan.graph.api.DirectedRelationFinder;
 import com.google.devtools.depan.model.RelationshipSet;
@@ -135,7 +136,9 @@ public class NewRelationshipSetWizard extends Wizard implements INewWizard {
    */
   private void addToSet(IFile file, String setName)
       throws IOException, CoreException {
-    ObjectXmlPersist persist = new ObjectXmlPersist();
+    // TODO(leeca):  Is this configured with the correct XStream flavor?
+    ObjectXmlPersist persist =
+        new ObjectXmlPersist(XStreamFactory.getSharedRefXStream());
     Collection<RelationshipSet> updateSet = loadRelationshipSet(persist, file);
     RelationshipSet set = DefaultRelationshipSet.SET;
     updateSet.add(set);
@@ -166,7 +169,9 @@ public class NewRelationshipSetWizard extends Wizard implements INewWizard {
     collection.add(set);
 
     // save data in the file
-    ObjectXmlPersist persist = new ObjectXmlPersist();
+    // TODO(leeca):  Is this configured with the correct XStream flavor?
+    ObjectXmlPersist persist =
+        new ObjectXmlPersist(XStreamFactory.getSharedRefXStream());
     persist.save(file.getLocationURI(), collection);
     file.refreshLocal(IResource.DEPTH_ZERO, null);
   }
@@ -180,5 +185,4 @@ public class NewRelationshipSetWizard extends Wizard implements INewWizard {
   @Override
   public void init(IWorkbench iworkbench, IStructuredSelection selection) {
   }
-
 }

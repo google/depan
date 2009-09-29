@@ -17,11 +17,9 @@
 package com.google.devtools.depan.eclipse.wizards;
 
 import com.google.devtools.depan.eclipse.editors.ResourceCache;
-import com.google.devtools.depan.eclipse.persist.GraphModelXmlPersist;
 import com.google.devtools.depan.model.GraphModel;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -163,7 +161,7 @@ public abstract class AbstractAnalysisWizard extends Wizard
    * @param graph analysis graph to write
    */
   private void saveAnalysisGraph(IProgressMonitor monitor, GraphModel graph)
-      throws CoreException, IOException {
+      throws CoreException {
     monitor.setTaskName("Getting File...");
 
     final IFile file = getOutputFile();

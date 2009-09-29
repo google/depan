@@ -20,14 +20,12 @@ import com.google.devtools.depan.graph.api.DirectedRelationFinder;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.view.ViewModel;
 
 import edu.uci.ics.jung.graph.Graph;
 
 import java.awt.Dimension;
 import java.awt.geom.Point2D;
 import java.util.Collection;
-
 
 /**
  * Assign locations to the graph nodes so they are rendered in a 
@@ -53,8 +51,8 @@ public class NewRadialLayout extends NewTreeLayout {
    * @param size available rendering space (ignored)
    */
   protected NewRadialLayout(Graph<GraphNode, GraphEdge> graph,
-      ViewModel viewModel, DirectedRelationFinder relations, Dimension size) {
-    super(graph, viewModel, relations, size);
+      GraphModel graphModel, DirectedRelationFinder relations, Dimension size) {
+    super(graph, graphModel, relations, size);
   }
 
   /**
@@ -62,15 +60,14 @@ public class NewRadialLayout extends NewTreeLayout {
    */
   @Override
   public void initialize() {
-    GraphModel layoutGraph = viewModel.getExposedGraph();
 
     // Determine number of leafs ("circumference" of the circles).
-    DryRunTool dryRun = new DryRunTool(layoutGraph, relations);
+    DryRunTool dryRun = new DryRunTool(graphModel, relations);
     dryRun.layoutTree();
 
     // Now assign locations
     HierarchicalLayoutTool layoutTool =
-        new RadialLayoutTool(layoutGraph, relations, dryRun.getLeafCount());
+        new RadialLayoutTool(graphModel, relations, dryRun.getLeafCount());
     layoutTool.layoutTree();
   }
 

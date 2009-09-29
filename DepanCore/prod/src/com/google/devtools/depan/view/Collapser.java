@@ -19,7 +19,10 @@ package com.google.devtools.depan.view;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.devtools.depan.model.GraphEdge;
+import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
+import com.google.devtools.depan.model.interfaces.GraphBuilder;
 
 import java.util.Collection;
 import java.util.List;
@@ -153,4 +156,140 @@ public class Collapser {
     }
     return result;
   }
+
+  /**
+   * Collapse all Nodes in the exposed graph using the hierarchy implied
+   * by the given set of relations.
+   * <p>
+   * The algorithm works by computing a topological sort over the imputed
+   * hierarchy, and then collapsing the nodes in order from bottom to top.
+   * This allows a user to later uncollapse individual masters,
+   * and to incrementally expose their internal details.
+   *
+   * @param graph source of nodes to collapse
+   * @param finder set of relations that define the hierarchy
+   * @param author interface component that initiated the action
+   */
+  public Collection<CollapseData> collapseTree(
+      GraphModel graph, TreeModel treeData) {
+
+    List<GraphNode> inOrder = treeData.topoSort();
+    Collection<CollapseData> collapseChanges = Lists.newArrayList();
+
+    for (GraphNode top : inOrder) {
+      addCollapseData(graph, collapseChanges, treeData, top);
+    }
+
+    return collapseChanges;
+  }
+
+  /**
+   * Collapse a single node based on its ancestors in the tree model.
+   * The given node becomes the master for the collapse group.
+   * All exposed children (and their exposed ancestors) become members
+   * of the collapse group, and the collapse group stops for (but includes)
+   * top-level master nodes in the ancestor set.
+   *
+   * @param graph source of nodes to collapse
+   * @param collapseChange destination of any added collapseData
+   * @param parent master node for collapse group
+   * @param treeModel source of successor/ancestor relations
+   */
+  private void addCollapseData(
+      GraphModel graph,
+      Collection<CollapseData> collapseChanges,
+      TreeModel treeModel,
+      GraphNode parent) {
+
+    // Nothing to do if the node has no successors
+    Collection<GraphNode> successors = treeModel.getSuccessors(parent);
+    if (successors.isEmpty()) {
+      return;
+    }
+
+    // Only include successor nodes that are exposed
+    Map<GraphNode, GraphNode> hiddenNodeMap = buildHiddenNodeMap();
+    HiddenNodesGizmo gizmo = new HiddenNodesGizmo(hiddenNodeMap);
+    Set<GraphNode> exposedNodes = getExposedNodeSet(graph, gizmo);
+
+    // Don't include the ancestors of already collapsed nodes
+    Set<GraphNode> masterNodes = getMasterNodeSet();
+
+    Collection<GraphNode> result = Lists.newArrayList();
+    result.add(parent);
+    addExposedAncestors(result, treeModel, exposedNodes, masterNodes, parent);
+
+    CollapseData collapseData = collapse(parent, result, false);
+    collapseChanges.add(collapseData);
+  }
+
+  private void addExposedAncestors(
+      Collection<GraphNode> result,
+      TreeModel treeModel,
+      Set<GraphNode> exposedNodes,
+      Set<GraphNode> masterNodes,
+      GraphNode parent) {
+    for (GraphNode child : treeModel.getSuccessors(parent)) {
+
+      // Only include exposed children
+      if (exposedNodes.contains(child)) {
+        result.add(child);
+
+        // Recursively add any exposed ancestors
+        addExposedAncestors(
+            result, treeModel, exposedNodes, masterNodes, child);
+      }
+    }
+  }
+
+  /**
+   * Based on the collapsing preferences, compute the set of nodes and
+   * edges that are exposed in a graph.
+   * 
+   * @param graph source of nodes to collapse
+   * @return graph containing only uncollapsed nodes
+   */
+  public GraphModel buildExposedGraph(GraphModel graph) {
+    Map<GraphNode, GraphNode> hiddenNodeMap = buildHiddenNodeMap();
+
+    // quick exit if nothing is collapsed
+    if (hiddenNodeMap.isEmpty()) {
+      return graph;
+    }
+
+    HiddenNodesGizmo gizmo = new HiddenNodesGizmo(hiddenNodeMap);
+
+    // Determine the exposed nodes and edges
+    Collection<GraphNode> nodes = getExposedNodeSet(graph, gizmo);
+
+    Collection<GraphEdge> edges = Lists.newArrayList();
+    gizmo.addExposedEdges(edges, graph.getEdges());
+
+    // Add the exposed components to the generated result
+    GraphModel result = new GraphModel();
+    GraphBuilder builder = result.getBuilder();
+    for (GraphNode node : nodes) {
+      builder.newNode(node);
+    }
+    for (GraphEdge edge : edges) {
+      builder.addEdge(edge);
+    }
+    return result;
+  }
+
+  /**
+   * Provide the current Set of exposed Nodes.
+   *
+   * @param graph source of nodes to collapse
+   * @param gizmo source of exposed Node information
+   * @return Set of exposed Nodes, including exposed master Nodes.
+   */
+  private Set<GraphNode> getExposedNodeSet(
+      GraphModel graph, HiddenNodesGizmo gizmo) {
+    Set<GraphNode> nodeSet = Sets.newHashSet();
+    addMasterNodes(nodeSet);
+    gizmo.addExposedNodes(nodeSet, graph.getNodes());
+    return nodeSet;
+  }
+
 }

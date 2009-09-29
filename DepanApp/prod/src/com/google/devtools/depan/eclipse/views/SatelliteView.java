@@ -16,9 +16,7 @@
 
 package com.google.devtools.depan.eclipse.views;
 
-
 import com.google.devtools.depan.eclipse.editors.ViewEditor;
-import com.google.devtools.depan.view.ViewModel;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
@@ -31,7 +29,6 @@ import org.eclipse.ui.part.ViewPart;
 
 /**
  * @author ycoppel@google.com (Yohann Coppel)
- *
  */
 public class SatelliteView extends ViewPart {
 
@@ -40,14 +37,8 @@ public class SatelliteView extends ViewPart {
 
   private java.awt.Frame frame;
 
-  private ViewModel openEditor = null;
+  private ViewEditor editor = null;
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.ui.part.WorkbenchPart
-   *      #createPartControl(org.eclipse.swt.widgets.Composite)
-   */
   @Override
   public void createPartControl(Composite parent) {
     Composite swtAwtComponent = new Composite(parent, SWT.EMBEDDED);
@@ -59,11 +50,6 @@ public class SatelliteView extends ViewPart {
     getViewSite().getPage().addPartListener(partListener);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
-   */
   @Override
   public void setFocus() {
   }
@@ -76,7 +62,7 @@ public class SatelliteView extends ViewPart {
 
   private void refresh() {
     frame.removeAll();
-    if (null != openEditor) {
+    if (null != editor) {
       // FIXME(ycoppel): SWT satellite view
 //      VisualizationViewer vv = openEditor.getSatellite();
 //      frame.add(vv);
@@ -94,7 +80,7 @@ public class SatelliteView extends ViewPart {
     }
 
     public void partClosed(IWorkbenchPart part) {
-      openEditor = null;
+      editor = null;
       refresh();
     }
 
@@ -110,11 +96,9 @@ public class SatelliteView extends ViewPart {
       if (!(part instanceof ViewEditor)) {
         return;
       }
-      ViewEditor editor = (ViewEditor) part;
-      openEditor = editor.getViewModel();
+      editor = (ViewEditor) part;
       refresh();
     }
   };
-
 }
 

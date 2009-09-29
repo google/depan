@@ -17,8 +17,8 @@
 package com.google.devtools.depan.eclipse.views.tools;
 
 import com.google.common.collect.Lists;
+import com.google.devtools.depan.eclipse.editors.ViewDocument;
 import com.google.devtools.depan.eclipse.editors.ViewEditor;
-import com.google.devtools.depan.eclipse.editors.ViewEditorInput;
 import com.google.devtools.depan.eclipse.utils.NodeLabelProvider;
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.utils.Sasher;
@@ -26,8 +26,8 @@ import com.google.devtools.depan.eclipse.utils.TableContentProvider;
 import com.google.devtools.depan.eclipse.views.ViewSelectionListenerTool;
 import com.google.devtools.depan.eclipse.visualization.layout.Layouts;
 import com.google.devtools.depan.filters.PathMatcher;
+import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.view.ViewModel;
 
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
@@ -94,7 +94,8 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
       @Override
       public void updatePendingList(SelectionEditorTool context) {
         // Include all nodes in current view
-        for (GraphNode node : context.getViewModel().getNodes()) {
+        GraphModel graph = context.getEditor().getViewGraph();
+        for (GraphNode node : graph.getNodes()) {
           context.previewListContent.add(node);
         }
       }
@@ -167,6 +168,7 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
     return Resources.NAME_SELECTIONEDITOR;
   }
 
+  // TODO(leeca): Is this really not used, or is selection editor tool broken?
   private Layouts getLayoutChoice() {
     if (layoutChoice.getSelectionIndex() == 0) {
       // return null, which means that a static layout must be used, using the
@@ -352,7 +354,7 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
     // compute the result
     refreshPreview();
     // apply the new selection
-    getView().setPickedNodes(previewListContent.getObjects());
+    getEditor().selectNodes(previewListContent.getObjects());
   }
 
   protected void createNewView() {
@@ -360,19 +362,14 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
     refreshPreview();
 
     // create a new ViewModel with the nodes
-    ViewModel newView = new ViewModel(getViewModel().getParentGraph());
-    newView.setNodes(previewListContent.getObjects());
-    // apply the layout
+    ViewDocument viewDoc = getEditor().buildNewViewDocument(
+        previewListContent.getObjects());
+
     if (layoutChoice.getSelectionIndex() == 0) {
-      newView.setLocations(getViewModel().getLayoutMap());
+      viewDoc.setNodeLocations(getEditor().getNodeLocations());
     }
 
-    // and the ViewEditorInput
-    final ViewEditorInput input = new ViewEditorInput(
-        newView, getLayoutChoice(),
-        getEditor().getParentFile());
-
-    ViewEditor.startViewEditor(input);
+    ViewEditor.startViewEditor(viewDoc);
   }
 
   /**
@@ -420,7 +417,7 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
 
     // TODO(leeca): Source graph model should be baked into node selector
     return nodeSelector.nextMatch(
-        getViewModel().getParentGraph(), currSelection);
+        getEditor().getParentGraph(), currSelection);
   }
 
   private Set<GraphNode> getSelectedNodes() {

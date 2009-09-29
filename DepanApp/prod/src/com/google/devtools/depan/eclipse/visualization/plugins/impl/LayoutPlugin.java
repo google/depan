@@ -16,18 +16,11 @@
 
 package com.google.devtools.depan.eclipse.visualization.plugins.impl;
 
-import com.google.devtools.depan.eclipse.visualization.View;
-import com.google.devtools.depan.eclipse.visualization.layout.Layouts;
 import com.google.devtools.depan.eclipse.visualization.ogl.EdgeRenderingProperty;
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeRenderingProperty;
 import com.google.devtools.depan.eclipse.visualization.plugins.core.EdgeRenderingPlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.core.NodeRenderingPlugin;
-import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.view.ViewModel;
-
-import edu.uci.ics.jung.algorithms.layout.AbstractLayout;
-import edu.uci.ics.jung.algorithms.util.IterativeContext;
 
 import java.awt.geom.Point2D;
 import java.util.Map;
@@ -45,23 +38,8 @@ import java.util.Map;
  */
 public class LayoutPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
 
-  Map<GraphNode, Point2D> layout;
-  private ViewModel viewModel;
-  private View view;
-  public boolean hasChanged = false;
-
-  private enum KeyState {
-    /**
-     * Waiting for a 'l' or 'L' to be pressed
-     */
-    WAITING,
-    /**
-     * Waiting for a number 1 to 9 to be pressed. if any other key is pressed,
-     * return in WAITING.
-     */
-    LISTENING
-  }
-  private KeyState keyState = KeyState.WAITING;
+  private Map<GraphNode, Point2D> layout;
+  private boolean hasChanged = false;
 
   /**
    * Apply a layout to the node in the rendering pipe.
@@ -69,10 +47,8 @@ public class LayoutPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
    * 0.5.
    * @param view
    */
-  public LayoutPlugin(View view) {
-  this.view = view;
-    this.viewModel = view.getViewModel();
-    this.layout = viewModel.getLayoutMap();
+  public LayoutPlugin(Map<GraphNode, Point2D> layoutMap) {
+    this.layout = layoutMap;
     this.hasChanged = false;
   }
 
@@ -114,30 +90,9 @@ public class LayoutPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
     hasChanged = false;
   }
 
+  @Override
   public boolean keyPressed(int keycode, char character, boolean ctrl,
       boolean alt, boolean shift) {
-    switch (this.keyState) {
-    case WAITING:
-      if (character == 'l' || character == 'L') {
-        this.keyState = KeyState.LISTENING;
-        System.out.println("Listening for a layout number. If the next key "
-            + "stroke is a number, the corresonding layout will be applied. if"
-            + "not, stop listening.");
-        return true;
-      }
-      break;
-    case LISTENING:
-      this.keyState = KeyState.WAITING;
-      if (character >= '1' && character <= Layouts.values().length + '0') {
-        System.out.println(
-            "Apply layout " + Layouts.values()[character - '1'].name());
-        view.applyLayout(Layouts.values()[character - '1']);
-        return true;
-      }
-      break;
-      default:
-        break;
-    }
     return false;
   }
 
@@ -151,71 +106,8 @@ public class LayoutPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
     // nothing to do
   }
 
-  /**
-   * Apply the given layout to the nodes. After applying the layout, each node's
-   * position is scaled and set to be in the [-0.5:0.5] range.
-   *
-   * @param newLayout
-   */
-  public Map<GraphNode, Point2D> setLayout(AbstractLayout<GraphNode, GraphEdge> newLayout) {
-    if (newLayout instanceof IterativeContext) {
-      IterativeContext it = (IterativeContext) newLayout;
-      int maxSteps = 1000;
-      while (maxSteps > 0 && !it.done()) {
-        it.step();
-        maxSteps--;
-      }
-    }
-
-    layout.clear();
-    double[] min = new double[2];
-    double[] max = new double[2];
-    min[0] = Double.MAX_VALUE;
-    min[1] = Double.MAX_VALUE;
-    max[0] = Double.MIN_VALUE;
-    max[1] = Double.MIN_VALUE;
-    // compute the min and max values for each coordinate of all points
-    for (GraphNode n : viewModel.getNodes()) {
-      double x = newLayout.getX(n);
-      double y = newLayout.getY(n);
-      min[0] = Math.min(min[0], x);
-      min[1] = Math.min(min[1], y);
-      max[0] = Math.max(max[0], x);
-      max[1] = Math.max(max[1], y);
-      layout.put(n, new Point2D.Double(x, y));
-    }
-    // scale everything to [-0.5:0.5] range
-    // find the range for each dimension
-    double rangeX = max[0] - min[0];
-    double rangeY = max[1] - min[1];
-    double factor;
-    // determine which one to use, to keep the same proportions.
-    if (rangeX == 0f && rangeY == 0f) {
-      factor = 1;
-    } else if (rangeX == 0) {
-      factor = rangeY;
-    } else if (rangeY == 0) {
-      factor = rangeX;
-    } else {
-      factor = Math.max(rangeX, rangeY);
-    }
-
-    if (factor != 1) {
-      for (Point2D p : layout.values()) {
-        // scale everything, and center (-rangeX/factor/2)
-        double newX = (p.getX() - min[0]) / factor - (rangeX / factor / 2);
-        double newY = (p.getY() - min[1]) / factor - (rangeY / factor / 2);
-        // minus Y, since in openGL, y coordinates are inverted
-        p.setLocation(new Point2D.Double(newX, -newY));
-      }
-    }
-    this.hasChanged = true;
-    return layout;
-  }
-
   public void setLayout(Map<GraphNode, Point2D> layoutMap) {
     this.layout = layoutMap;
     this.hasChanged = true;
   }
 }
-

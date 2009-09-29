@@ -16,40 +16,30 @@
 
 package com.google.devtools.depan.eclipse.editors;
 
-import com.google.devtools.depan.eclipse.visualization.layout.Layouts;
-import com.google.devtools.depan.view.ViewModel;
-
-import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 
 /**
  * @author ycoppel@google.com (Yohann Coppel)
- *
  */
 public class ViewEditorInput implements IEditorInput {
 
-  private final ViewModel view;
-  private final Layouts layout;
-  private final IFile parentFile;
+  private final ViewDocument viewInfo;
 
-  public ViewEditorInput(ViewModel view, Layouts layout, IFile parentFile) {
-    this.view = view;
-    this.layout = layout;
-    this.parentFile = parentFile;
+  public ViewEditorInput(ViewDocument viewInfo) {
+    this.viewInfo = viewInfo;
   }
 
-  public ViewModel getView() {
-    return view;
+  public ViewDocument getViewDocument() {
+    return viewInfo;
   }
 
-  public Layouts getLayout() {
-    return layout;
-  }
-
-  public IFile getParentFile() {
-    return parentFile;
+  @Override
+  public boolean equals(Object compare) {
+    // ViewEditorInputs only match themselves, never other entities,
+    // even if the content is the same.
+    return this == compare;
   }
 
   @Override
@@ -64,18 +54,17 @@ public class ViewEditorInput implements IEditorInput {
 
   @Override
   public String getName() {
-    return view.getName();
+    return viewInfo.getGraphModelLocation().getName();
   }
 
   @Override
   public IPersistableElement getPersistable() {
-    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
   public String getToolTipText() {
-    return view.getName();
+    return viewInfo.getGraphModelLocation().getFullPath().toString();
   }
 
   @Override

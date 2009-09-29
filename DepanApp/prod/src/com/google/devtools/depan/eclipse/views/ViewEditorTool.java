@@ -17,8 +17,6 @@
 package com.google.devtools.depan.eclipse.views;
 
 import com.google.devtools.depan.eclipse.editors.ViewEditor;
-import com.google.devtools.depan.eclipse.visualization.View;
-import com.google.devtools.depan.view.ViewModel;
 
 /**
  * Provide an abstract Tool implementation for tools that operate
@@ -42,34 +40,8 @@ public abstract class ViewEditorTool implements Tool {
     return (null != getEditor());
   }
 
-  public ViewModel getViewModel() {
-    if (hasEditor()) {
-      return getEditor().getViewModel();
-    } else {
-      return null;
-    }
-  }
-
-  public View getView() {
-    if (hasEditor()) {
-      return getEditor().getView();
-    } else {
-      return null;
-    }
-  }
-
   public void selected(boolean isSelected) {
     // nothing to do here.
-  }
-
-  protected boolean hasView() {
-    if (!hasEditor()) {
-      return false;
-    }
-    if (null == getView()) {
-      return false;
-    }
-    return true;
   }
 
   /**

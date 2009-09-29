@@ -24,12 +24,8 @@ import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.api.RelationFinder;
 import com.google.devtools.depan.graph.basic.BasicGraph;
 import com.google.devtools.depan.model.interfaces.GraphBuilder;
-import com.google.devtools.depan.model.interfaces.GraphListener;
-import com.google.devtools.depan.view.EdgeDisplayProperty;
-import com.google.devtools.depan.view.NodeDisplayProperty;
 import com.google.devtools.depan.view.SuccessorEdges;
 import com.google.devtools.depan.view.SuccessorsMap;
-import com.google.devtools.depan.view.ViewModel;
 
 import java.util.Collection;
 import java.util.List;
@@ -57,16 +53,6 @@ import java.util.Set;
  *
  */
 public class GraphModel extends BasicGraph<String> {
-
-  /**
-   * list of ViewModel attached to this GraphModel.
-   */
-  private Set<ViewModel> views = Sets.newHashSet();
-
-  /**
-   * A collection of listeners for graph events.
-   */
-  private Collection<GraphListener> listeners = Lists.newArrayList();
 
   /**
    * Basic constructor for a view model.
@@ -360,70 +346,6 @@ public class GraphModel extends BasicGraph<String> {
       result.put(node, 0);
     }
     return result;
-  }
-
-  /**
-   * register the given {@link ViewModel} as a view for this graph.
-   *
-   * @param view
-   */
-  public void registerView(ViewModel view) {
-    this.views.add(view);
-  }
-
-  public void unRegisterView(ViewModel view) {
-    if (this.views.contains(view)) {
-      this.views.remove(view);
-    }
-  }
-
-  /**
-   * Give a list of opened views associated with this graph.
-   *
-   * @return the views associated with this graph.
-   */
-  public Set<ViewModel> getViews() {
-    return views;
-  }
-
-  public void registerListener(GraphListener listener) {
-    if (!listeners.contains(listener)) {
-      listeners.add(listener);
-    }
-  }
-
-  public void unRegisterListener(GraphListener listener) {
-    if (listeners.contains(listener)) {
-      listeners.remove(listener);
-    }
-  }
-
-  /**
-   * Informs all listeners about the change in the display property of the given
-   * node.
-   *
-   * @param node The node whose display property is modified.
-   * @param property The display property that holds the modifications.
-   */
-  public void fireNodePropertyChange(
-      GraphNode node, NodeDisplayProperty property) {
-    for (GraphListener listener : listeners) {
-      listener.nodePropertyChanged(node, property);
-    }
-  }
-
-  /**
-   * Informs all listeners about the change in the display property of the given
-   * graph edge.
-   *
-   * @param edge Graph edge whose display property is modified.
-   * @param property The display property that holds the modifications.
-   */
-  public void fireEdgePropertyChange(
-      GraphEdge edge, EdgeDisplayProperty property) {
-    for (GraphListener listener : listeners) {
-      listener.edgePropertyChanged(edge, property);
-    }
   }
 
   /////////////////////////////////////

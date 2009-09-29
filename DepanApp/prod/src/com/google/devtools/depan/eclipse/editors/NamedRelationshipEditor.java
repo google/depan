@@ -17,6 +17,7 @@
 package com.google.devtools.depan.eclipse.editors;
 
 import com.google.devtools.depan.eclipse.persist.ObjectXmlPersist;
+import com.google.devtools.depan.eclipse.persist.XStreamFactory;
 import com.google.devtools.depan.eclipse.utils.ModificationListener;
 import com.google.devtools.depan.eclipse.utils.RelationshipPicker;
 import com.google.devtools.depan.eclipse.utils.RelationshipPickerHelper;
@@ -99,7 +100,9 @@ public class NamedRelationshipEditor extends EditorPart implements
   @Override
   public void doSave(IProgressMonitor monitor) {
     try {
-      ObjectXmlPersist persist = new ObjectXmlPersist();
+      // TODO(leeca):  Is this configured with the correct XStream flavor?
+      ObjectXmlPersist persist =
+          new ObjectXmlPersist(XStreamFactory.getSharedRefXStream());
       persist.save(file.getRawLocationURI(), sets);
 
       setDirtyState(false);
@@ -135,7 +138,10 @@ public class NamedRelationshipEditor extends EditorPart implements
         file = fileInput.getFile();
 
         // load the file and retrieve its content in sets.
-        ObjectXmlPersist persist = new ObjectXmlPersist();
+        // TODO(leeca):  Is this configured with the correct XStream flavor?
+        ObjectXmlPersist persist =
+            new ObjectXmlPersist(XStreamFactory.getSharedRefXStream());
+
         sets = loadNamedRelationship(persist, file.getRawLocationURI());
 
         setDirtyState(false);

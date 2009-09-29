@@ -178,7 +178,7 @@ public class RelationPickerTool extends ViewEditorTool
       return;
     }
     EdgeIncludePlugin edgeInclude =
-      getView().getRenderingPipe().getEdgeInclude();
+        getEditor().getRenderer().getEdgeInclude();
 
     // show all relations
     for (Relation r : contentProvider.getObjects()) {
@@ -202,7 +202,7 @@ public class RelationPickerTool extends ViewEditorTool
       return;
     }
     EdgeIncludePlugin edgeInclude =
-        getView().getRenderingPipe().getEdgeInclude();
+        getEditor().getRenderer().getEdgeInclude();
 
     // clear the list.
     List<Relation> selected = Lists.newArrayList(contentProvider.getObjects());
@@ -282,5 +282,4 @@ public class RelationPickerTool extends ViewEditorTool
   protected void reverseSelection() {
     selectFinder(new ReversedDirectedRelationFinder(getFinder()));
   }
-
 }

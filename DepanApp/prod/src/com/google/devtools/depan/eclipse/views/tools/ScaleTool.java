@@ -146,10 +146,10 @@ public class ScaleTool extends ViewEditorTool {
    * @param scale
    */
   private void applyScale(float scale) {
-    if (null == getView()) {
+    if (!hasEditor()) {
       return;
     }
-    getView().getRenderingPipe().getFactor().applyFactor(scale);
+    getEditor().getRenderer().getFactor().applyFactor(scale);
   }
 
   /**
@@ -157,10 +157,10 @@ public class ScaleTool extends ViewEditorTool {
    * @param scale
    */
   private void applyZoom(float scale) {
-    if (null == getView()) {
+    if (!hasEditor()) {
       return;
     }
-    getView().getGLPanel().getGrip().setZoom(scale);
+    getEditor().getRenderer().getGrip().setZoom(scale);
   }
 
   /**
@@ -168,9 +168,9 @@ public class ScaleTool extends ViewEditorTool {
    * to fit into the current view, with the current zoom level.
    */
   private void automaticScaling() {
-    if (null == getView()) {
+    if (!hasEditor()) {
       return;
     }
-    getView().getRenderingPipe().getFactor().computeBestScalingFactor();
+    getEditor().getRenderer().getFactor().computeBestScalingFactor();
   }
 }

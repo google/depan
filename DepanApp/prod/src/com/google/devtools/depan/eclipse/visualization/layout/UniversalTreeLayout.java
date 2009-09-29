@@ -24,7 +24,6 @@ import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.RelationshipTreeBuilder;
 import com.google.devtools.depan.util.Tree;
-import com.google.devtools.depan.view.ViewModel;
 
 import edu.uci.ics.jung.algorithms.layout.AbstractLayout;
 import edu.uci.ics.jung.graph.Graph;
@@ -34,7 +33,6 @@ import java.awt.Point;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
-
 
 /**
  * @author Karlheinz Toni (JUNG pacakge)
@@ -60,29 +58,25 @@ public class UniversalTreeLayout extends
 
   protected Set<GraphNode> roots;
   protected GraphModel graphModel;
-  protected ViewModel viewModel;
   protected DirectedRelationFinder relations;
 
   protected Collection<Tree<GraphNode>> hierarchy = null;
 
-  protected UniversalTreeLayout(Graph<GraphNode, GraphEdge> graph,
-      ViewModel viewModel, DirectedRelationFinder relations, Dimension size) {
+  protected UniversalTreeLayout(
+      Graph<GraphNode, GraphEdge> graph,
+      GraphModel graphModel, DirectedRelationFinder relations,
+      Dimension size) {
     super(graph, size);
-    this.viewModel = viewModel;
-    this.graphModel = viewModel.getGraph();
+    this.graphModel = graphModel;
     this.relations = relations;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see edu.uci.ics.jung.algorithms.layout.Layout#initialize()
-   */
+  @Override
   public void initialize() {
     allreadyDone.clear();
     hierarchy = new RelationshipTreeBuilder(
-        viewModel.getEdges(),
-        viewModel.getNodes(),
+        graphModel.getEdges(),
+        graphModel.getNodes(),
         relations).buildTree();
     findRoots();
     buildTree();
@@ -179,13 +173,8 @@ public class UniversalTreeLayout extends
     locations.get(vertex).setLocation(mCurrentPoint);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see edu.uci.ics.jung.algorithms.layout.Layout#reset()
-   */
+  @Override
   public void reset() {
     initialize();
   }
-
 }

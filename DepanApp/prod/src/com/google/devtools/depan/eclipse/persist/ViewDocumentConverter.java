@@ -16,7 +16,10 @@
 
 package com.google.devtools.depan.eclipse.persist;
 
-import com.google.devtools.depan.model.GraphEdge;
+import com.google.devtools.depan.eclipse.editors.GraphModelReference;
+import com.google.devtools.depan.eclipse.editors.ViewDocument;
+import com.google.devtools.depan.eclipse.editors.ViewPreferences;
+import com.google.devtools.depan.eclipse.editors.ViewDocument.Components;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 
@@ -27,30 +30,31 @@ import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import com.thoughtworks.xstream.mapper.Mapper;
 
+import java.util.Collection;
 import java.util.logging.Logger;
 
 /**
- * Custom {@code XStream} converter for {@code GraphModel}s.
+ * Custom {@code XStream} converter for {@code ViewDocument}s.
  * 
  * @author <a href="mailto:leeca@google.com">Lee Carver</a>
  */
-public class GraphModelConverter implements Converter {
+public class ViewDocumentConverter implements Converter {
 
-  public static final String GRAPH_DEF_TAG = "graph-model";
+  public static final String VIEW_INFO_TAG = "view-info";
 
   private static final Logger logger =
-      Logger.getLogger(GraphModelConverter.class.getName());
+      Logger.getLogger(ViewDocumentConverter.class.getName());
 
   private final Mapper mapper;
 
-  public GraphModelConverter(Mapper mapper) {
+  public ViewDocumentConverter(Mapper mapper) {
     this.mapper = mapper;
   }
 
   @Override
   @SuppressWarnings("unchecked")  // Parent type uses raw type Class
   public boolean canConvert(Class type) {
-    return GraphModel.class.equals(type);
+    return ViewDocument.class.equals(type);
   }
 
   /**
@@ -59,17 +63,17 @@ public class GraphModelConverter implements Converter {
   @Override
   public void marshal(Object source, HierarchicalStreamWriter writer,
       MarshallingContext context) {
-    GraphModel graph = (GraphModel) source;
+    ViewDocument viewInfo = (ViewDocument) source;
+    Components components = viewInfo.getComponents();
 
-    // Save all nodes.
-    for (GraphNode node : graph.getNodes()) {
-      marshalObject(node, writer, context);
-    }
+    // Save all node references.
+    marshalObject(components.getParentGraph(), writer, context);
 
-    // Save all edges.
-    for (GraphEdge edge : graph.getEdges()) {
-      marshalObject(edge, writer, context);
-    }
+    // Save all node references.
+    marshalObject(components.getViewNodes(), writer, context);
+
+    // Save the preferences.
+    marshalObject(components.getUserPrefs(), writer, context);
   }
 
   protected void marshalObject(Object item,
@@ -98,36 +102,38 @@ public class GraphModelConverter implements Converter {
     Object prior = context.get(GraphModel.class);
 
     try {
-      GraphModel result = new GraphModel();
-      context.put(GraphModel.class, result);
+      GraphModelReference viewInfo = (GraphModelReference) unmarshalObject(reader, context);
+      context.put(GraphModel.class, viewInfo.getGraph());
 
-      while (reader.hasMoreChildren()) {
-        reader.moveDown();
-        String childName = reader.getNodeName();
-        Class<?> childClass = mapper.realClass(childName);
+      Collection<GraphNode> viewNodes = loadGraphNodes(reader, context);
 
-        if (GraphNode.class.isAssignableFrom(childClass)) {
-          GraphNode node = (GraphNode) context.convertAnother(null, childClass);
-          result.addNode(node);
-        }
-        else if (GraphEdge.class.isAssignableFrom(childClass)) {
-          GraphEdge edge =
-              (GraphEdge) context.convertAnother(null, childClass);
-          result.addEdge(edge);
-        } else {
-          logger.info("Skipped object with tag " + childName);
-        }
+      ViewPreferences viewPrefs = (ViewPreferences) unmarshalObject(reader, context);
+      viewPrefs.initTransients();
 
-        reader.moveUp();
-      }
-
-      return result;
-    } catch (RuntimeException err) {
-      // TODO Auto-generated catch block
-      err.printStackTrace();
-      throw err;
+      return new ViewDocument(viewInfo, viewNodes, viewPrefs);
     } finally {
       context.put(GraphModel.class, prior);
     }
+  }
+
+  /**
+   * Isolate unchecked conversion.
+   */
+  @SuppressWarnings("unchecked")
+  private Collection<GraphNode> loadGraphNodes(
+      HierarchicalStreamReader reader, UnmarshallingContext context) {
+    return (Collection<GraphNode>) unmarshalObject(reader, context);
+  }
+
+  private Object unmarshalObject(
+      HierarchicalStreamReader reader, UnmarshallingContext context) {
+    reader.moveDown();
+    String childName = reader.getNodeName();
+    Class<?> childClass = mapper.realClass(childName);
+
+    Object result = context.convertAnother(null, childClass);
+
+    reader.moveUp();
+    return result;
   }
 }

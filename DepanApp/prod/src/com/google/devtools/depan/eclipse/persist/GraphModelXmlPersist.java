@@ -24,14 +24,15 @@ import java.net.URI;
 /**
  * Provide easy to use load and save methods for {@link GraphModel}s.
  * 
- * @author <a href="leeca@google.com">Lee Carver</a>
+ * @author <a href="mailto:leeca@google.com">Lee Carver</a>
  */
 public class GraphModelXmlPersist {
 
   protected final ObjectXmlPersist xmlPersist;
 
   public GraphModelXmlPersist() {
-    this.xmlPersist = new ObjectXmlPersist();
+    this.xmlPersist = 
+        new ObjectXmlPersist(XStreamFactory.getSharedGraphXStream());
   }
 
   public GraphModel load(URI uri) {

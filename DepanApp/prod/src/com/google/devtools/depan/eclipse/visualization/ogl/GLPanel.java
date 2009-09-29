@@ -19,12 +19,12 @@ package com.google.devtools.depan.eclipse.visualization.ogl;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds;
 import com.google.devtools.depan.eclipse.visualization.SelectionChangeListener;
-import com.google.devtools.depan.eclipse.visualization.View;
 import com.google.devtools.depan.model.GraphEdge;
+import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.view.ViewModel;
 
 import com.sun.opengl.util.BufferUtil;
 
@@ -49,6 +49,10 @@ import java.util.logging.Logger;
  *
  */
 public class GLPanel extends GLScene {
+
+  private static final Logger logger =
+    Logger.getLogger(GLPanel.class.getName());
+
   public static final int ID_MASK     = 0xC0000000; // 2 higher bits as tag
   // 2 higher bits are 0
   public static final int ID_MASK_INV = ID_MASK ^ 0xFFFFFFFF;
@@ -64,9 +68,6 @@ public class GLPanel extends GLScene {
    * 2 higher bits are "11" -> node
    */
   public static final int NODE_MASK   = 0xC0000000;
-
-  private static final Logger logger =
-      Logger.getLogger(GLPanel.class.getName());
 
   /**
    * Set of {@link NodeRenderingProperty}, one for each {@link GraphNode} to
@@ -112,18 +113,20 @@ public class GLPanel extends GLScene {
    */
   protected Set<NodeRenderingProperty> selection;
 
-  public GLPanel(Composite parent, View view,
-      SelectionChangeListener listener) {
+  public GLPanel(
+      Composite parent, ViewEditor editor,
+      SelectionChangeListener listener,
+      Map<GraphNode, Double> nodeRanking) {
     super(parent);
     this.selectionListener = listener;
 
     selection = Sets.newHashSet();
 
-    ViewModel viewModel = view.getViewModel();
+    GraphModel viewGraph = editor.getViewGraph();
 
     // nodes
     GraphNode[] nodes = new GraphNode[0];
-    nodes = viewModel.getNodes().toArray(nodes);
+    nodes = viewGraph.getNodes().toArray(nodes);
     nodesProperties = new NodeRenderingProperty[nodes.length];
     for (int i = 0; i < nodes.length; ++i) {
       GraphNode n = nodes[i];
@@ -134,7 +137,7 @@ public class GLPanel extends GLScene {
 
     // edges
     GraphEdge[] edges = new GraphEdge[0];
-    edges = viewModel.getEdges().toArray(edges);
+    edges = viewGraph.getEdges().toArray(edges);
     edgesProperties = new EdgeRenderingProperty[edges.length];
     for (int i = 0; i < edges.length; ++i) {
       GraphEdge edge = edges[i];
@@ -153,7 +156,7 @@ public class GLPanel extends GLScene {
     // Allocate the select buffer needed for these graphic elements.
     selectBuffer = allocSelectBuffer();
 
-    renderer = new RenderingPipe(gl, glu, this, view);
+    renderer = new RenderingPipe(gl, glu, this, editor, nodeRanking);
     dryRun();
 
     Refresher r = new Refresher(this);
@@ -554,6 +557,9 @@ public class GLPanel extends GLScene {
   }
 
   private void notifySelected(NodeRenderingProperty[] props) {
+    if (props.length ==0) {
+      return;
+    }
     selectionListener.notifyAddedToSelection(getGraphNodes(props));
   }
 
@@ -562,6 +568,9 @@ public class GLPanel extends GLScene {
   }
 
   private void notifyUnselected(NodeRenderingProperty[] props) {
+    if (props.length ==0) {
+      return;
+    }
     selectionListener.notifyRemovedFromSelection(getGraphNodes(props));
   }
 }

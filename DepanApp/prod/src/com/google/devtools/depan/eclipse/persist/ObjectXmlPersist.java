@@ -39,7 +39,7 @@ import java.net.URI;
  * accepted a type token (e.g. {@code Blix.class}), but that's a more heavy
  * handed implementation.
  * 
- * @author <a href="leeca@google.com">Lee Carver</a>
+ * @author <a href="mailto:leeca@google.com">Lee Carver</a>
  */
 public class ObjectXmlPersist {
   /**
@@ -49,26 +49,20 @@ public class ObjectXmlPersist {
 
   /**
    * Create a serializer using the provided XStream.
-   * The {@code XStreamFactory} class can synthesize an appropriate
-   * {@code XStream} for most purposes.
+   * The best sources for the XStream are:
+   * <ul>
+   * <li>{@link XStreamFactory#configureGraphXStream(XStream)} for
+   *     {@link GraphModel} persistence</li>
+   * <li>{@link XStreamFactory#configureRefXStream(XStream)} for persisting
+   *     entities that reference graph elements, such as
+   *     {@link ViewDocument}.</li>
+   * <ul>
+   * Check the {@code XStreamFactory} class for other construction mechanisms.
    * 
    * @param xstream {@code XStream }to use for serialization
    */
   public ObjectXmlPersist(XStream xstream) {
     this.xstream = xstream;
-  }
-
-  /**
-   * Create a instance that uses the shared StAX XStream driver.  The StAX
-   * driver is preferred, especially for large objects 
-   * (e.g. {@code GraphModel}s), since it uses much less ignorable white-space.
-   * It also has the advantage that an XML declaration is automatically written
-   * at the top of the file, so the resulting output is actually valid XML.
-   * Finally, reusing the shared XStream instance reduces the configuration
-   * costs of multiple XStreams.
-   */
-  public ObjectXmlPersist() {
-    this(XStreamFactory.getSharedXStream());
   }
 
   /**

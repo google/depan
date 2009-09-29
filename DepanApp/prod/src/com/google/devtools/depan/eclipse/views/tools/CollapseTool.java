@@ -203,10 +203,10 @@ public class CollapseTool extends ViewSelectionListenerTool
    */
   protected void autoCollapse(DirectedRelationFinder finder) {
     // TODO(leeca): How can this be active if there is no ViewModel
-    if ((null == getView()) || (null == getViewModel())) {
+    if (!hasEditor()) {
       return;
     }
-    getViewModel().autoCollapse(finder, null);
+    getEditor().autoCollapse(finder, null);
   }
 
   /**
@@ -218,7 +218,7 @@ public class CollapseTool extends ViewSelectionListenerTool
   protected void uncollapseButton(int selectionIndex, boolean deleteGroup) {
     GraphNode master = collapseMaster.getElementAtIndex(
         masterViewer.getCombo().getSelectionIndex());
-    getViewModel().uncollapse(master, deleteGroup, null);
+    getEditor().uncollapse(master, deleteGroup, null);
   }
   
   /**
@@ -228,7 +228,7 @@ public class CollapseTool extends ViewSelectionListenerTool
     int selectionNumber = masterViewer.getCombo().getItemCount();
     for (int i = 0; i < selectionNumber; i++) {
       GraphNode master = collapseMaster.getElementAtIndex(i);
-      getViewModel().uncollapse(master, false, null);
+      getEditor().uncollapse(master, false, null);
     }
   }
 
@@ -243,7 +243,7 @@ public class CollapseTool extends ViewSelectionListenerTool
     GraphNode master = collapseMaster.getElementAtIndex(
         masterViewer.getCombo().getSelectionIndex());
     Collection<GraphNode> objects = collapseMaster.getObjects();
-    getViewModel().collapse(master, objects, erase, null);
+    getEditor().collapse(master, objects, erase, null);
   }
 
   @Override

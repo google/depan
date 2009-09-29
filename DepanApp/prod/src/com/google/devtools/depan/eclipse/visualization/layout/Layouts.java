@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.eclipse.visualization.layout;
 
-import com.google.devtools.depan.eclipse.visualization.View;
+import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.graph.api.DirectedRelationFinder;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphNode;
@@ -45,18 +45,18 @@ public enum Layouts {
   FRLayout {
     @Override
     public AbstractLayout<GraphNode, GraphEdge> getLayout(
-        View view, DirectedRelationFinder relations) {
+        ViewEditor editor, DirectedRelationFinder relations) {
       return new FRLayout<GraphNode, GraphEdge>(
-          view.getJungGraph(), LAYOUT_SIZE);
+          editor.getJungGraph(), LAYOUT_SIZE);
     }
   },
   FRLayout2 {
     @Override
     public AbstractLayout<GraphNode, GraphEdge> getLayout(
-        View view, DirectedRelationFinder relations) {
+        ViewEditor editor, DirectedRelationFinder relations) {
       AbstractLayout<GraphNode, GraphEdge> result =
           new FRLayout2<GraphNode, GraphEdge>(
-              view.getJungGraph(), LAYOUT_SIZE);
+              editor.getJungGraph(), LAYOUT_SIZE);
       result.setSize(LAYOUT_SIZE);
       return result;
     }
@@ -64,9 +64,9 @@ public enum Layouts {
   SpringLayout {
     @Override
     public AbstractLayout<GraphNode, GraphEdge> getLayout(
-        View view, DirectedRelationFinder relations) {
+        ViewEditor editor, DirectedRelationFinder relations) {
       AbstractLayout<GraphNode, GraphEdge> result =
-          new SpringLayout<GraphNode, GraphEdge>(view.getJungGraph());
+          new SpringLayout<GraphNode, GraphEdge>(editor.getJungGraph());
       result.setSize(LAYOUT_SIZE);
       return result;
     }
@@ -74,9 +74,9 @@ public enum Layouts {
   SpringLayout2 {
     @Override
     public AbstractLayout<GraphNode, GraphEdge> getLayout(
-        View view, DirectedRelationFinder relations) {
+        ViewEditor editor, DirectedRelationFinder relations) {
       AbstractLayout<GraphNode, GraphEdge> result =
-            new SpringLayout2<GraphNode, GraphEdge>(view.getJungGraph());
+            new SpringLayout2<GraphNode, GraphEdge>(editor.getJungGraph());
       result.setSize(LAYOUT_SIZE);
       return result;
     }
@@ -84,9 +84,9 @@ public enum Layouts {
   KKLayout {
     @Override
     public AbstractLayout<GraphNode, GraphEdge> getLayout(
-        View view, DirectedRelationFinder relations) {
+        ViewEditor editor, DirectedRelationFinder relations) {
       KKLayout<GraphNode, GraphEdge> result =
-          new KKLayout<GraphNode, GraphEdge>(view.getJungGraph());
+          new KKLayout<GraphNode, GraphEdge>(editor.getJungGraph());
       result.setSize(LAYOUT_SIZE);
       return result;
     }
@@ -94,9 +94,9 @@ public enum Layouts {
   CircleLayout {
     @Override
     public AbstractLayout<GraphNode, GraphEdge> getLayout(
-        View view, DirectedRelationFinder relations) {
+        ViewEditor editor, DirectedRelationFinder relations) {
       AbstractLayout<GraphNode, GraphEdge> result =
-          new CircleLayout<GraphNode, GraphEdge>(view.getJungGraph());
+          new CircleLayout<GraphNode, GraphEdge>(editor.getJungGraph());
       result.setSize(LAYOUT_SIZE);
       return result;
     }
@@ -104,9 +104,9 @@ public enum Layouts {
   ISOMLayout {
     @Override
     public AbstractLayout<GraphNode, GraphEdge> getLayout(
-        View view, DirectedRelationFinder relations) {
+        ViewEditor editor, DirectedRelationFinder relations) {
       ISOMLayout<GraphNode, GraphEdge> result =
-          new ISOMLayout<GraphNode, GraphEdge>(view.getJungGraph());
+          new ISOMLayout<GraphNode, GraphEdge>(editor.getJungGraph());
       result.setSize(LAYOUT_SIZE);
       return result;
     }
@@ -114,11 +114,11 @@ public enum Layouts {
   UniversalTreeLayout {
     @Override
     public AbstractLayout<GraphNode, GraphEdge> getLayout(
-        View view, DirectedRelationFinder relations) {
+        ViewEditor editor, DirectedRelationFinder relations) {
       AbstractLayout<GraphNode, GraphEdge> result =
-      new UniversalTreeLayout(
-          view.getJungGraph(), view.getViewModel(),
-          relations, LAYOUT_SIZE);
+          new UniversalTreeLayout(
+              editor.getJungGraph(), editor.getViewGraph(),
+              relations, LAYOUT_SIZE);
       result.initialize();
       return result;
     }
@@ -126,11 +126,11 @@ public enum Layouts {
   UniversalRadialLayout {
     @Override
     public AbstractLayout<GraphNode, GraphEdge> getLayout(
-        View view, DirectedRelationFinder relations) {
+        ViewEditor editor, DirectedRelationFinder relations) {
       AbstractLayout<GraphNode, GraphEdge> result =
           new UniversalRadialLayout(
-          view.getJungGraph(), view.getViewModel(),
-          relations, LAYOUT_SIZE);
+              editor.getJungGraph(), editor.getViewGraph(),
+              relations, LAYOUT_SIZE);
       result.initialize();
       return result;
     }
@@ -138,10 +138,10 @@ public enum Layouts {
   NewTreeLayout {
     @Override
     public AbstractLayout<GraphNode, GraphEdge> getLayout(
-        View view, DirectedRelationFinder relations) {
+        ViewEditor editor, DirectedRelationFinder relations) {
       AbstractLayout<GraphNode, GraphEdge> result =
           new NewTreeLayout(
-          view.getJungGraph(), view.getViewModel(),
+            editor.getJungGraph(), editor.getViewGraph(),
           relations, LAYOUT_SIZE);
       result.initialize();
       return result;
@@ -150,10 +150,10 @@ public enum Layouts {
   NewRadialLayout {
     @Override
     public AbstractLayout<GraphNode, GraphEdge> getLayout(
-        View view, DirectedRelationFinder relations) {
+        ViewEditor editor, DirectedRelationFinder relations) {
       AbstractLayout<GraphNode, GraphEdge> result =
           new NewRadialLayout(
-          view.getJungGraph(), view.getViewModel(),
+            editor.getJungGraph(), editor.getViewGraph(),
           relations, LAYOUT_SIZE);
       result.initialize();
       return result;
@@ -170,7 +170,7 @@ public enum Layouts {
    * @return a new Layout.
    */
   public abstract AbstractLayout<GraphNode, GraphEdge> getLayout(
-      View view, DirectedRelationFinder relations);
+      ViewEditor editor, DirectedRelationFinder relations);
 
   public static final Dimension LAYOUT_SIZE = new Dimension(1000, 1000);
 }

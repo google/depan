@@ -18,8 +18,8 @@ package com.google.devtools.depan.eclipse.visualization.layout;
 
 import com.google.devtools.depan.graph.api.DirectedRelationFinder;
 import com.google.devtools.depan.model.GraphEdge;
+import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.view.ViewModel;
 
 import edu.uci.ics.jung.algorithms.layout.PolarPoint;
 import edu.uci.ics.jung.graph.Graph;
@@ -38,8 +38,6 @@ import java.util.Map;
  */
 public class UniversalRadialLayout extends UniversalTreeLayout {
 
-  private Dimension size;
-
   protected Map<GraphNode, PolarPoint> polarLocations =
       LazyMap.decorate(
           new HashMap<GraphNode, PolarPoint>(),
@@ -51,10 +49,9 @@ public class UniversalRadialLayout extends UniversalTreeLayout {
 
   protected UniversalRadialLayout(
       Graph<GraphNode, GraphEdge> graph,
-      ViewModel viewModel,
-      DirectedRelationFinder relations, Dimension size) {
-    super(graph, viewModel, relations, size);
-    this.size = size;
+      GraphModel graphModel, DirectedRelationFinder relations,
+      Dimension size) {
+    super(graph, graphModel, relations, size);
   }
 
   @Override
@@ -77,10 +74,10 @@ public class UniversalRadialLayout extends UniversalTreeLayout {
     Point2D max = getMaxXY();
     double maxx = max.getX();
     double maxy = max.getY();
-    maxx = Math.max(maxx, size.width);
+    maxx = Math.max(maxx, getSize().width);
     double theta = 2 * Math.PI / maxx;
 
-    double deltaRadius = size.width / 2 / maxy;
+    double deltaRadius = getSize().width / 2 / maxy;
     for (Map.Entry<GraphNode, Point2D> entry
         : locations.entrySet()) {
       GraphNode v = entry.getKey();
@@ -92,7 +89,8 @@ public class UniversalRadialLayout extends UniversalTreeLayout {
   }
 
   public Point2D getCenter() {
-    return new Point2D.Double(size.getWidth() / 2, size.getHeight() / 2);
+    return new Point2D.Double(
+        getSize().getWidth() / 2, getSize().getHeight() / 2);
   }
 
   public Map<GraphNode, PolarPoint> getPolarLocations() {
@@ -110,7 +108,7 @@ public class UniversalRadialLayout extends UniversalTreeLayout {
 
   @Override
   public void setSize(Dimension size) {
-    this.size = size;
+    this.setSize(size);
     buildTree();
   }
 
@@ -118,14 +116,10 @@ public class UniversalRadialLayout extends UniversalTreeLayout {
   public double getX(GraphNode v) {
     return transform(v).getX();
   }
-  
+
   @Override
   public double getY(GraphNode v) {
     return transform(v).getY();
-  }
-  
-  public Dimension getCurrentSize() {
-    return size;
   }
 
   @Override
@@ -138,5 +132,4 @@ public class UniversalRadialLayout extends UniversalTreeLayout {
         + centerY);
     return cartesian;
   }
-
 }

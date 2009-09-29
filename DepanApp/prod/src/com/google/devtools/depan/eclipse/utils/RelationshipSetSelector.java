@@ -20,8 +20,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.devtools.depan.eclipse.Project;
-import com.google.devtools.depan.eclipse.persist.GraphModelConverter;
 import com.google.devtools.depan.eclipse.persist.ObjectXmlPersist;
+import com.google.devtools.depan.eclipse.persist.XStreamFactory;
 import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
 import com.google.devtools.depan.eclipse.plugins.SourcePluginRegistry;
 import com.google.devtools.depan.model.RelationshipSet;
@@ -426,7 +426,9 @@ public class RelationshipSetSelector extends CompositeRowControl
   private Collection<RelationshipSet> fetchRelationshipSets(
       IResource resource) {
     try {
-      ObjectXmlPersist persist = new ObjectXmlPersist();
+      // TODO(leeca):  Is this configured with the correct XStream flavor?
+      ObjectXmlPersist persist = 
+          new ObjectXmlPersist(XStreamFactory.getSharedRefXStream());
       Collection<RelationshipSet> sets =
           loadRelationshipSets(persist, resource);
       return sets;

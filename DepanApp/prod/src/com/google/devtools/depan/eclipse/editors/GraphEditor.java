@@ -26,14 +26,9 @@ import com.google.devtools.depan.eclipse.utils.LayoutSelector;
 import com.google.devtools.depan.eclipse.utils.RelationshipSelectorListener;
 import com.google.devtools.depan.eclipse.utils.RelationshipSetSelector;
 import com.google.devtools.depan.eclipse.visualization.layout.Layouts;
-import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.RelationshipSet;
-import com.google.devtools.depan.model.interfaces.GraphListener;
-import com.google.devtools.depan.view.EdgeDisplayProperty;
-import com.google.devtools.depan.view.NodeDisplayProperty;
-import com.google.devtools.depan.view.ViewModel;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -55,6 +50,7 @@ import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.MultiPageEditorPart;
 
+import java.util.Collection;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -63,22 +59,23 @@ import java.util.logging.Logger;
  */
 public class GraphEditor
     extends MultiPageEditorPart
-    implements TCreator<ViewModel>,
-        NodeTreeProvider<GraphNode>,
-        RelationshipSelectorListener,
-        GraphListener {
+    implements NodeTreeProvider<GraphNode>,
+        RelationshipSelectorListener {
 
   private static final Logger logger =
       Logger.getLogger(GraphEditor.class.getName());
 
-  private GraphModel graph = null;
   private IFile file = null;
+  private GraphModel graph = null;
+
   private CheckboxTreeViewer tree = null;
   private List associatedViews = null;
-  private Binop<ViewModel> binop = null;
   private boolean recursiveTreeSelect = false;
   private CheckNodeTreeView<GraphNode> checkNodeTreeView = null;
   private LayoutSelector layoutChoice = null;
+
+  // TODO(leeca): Figure out how to turn this back on
+  // private Binop<GraphModel> binop = null;
 
   /**
    * Selector for named relationships sets.
@@ -118,7 +115,7 @@ public class GraphEditor
     top.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
     RowLayout toplayout = new RowLayout();
     toplayout.fill = true;
-    toplayout.pack = false;
+    toplayout.pack = true;
     toplayout.wrap = true;
     toplayout.type = SWT.HORIZONTAL;
     top.setLayout(toplayout);
@@ -136,7 +133,7 @@ public class GraphEditor
       public void widgetSelected(SelectionEvent e) {
         try {
           Layouts layout = getSelectedLayout();
-          createView(layout);
+          createViewEditor(layout);
         } catch (IllegalArgumentException ex) {
           // bad layout. don't do anything for the layout, but still finish the
           // creation of the view.
@@ -202,9 +199,10 @@ public class GraphEditor
       }
     });
 
-    associatedViews =
-      new List(leftPanel, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
-    associatedViews.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+    associatedViews = new List(
+        leftPanel, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
+    associatedViews.setLayoutData(
+        new GridData(SWT.FILL, SWT.FILL, true, true));
     // fill associated Views list.
     updateList();
     associatedViews.addSelectionListener(new SelectionAdapter() {
@@ -215,15 +213,16 @@ public class GraphEditor
     });
 
     // Right panel --------------
-    binop = new Binop<ViewModel>(composite, SWT.None, this, this);
-    binop.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+    // TODO(leeca): Figure out how to turn this back on
+    // binop = new Binop<GraphModel>(composite, SWT.None, this, this);
+    // binop.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
     int index = addPage(composite);
     setPageText(index, "Opened related Views");
   }
 
-
   protected void selectView() {
+/* TODO(leeca):  Need richer ReferencedGraphModel
     associatedViews.getSelectionIndices();
     if (associatedViews.getSelectionCount() == 1) {
       for (ViewModel v : graph.getViews()) {
@@ -243,34 +242,51 @@ public class GraphEditor
       }
       binop.setBoth(v1, v2);
     }
+*/
   }
 
   private void updateList() {
+/* TODO(leeca):  Need richer ReferencedGraphModel
     associatedViews.removeAll();
     for (ViewModel v : graph.getViews()) {
       associatedViews.add(v.getName());
     }
     associatedViews.redraw();
+*/
   }
 
-  @SuppressWarnings("unchecked")
-  protected void createView(Layouts layout) {
-    Set<GraphNode> nodes = Sets.newHashSet();
+  /**
+   * Create a new Graph Visualization editor from the selected tree elements.
+   *
+   * @param view Source of dependency data
+   * @param layout Initial layout for visualization
+   */
+  protected void createViewEditor(Layouts layout) {
     CheckboxTreeViewer treeView = checkNodeTreeView.getCheckboxTreeViewer();
 
-    for (Object o : treeView.getCheckedElements()) {
-      if (o instanceof NodeWrapper) {
-        nodes.add(((NodeWrapper) o).getNode());
-      }
-    }
+    Collection<GraphNode> nodes = getSelectedNodes(treeView);
     if (nodes.size() <= 0) {
       return;
     }
 
-    final ViewModel viewModel = new ViewModel(graph);
-    viewModel.setNodes(nodes);
+    GraphModelReference graphRef = new GraphModelReference(file, graph);
+    ViewPreferences userPrefs = new ViewPreferences();
+    ViewDocument viewInfo = new ViewDocument(graphRef, nodes, userPrefs);
+    ViewEditor.startViewEditor(viewInfo);
+  }
 
-    create(viewModel, layout);
+  /**
+   * @param nodes
+   * @param treeView
+   */
+  private Collection<GraphNode> getSelectedNodes(CheckboxTreeViewer treeView) {
+    Set<GraphNode> result = Sets.newHashSet();
+    for (Object item : treeView.getCheckedElements()) {
+      if (item instanceof NodeWrapper) {
+        result.add(((NodeWrapper<?>) item).getNode());
+      }
+    }
+    return result;
   }
 
   @Override
@@ -303,28 +319,16 @@ public class GraphEditor
     this.setPartName(title);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.ui.part.EditorPart
-   *      #doSave(org.eclipse.core.runtime.IProgressMonitor)
-   */
   @Override
   public void doSave(IProgressMonitor monitor) {
 
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.ui.part.EditorPart#doSaveAs()
-   */
   @Override
   public void doSaveAs() {
 
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.ui.part.EditorPart#isSaveAsAllowed()
-   */
   @Override
   public boolean isSaveAsAllowed() {
     return false;
@@ -335,52 +339,8 @@ public class GraphEditor
     super.dispose();
   }
 
-  public void create(ViewModel view) {
-    create(view, getSelectedLayout());
-  }
-
-  /**
-   * Create a new Graph Visualization editor from the selected tree elements.
-   *
-   * @param view Source of dependency data
-   * @param layout Initial layout for visualization
-   */
-  public void create(ViewModel view, Layouts layout) {
-    final ViewEditorInput input = new ViewEditorInput(view, layout, file);
-    ViewEditor.startViewEditor(input);
-    updateList();
-  }
-
   public GraphNode getObject(GraphNode node) {
     return node;
-  }
-
-  /*
-   * (non-Javadoc)
-   *
-   * @see com.google.devtools.depan.model.interfaces.GraphListener
-   *      #newView(com.google.devtools.depan.view.ViewModel)
-   */
-  public void newView(ViewModel view) {
-    updateList();
-  }
-
-  /**
-   * Callback when display property of a node is modified.
-   *
-   * @param node The node whose display property is modified.
-   * @param property The display property that holds the modifications.
-   */
-  @Override
-  public void nodePropertyChanged(
-      GraphNode node, NodeDisplayProperty property) {
-    // No actions needed on node changes.
-  }
-
-  @Override
-  public void edgePropertyChanged(
-      GraphEdge edge, EdgeDisplayProperty property) {
-    // No actions needed on edge changes.
   }
 
   @Override

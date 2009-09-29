@@ -17,6 +17,7 @@
 package com.google.devtools.depan.eclipse.editors;
 
 import com.google.devtools.depan.eclipse.persist.ObjectXmlPersist;
+import com.google.devtools.depan.eclipse.persist.XStreamFactory;
 import com.google.devtools.depan.eclipse.utils.Tools;
 import com.google.devtools.depan.tasks.MigrationGroup;
 import com.google.devtools.depan.tasks.MigrationRule;
@@ -140,7 +141,10 @@ public class RemapEditor extends MultiPageEditorPart
     if (input instanceof IFileEditorInput) {
       try {
         uri = ((IFileEditorInput) input).getFile().getLocationURI();
-        ObjectXmlPersist persist = new ObjectXmlPersist();
+        // TODO(leeca):  Is this configured with the correct XStream flavor?
+        ObjectXmlPersist persist =
+            new ObjectXmlPersist(XStreamFactory.getSharedRefXStream());
+
         migrationTask = loadMigrationTask(persist);
         this.setPartName(migrationTask.getName());
       } catch (IOException errIo) {
@@ -157,7 +161,9 @@ public class RemapEditor extends MultiPageEditorPart
   @Override
   public void doSave(IProgressMonitor monitor) {
     try {
-      ObjectXmlPersist persist = new ObjectXmlPersist();
+      // TODO(leeca):  Is this configured with the correct XStream flavor?
+      ObjectXmlPersist persist =
+          new ObjectXmlPersist(XStreamFactory.getSharedRefXStream());
       persist.save(uri, migrationTask);
       setDirtyState(false);
     } catch (IOException errIo) {

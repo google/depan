@@ -33,14 +33,14 @@ public abstract class ViewSelectionListenerTool extends ViewEditorTool
 
   @Override
   protected void acquireResources() {
-    getView().registerListener(this);
+    getEditor().addSelectionChangeListener(this);
   }
 
   @Override
   protected void releaseResources() {
     emptySelection();
-    if (hasView()) {
-      getView().unRegisterListener(this);
+    if (hasEditor()) {
+      getEditor().removeSelectionChangeListener(this);
     }
   }
 
@@ -51,7 +51,7 @@ public abstract class ViewSelectionListenerTool extends ViewEditorTool
 
   @Override
   protected void updateControls() {
-    updateSelectionTo(getView().getPickedNodes());
+    updateSelectionTo(getEditor().getSelectedNodeArray());
   }
 
   /**
