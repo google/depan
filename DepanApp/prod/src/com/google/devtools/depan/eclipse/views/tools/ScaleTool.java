@@ -83,7 +83,7 @@ public class ScaleTool extends ViewEditorTool {
         + "applying an automatic scaling should restore a good view.\n"
         + "\n"
         + "The stretch value is relative to the previously applied stretch "
-        + "value. Therefore, applying a stretch value of 100% never do "
+        + "value. Therefore, applying a stretch value of 100% will never do "
         + "anything, and a stretch value of 200% always makes the graph two "
         + "times larger even if applied multiple times consecutivelly.\n"
         + "\n"

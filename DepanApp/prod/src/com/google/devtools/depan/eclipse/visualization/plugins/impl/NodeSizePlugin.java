@@ -89,12 +89,13 @@ public class NodeSizePlugin<E> implements NodeRenderingPlugin {
       maxDegree = inDegree;
     }
     // find maximum importance
-    Double imp = importances.get(p.node);
-    if (null != imp && imp > maxImportance) {
-      maxImportance = imp;
-    }
+    // find maximum importance
+    Double impObj = importances.get(p.node);
+    double importance = (null == impObj) ? 0.0 : impObj.doubleValue();
+    maxImportance = Math.max(maxImportance, importance);
+
     // store costly informations to retrieve at each frame.
-    p.pluginStore.put(this, new NodeSizeData(imp, inDegree, outDegree));
+    p.pluginStore.put(this, new NodeSizeData(importance, inDegree, outDegree));
   }
 
   @Override

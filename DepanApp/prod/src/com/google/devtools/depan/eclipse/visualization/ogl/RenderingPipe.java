@@ -96,7 +96,7 @@ public class RenderingPipe {
     edgeColors = new EdgeColorPlugin();
     stepper = new SteperPlugin();
     drawing = new DrawingPlugin(gl, panel);
-    factor = new FactorPlugin(gl, glu, panel.getGrip());
+    factor = new FactorPlugin(panel);
     nodeSize = new NodeSizePlugin<GraphEdge>(graph, nodeRanking);
     nodeStroke = new NodeStrokePlugin<GraphEdge>(panel, graph);
     nodeShape = new NodeShapePlugin<GraphEdge>(graph);

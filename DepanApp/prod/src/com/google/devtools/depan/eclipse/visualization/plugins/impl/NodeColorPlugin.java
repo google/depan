@@ -63,18 +63,18 @@ public class NodeColorPlugin<E> implements NodeRenderingPlugin {
   @Override
   public void dryRun(NodeRenderingProperty p) {
     this.nodeNumber++;
+
     // find maximum degree
     int degree = graph.getPredecessorCount(p.node);
-    if (degree > maxDegree) {
-      maxDegree = degree;
-    }
+    maxDegree = Math.max(maxDegree, degree);
+
     // find maximum importance
-    Double imp = importances.get(p.node);
-    if (null != imp && imp > maxImportance) {
-      maxImportance = imp;
-    }
+    Double impObj = importances.get(p.node);
+    double importance = (null == impObj) ? 0.0 : impObj.doubleValue();
+    maxImportance = Math.max(maxImportance, importance);
+
     // store costly informations to retrieve at each frame.
-    p.pluginStore.put(this, new NodeColorData(imp, degree));
+    p.pluginStore.put(this, new NodeColorData(importance, degree));
   }
 
   @Override

@@ -220,6 +220,12 @@ public class ViewPreferences {
     return nodeLocations;
   }
 
+  /**
+   * Set new locations for all nodes.  Nodes not included in the map will
+   * move to the origin (0.0, 0.0).
+   *
+   * @param newLocations
+   */
   public void setNodeLocations(final Map<GraphNode, Point2D> newLocations) {
     nodeLocations = newLocations;
 
@@ -227,6 +233,25 @@ public class ViewPreferences {
       @Override
       public void dispatch(ViewPrefsListener listener) {
         listener.nodeLocationsChanged(newLocations);
+      }
+    });
+  }
+
+  /**
+   * Edit the locations for nodes in the {@code newLocations} map.
+   * Nodes not included in the map will be left at their current location.
+   * 
+   * @param newLocations 
+   * @param author
+   */
+  public void editNodeLocations(
+      final Map<GraphNode, Point2D> newLocations, final Object author) {
+    nodeLocations.putAll(newLocations);
+
+    listeners.fireEvent(new SimpleDispatcher() {
+      @Override
+      public void dispatch(ViewPrefsListener listener) {
+        listener.locationsChanged(newLocations, author);
       }
     });
   }

@@ -33,6 +33,7 @@ import com.google.devtools.depan.eclipse.utils.ListenerManager;
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.utils.Tools;
 import com.google.devtools.depan.eclipse.views.tools.RelationCount;
+import com.google.devtools.depan.eclipse.visualization.RendererChangeListener;
 import com.google.devtools.depan.eclipse.visualization.SelectionChangeListener;
 import com.google.devtools.depan.eclipse.visualization.View;
 import com.google.devtools.depan.eclipse.visualization.layout.Layouts;
@@ -149,6 +150,9 @@ public class ViewEditor extends MultiPageEditorPart
   /** Receiver for selection changes in the renderer. */
   private SelectionChangeListener rendererSelectionListener;
 
+  /** Receiver for property changes from the renderer. */
+  private RendererChangeListener rendererChangeListener;
+
   /**
    * Forward only selection change events to interested parties.
    */
@@ -229,7 +233,7 @@ public class ViewEditor extends MultiPageEditorPart
         new GridData(SWT.FILL, SWT.FILL, true, true));
 
     // Configure the rendering pipe before listening for changes
-    updateNodeLocations(viewInfo.getNodeLocations());
+    renderer.initializeNodeLocations(viewInfo.getNodeLocations());
     setPreferences();
 
     // The low-level OGL renderer does not directly notify the user preferences
@@ -237,6 +241,9 @@ public class ViewEditor extends MultiPageEditorPart
     // and it relays them to the underlying preference store.
     rendererSelectionListener = new RendererSelectionChangeListener();
     renderer.registerListener(rendererSelectionListener);
+
+    rendererChangeListener = new RendererChangeReceiver();
+    renderer.addLocationListener(rendererChangeListener);
 
     int index = addPage(parent);
     setPageText(index, "Graph View");
@@ -356,6 +363,11 @@ public class ViewEditor extends MultiPageEditorPart
 
     if (null != rendererSelectionListener) {
       renderer.unRegisterListener(rendererSelectionListener);
+      rendererSelectionListener = null;
+    }
+
+    if (null != rendererChangeListener) {
+      renderer.removeLocationListener(rendererChangeListener);
       rendererSelectionListener = null;
     }
 
@@ -848,10 +860,28 @@ public class ViewEditor extends MultiPageEditorPart
       Layouts newLayout, DirectedRelationFinder relationfinder) {
     Map<GraphNode, Point2D> nodeLocations =
         computeLayoutLocations(newLayout, relationfinder);
-    viewInfo.setNodeLocations(nodeLocations);
+
+    // TODO(leeca): get the layout code above to scale to viewport correctly
+    // In the interim, push the new locations to the renderer, and then
+    // trigger a "best scaling" event which will propagate location changed
+    // event all the way to the viewInfo.  Much more round-about then the
+    // one line below:
+    // viewInfo.setNodeLocations(nodeLocations);
+
+    updateNodeLocations(nodeLocations);
+    renderer.computeBestScalingFactor();
+    
   }
 
   public void clusterize(Layouts layout, DirectedRelationFinder finder) {
+    applyLayout(layout, finder);
+  }
+
+  // TODO(leeca):  cleanup/consolidate applyLayout and clusterize
+  // The should be different entry points for the same algorithm.
+  // But with the broken cluster() below, making clusterize() == applyLayout(),
+  // at least something useful happens.
+  public void x_clusterize(Layouts layout, DirectedRelationFinder finder) {
     cluster(layout, finder);
 
     // TODO(leeca): Is this necessary if setNodeLocations
@@ -1077,6 +1107,18 @@ public class ViewEditor extends MultiPageEditorPart
   }
 
   /////////////////////////////////////
+  // Renderer change notification support
+
+  private class RendererChangeReceiver
+      implements RendererChangeListener {
+
+    @Override
+    public void locationsChanged(Map<GraphNode, Point2D> changes) {
+      viewInfo.editNodeLocations(changes, renderer);
+    }
+  }
+
+  /////////////////////////////////////
   // Specialized features
 
   public GraphData<NodeDisplayProperty> getHierarchy(
@@ -1175,8 +1217,11 @@ public class ViewEditor extends MultiPageEditorPart
     }
 
     @Override
-    public void locationsChanged(Collection<GraphNode> movedNodes, Object author) {
-      // TODO(leeca): probably need to post changes to renderer.
+    public void locationsChanged(
+        Map<GraphNode, Point2D> newLocations, Object author) {
+      if (author != renderer) {
+        renderer.changeNodeLocations(newLocations);
+      }
       markDirty();
     }
 

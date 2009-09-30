@@ -16,12 +16,8 @@
 
 package com.google.devtools.depan.eclipse.visualization.plugins.impl;
 
-import javax.media.opengl.GL;
-import javax.media.opengl.glu.GLU;
-
-import com.google.devtools.depan.eclipse.visualization.ogl.GLScene;
+import com.google.devtools.depan.eclipse.visualization.ogl.GLPanel;
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeRenderingProperty;
-import com.google.devtools.depan.eclipse.visualization.ogl.SceneGrip;
 import com.google.devtools.depan.eclipse.visualization.plugins.core.NodeRenderingPlugin;
 
 /**
@@ -46,9 +42,7 @@ import com.google.devtools.depan.eclipse.visualization.plugins.core.NodeRenderin
  */
 public class FactorPlugin implements NodeRenderingPlugin {
 
-  private GL gl;
-  private GLU glu;
-  private SceneGrip grip;
+  private final GLPanel panel;
 
   /**
    * Factor to apply to the x coordinates.
@@ -85,10 +79,8 @@ public class FactorPlugin implements NodeRenderingPlugin {
   private float[] min = { 0f, 0f };
   private float[] max = { 0f, 0f };
 
-  public FactorPlugin(GL gl, GLU glu, SceneGrip grip) {
-    this.gl = gl;
-    this.glu = glu;
-    this.grip = grip;
+  public FactorPlugin(GLPanel panel) {
+    this.panel = panel;
   }
 
   /**
@@ -188,6 +180,7 @@ public class FactorPlugin implements NodeRenderingPlugin {
       break;
     case SET:
       current = State.NORMAL;
+      panel.notifyLocationChange();
       break;
     default:
       break;
@@ -217,15 +210,12 @@ public class FactorPlugin implements NodeRenderingPlugin {
    * @return true if a new factor was calculated, false otherwise.
    */
   private boolean computeFactor() {
-    int[] viewport = new int[4];
     // A constant applied to the final factor, to get some margin for instance.
     final double applyToFactor = 0.9f;
 
-    gl.glGetIntegerv(GL.GL_VIEWPORT, viewport, 0);
-    double[] topLeft =
-        GLScene.getOGLPos(gl, glu, grip, viewport[0], viewport[1]);
-    double[] bottomRight =
-        GLScene.getOGLPos(gl, glu, grip, viewport[2], viewport[3]);
+    int [] viewport = panel.getViewport();
+    double[] topLeft = panel.getOGLPos(viewport[0], viewport[1]);
+    double[] bottomRight = panel.getOGLPos(viewport[2], viewport[3]);
 
     // compute the optimal factor
     float dx = max[0] - min[0];
@@ -261,5 +251,4 @@ public class FactorPlugin implements NodeRenderingPlugin {
   public void dryRun(NodeRenderingProperty p) {
     // nothing to do
   }
-
 }

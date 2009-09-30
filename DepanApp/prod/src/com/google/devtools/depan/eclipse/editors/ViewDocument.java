@@ -105,12 +105,17 @@ public class ViewDocument {
     return userPrefs.getNodeLocations();
   }
 
-  public void setNodeLocations(Map<GraphNode, Point2D> nodeLocations) {
-    userPrefs.setNodeLocations(nodeLocations);
-  }
-
   public NodeDisplayProperty getNodeProperty(GraphNode node) {
     return userPrefs.getNodeProperty(node);
+  }
+
+  public void editNodeLocations(
+      Map<GraphNode, Point2D> changes, Object author) {
+    userPrefs.editNodeLocations(changes, author);
+  }
+
+  public void setNodeLocations(Map<GraphNode, Point2D> nodeLocations) {
+    userPrefs.setNodeLocations(nodeLocations);
   }
 
   public void setNodeProperty(

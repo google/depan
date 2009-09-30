@@ -55,7 +55,7 @@ public interface ViewPrefsListener {
 
     @Override
     public void locationsChanged(
-        Collection<GraphNode> movedNodes, Object author) {
+        Map<GraphNode, Point2D> newLocations, Object author) {
     }
 
     @Override
@@ -85,7 +85,7 @@ public interface ViewPrefsListener {
    * @param author the initiator of the change.
    */
   public void locationsChanged(
-      Collection<GraphNode> movedNodes, Object author);
+      Map<GraphNode, Point2D> newLocations, Object author);
 
   /**
    * Callback when nodes collapsing changes.

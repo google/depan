@@ -20,6 +20,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds;
+import com.google.devtools.depan.eclipse.utils.ListenerManager;
+import com.google.devtools.depan.eclipse.utils.ListenerManager.Dispatcher;
 import com.google.devtools.depan.eclipse.visualization.ogl.ArrowHead;
 import com.google.devtools.depan.eclipse.visualization.ogl.GLPanel;
 import com.google.devtools.depan.eclipse.visualization.ogl.RenderingPipe;
@@ -58,7 +60,8 @@ import java.util.Map;
  * @author ycoppel@google.com (Yohann Coppel)
  *
  */
-public class View implements SelectionChangeListener {
+public class View
+    implements SelectionChangeListener, RendererChangeListener {
 
   /**
    * The JUNG graph that is use for rendering and presentation.
@@ -77,8 +80,11 @@ public class View implements SelectionChangeListener {
   /**
    * Collection of listeners listening for a change in the node selection.
    */
-  private Collection<SelectionChangeListener> changeListeners =
+  private Collection<SelectionChangeListener> selectionListeners =
       Lists.newArrayList();
+
+  private ListenerManager<RendererChangeListener> changeListeners =
+      new ListenerManager<RendererChangeListener>();
 
   /**
    * Rendering object.
@@ -95,10 +101,9 @@ public class View implements SelectionChangeListener {
   /**
    * Create a new View, with the given model and initialize the layout.
    *
-   * @param model underlying model.
-   * @param initLayout first layout to apply to the view.
    * @param parent parent SWT control.
    * @param style style to apply to the SWT object containing the view.
+   * @param editor source of rendering properties and target of change actions
    */
   public View(
       Composite parent, int style, ViewEditor editor) {
@@ -106,8 +111,7 @@ public class View implements SelectionChangeListener {
     this.jungGraph = editor.getJungGraph();
 
     rankGraph();
-    glPanel = new GLPanel(parent, editor, this, ranking);
-    updateNodeLocations(editor.getNodeLocations());
+    glPanel = new GLPanel(parent, editor, this, this, ranking);
   }
 
   public void dispose() {
@@ -298,8 +302,38 @@ public class View implements SelectionChangeListener {
     }
   }
 
-  public void updateNodeLocations(Map<GraphNode, Point2D> nodeLocations) {
-    glPanel.getRenderingPipe().getLayout().setLayout(nodeLocations);
+  public void initializeNodeLocations(Map<GraphNode, Point2D> locations) {
+    glPanel.initializeNodeLocations(locations);
+  }
+
+  /**
+   * Set the target locations for each node.  This leads to animated moves of
+   * the nodes to the new location.  No location changed event is generated.
+   * 
+   * @param nodeLocations new locations for nodes
+   */
+  public void updateNodeLocations(Map<GraphNode, Point2D> newLocations) {
+    glPanel.getRenderingPipe().getLayout().setLayout(newLocations);
+  }
+
+  /**
+   * Change the target locations for nodes in the location map.  These leads
+   * to animated moves the nodes.  No location changed event is generated.
+   * 
+   * @param newLocations new locations for nodes
+   */
+  public void changeNodeLocations(Map<GraphNode, Point2D> newLocations) {
+    glPanel.getRenderingPipe().getLayout().editLayout(newLocations);
+  }
+
+  /**
+   * Automatically scale the graph while rendering it.  Once the scale is
+   * computed, the renderer moves the nodes the new locations and fires
+   * a location changed event.
+   * 
+   * @param nodeLocations new locations for nodes
+   */
+  public void computeBestScalingFactor() {
     glPanel.getRenderingPipe().getFactor().computeBestScalingFactor();
   }
 
@@ -310,14 +344,14 @@ public class View implements SelectionChangeListener {
   // SelectionChangListener that has register with it.
 
   public void registerListener(SelectionChangeListener listener) {
-    if (!changeListeners.contains(listener)) {
-      changeListeners.add(listener);
+    if (!selectionListeners.contains(listener)) {
+      selectionListeners.add(listener);
     }
   }
 
   public void unRegisterListener(SelectionChangeListener listener) {
-    if (changeListeners.contains(listener)) {
-      changeListeners.remove(listener);
+    if (selectionListeners.contains(listener)) {
+      selectionListeners.remove(listener);
     }
   }
 
@@ -326,7 +360,7 @@ public class View implements SelectionChangeListener {
    */
   @Override
   public void notifyAddedToSelection(GraphNode[] selected) {
-    for (SelectionChangeListener listener : changeListeners) {
+    for (SelectionChangeListener listener : selectionListeners) {
       listener.notifyAddedToSelection(selected);
     }
   }
@@ -336,8 +370,37 @@ public class View implements SelectionChangeListener {
    */
   @Override
   public void notifyRemovedFromSelection(GraphNode[] unselected) {
-    for (SelectionChangeListener listener : changeListeners) {
+    for (SelectionChangeListener listener : selectionListeners) {
       listener.notifyRemovedFromSelection(unselected);
     }
+  }
+
+  /////////////////////////////////////
+  // Handle location changed notification
+  // TODO(leeca): This should be merged with selection notification,
+  // but we'll get to that later.
+
+  public void addLocationListener(RendererChangeListener listener) {
+    changeListeners.addListener(listener);
+  }
+
+  public void removeLocationListener(RendererChangeListener listener) {
+    changeListeners.removeListener(listener);
+  }
+
+  @Override
+  public void locationsChanged(final Map<GraphNode, Point2D> changes) {
+    changeListeners.fireEvent(new Dispatcher<RendererChangeListener>() {
+
+      @Override
+      public void captureException(RuntimeException errAny) {
+        // Ignore these
+      }
+
+      @Override
+      public void dispatch(RendererChangeListener listener) {
+        listener.locationsChanged(changes);
+      }
+    });
   }
 }

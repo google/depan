@@ -42,11 +42,6 @@ import javax.media.opengl.glu.GLU;
  * An abstract GLScene. Handling OpenGL specific details.
  *
  * @author Yohann Coppel
- *
- */
-/**
- * @author leeca@google.com (Your Name Here)
- *
  */
 public abstract class GLScene {
   public static final float FACTOR = 1f;
@@ -251,6 +246,12 @@ public abstract class GLScene {
 
   public double[] getOGLPos(int x, int y) {
     return GLScene.getOGLPos(gl, glu, grip, x, y);
+  }
+
+  public int[] getViewport() {
+    int[] viewPort = new int[4];
+    gl.glGetIntegerv(GL.GL_VIEWPORT, viewPort, 0);
+    return viewPort;
   }
 
   /**

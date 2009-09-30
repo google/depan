@@ -21,6 +21,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds;
+import com.google.devtools.depan.eclipse.visualization.RendererChangeListener;
 import com.google.devtools.depan.eclipse.visualization.SelectionChangeListener;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
@@ -31,6 +32,7 @@ import com.sun.opengl.util.BufferUtil;
 import org.eclipse.swt.widgets.Composite;
 
 import java.awt.Color;
+import java.awt.geom.Point2D;
 import java.nio.IntBuffer;
 import java.util.Collection;
 import java.util.List;
@@ -109,16 +111,24 @@ public class GLPanel extends GLScene {
   protected SelectionChangeListener selectionListener;
 
   /**
+   * The location listener notified when the graph or visualization
+   * properties change.
+   */
+  protected RendererChangeListener changeListener;
+
+  /**
    * Set of currently selected nodes.
    */
   protected Set<NodeRenderingProperty> selection;
 
   public GLPanel(
       Composite parent, ViewEditor editor,
-      SelectionChangeListener listener,
+      SelectionChangeListener selectionListener,
+      RendererChangeListener changeListener,
       Map<GraphNode, Double> nodeRanking) {
     super(parent);
-    this.selectionListener = listener;
+    this.selectionListener = selectionListener;
+    this.changeListener = changeListener;
 
     selection = Sets.newHashSet();
 
@@ -163,6 +173,19 @@ public class GLPanel extends GLScene {
     r.start();
   }
 
+  public void initializeNodeLocations(Map<GraphNode, Point2D> locations) {
+    for (NodeRenderingProperty nodeProp : nodesProperties) {
+
+      // Set the initial location, if any
+      Point2D pos = locations.get(nodeProp.node);
+      if (null != pos) {
+        nodeProp.positionX = (float) pos.getX();
+        nodeProp.positionY = (float) pos.getY();
+        nodeProp.targetPositionX = nodeProp.positionX; 
+        nodeProp.targetPositionY = nodeProp.positionY;
+      }
+    }
+  }
 
   /**
    * Perform a dry run in the rendering pipe, so that every plugin knows about
@@ -572,5 +595,20 @@ public class GLPanel extends GLScene {
       return;
     }
     selectionListener.notifyRemovedFromSelection(getGraphNodes(props));
+  }
+
+
+  public void notifyLocationChange() {
+    Map<GraphNode, Point2D> changes =
+        Maps.newHashMapWithExpectedSize(nodesProperties.length);
+    for (NodeRenderingProperty node : nodesProperties) {
+      if ((node.targetPositionX != node.positionX) 
+          || (node.targetPositionY != node.positionY)) {
+        Point2D position = new Point2D.Float(
+            node.targetPositionX, node.targetPositionY);
+        changes.put(node.node, position);
+      }
+    }
+    changeListener.locationsChanged(changes);
   }
 }

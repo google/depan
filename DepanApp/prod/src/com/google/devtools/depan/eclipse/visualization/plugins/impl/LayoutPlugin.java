@@ -110,4 +110,9 @@ public class LayoutPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
     this.layout = layoutMap;
     this.hasChanged = true;
   }
+
+  public void editLayout(Map<GraphNode, Point2D> newLocations) {
+    this.layout.putAll(newLocations);
+    this.hasChanged = true;
+  }
 }
