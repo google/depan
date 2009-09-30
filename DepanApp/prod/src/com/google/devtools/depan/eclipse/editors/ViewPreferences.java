@@ -235,6 +235,18 @@ public class ViewPreferences {
     return layoutFinder;
   }
 
+  public void setLayoutFinder(DirectedRelationFinder finder) {
+    layoutFinder = finder;
+  }
+
+  public Layouts getSelectedLayout() {
+    return selectedLayout;
+  }
+
+  public void setSelectedLayout(Layouts layout) {
+    selectedLayout = layout;
+  }
+
   /////////////////////////////////////
   // Manipulate the nodes
 

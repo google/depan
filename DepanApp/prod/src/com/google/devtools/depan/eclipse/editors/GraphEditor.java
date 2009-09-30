@@ -132,8 +132,7 @@ public class GraphEditor
       @Override
       public void widgetSelected(SelectionEvent e) {
         try {
-          Layouts layout = getSelectedLayout();
-          createViewEditor(layout);
+          createViewEditor();
         } catch (IllegalArgumentException ex) {
           // bad layout. don't do anything for the layout, but still finish the
           // creation of the view.
@@ -256,12 +255,10 @@ public class GraphEditor
   }
 
   /**
-   * Create a new Graph Visualization editor from the selected tree elements.
-   *
-   * @param view Source of dependency data
-   * @param layout Initial layout for visualization
+   * Create a new Graph Visualization editor from the selected tree elements
+   * and other {@code GraphEditor} settings.
    */
-  protected void createViewEditor(Layouts layout) {
+  protected void createViewEditor() {
     CheckboxTreeViewer treeView = checkNodeTreeView.getCheckboxTreeViewer();
 
     Collection<GraphNode> nodes = getSelectedNodes(treeView);
@@ -270,7 +267,11 @@ public class GraphEditor
     }
 
     GraphModelReference graphRef = new GraphModelReference(file, graph);
+
     ViewPreferences userPrefs = new ViewPreferences();
+    userPrefs.setSelectedLayout(getSelectedLayout());
+    userPrefs.setLayoutFinder(relationshipSetselector.getSelection());
+
     ViewDocument viewInfo = new ViewDocument(graphRef, nodes, userPrefs);
     ViewEditor.startViewEditor(viewInfo);
   }

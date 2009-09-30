@@ -228,13 +228,15 @@ public class ViewEditor extends MultiPageEditorPart
     renderer.getControl().setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, true));
 
+    // Configure the rendering pipe before listening for changes
+    updateNodeLocations(viewInfo.getNodeLocations());
+    setPreferences();
+
     // The low-level OGL renderer does not directly notify the user preferences
     // of location changes.  Instead, it notifies the editor of these changes,
     // and it relays them to the underlying preference store.
     rendererSelectionListener = new RendererSelectionChangeListener();
     renderer.registerListener(rendererSelectionListener);
-
-    setPreferences();
 
     int index = addPage(parent);
     setPageText(index, "Graph View");
@@ -318,6 +320,9 @@ public class ViewEditor extends MultiPageEditorPart
     viewGraph = viewInfo.buildGraphView();
     jungGraph = createJungGraph(getViewGraph());
     updateExposedGraph();
+    if (viewInfo.getNodeLocations().isEmpty()) {
+      applyLayout(viewInfo.getSelectedLayout(), viewInfo.getLayoutFinder());
+    }
 
     hierarchies = new HierarchyCache<NodeDisplayProperty>(
         viewInfo.getNodeDisplayPropertyProvider(),

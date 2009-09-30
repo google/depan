@@ -17,6 +17,7 @@
 package com.google.devtools.depan.eclipse.editors;
 
 import com.google.devtools.depan.eclipse.trees.NodeTreeProvider;
+import com.google.devtools.depan.eclipse.visualization.layout.Layouts;
 import com.google.devtools.depan.graph.api.DirectedRelationFinder;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
@@ -124,6 +125,14 @@ public class ViewDocument {
   public void setEdgeProperty(
       GraphEdge edge, EdgeDisplayProperty newProperty) {
     userPrefs.setEdgeProperty(edge, newProperty);
+  }
+
+  public void setSelectedLayout(Layouts layout) {
+    userPrefs.setSelectedLayout(layout);
+  }
+
+  public Layouts getSelectedLayout() {
+    return userPrefs.getSelectedLayout();
   }
 
   public Collection<GraphNode> getSelectedNodes() {
