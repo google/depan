@@ -126,6 +126,12 @@ public class ViewEditor extends MultiPageEditorPart
   /** Dirty state. */
   private boolean isDirty = true;
 
+  /**
+   * If true, layout the graph after the renderer is created.
+   * See {@code #layoutKludge()} for more details.
+   */
+  private boolean kludgedLayout;
+
   /////////////////////////////////////
   // Alternate graph perspectives
 
@@ -232,8 +238,8 @@ public class ViewEditor extends MultiPageEditorPart
     renderer.getControl().setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, true));
 
-    // Configure the rendering pipe before listening for changes
-    renderer.initializeNodeLocations(viewInfo.getNodeLocations());
+    // Configure the rendering pipe before listening for changes.
+    layoutKludge();
     setPreferences();
 
     // The low-level OGL renderer does not directly notify the user preferences
@@ -247,6 +253,20 @@ public class ViewEditor extends MultiPageEditorPart
 
     int index = addPage(parent);
     setPageText(index, "Graph View");
+  }
+
+  /**
+   * If we could scale the layout to the view-port without setting up the
+   * renderer, we wouldn't need this.  But that will require viewport
+   * peristence in the ViewPrefs, and the ability for ViewEditor to scale
+   * positions to the viewport size.
+   */
+  private void layoutKludge() {
+    if (!kludgedLayout) {
+      renderer.initializeNodeLocations(viewInfo.getNodeLocations());
+      return;
+    }
+    applyLayout(viewInfo.getSelectedLayout(), viewInfo.getLayoutFinder());
   }
 
   protected String edgeToolTip(GraphEdge edge) {
@@ -327,9 +347,7 @@ public class ViewEditor extends MultiPageEditorPart
     viewGraph = viewInfo.buildGraphView();
     jungGraph = createJungGraph(getViewGraph());
     updateExposedGraph();
-    if (viewInfo.getNodeLocations().isEmpty()) {
-      applyLayout(viewInfo.getSelectedLayout(), viewInfo.getLayoutFinder());
-    }
+    kludgedLayout = viewInfo.getNodeLocations().isEmpty();
 
     hierarchies = new HierarchyCache<NodeDisplayProperty>(
         viewInfo.getNodeDisplayPropertyProvider(),
