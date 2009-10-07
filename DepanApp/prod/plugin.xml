@@ -55,7 +55,7 @@
          </property>
          <property
                name="aboutText"
-               value="DepAn - A direct manipulation tool for the visualization, analysis, and refactoring of dependencies in large applications.&#x0A;&#x0A;Version 0.0.3&#x0A;&#x0A;Contributors:&#x0A;- Yohann Coppel&#x0A;- Lee Carver&#x0A;- Tugrul Ince">
+               value="DepAn - A direct manipulation tool for the visualization, analysis, and refactoring of dependencies in large applications.&#x0A;&#x0A;Version 0.0.4gg&#x0A;&#x0A;Contributors:&#x0A;- Yohann Coppel&#x0A;- Lee Carver&#x0A;- Tugrul Ince">
          </property>
       </product>
    </extension>

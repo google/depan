@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.4"?>
 
-<product name="DepAn" id="com.google.devtools.depan.DepAn" application="com.google.devtools.depan.application" version="0.0.3" useFeatures="true">
+<product name="DepAn" id="com.google.devtools.depan.DepAn" application="com.google.devtools.depan.application" version="0.0.4" useFeatures="true">
 
    <aboutInfo>
       <image path="/DepanApp/icons/branding/depan-logo-315x110.gif"/>
       <text>
          DepAn - A direct manipulation tool for the visualization, analysis, and refactoring of dependencies in large applications.
 
-Version 0.0.3
+Version 0.0.4
 
 Contributors:
 - Yohann Coppel
@@ -40,6 +40,7 @@ Contributors:
       </win>
    </launcher>
 
+
    <vm>
    </vm>
 
@@ -47,7 +48,7 @@ Contributors:
    </plugins>
 
    <features>
-      <feature id="Depan_linux.gtk" version="0.0.3"/>
+      <feature id="Depan_linux.gtk" version="0.0.4"/>
    </features>
 
 </product>

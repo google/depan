@@ -6,7 +6,7 @@
   <property name="basearch" value="${arch}"/>
   <property name="basenl" value="${nl}"/>
   <property name="bundleId" value="com.google.devtools.depan.libraries"/>
-  <property name="bundleVersion" value="0.0.1"/>
+  <property name="bundleVersion" value="0.0.2"/>
 
   <!-- Environment variables for external files -->
   <!-- You will probably need to change these to reflect your local

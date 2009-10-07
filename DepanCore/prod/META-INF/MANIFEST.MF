@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: DepanCore
 Bundle-SymbolicName: com.google.devtools.depan.core;singleton:=true
-Bundle-Version: 1.0.4
+Bundle-Version: 1.0.5
 Bundle-Vendor: Google Inc.
 Export-Package: com.google.devtools.depan.filters,
  com.google.devtools.depan.graph.api,

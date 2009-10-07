@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: DepanJogl Plug-in
 Bundle-SymbolicName: com.google.devtools.depan.jogl
-Bundle-Version: 0.0.1
+Bundle-Version: 0.0.2
 Bundle-Vendor: Google Inc.
 Export-Package: com.sun.opengl.util,
  com.sun.opengl.util.j2d,
