@@ -132,30 +132,14 @@ public class FactorPlugin implements NodeRenderingPlugin {
   public boolean keyPressed(int keycode, char character, boolean ctrl,
       boolean alt, boolean shift) {
     if (character == '+') {
-      if (alt && !shift) {
-        factorX = 1.1f;
-        factorY = 1.0f;
-      } else if (!alt && shift) {
-        factorX = 1.0f;
-        factorY = 1.1f;
-      } else {
-        factorX = 1.1f;
-        factorY = 1.1f;
-      }
+      factorX = 1.1f;
+      factorY = 1.1f;
       current = State.SET;
       return true;
     }
     if (character == '-') {
-      if (alt && !shift) {
-        factorX = 0.9f;
-        factorY = 1.0f;
-      } else if (!alt && shift) {
-        factorX = 1.0f;
-        factorY = 0.9f;
-      } else {
-        factorX = 0.9f;
-        factorY = 0.9f;
-      }
+      factorX = 0.9f;
+      factorY = 0.9f;
       current = State.SET;
       return true;
     }
