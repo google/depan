@@ -197,7 +197,7 @@ public class DrawingPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
     float halfWidth = quarterValue(property.textTexture.getWidth());
     float halfHeight = quarterValue(property.textTexture.getHeight());
     float centerX = (property.size + halfWidth) * property.textDx;
-    float centerY = (property.size * property.ratio + halfHeight)
+    float centerY = (property.size * property.ratio / 2 + halfHeight)
         * property.textDy;
 
     centerX = property.positionX * GLScene.FACTOR + centerX;
