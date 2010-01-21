@@ -168,18 +168,6 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
     return Resources.NAME_SELECTIONEDITOR;
   }
 
-  // TODO(leeca): Is this really not used, or is selection editor tool broken?
-  private Layouts getLayoutChoice() {
-    if (layoutChoice.getSelectionIndex() == 0) {
-      // return null, which means that a static layout must be used, using the
-      // previously existing positions.
-      return null;
-    }
-    Layouts l = Layouts.valueOf(
-        layoutChoice.getItem(layoutChoice.getSelectionIndex()));
-    return l;
-  }
-
   @Override
   public Control setupComposite(Composite parent) {
     // Create components
@@ -357,16 +345,34 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
     getEditor().selectNodes(previewListContent.getObjects());
   }
 
+  /**
+   * Determine the layout chosen by the user.
+   * 
+   * @return a Layouts object, or null if positions should be retained.
+   */
+  private Layouts getLayoutChoice() {
+    if (layoutChoice.getSelectionIndex() == 0) {
+      // return null, which means that a static layout must be used, using the
+      // previously existing positions.
+      return null;
+    }
+    Layouts l = Layouts.valueOf(
+        layoutChoice.getItem(layoutChoice.getSelectionIndex()));
+    return l;
+  }
+
   protected void createNewView() {
     // compute the result
     refreshPreview();
 
     // create a new ViewModel with the nodes
+    // node locations for current nodes are copied to the new view
     ViewDocument viewDoc = getEditor().buildNewViewDocument(
         previewListContent.getObjects());
 
-    if (layoutChoice.getSelectionIndex() == 0) {
-      viewDoc.setNodeLocations(getEditor().getNodeLocations());
+    Layouts chosenLayout = getLayoutChoice();
+    if (null != chosenLayout) {
+      viewDoc.setSelectedLayout(chosenLayout);
     }
 
     ViewEditor.startViewEditor(viewDoc);

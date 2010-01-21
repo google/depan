@@ -126,12 +126,6 @@ public class ViewEditor extends MultiPageEditorPart
   /** Dirty state. */
   private boolean isDirty = true;
 
-  /**
-   * If true, layout the graph after the renderer is created.
-   * See {@code #layoutKludge()} for more details.
-   */
-  private boolean kludgedLayout;
-
   /////////////////////////////////////
   // Alternate graph perspectives
 
@@ -258,15 +252,19 @@ public class ViewEditor extends MultiPageEditorPart
   /**
    * If we could scale the layout to the view-port without setting up the
    * renderer, we wouldn't need this.  But that will require viewport
-   * peristence in the ViewPrefs, and the ability for ViewEditor to scale
+   * persistence in the ViewPrefs, and the ability for ViewEditor to scale
    * positions to the viewport size.
    */
   private void layoutKludge() {
-    if (!kludgedLayout) {
-      renderer.initializeNodeLocations(viewInfo.getNodeLocations());
+    Layouts selectedLayout = viewInfo.getSelectedLayout();
+    Map<GraphNode, Point2D> nodeLocations = viewInfo.getNodeLocations();
+    if ((null == selectedLayout) && (nodeLocations.size() > 0)) {
+      renderer.initializeNodeLocations(nodeLocations);
       return;
     }
-    applyLayout(viewInfo.getSelectedLayout(), viewInfo.getLayoutFinder());
+    if (null != selectedLayout ) {
+      applyLayout(selectedLayout, viewInfo.getLayoutFinder());
+    }
   }
 
   protected String edgeToolTip(GraphEdge edge) {
@@ -347,7 +345,6 @@ public class ViewEditor extends MultiPageEditorPart
     viewGraph = viewInfo.buildGraphView();
     jungGraph = createJungGraph(getViewGraph());
     updateExposedGraph();
-    kludgedLayout = viewInfo.getNodeLocations().isEmpty();
 
     hierarchies = new HierarchyCache<NodeDisplayProperty>(
         viewInfo.getNodeDisplayPropertyProvider(),
