@@ -27,8 +27,13 @@ public class ViewEditorInput implements IEditorInput {
 
   private final ViewDocument viewInfo;
 
-  public ViewEditorInput(ViewDocument viewInfo) {
+  // TODO(leeca):  In the future, this could evolve into a bundle of
+  // transient display options.
+  private final boolean skipLayout;
+
+  public ViewEditorInput(ViewDocument viewInfo, boolean skipLayout) {
     this.viewInfo = viewInfo;
+    this.skipLayout = skipLayout;
   }
 
   public ViewDocument getViewDocument() {
@@ -73,5 +78,12 @@ public class ViewEditorInput implements IEditorInput {
   @SuppressWarnings("unchecked")
   public Object getAdapter(Class adapter) {
     return null;
+  }
+
+  /**
+   * @return whether to skip node layout computation on initial render.
+   */
+  public boolean skipLayout() {
+    return skipLayout;
   }
 }

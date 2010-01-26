@@ -273,7 +273,7 @@ public class GraphEditor
     userPrefs.setLayoutFinder(relationshipSetselector.getSelection());
 
     ViewDocument viewInfo = new ViewDocument(graphRef, nodes, userPrefs);
-    ViewEditor.startViewEditor(viewInfo);
+    ViewEditor.startViewEditor(viewInfo, false);
   }
 
   /**

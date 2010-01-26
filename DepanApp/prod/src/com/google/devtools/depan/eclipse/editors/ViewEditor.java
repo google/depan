@@ -135,6 +135,12 @@ public class ViewEditor extends MultiPageEditorPart
 
   private GraphModel exposedGraph;
 
+  /**
+   * Skip layout on initial render if existing positions should 
+   * be preserved.
+   */
+  private boolean skipLayout;
+
   /////////////////////////////////////
   // Resources to release in the dispose() method
 
@@ -256,15 +262,20 @@ public class ViewEditor extends MultiPageEditorPart
    * positions to the viewport size.
    */
   private void layoutKludge() {
-    Layouts selectedLayout = viewInfo.getSelectedLayout();
-    Map<GraphNode, Point2D> nodeLocations = viewInfo.getNodeLocations();
-    if ((null == selectedLayout) && (nodeLocations.size() > 0)) {
-      renderer.initializeNodeLocations(nodeLocations);
+    renderer.initializeNodeLocations(viewInfo.getNodeLocations());
+
+    // Don't layout nodes if previous location is good.
+    if (skipLayout) {
       return;
     }
+
+    // Re-layout nodes if necessary.
+    Layouts selectedLayout = viewInfo.getSelectedLayout();
     if (null != selectedLayout ) {
       applyLayout(selectedLayout, viewInfo.getLayoutFinder());
     }
+
+    // Otherwise, just use default positions - user will need to choose layout.
   }
 
   protected String edgeToolTip(GraphEdge edge) {
@@ -319,6 +330,7 @@ public class ViewEditor extends MultiPageEditorPart
       ViewEditorInput editorInput = (ViewEditorInput) input;
       viewFile = null; // not yet saved
       viewInfo = editorInput.getViewDocument();
+      skipLayout = editorInput.skipLayout();
       String graphName = viewInfo.getGraphModelLocation().getName();
       String partName = NewEditorHelper.newEditorLabel(
           graphName + " - New View");
@@ -328,6 +340,7 @@ public class ViewEditor extends MultiPageEditorPart
       try {
         viewFile = ((IFileEditorInput) input).getFile();
         viewInfo = loadViewDocument(viewFile);
+        skipLayout = (viewInfo.getNodeLocations().size() > 0);
         setPartName(viewFile.getName());
         setDirtyState(false);
       } catch (IOException e) {
@@ -767,6 +780,10 @@ public class ViewEditor extends MultiPageEditorPart
   /////////////////////////////////////
   // Update Graph Layouts
 
+  public Layouts getSelectedLayout() {
+    return viewInfo.getSelectedLayout();
+  }
+
   public Map<GraphNode, Point2D> getNodeLocations() {
     return viewInfo.getNodeLocations();
   }
@@ -1175,10 +1192,13 @@ public class ViewEditor extends MultiPageEditorPart
    * This is an asynchronous active, as the new editor will execute separately
    * from the other workbench windows.
    * 
-   * @param config ViewEditor configuration options.
+   * @param newInfo graph to display
+   * @param skipLayout {@code true} if layout should be skipped on initial
+   *     rendering.
    */
-  public static void startViewEditor(ViewDocument newInfo) {
-    final ViewEditorInput input = new ViewEditorInput(newInfo);
+  public static void startViewEditor(
+      ViewDocument newInfo, boolean skipLayout) {
+    final ViewEditorInput input = new ViewEditorInput(newInfo, skipLayout);
     getWorkbenchDisplay().asyncExec(new Runnable() {
       public void run() {
         IWorkbenchPage page = PlatformUI.getWorkbench()

@@ -173,4 +173,23 @@ public enum Layouts {
       ViewEditor editor, DirectedRelationFinder relations);
 
   public static final Dimension LAYOUT_SIZE = new Dimension(1000, 1000);
+
+  /**
+   * Provide a consistent index for {@link Layouts} instances that can be used
+   * in UIs.  The {@code ordinal()} might be a feasible substitute, but the
+   * JavaDoc discourages its use.  This value should not be saved, as the
+   * index number can change as more layouts are added.
+   * 
+   * @param layout instance to index
+   */
+  public static int indexOf(Layouts layout) {
+    int index = 0;
+    for (Layouts choice : Layouts.values()) {
+      if (layout == choice) {
+        return index;
+      }
+      index++;
+    }
+    return -1;
+  }
 }

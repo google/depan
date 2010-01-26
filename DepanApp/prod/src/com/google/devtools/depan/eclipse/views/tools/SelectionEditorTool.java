@@ -19,6 +19,7 @@ package com.google.devtools.depan.eclipse.views.tools;
 import com.google.common.collect.Lists;
 import com.google.devtools.depan.eclipse.editors.ViewDocument;
 import com.google.devtools.depan.eclipse.editors.ViewEditor;
+import com.google.devtools.depan.eclipse.utils.LayoutPickerControl;
 import com.google.devtools.depan.eclipse.utils.NodeLabelProvider;
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.utils.Sasher;
@@ -63,9 +64,7 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
 
   private TableContentProvider<GraphNode> previewListContent = null;
   private TableViewer previewList;
-
-  private CCombo layoutChoice = null;
-  private static final String LAYOUT_KEEP = "Keep positions";
+  private LayoutPickerControl layoutPicker;
 
   private CCombo modeChoice = null;
 
@@ -204,21 +203,13 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
     modeChoice.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
     new Label(baseComposite, SWT.NONE).setText("Apply layout");
-    layoutChoice = new CCombo(baseComposite, SWT.READ_ONLY | SWT.BORDER);
+    layoutPicker = new LayoutPickerControl(baseComposite, true);
+    updateSelectedLayout();
 
     Composite actionButtons = new Composite(baseComposite, SWT.NONE);
     Button preview = new Button(actionButtons, SWT.PUSH);
     Button justSelect = new Button(actionButtons, SWT.PUSH);
     Button doit = new Button(actionButtons, SWT.PUSH);
-
-    // layouts
-    // warning: if you change the order of the combo items, change the indexes
-    // in createNewView() !
-    layoutChoice.add(LAYOUT_KEEP);
-    for (Layouts l : Layouts.values()) {
-      layoutChoice.add(l.toString());
-    }
-    layoutChoice.select(0);
 
     // the middle table (relationTable occupies 50% of all space, both
     // top (selectedNodes) and bottom (previewList) share the 50% left.
@@ -261,7 +252,7 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
     actionButtons.setLayout(new GridLayout(3, true));
     outerSash.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
-    layoutChoice.setLayoutData(
+    layoutPicker.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, false));
     actionButtons.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
@@ -273,6 +264,15 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
         new GridData(SWT.FILL, SWT.FILL, true, false));
 
     return baseComposite;
+  }
+
+  /**
+   * Set the selected layout control to show the current layout for the editor.
+   */
+  private void updateSelectedLayout() {
+    if (null != getEditor()) {
+      layoutPicker.setLayoutChoice(getEditor().getSelectedLayout());
+    }
   }
 
   private static CCombo createModeCombo(Composite parent,
@@ -345,22 +345,6 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
     getEditor().selectNodes(previewListContent.getObjects());
   }
 
-  /**
-   * Determine the layout chosen by the user.
-   * 
-   * @return a Layouts object, or null if positions should be retained.
-   */
-  private Layouts getLayoutChoice() {
-    if (layoutChoice.getSelectionIndex() == 0) {
-      // return null, which means that a static layout must be used, using the
-      // previously existing positions.
-      return null;
-    }
-    Layouts l = Layouts.valueOf(
-        layoutChoice.getItem(layoutChoice.getSelectionIndex()));
-    return l;
-  }
-
   protected void createNewView() {
     // compute the result
     refreshPreview();
@@ -370,12 +354,10 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
     ViewDocument viewDoc = getEditor().buildNewViewDocument(
         previewListContent.getObjects());
 
-    Layouts chosenLayout = getLayoutChoice();
-    if (null != chosenLayout) {
-      viewDoc.setSelectedLayout(chosenLayout);
-    }
+    Layouts chosenLayout = layoutPicker.getLayoutChoice();
+    viewDoc.setSelectedLayout(chosenLayout);
 
-    ViewEditor.startViewEditor(viewDoc);
+    ViewEditor.startViewEditor(viewDoc, null == chosenLayout);
   }
 
   /**
@@ -404,6 +386,7 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
 
   @Override
   protected void updateControls() {
+    updateSelectedLayout();
     int activeTab = selectorTab.getSelectionIndex();
     if (activeTab >= 0) {
       selectorTabParts.get(activeTab).updateControl(getEditor());
