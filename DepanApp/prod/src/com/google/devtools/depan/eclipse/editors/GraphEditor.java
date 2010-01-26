@@ -22,7 +22,8 @@ import com.google.devtools.depan.eclipse.trees.GraphData;
 import com.google.devtools.depan.eclipse.trees.NodeTreeProvider;
 import com.google.devtools.depan.eclipse.trees.NodeTreeView.NodeWrapper;
 import com.google.devtools.depan.eclipse.utils.DefaultRelationshipSet;
-import com.google.devtools.depan.eclipse.utils.LayoutSelector;
+import com.google.devtools.depan.eclipse.utils.LabeledControl;
+import com.google.devtools.depan.eclipse.utils.LayoutPickerControl;
 import com.google.devtools.depan.eclipse.utils.RelationshipSelectorListener;
 import com.google.devtools.depan.eclipse.utils.RelationshipSetSelector;
 import com.google.devtools.depan.eclipse.visualization.layout.Layouts;
@@ -72,7 +73,7 @@ public class GraphEditor
   private List associatedViews = null;
   private boolean recursiveTreeSelect = false;
   private CheckNodeTreeView<GraphNode> checkNodeTreeView = null;
-  private LayoutSelector layoutChoice = null;
+  private LayoutPickerControl layoutPicker = null;
 
   // TODO(leeca): Figure out how to turn this back on
   // private Binop<GraphModel> binop = null;
@@ -92,7 +93,7 @@ public class GraphEditor
   }
 
   protected Layouts getSelectedLayout() {
-    return layoutChoice.getSelectedLayout();
+    return layoutPicker.getLayoutChoice();
   }
 
   /////////////////////////////////////
@@ -124,7 +125,8 @@ public class GraphEditor
     relationshipSetselector.selectSet(DefaultRelationshipSet.SET);
 
     // create layout choice selector
-    layoutChoice = new LayoutSelector(top);
+    layoutPicker = LabeledControl.createLabeledLayoutPicker(
+        top, SWT.NONE, "Layout to use: ", false);
 
     Button create = new Button(top, SWT.PUSH);
     create.setText("Create view");

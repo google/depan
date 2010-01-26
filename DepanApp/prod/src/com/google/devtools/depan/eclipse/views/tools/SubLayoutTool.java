@@ -17,13 +17,13 @@
 package com.google.devtools.depan.eclipse.views.tools;
 
 import com.google.devtools.depan.eclipse.utils.DefaultRelationshipSet;
+import com.google.devtools.depan.eclipse.utils.LayoutPickerControl;
 import com.google.devtools.depan.eclipse.utils.RelationshipSetSelector;
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.views.ViewEditorTool;
 import com.google.devtools.depan.eclipse.visualization.layout.Layouts;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -34,20 +34,18 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
+import java.util.logging.Logger;
+
 /**
  * @author ycoppel@google.com (Yohann Coppel)
  *
  */
 public class SubLayoutTool extends ViewEditorTool {
 
-  /**
-   * Drop down List of available layouts.
-   */
-  private CCombo layoutChoice = null;
+  /** Drop down List of available layouts. */
+  private LayoutPickerControl layoutPicker = null;
 
-  /**
-   * Selector for named relationships sets.
-   */
+  /** Selector for named relationships sets. */
   private RelationshipSetSelector relationshipSetselector = null;
 
   @Override
@@ -66,14 +64,15 @@ public class SubLayoutTool extends ViewEditorTool {
 
     // components
     new Label(baseComposite, SWT.NONE).setText("Sub layout : ");
-    layoutChoice = new CCombo(baseComposite, SWT.READ_ONLY | SWT.BORDER);
+    layoutPicker = new LayoutPickerControl(baseComposite, false);
+
     Label selectLabel = new Label(baseComposite, SWT.NONE);
+    selectLabel.setText("Relationship set");
+
     relationshipSetselector = new RelationshipSetSelector(baseComposite);
     Button apply = new Button(baseComposite, SWT.PUSH);
     Control selector = relationshipSetselector.getControl();
     Label help = new Label(baseComposite, SWT.WRAP);
-
-    selectLabel.setText("Relationship set");
 
     help.setText("The relationship set is used only in layouts requiring "
         + "a hierarchy. Basically Tree layouts.\n\n"
@@ -88,7 +87,7 @@ public class SubLayoutTool extends ViewEditorTool {
     // layout (SWT layouts...)
     GridLayout grid = new GridLayout(2, false);
     baseComposite.setLayout(grid);
-    layoutChoice.setLayoutData(
+    layoutPicker.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
     apply.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
@@ -96,12 +95,6 @@ public class SubLayoutTool extends ViewEditorTool {
         new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
     selector.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
-
-    // View's layouts:
-    for (Layouts l : Layouts.values()) {
-      layoutChoice.add(l.toString());
-    }
-    layoutChoice.select(0);
 
     apply.setText("Apply");
     apply.addSelectionListener(new SelectionAdapter() {
@@ -130,14 +123,14 @@ public class SubLayoutTool extends ViewEditorTool {
     }
 
     try {
-      Layouts layout = Layouts.valueOf(
-          layoutChoice.getItem(layoutChoice.getSelectionIndex()));
+      Layouts layout = layoutPicker.getLayoutChoice();
       getEditor().clusterize(layout, relationshipSetselector.getSelection());
     } catch (IllegalArgumentException ex) {
       // bad layout. don't do anything for the layout, but still finish the
       // creation of the view.
-      System.err.println("Bad layout.");
+      Logger logger = Logger.getLogger(SubLayoutTool.class.getName());
+      logger.warning(
+          "Bad layout.  Selected " + layoutPicker.getSelectionIndex());
     }
   }
-
 }

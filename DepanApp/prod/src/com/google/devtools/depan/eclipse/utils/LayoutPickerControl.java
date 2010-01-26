@@ -80,13 +80,25 @@ public class LayoutPickerControl extends Composite {
    * Determine the {@code Layouts} instance chosen by the user.
    * 
    * @return a Layouts object, or null if positions should be retained.
+   * @throws IllegalArgumentException if the current selection is not a
+   *     valid {@link Layouts} instance.
    */
   public Layouts getLayoutChoice() {
-    if (allowKeep && (layoutChoice.getSelectionIndex() == 0)) {
+    int index = getSelectionIndex();
+    if (allowKeep && (index == 0)) {
       return null;
     }
-    Layouts l = Layouts.valueOf(
-        layoutChoice.getItem(layoutChoice.getSelectionIndex()));
-    return l;
+    Layouts result = Layouts.valueOf(layoutChoice.getItem(index));
+    return result;
+  }
+
+  /**
+   * Provide the selection index from underlying CCombo control.
+   * Mostly useful for debugging and error messages.
+   * 
+   * @return selection index from underlying CCombo control
+   */
+  public int getSelectionIndex() {
+    return layoutChoice.getSelectionIndex();
   }
 }
