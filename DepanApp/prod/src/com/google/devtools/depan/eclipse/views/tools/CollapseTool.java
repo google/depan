@@ -16,8 +16,10 @@
 
 package com.google.devtools.depan.eclipse.views.tools;
 
+import com.google.devtools.depan.eclipse.utils.DefaultRelationshipSet;
+import com.google.devtools.depan.eclipse.utils.LabeledControl;
 import com.google.devtools.depan.eclipse.utils.RelationshipSelectorListener;
-import com.google.devtools.depan.eclipse.utils.RelationshipSetSelector;
+import com.google.devtools.depan.eclipse.utils.RelationshipSetPickerControl;
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.utils.TableContentProvider;
 import com.google.devtools.depan.eclipse.views.ViewSelectionListenerTool;
@@ -64,85 +66,62 @@ public class CollapseTool extends ViewSelectionListenerTool
 
   private ComboViewer masterViewer;
 
-  /* (non-Javadoc)
-   * @see com.google.devtools.depan.eclipse.views.Tool#getComposite()
-   */
+  @Override
   public Control setupComposite(Composite parent) {
     // first expand bar containing collapsing operations
     Composite topComposite = new Composite(parent, SWT.NONE);
 
-    // components
-    Group manualCollapse = new Group(topComposite, SWT.BORDER);
-    Label labelCollapse = new Label(manualCollapse, SWT.NONE);
-    masterViewer = new ComboViewer(manualCollapse, SWT.READ_ONLY | SWT.FLAT);
-    Button eraseCollapse = new Button(manualCollapse, SWT.PUSH);
-    Button collapseButton = new Button(manualCollapse, SWT.PUSH);
-
-    Label labelUncollapse = new Label(manualCollapse, SWT.NONE);
-    final CCombo uncollapseOpts =
-      new CCombo(manualCollapse, SWT.READ_ONLY | SWT.FLAT);
-    Button deleteCollapse = new Button(manualCollapse, SWT.PUSH);
-    Button uncollapseButton = new Button(manualCollapse, SWT.PUSH);
-    Button uncollapseAll = new Button(manualCollapse, SWT.PUSH);
-
-    Group autoCollapse = new Group(topComposite, SWT.BORDER);
-    final RelationshipSetSelector namedSet =
-        new RelationshipSetSelector(autoCollapse);
-    Button doAutoGrouping = new Button(autoCollapse, SWT.PUSH);
-
-    // text
-    manualCollapse.setText("Manual collapsing");
-    labelCollapse.setText("Collapse under");
-    eraseCollapse.setText("collapse / erase");
-    collapseButton.setText("collapse / add");
-
-    labelUncollapse.setText("Uncollapse");
-    deleteCollapse.setText("uncollapse / Delete");
-    uncollapseButton.setText("uncollapse");
-    uncollapseAll.setText("Uncollapse All Selected");
-
-    autoCollapse.setText("Automatic collapsing based on a relationship set");
-    doAutoGrouping.setText("Collapse");
-
-    // layout
-    GridLayout topGrid = new GridLayout(1, false);
-    GridLayout manualGrid = new GridLayout(2, true);
-    GridLayout autoGrid = new GridLayout(3, false);
+    GridLayout topGrid = new GridLayout();
     topGrid.verticalSpacing = 9;
+    topComposite.setLayout(topGrid);
+
+    // Setup the manual collapse controls
+    setupManualCollapseGroup(topComposite);
+    setupAutoCollapseGroup(topComposite);
+
+    // content
+    collapseMaster = new TableContentProvider<GraphNode>();
+    collapseMaster.initViewer(masterViewer);
+
+    //FIXME(yc): select first set
+    //namedSet.selectSet(BuiltinRelationshipSets.CONTAINER);
+
+    return topComposite;
+  }
+
+  private void setupManualCollapseGroup(Composite parent) {
+    Group manualCollapse = new Group(parent, SWT.BORDER);
+    manualCollapse.setText("Manual collapsing");
+    manualCollapse.setLayoutData(
+      new GridData(SWT.FILL, SWT.FILL, true, false));
+
+    GridLayout manualGrid = new GridLayout(2, true);
     manualGrid.marginWidth = 10;
     manualGrid.marginHeight = 10;
-    autoGrid.marginWidth = 10;
-    autoGrid.marginHeight = 10;
-    topComposite.setLayout(topGrid);
     manualCollapse.setLayout(manualGrid);
-    autoCollapse.setLayout(autoGrid);
 
-    manualCollapse.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false));
-    labelCollapse.setLayoutData(
-        new GridData(SWT.LEFT, SWT.FILL, true, false, 2, 1));
+    Label labelCollapse = createLabel(manualCollapse, "Collapse under");
+
+    masterViewer = new ComboViewer(manualCollapse, SWT.READ_ONLY | SWT.FLAT);
     masterViewer.getCombo().setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, false, 2, 2));
-    eraseCollapse.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, false, false));
-    collapseButton.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, false, false));
 
-    labelUncollapse.setLayoutData(
-        new GridData(SWT.LEFT, SWT.FILL, true, false, 2, 1));
+    Button eraseCollapse = createPushButton(manualCollapse, "collapse / erase");
+    Button collapseButton = createPushButton(manualCollapse, "collapse / add");
+
+    Label labelUncollapse = createLabel(manualCollapse, "Uncollapse");
+
+    final CCombo uncollapseOpts =
+        new CCombo(manualCollapse, SWT.READ_ONLY | SWT.FLAT);
+    for (String s : uncollapseOptions) {
+      uncollapseOpts.add(s);
+    }
     uncollapseOpts.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
-    deleteCollapse.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, false, false));
-    uncollapseButton.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, false, false));
-    uncollapseAll.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, false, false, 2, 1));
 
-    autoCollapse.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false));
-    namedSet.getControl().setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false));
+    Button deleteCollapse = createPushButton(manualCollapse, "uncollapse / Delete");
+    Button uncollapseButton = createPushButton(manualCollapse, "uncollapse");
+    Button uncollapseAll = createPushButton(manualCollapse, "Uncollapse All Selected");
 
     // actions
     eraseCollapse.addSelectionListener(new SelectionAdapter() {
@@ -175,24 +154,51 @@ public class CollapseTool extends ViewSelectionListenerTool
         uncollapseAllSelected();
       }
     });
+  }
+
+  private void setupAutoCollapseGroup(Composite parent) {
+    Group autoCollapse = new Group(parent, SWT.BORDER);
+    autoCollapse.setText("Automatic collapsing based on a relationship set");
+    autoCollapse.setLayoutData(
+      new GridData(SWT.FILL, SWT.FILL, true, false));
+
+    GridLayout autoGrid = new GridLayout(3, false);
+    autoGrid.marginWidth = 10;
+    autoGrid.marginHeight = 10;
+    autoCollapse.setLayout(autoGrid);
+
+    Label pickerLabel = RelationshipSetPickerControl.createPickerLabel(autoCollapse);
+    pickerLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+
+    final RelationshipSetPickerControl autoSetPicker =
+        new RelationshipSetPickerControl(autoCollapse);
+    autoSetPicker.selectSet(DefaultRelationshipSet.SET);
+    autoSetPicker.setLayoutData(
+        new GridData(SWT.FILL, SWT.CENTER, true, false));
+
+    Button doAutoGrouping = createPushButton(autoCollapse, "Collapse");
+
+    // actions
     doAutoGrouping.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
-        autoCollapse(namedSet.getSelection());
+        autoCollapse(autoSetPicker.getSelection());
       }
     });
+  }
 
-    // content
-    collapseMaster = new TableContentProvider<GraphNode>();
-    collapseMaster.initViewer(masterViewer);
+  private Button createPushButton(Composite parent, String text) {
+    Button result = new Button(parent, SWT.PUSH);
+    result.setText(text);
+    result.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
+    return result;
+  }
 
-    for (String s : uncollapseOptions) {
-      uncollapseOpts.add(s);
-    }
-    //FIXME(yc): select first set
-    //namedSet.selectSet(BuiltinRelationshipSets.CONTAINER);
-
-    return topComposite;
+  private Label createLabel(Composite parent, String text) {
+    Label result = new Label(parent, SWT.NONE);
+    result.setText(text);
+    result.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
+    return result;
   }
 
   /**

@@ -21,7 +21,7 @@ import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
 import com.google.devtools.depan.eclipse.plugins.SourcePluginRegistry;
 import com.google.devtools.depan.eclipse.utils.ListContentProvider;
 import com.google.devtools.depan.eclipse.utils.RelationshipSelectorListener;
-import com.google.devtools.depan.eclipse.utils.RelationshipSetSelector;
+import com.google.devtools.depan.eclipse.utils.RelationshipSetPickerControl;
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.views.ViewEditorTool;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.EdgeIncludePlugin;
@@ -66,7 +66,7 @@ public class RelationPickerTool extends ViewEditorTool
   /**
    * The {@link RelationshipSetSelector} to choose a named set.
    */
-  private RelationshipSetSelector selector;
+  private RelationshipSetPickerControl selector;
 
   /**
    * Shell used to open dialogs (SaveAs dialog in this case).
@@ -108,29 +108,27 @@ public class RelationPickerTool extends ViewEditorTool
     this.shell = parent.getShell();
 
     Composite topLevel = new Composite(parent, SWT.NONE);
-    selector = new RelationshipSetSelector(topLevel);
-    selector.addChangeListener(this);
-    Button save = new Button(topLevel, SWT.PUSH);
-    Button reverse = new Button(topLevel, SWT.PUSH);
-    Label listLabel = new Label(topLevel, SWT.NONE);
-    list = new ListViewer(topLevel, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
-
-    // layout
-    GridLayout gridLayout = new GridLayout(3, false);
+    GridLayout gridLayout = new GridLayout();
     gridLayout.verticalSpacing = 10;
     topLevel.setLayout(gridLayout);
-    selector.getControl().setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false));
+
+    setupRelationPicker(topLevel);
+
+    Button reverse = new Button(topLevel, SWT.PUSH);
+    reverse.setText("Reverse selection");
     reverse.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 3, 1));
+
+    Label listLabel = new Label(topLevel, SWT.NONE);
+    listLabel.setText("Select relationships to hide :");
     listLabel.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, false, 3, 1));
+
+    list = new ListViewer(topLevel, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
+    // layout
     list.getList().setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1));
 
     // content
-    save.setText("Save selection as");
-    reverse.setText("Reverse selection");
-    listLabel.setText("Select relationships to hide :");
     contentProvider = new ListContentProvider<Relation>(list);
 
     // actions
@@ -138,12 +136,6 @@ public class RelationPickerTool extends ViewEditorTool
       @Override
       public void widgetSelected(SelectionEvent e) {
         updateModel();
-      }
-    });
-    save.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        saveSelection();
       }
     });
     reverse.addSelectionListener(new SelectionAdapter() {
@@ -157,6 +149,32 @@ public class RelationPickerTool extends ViewEditorTool
     updateView();
 
     return topLevel;
+  }
+
+  private void setupRelationPicker(Composite parent) {
+    Composite region = new Composite(parent, SWT.None);
+    region.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+    region.setLayout(new GridLayout(3, false));
+
+    Label pickerLabel = RelationshipSetPickerControl.createPickerLabel(region);
+    pickerLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+
+    selector = new RelationshipSetPickerControl(region);
+    selector.addChangeListener(this);
+    selector.setLayoutData(
+        new GridData(SWT.FILL, SWT.FILL, true, false));
+
+    Button save = new Button(region, SWT.PUSH);
+    save.setText("Save selection as");
+    save.setLayoutData(
+      new GridData(SWT.FILL, SWT.FILL, true, false));
+
+    save.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        saveSelection();
+      }
+    });
   }
 
   private void fill() {

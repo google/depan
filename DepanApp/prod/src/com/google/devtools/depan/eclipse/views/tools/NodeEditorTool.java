@@ -24,8 +24,9 @@ import com.google.devtools.depan.eclipse.trees.NodeTreeView;
 import com.google.devtools.depan.eclipse.trees.NodeTreeView.NodeWrapper;
 import com.google.devtools.depan.eclipse.utils.DefaultRelationshipSet;
 import com.google.devtools.depan.eclipse.utils.EditColTableDef;
+import com.google.devtools.depan.eclipse.utils.LabeledControl;
 import com.google.devtools.depan.eclipse.utils.RelationshipSelectorListener;
-import com.google.devtools.depan.eclipse.utils.RelationshipSetSelector;
+import com.google.devtools.depan.eclipse.utils.RelationshipSetPickerControl;
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.utils.Tools;
 import com.google.devtools.depan.eclipse.views.NodeEditorLabelProvider;
@@ -43,11 +44,15 @@ import org.eclipse.jface.viewers.ComboBoxCellEditor;
 import org.eclipse.jface.viewers.ICellModifier;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
@@ -73,7 +78,7 @@ public class NodeEditorTool extends ViewSelectionListenerTool
   /**
    * Selector for named relationships sets.
    */
-  private RelationshipSetSelector relationshipSetselector = null;
+  private RelationshipSetPickerControl relationshipSetPicker = null;
 
   protected static final String COL_NAME = "Name";
   protected static final String COL_VISIBLE = "Visible";
@@ -120,19 +125,14 @@ public class NodeEditorTool extends ViewSelectionListenerTool
   @Override
   public Control setupComposite(Composite parent) {
     Composite baseComposite = new Composite(parent, SWT.NONE);
+    GridLayout grid = new GridLayout(1, false);
+    baseComposite.setLayout(grid);
 
-    relationshipSetselector = new RelationshipSetSelector(baseComposite);
-    Control selector = relationshipSetselector.getControl();
-    relationshipSetselector.selectSet(DefaultRelationshipSet.SET);
-    relationshipSetselector.addChangeListener(this);
+    setupRelationPicker(baseComposite);
 
     nodeTreeView = new NodeTreeView<NodeDisplayProperty>(baseComposite,
         SWT.VIRTUAL | SWT.FULL_SELECTION | SWT.BORDER);
 
-    GridLayout grid = new GridLayout(1, false);
-    baseComposite.setLayout(grid);
-    selector.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false));
     nodeTreeView.getTreeViewer().getControl().setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, true));
 
@@ -167,6 +167,21 @@ public class NodeEditorTool extends ViewSelectionListenerTool
     nodeTreeView.getTreeViewer().setSorter(new NodeWrapperTreeSorter());
 
     return baseComposite;
+  }
+
+  private void setupRelationPicker(Composite parent) {
+    Composite region = new Composite(parent, SWT.NONE);
+    region.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+    region.setLayout(new GridLayout(2, false));
+
+    Label pickerLabel = RelationshipSetPickerControl.createPickerLabel(region);
+    pickerLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+
+    relationshipSetPicker = new RelationshipSetPickerControl(region);
+    relationshipSetPicker.selectSet(DefaultRelationshipSet.SET);
+    relationshipSetPicker.addChangeListener(this);
+    relationshipSetPicker.setLayoutData(
+        new GridData(SWT.FILL, SWT.CENTER, true, false));
   }
 
   /*
@@ -269,7 +284,7 @@ public class NodeEditorTool extends ViewSelectionListenerTool
   }
 
   private GraphData<NodeDisplayProperty> getEditorHierarchy() {
-    RelationshipSet relSet = relationshipSetselector.getSelection();
+    RelationshipSet relSet = relationshipSetPicker.getSelection();
     DirectedRelationFinder relFinder = relSet;
     GraphData<NodeDisplayProperty> hierarchy =
         getEditor().getHierarchy(relFinder);

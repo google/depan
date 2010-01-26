@@ -107,7 +107,7 @@ public class RelationshipPicker
    * The quick selector on top of this widget applying a selection to the list
    * of relationship.
    */
-  private RelationshipSetSelector relationshipSetSelector = null;
+  private RelationshipSetPickerControl relationshipSetPicker = null;
 
   /**
    * A shell necessary to open dialogs.
@@ -127,63 +127,29 @@ public class RelationshipPicker
    * @return a {@link Control} containing this widget.
    */
   public Control getControl(Composite parent) {
-    final int layoutCols = 8;
     this.shell = parent.getShell();
 
     // component
     Composite panel = new Composite(parent, SWT.BORDER);
-    GridLayout layout = new GridLayout(layoutCols, true);
-    panel.setLayout(layout);
+    panel.setLayout(new GridLayout());
 
     // components inside the panel
-    Composite top = new Composite(panel, SWT.NONE);
-    top.setLayout(new GridLayout(3, false));
-    relationshipSetSelector = new RelationshipSetSelector(
-        top, "Copy selection from");
-    relationshipSetSelector.addChangeListener(this);
-    Control selector = relationshipSetSelector.getControl();
-    Button saveAs = new Button(top, SWT.PUSH);
-    Button reverseAll = new Button(top, SWT.PUSH);
+    setupRelationPicker(panel);
 
+    Button reverseAll = new Button(panel, SWT.PUSH);
+    reverseAll.setText("Reverse all lines");
+    reverseAll.setLayoutData(
+        new GridData(SWT.FILL, SWT.FILL, false, false));
+    
     relationPicker = new TableViewer(
         panel, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
 
-    Label optionsLabel = new Label(panel, SWT.NONE);
-    Label forward = new Label(panel, SWT.NONE);
-    Button forwardAll = new Button(panel, SWT.PUSH);
-    Button forwardNone = new Button(panel, SWT.PUSH);
-    Button forwardReverse = new Button(panel, SWT.PUSH);
-    Label backward = new Label(panel, SWT.NONE);
-    Button backwardAll = new Button(panel, SWT.PUSH);
-    Button backwardNone = new Button(panel, SWT.PUSH);
-    Button backwardReverse = new Button(panel, SWT.PUSH);
-
-    // layout stuff
-    top.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false, layoutCols, 1));
-    relationshipSetSelector.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, false, false));
-    selector.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false));
-    reverseAll.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, false, false, layoutCols, 1));
-    relationPicker.getTable().setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, true, layoutCols, 1));
-    optionsLabel.setLayoutData(
-        new GridData(SWT.LEFT, SWT.FILL, false, false, layoutCols, 1));
-    forward.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false));
-    forwardAll.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-    forwardNone.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-    forwardReverse.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-    backward.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false));
-    backwardAll.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-    backwardNone.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-    backwardReverse.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false));
+    setupRelationToggles(panel);
 
     // initialize the table
     Table relationTable = relationPicker.getTable();
     relationTable.setHeaderVisible(true);
+    relationTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     EditColTableDef.setupTable(
         RelationshipPickerHelper.TABLE_DEF, relationTable);
 
@@ -207,27 +173,7 @@ public class RelationshipPicker
     relationPickerContent.initViewer(relationPicker);
     relationPicker.setSorter(new AlphabeticSorter(this));
 
-    // options
-    saveAs.setText("Save as...");
-    reverseAll.setText("Reverse all lines");
-    optionsLabel.setText("For selected lines:");
-    forward.setText("Forward");
-    forwardAll.setImage(Resources.IMAGE_ON);
-    forwardNone.setImage(Resources.IMAGE_OFF);
-    forwardReverse.setText("Reverse");
-    backward.setText("Backward");
-    backwardAll.setImage(Resources.IMAGE_ON);
-    backwardNone.setImage(Resources.IMAGE_OFF);
-    backwardReverse.setText("Reverse");
-
     // options actions
-    saveAs.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        saveAsAction();
-      }
-    });
-
     reverseAll.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -235,6 +181,83 @@ public class RelationshipPicker
       }
     });
 
+    fill();
+    fillSets();
+    return panel;
+  }
+
+  private void setupRelationPicker(Composite parent) {
+    Composite region = new Composite(parent, SWT.NONE);
+    region.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+    region.setLayout(new GridLayout(3, false));
+
+    Label pickerLabel = RelationshipSetPickerControl.createPickerLabel(region);
+    pickerLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+
+    relationshipSetPicker = new RelationshipSetPickerControl(region);
+    relationshipSetPicker.selectSet(DefaultRelationshipSet.SET);
+    relationshipSetPicker.addChangeListener(this);
+    relationshipSetPicker.setLayoutData(
+        new GridData(SWT.FILL, SWT.CENTER, true, false));
+
+    Button save = new Button(region, SWT.PUSH);
+    save.setText("Save selection as");
+    save.setLayoutData(
+      new GridData(SWT.FILL, SWT.CENTER, false, false));
+
+    save.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        saveAsAction();
+      }
+    });
+  }
+
+  private void setupRelationToggles(Composite parent) {
+    Label optionsLabel = new Label(parent, SWT.NONE);
+    optionsLabel.setText("For selected lines:");
+    optionsLabel.setLayoutData(
+        new GridData(SWT.LEFT, SWT.FILL, false, false));
+
+    Composite toggles = new Composite(parent, SWT.NONE);
+    toggles.setLayout(new GridLayout(8, false));
+    toggles.setLayoutData(
+        new GridData(SWT.FILL, SWT.FILL, true, false));
+
+    Label forward = new Label(toggles, SWT.NONE);
+    forward.setText("Forward");
+    forward.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
+
+    Button forwardAll = new Button(toggles, SWT.PUSH);
+    forwardAll.setImage(Resources.IMAGE_ON);
+    forwardAll.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+
+    Button forwardNone = new Button(toggles, SWT.PUSH);
+    forwardNone.setImage(Resources.IMAGE_OFF);
+    forwardNone.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+
+    Button forwardReverse = new Button(toggles, SWT.PUSH);
+    forwardReverse.setText("Reverse");
+    forwardReverse.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+
+    Label backward = new Label(toggles, SWT.NONE);
+    backward.setText("Backward");
+    backward.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
+
+    Button backwardAll = new Button(toggles, SWT.PUSH);
+    backwardAll.setImage(Resources.IMAGE_ON);
+    backwardAll.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+
+    Button backwardNone = new Button(toggles, SWT.PUSH);
+    backwardNone.setImage(Resources.IMAGE_OFF);
+    backwardNone.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+
+    Button backwardReverse = new Button(toggles, SWT.PUSH);
+    backwardReverse.setText("Reverse");
+    backwardReverse.setLayoutData(
+        new GridData(SWT.FILL, SWT.FILL, true, false));
+
+    // actions
     forwardAll.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -276,10 +299,6 @@ public class RelationshipPicker
         backwardReverseSelection();
       }
     });
-
-    fill();
-    fillSets();
-    return panel;
   }
 
   /**
@@ -356,10 +375,10 @@ public class RelationshipPicker
     Map<RelationshipSet, String> sets = Maps.newHashMap();
     sets.put(instanceSet, "Temporary set");
 
-    relationshipSetSelector.addSets(sets);
+    relationshipSetPicker.addSets(sets);
     // select the temporary set
     selectRelationshipSet(instanceSet);
-    relationshipSetSelector.selectSet(instanceSet);
+    relationshipSetPicker.selectSet(instanceSet);
   }
 
   /**
@@ -612,7 +631,7 @@ public class RelationshipPicker
           relation.matchBackward());
     }
     this.selectedSet = instanceSet;
-    relationshipSetSelector.selectSet(instanceSet);
+    relationshipSetPicker.selectSet(instanceSet);
   }
 
   /*
@@ -693,10 +712,9 @@ public class RelationshipPicker
    * if a valid {@link RelationshipSetSelector} object is not found.
    */
   public RelationshipSet getSelectedRelationshipSet() {
-    if (relationshipSetSelector == null) {
+    if (relationshipSetPicker == null) {
       return RelationshipSetAdapter.EMTPY;
     }
-    return relationshipSetSelector.getSelection();
+    return relationshipSetPicker.getSelection();
   }
 }
-

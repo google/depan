@@ -25,7 +25,7 @@ import com.google.devtools.depan.eclipse.utils.DefaultRelationshipSet;
 import com.google.devtools.depan.eclipse.utils.LabeledControl;
 import com.google.devtools.depan.eclipse.utils.LayoutPickerControl;
 import com.google.devtools.depan.eclipse.utils.RelationshipSelectorListener;
-import com.google.devtools.depan.eclipse.utils.RelationshipSetSelector;
+import com.google.devtools.depan.eclipse.utils.RelationshipSetPickerControl;
 import com.google.devtools.depan.eclipse.visualization.layout.Layouts;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
@@ -44,6 +44,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
@@ -81,7 +82,7 @@ public class GraphEditor
   /**
    * Selector for named relationships sets.
    */
-  private RelationshipSetSelector relationshipSetselector = null;
+  private RelationshipSetPickerControl relationshipSetPicker = null;
 
   private HierarchyCache<GraphNode> hierarchies;
 
@@ -121,8 +122,7 @@ public class GraphEditor
     toplayout.type = SWT.HORIZONTAL;
     top.setLayout(toplayout);
 
-    relationshipSetselector = new RelationshipSetSelector(top);
-    relationshipSetselector.selectSet(DefaultRelationshipSet.SET);
+    setupRelationPicker(top);
 
     // create layout choice selector
     layoutPicker = LabeledControl.createLabeledLayoutPicker(
@@ -156,12 +156,11 @@ public class GraphEditor
 
     // tree --------------------
     System.out.println("Initialize tree...");
-    RelationshipSet relSet = relationshipSetselector.getSelection();
+    RelationshipSet relSet = relationshipSetPicker.getSelection();
     checkNodeTreeView = new CheckNodeTreeView<GraphNode>(
         composite, SWT.VIRTUAL | SWT.FULL_SELECTION | SWT.BORDER);
     selectedSetChanged(relSet);
     System.out.println("  DONE");
-    relationshipSetselector.addChangeListener(this);
 
     tree = checkNodeTreeView.getCheckboxTreeViewer();
     tree.getTree().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -176,6 +175,20 @@ public class GraphEditor
 
     int index = addPage(composite);
     setPageText(index, "New View");
+  }
+
+  private void setupRelationPicker(Composite parent) {
+    Composite region = new Composite(parent, SWT.None);
+    region.setLayout(new GridLayout(2, false));
+
+    Label pickerLabel = RelationshipSetPickerControl.createPickerLabel(region);
+    pickerLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+
+    relationshipSetPicker = new RelationshipSetPickerControl(region);
+    relationshipSetPicker.selectSet(DefaultRelationshipSet.SET);
+    relationshipSetPicker.addChangeListener(this);
+    relationshipSetPicker.setLayoutData(
+        new GridData(SWT.FILL, SWT.CENTER, true, false));
   }
 
   private void createPage1() {
@@ -272,7 +285,7 @@ public class GraphEditor
 
     ViewPreferences userPrefs = new ViewPreferences();
     userPrefs.setSelectedLayout(getSelectedLayout());
-    userPrefs.setLayoutFinder(relationshipSetselector.getSelection());
+    userPrefs.setLayoutFinder(relationshipSetPicker.getSelection());
 
     ViewDocument viewInfo = new ViewDocument(graphRef, nodes, userPrefs);
     ViewEditor.startViewEditor(viewInfo, false);

@@ -41,8 +41,10 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -62,11 +64,11 @@ import java.util.logging.Logger;
  * @author ycoppel@google.com (Yohann Coppel)
  *
  */
-public class RelationshipSetSelector extends CompositeRowControl
+public class RelationshipSetPickerControl extends Composite
     implements ViewerObjectToString, IResourceChangeListener {
 
   private static final Logger logger =
-      Logger.getLogger(RelationshipSetSelector.class.getName());
+      Logger.getLogger(RelationshipSetPickerControl.class.getName());
 
   /**
    * 
@@ -84,11 +86,6 @@ public class RelationshipSetSelector extends CompositeRowControl
    * Listener when the selection change.
    */
   private List<RelationshipSelectorListener> listeners = Lists.newArrayList();
-
-  /**
-   * Top-level widget.
-   */
-  private Control topControl = null;
 
   /**
    * The drop-down list itself.
@@ -200,27 +197,25 @@ public class RelationshipSetSelector extends CompositeRowControl
     }
   }
 
+  public static Label createPickerLabel(Composite parent) {
+    Label result = new Label(parent, SWT.NONE);
+    result.setText(RELATION_SET_LABEL);
+    result.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+    return result;
+  }
+
   /////////////////////////////////////
   // Relationship Set Selector itself
-
-  /**
-   * Build a new {@link RelationshipSetSelector} with the given listener,
-   * and as a child for <code>parent</code>.
-   */
-  public RelationshipSetSelector(Composite parent) {
-    this(parent, RELATION_SET_LABEL);
-  }
 
   /**
    * @param top
    * @param string
    */
-  public RelationshipSetSelector(Composite parent, String labelText) {
-    super(parent, 2);
+  public RelationshipSetPickerControl(Composite parent) {
+    super(parent, SWT.NONE);
+    setLayout(new FillLayout());
 
-    addLabel(labelText);
-
-    setsViewer = new ComboViewer(container, SWT.READ_ONLY | SWT.FLAT);
+    setsViewer = new ComboViewer(this, SWT.READ_ONLY | SWT.FLAT);
     relationshipSets = new ListContentProvider<ContentNameProvider>(setsViewer);
     setsViewer.setContentProvider(relationshipSets);
     setsViewer.setSorter(new AlphabeticSorter(this));
@@ -240,16 +235,6 @@ public class RelationshipSetSelector extends CompositeRowControl
 
     ResourcesPlugin.getWorkspace().addResourceChangeListener(
         this, IResourceChangeEvent.POST_CHANGE);
-
-    topControl = container; 
-  }
-
-  /**
-   * @return a Control for this widget containing all others widgets (buttons,
-   *         labels, drop-down list...)
-   */
-  public Control getControl() {
-    return topControl;
   }
 
   /**
@@ -326,12 +311,7 @@ public class RelationshipSetSelector extends CompositeRowControl
     return null;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.google.devtools.depan.eclipse.utils.ViewerObjectToString
-   *      #getString(java.lang.Object)
-   */
+  @Override // ViewerObjectToString
   public String getString(Object object) {
     return object.toString();
   }

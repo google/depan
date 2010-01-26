@@ -18,7 +18,7 @@ package com.google.devtools.depan.eclipse.views.tools;
 
 import com.google.devtools.depan.eclipse.utils.DefaultRelationshipSet;
 import com.google.devtools.depan.eclipse.utils.LayoutPickerControl;
-import com.google.devtools.depan.eclipse.utils.RelationshipSetSelector;
+import com.google.devtools.depan.eclipse.utils.RelationshipSetPickerControl;
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.views.ViewEditorTool;
 import com.google.devtools.depan.eclipse.visualization.layout.Layouts;
@@ -46,7 +46,7 @@ public class SubLayoutTool extends ViewEditorTool {
   private LayoutPickerControl layoutPicker = null;
 
   /** Selector for named relationships sets. */
-  private RelationshipSetSelector relationshipSetselector = null;
+  private RelationshipSetPickerControl relationshipSetselector = null;
 
   @Override
   public Image getIcon() {
@@ -61,19 +61,28 @@ public class SubLayoutTool extends ViewEditorTool {
   @Override
   public Control setupComposite(Composite parent) {
     Composite baseComposite = new Composite(parent, SWT.NONE);
+    GridLayout grid = new GridLayout(2, false);
+    baseComposite.setLayout(grid);
 
     // components
     new Label(baseComposite, SWT.NONE).setText("Sub layout : ");
     layoutPicker = new LayoutPickerControl(baseComposite, false);
+    layoutPicker.setLayoutData(
+        new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
 
-    Label selectLabel = new Label(baseComposite, SWT.NONE);
-    selectLabel.setText("Relationship set");
+    Label selectLabel = RelationshipSetPickerControl.createPickerLabel(baseComposite);
 
-    relationshipSetselector = new RelationshipSetSelector(baseComposite);
+    relationshipSetselector = new RelationshipSetPickerControl(baseComposite);
+    relationshipSetselector.selectSet(DefaultRelationshipSet.SET);
+    relationshipSetselector.setLayoutData(
+      new GridData(SWT.FILL, SWT.CENTER, true, false));
+
     Button apply = new Button(baseComposite, SWT.PUSH);
-    Control selector = relationshipSetselector.getControl();
-    Label help = new Label(baseComposite, SWT.WRAP);
+    apply.setText("Apply");
+    apply.setLayoutData(
+        new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
 
+    Label help = new Label(baseComposite, SWT.WRAP);
     help.setText("The relationship set is used only in layouts requiring "
         + "a hierarchy. Basically Tree layouts.\n\n"
         + ""
@@ -83,20 +92,10 @@ public class SubLayoutTool extends ViewEditorTool {
         + ""
         + "If there are no selected nodes, apply the layout / [default]size "
         + "to the entire graph.");
-
-    // layout (SWT layouts...)
-    GridLayout grid = new GridLayout(2, false);
-    baseComposite.setLayout(grid);
-    layoutPicker.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
-    apply.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
     help.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
-    selector.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
 
-    apply.setText("Apply");
+    // actions
     apply.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
