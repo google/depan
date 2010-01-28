@@ -29,6 +29,13 @@ import com.google.devtools.depan.model.GraphNode;
  *
  */
 public interface DependenciesListener {
+  /**
+   * Find a node in the current graph.
+   * 
+   * @param target node to find in graph
+   * @return node in graph, or {@code null} if not found.
+   */
+  public GraphNode lookup(GraphNode target);
 
   /**
    * Insert a Node with no dependencies.  Sometimes you just have a node

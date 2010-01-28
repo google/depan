@@ -54,9 +54,8 @@ public interface GraphBuilder {
    * Return an existing node if the newNode is already known to the graph.
    * 
    * @param newNode new Node.
-   * @return if newNode matches a known node, the known nodes is returned.
-   *   Otherwise newNode is returned.
+   * @return if newNode matches a known node, the known node is returned.
+   *   Otherwise, newNode added to the graph and returned.
    */
   public GraphNode mapNode(GraphNode newNode);
-  
 }

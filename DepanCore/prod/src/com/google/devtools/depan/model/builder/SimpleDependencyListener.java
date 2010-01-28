@@ -70,4 +70,10 @@ public class SimpleDependencyListener
       newDep(parent, c, t);
     }
   }
+
+
+  @Override
+  public GraphNode lookup(GraphNode target) {
+    return (GraphNode) graphBuilder.getGraph().findNode(target.getId());
+  }
 }
