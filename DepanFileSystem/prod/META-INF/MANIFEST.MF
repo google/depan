@@ -11,6 +11,7 @@ Require-Bundle: com.google.devtools.depan,
  org.eclipse.ui,
  com.google.devtools.depan.libraries
 Export-Package: com.google.devtools.depan.filesystem,
+ com.google.devtools.depan.filesystem.builder,
  com.google.devtools.depan.filesystem.eclipse,
  com.google.devtools.depan.filesystem.editors,
  com.google.devtools.depan.filesystem.graph,

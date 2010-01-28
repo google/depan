@@ -27,6 +27,9 @@ import java.io.IOException;
 import java.util.logging.Logger;
 
 /**
+ * Populate a GraphModel based on the contents of an accessible
+ * file system tree.
+ * 
  * @author <a href="leeca@google.com">Lee Carver</a>
  */
 public class TreeLoader {
@@ -163,8 +166,8 @@ public class TreeLoader {
   }
 
   private FileElement createFile(File file) throws IOException {
-    String dirPath = getElementPath(file);
-    return new FileElement(dirPath);
+    String filePath = getElementPath(file);
+    return new FileElement(filePath);
   }
 
   /**
