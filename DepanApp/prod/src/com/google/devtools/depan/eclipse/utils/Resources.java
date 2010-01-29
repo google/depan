@@ -18,6 +18,9 @@ package com.google.devtools.depan.eclipse.utils;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
+import org.osgi.framework.Bundle;
+
+import java.net.URL;
 
 /**
  * @author ycoppel@google.com (Yohann Coppel)
@@ -81,5 +84,15 @@ public final class Resources {
 
   public static Image getOnOff(boolean on) {
     return on ? IMAGE_ON : IMAGE_OFF;
+  }
+
+  public static ImageDescriptor getImageDescriptor(
+      Bundle bundle, String path) {
+    try {
+      URL imageURL = bundle.getResource(path);
+      return ImageDescriptor.createFromURL(imageURL);
+    } catch (Exception e) {
+      return IMAGE_DESC_DEFAULT;
+    }
   }
 }

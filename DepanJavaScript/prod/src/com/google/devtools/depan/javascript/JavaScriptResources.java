@@ -27,9 +27,8 @@ package com.google.devtools.depan.javascript;
  * @author <a href="leeca@google.com">Lee Carver</a>
  */
 public class JavaScriptResources {
-  /**
-   * Plug-in ID used to identify this plug-in.
-   */
+
+  /** Plug-in ID used to identify this plug-in. */
   public static final String PLUGIN_ID =
       "com.google.devtools.depan.javascript";
 

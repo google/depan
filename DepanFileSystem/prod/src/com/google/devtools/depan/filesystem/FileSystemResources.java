@@ -16,12 +16,12 @@
 
 package com.google.devtools.depan.filesystem;
 
+import com.google.devtools.depan.eclipse.utils.Resources;
+
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.osgi.framework.Bundle;
-
-import java.net.URL;
 
 /**
  * Provides the resources for this plug-in such as images.
@@ -29,11 +29,13 @@ import java.net.URL;
  * @author tugrul@google.com (Tugrul Ince)
  */
 public abstract class FileSystemResources {
-  /**
-   * Plug-in ID used to identify this plug-in.
-   */
+
+  /** Plug-in ID used to identify this plug-in. */
   public static final String PLUGIN_ID = "com.google.devtools.depan.filesystem";
 
+  /**
+   * Bundle that is responsible for storing the resources for this plug-in.
+   */
   private static final Bundle BUNDLE = Platform.getBundle(PLUGIN_ID);
 
   /**
@@ -58,45 +60,11 @@ public abstract class FileSystemResources {
    */
   public static final Image IMAGE_FILE = getImage(IMAGE_DESC_FILE);
 
-  /**
-   * Returns the <code>ImageDescriptor</code> from the file on the given path.
-   *
-   * @param path Path of the file to be used to create the
-   * <code>ImageDescriptor</code>.
-   * @return <code>ImageDescriptor</code> at the specified path; or default
-   * <code>ImageDescriptor</code> if an <code>ImageDescriptor</code> cannot be
-   * created from the file with the given path.
-   */
-  protected static ImageDescriptor getImageDescriptor(String path) {
-    try {
-      URL imageURL = getResource(path);
-      return ImageDescriptor.createFromURL(imageURL);
-    } catch (Exception e) {
-      return com.google.devtools.depan.eclipse.utils.Resources
-          .IMAGE_DESC_DEFAULT;
-    }
+  private static ImageDescriptor getImageDescriptor(String path) {
+    return Resources.getImageDescriptor(BUNDLE, path);
   }
 
-  /**
-   * Returns the URL for the given path.
-   *
-   * @param path Path of the resource.
-   * @return URL for the given path.
-   */
-  protected static URL getResource(String path) {
-    return BUNDLE.getResource(path);
-  }
-
-  /**
-   * Creates and returns the <code>Image</code> from the given
-   * <code>ImageDescriptor</code>.
-   *
-   * @param descriptor <code>ImageDescriptor</code> which is required to create
-   * the <code>Image</code>.
-   * @return <code>Image</code> created from the given
-   * <code>ImageDescriptor</code>.
-   */
-  protected static Image getImage(ImageDescriptor descriptor) {
+  private static Image getImage(ImageDescriptor descriptor) {
     return descriptor.createImage();
   }
 }

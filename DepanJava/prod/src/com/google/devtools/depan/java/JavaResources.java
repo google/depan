@@ -16,22 +16,25 @@
 
 package com.google.devtools.depan.java;
 
+import com.google.devtools.depan.eclipse.utils.Resources;
+
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.osgi.framework.Bundle;
 
-import java.net.URL;
-
 /**
  * @author ycoppel@google.com (Yohann Coppel)
- *
  */
 public abstract class JavaResources {
 
+  /** Plug-in ID used to identify this plug-in. */
   public static final String PLUGIN_ID = "com.google.devtools.depan.java";
 
-  private static Bundle bundle = Platform.getBundle(PLUGIN_ID);
+  /**
+   * Bundle that is responsible for storing the resources for this plug-in.
+   */
+  private static final Bundle BUNDLE = Platform.getBundle(PLUGIN_ID);
 
   // icons
   public static final ImageDescriptor IMAGE_DESC_FIELD =
@@ -57,13 +60,7 @@ public abstract class JavaResources {
       getImage(IMAGE_DESC_TYPE);
 
   private static ImageDescriptor getImageDescriptor(String path) {
-    try {
-      URL imageURL = bundle.getResource(path);
-      return ImageDescriptor.createFromURL(imageURL);
-    } catch (Exception e) {
-      return com.google.devtools.depan.eclipse.utils.Resources
-          .IMAGE_DESC_DEFAULT;
-    }
+    return Resources.getImageDescriptor(BUNDLE, path);
   }
 
   private static Image getImage(ImageDescriptor descriptor) {
