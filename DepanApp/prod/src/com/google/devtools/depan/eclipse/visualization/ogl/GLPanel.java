@@ -472,6 +472,10 @@ public class GLPanel extends GLScene {
   }
 
   private void logIds(Level level, int[] ids) {
+    // Early exit if no ids will be logged.
+    if (!logger.isLoggable(level)) {
+      return;
+    }
     int item = 0;
     for (int id : ids) {
       logger.log(level, "item #" + item++ + "; " + idInfo(id));

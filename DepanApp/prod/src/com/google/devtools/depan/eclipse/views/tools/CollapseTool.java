@@ -17,7 +17,6 @@
 package com.google.devtools.depan.eclipse.views.tools;
 
 import com.google.devtools.depan.eclipse.utils.DefaultRelationshipSet;
-import com.google.devtools.depan.eclipse.utils.LabeledControl;
 import com.google.devtools.depan.eclipse.utils.RelationshipSelectorListener;
 import com.google.devtools.depan.eclipse.utils.RelationshipSetPickerControl;
 import com.google.devtools.depan.eclipse.utils.Resources;
