@@ -410,7 +410,7 @@ public abstract class GLScene {
         offset++;
       }
     }
-    System.err.println("hits = " + hits + "; offset = " + offset);
+    logger.fine("hits = " + hits + "; offset = " + offset);
     return hitsResults;
   }
 

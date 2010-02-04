@@ -34,10 +34,12 @@ import org.eclipse.swt.widgets.Composite;
 import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.nio.IntBuffer;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -229,6 +231,7 @@ public class GLPanel extends GLScene {
       prop.targetPositionX += x;
       prop.targetPositionY += y;
     }
+    notifyHardLocationChange(selection);
   }
 
   @Override
@@ -462,16 +465,16 @@ public class GLPanel extends GLScene {
     unselect(selection.toArray(new NodeRenderingProperty[0]));
 
     // Report the selection, if problems
-    logIds(ids);
+    logIds(Level.FINE, ids);
 
     // select new ones.
     select(getNodeRenderers(ids));
   }
 
-  private void logIds(int[] ids) {
+  private void logIds(Level level, int[] ids) {
     int item = 0;
     for (int id : ids) {
-      logger.info("item #" + item++ + "; " + idInfo(id));
+      logger.log(level, "item #" + item++ + "; " + idInfo(id));
     }
   }
 
@@ -597,11 +600,40 @@ public class GLPanel extends GLScene {
     selectionListener.notifyRemovedFromSelection(getGraphNodes(props));
   }
 
-
-  public void notifyLocationChange() {
+  /**
+   * Update the position of all nodes in the collection, regardless of their
+   * current location.
+   * 
+   * <p>This method is called after mouse-drag moves.
+   * 
+   * @param movedNodes collection of moved nodes.
+   */
+  private void notifyHardLocationChange(
+      Collection<? extends NodeRenderingProperty>  movedNodes) {
     Map<GraphNode, Point2D> changes =
-        Maps.newHashMapWithExpectedSize(nodesProperties.length);
-    for (NodeRenderingProperty node : nodesProperties) {
+        Maps.newHashMapWithExpectedSize(movedNodes.size());
+    for (NodeRenderingProperty node : movedNodes) {
+      Point2D position = new Point2D.Float(
+          node.targetPositionX, node.targetPositionY);
+      changes.put(node.node, position);
+    }
+    changeListener.locationsChanged(changes);
+  }
+
+  /**
+   * Update the position of nodes in the collections that actually have a
+   * target location that is different from their current position.
+   * 
+   * <p>The {@link FactorPlugin} calls this after computing new scaled positions
+   * for each node.
+   * 
+   * @param movedNodes collection of moved nodes, often all nodes
+   */
+  private void notifySoftLocationChange(
+      Collection<? extends NodeRenderingProperty> movedNodes) {
+    Map<GraphNode, Point2D> changes =
+        Maps.newHashMapWithExpectedSize(movedNodes.size());
+    for (NodeRenderingProperty node : movedNodes) {
       if ((node.targetPositionX != node.positionX) 
           || (node.targetPositionY != node.positionY)) {
         Point2D position = new Point2D.Float(
@@ -610,5 +642,9 @@ public class GLPanel extends GLScene {
       }
     }
     changeListener.locationsChanged(changes);
+  }
+
+  public void notifyLocationChange() {
+    notifySoftLocationChange(Arrays.asList(nodesProperties));
   }
 }
