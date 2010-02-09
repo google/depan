@@ -16,7 +16,9 @@
 
 package com.google.devtools.depan.eclipse.wizards;
 
+import com.google.devtools.depan.eclipse.editors.GraphDocument;
 import com.google.devtools.depan.eclipse.editors.ResourceCache;
+import com.google.devtools.depan.eclipse.plugins.SourcePluginRegistry;
 import com.google.devtools.depan.model.GraphModel;
 
 import org.eclipse.core.resources.IFile;
@@ -104,9 +106,9 @@ public abstract class AbstractAnalysisWizard extends Wizard
       monitor.beginTask(
           "Creating " + getOutputFileName(), 2 + countAnalysisWork());
 
-      GraphModel graph = generateAnalysisGraph(monitor);
+      GraphDocument graph = generateAnalysisDocument(monitor);
 
-      saveAnalysisGraph(monitor, graph);
+      saveAnalysisDocument(monitor, graph);
     } catch (CoreException e) {
       throw new InvocationTargetException(e);
     } catch (IOException errIo) {
@@ -115,6 +117,16 @@ public abstract class AbstractAnalysisWizard extends Wizard
     } finally {
       monitor.done();
     }
+  }
+
+  /**
+   * Create a new {@link GraphDocument} with the list of analysis plugins.
+   * The first listed plugin becomes the UI default for the document.
+   */
+  protected GraphDocument createGraphDocument(
+      GraphModel graph, String... pluginIds) {
+    return new GraphDocument(graph, 
+      SourcePluginRegistry.buildPluginList(pluginIds));
   }
 
   /**
@@ -128,14 +140,14 @@ public abstract class AbstractAnalysisWizard extends Wizard
   protected abstract int countAnalysisWork();
 
   /**
-   * Using the wizards internal data, produce an analysis graph
+   * Using the wizard's internal data, produce an analysis graph
    * that should be saved.
    * 
    * This is a Template method that extending classes are intended to override.
    * 
    * @param monitor receiver for {@code monitor.worked()} calls
    */
-  protected abstract GraphModel generateAnalysisGraph(
+  protected abstract GraphDocument generateAnalysisDocument(
       IProgressMonitor monitor)
       throws CoreException, IOException;
 
@@ -160,7 +172,8 @@ public abstract class AbstractAnalysisWizard extends Wizard
    * @param monitor receiver for 2 {@code monitor.worked()} calls
    * @param graph analysis graph to write
    */
-  private void saveAnalysisGraph(IProgressMonitor monitor, GraphModel graph)
+  private void saveAnalysisDocument(
+      IProgressMonitor monitor, GraphDocument graph)
       throws CoreException {
     monitor.setTaskName("Getting File...");
 
@@ -169,7 +182,7 @@ public abstract class AbstractAnalysisWizard extends Wizard
 
     monitor.setTaskName("Writing file...");
 
-    ResourceCache.storeGraphModel(file, graph);
+    ResourceCache.storeGraphDocument(file, graph);
 
     monitor.worked(1);
   }

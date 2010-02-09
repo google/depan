@@ -17,6 +17,7 @@
 package com.google.devtools.depan.eclipse.wizards;
 
 import com.google.devtools.depan.eclipse.Project;
+import com.google.devtools.depan.eclipse.editors.GraphDocument;
 import com.google.devtools.depan.eclipse.utils.TableContentProvider;
 
 import org.eclipse.core.resources.IResource;
@@ -42,15 +43,13 @@ import java.util.List;
  *   dependency graphs are included.
  * - options for renaming nodes from one dependency graph to match identities in
  *   another graph (e.g. add parent directories to Directory and File nodes).
- * - richer UI presentation of .dpang resources from multiple projects.
+ * - richer UI presentation of .dgi resources from multiple projects.
  * 
  * @author <a href="leeca@google.com">Lee Carver</a>
  */
 public class NewMergedGraphPage extends AbstractAnalysisPage {
 
   private static final String PAGE_LABEL = "Merge Dependency Graphs";
-
-  private static final String GRAPH_EXT = "dpang";
 
   private String errorMsg;
 
@@ -63,9 +62,9 @@ public class NewMergedGraphPage extends AbstractAnalysisPage {
    */
   public NewMergedGraphPage(ISelection selection) {
     super(selection, PAGE_LABEL,
-        "This wizard creates a new *.dpang file"
-            + " by merging existing dependency graphs.",
-         "Merged.dpang");
+        "This wizard creates a new dependency graph"
+        + " by merging existing dependency graphs.",
+        createFilename("Merged"));
   }
 
   @Override
@@ -120,7 +119,7 @@ public class NewMergedGraphPage extends AbstractAnalysisPage {
         new TableContentProvider<IResource>();
 
     for (Project project : Project.getProjects()) {
-      for (IResource resource : project.listFiles(GRAPH_EXT)) {
+      for (IResource resource : project.listFiles(GraphDocument.EXTENSION)) {
         result.add(resource);
       }
     }

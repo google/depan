@@ -31,11 +31,13 @@ public class DepAnNature implements IProjectNature {
   private IProject current;
 
   @Override
+  @SuppressWarnings("unused") // Exception part of signature
   public void configure() throws CoreException {
     // No configuration defined for this nature.
   }
 
   @Override
+  @SuppressWarnings("unused") // Exception part of signature
   public void deconfigure() throws CoreException {
     // No configuration defined for this nature.
   }

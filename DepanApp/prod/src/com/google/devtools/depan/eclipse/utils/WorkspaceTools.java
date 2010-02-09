@@ -123,8 +123,8 @@ public final class WorkspaceTools {
 
   /**
    * Guess a filename for a new file.  For example, if an initial filename
-   * of {@code Tree.dpang} already exist, the first guess will be
-   * {@code Tree (1).dpang}.
+   * of {@code Tree.dgi} already exist, the first guess will be
+   * {@code Tree (1).dgi}.
    * 
    * This is best-effort heuristic, and is not guaranteed to actually be an
    * unused filename.  If the application wishes to ensure that no existing

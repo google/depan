@@ -42,6 +42,7 @@ public class ViewDocumentConverter implements Converter {
 
   public static final String VIEW_INFO_TAG = "view-info";
 
+  @SuppressWarnings("unused")  // Sure to be used in the future.
   private static final Logger logger =
       Logger.getLogger(ViewDocumentConverter.class.getName());
 

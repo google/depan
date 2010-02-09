@@ -44,15 +44,14 @@ import java.util.Map;
  * are plugin that provides new sources of dependencies. For instance, one
  * source plugin could provide Java dependencies, another one C/C++
  * dependencies, etc.
- * <p>
- * It is also a static interface to transform {@link Element}s into useful
+ * 
+ * <p>It is also a static interface to transform {@link Element}s into useful
  * values such as colors, shapes, etc. The algorithm for this task is simple.
  * The plugin registry first look at the class of the given {@link Element}.
  * Then it selects the plugin providing the class, and call the right function
  * to that plugin.
  *
  * @author Yohann Coppel
- *
  */
 public class SourcePluginRegistry {
   /**
@@ -63,25 +62,26 @@ public class SourcePluginRegistry {
 
   /**
    * Static instance. This class is a singleton.
+   * It is created lazily on first access.
    */
-  private final static SourcePluginRegistry INSTANCE =
-      new SourcePluginRegistry();
+  private static SourcePluginRegistry INSTANCE = null;
 
   /**
    * A list of all registered plugins entries. The key is the plugin id.
    */
-  private Map<String, SourcePluginEntry> entries = null;
+  private final Map<String, SourcePluginEntry> entries = Maps.newHashMap();
 
   /**
    * List of all registered plugins instances.
    */
-  private List<SourcePlugin> pluginList = null;
+  private final Map<SourcePlugin, String> pluginToId = Maps.newHashMap();
 
   /**
    * A map to find the right {@link ElementTransformers} given a element's
    * class.
    */
-  private Map<Class<? extends Element>, ElementTransformers> transformers;
+  private final Map<Class<? extends Element>, ElementTransformers> transformers =
+      Maps.newHashMap();
 
   /**
    * A PluginClassLoader that can load classes provided by a plugin.
@@ -95,14 +95,33 @@ public class SourcePluginRegistry {
   }
 
   /**
+   * Provide the {@code SourcePluginRegistry} singleton.
+   * It is created lazily when needed.
+   */
+  public static synchronized SourcePluginRegistry getInstance() {
+    if (null == INSTANCE) {
+      INSTANCE = new SourcePluginRegistry();
+      INSTANCE.load();
+    }
+    return INSTANCE;
+  }
+
+  /**
    * @return a list of {@link SourcePluginEntry}es containing informations on
    * the registered plugins.
    */
   public static Collection<SourcePluginEntry> getEntries() {
-    if (null == INSTANCE.entries) {
-      INSTANCE.load();
-    }
-    return INSTANCE.entries.values();
+    return getInstance().entries.values();
+  }
+
+  /**
+   * Get the SourcePluginEntry with the given ID from the singleton.
+   * @param id a SourcePluginEntry ID.
+   * @return the corresponding SourcePluginEntry, or <code>null</code> if no
+   * plugins has the given ID.
+   */
+  public static SourcePluginEntry getEntry(String id) {
+    return getInstance().getSourcePluginEntry(id);
   }
 
   /**
@@ -111,33 +130,57 @@ public class SourcePluginRegistry {
    * @return the corresponding SourcePluginEntry, or <code>null</code> if no
    * plugins has the given ID.
    */
-  public static SourcePluginEntry getEntry(String id) {
-    if (null == INSTANCE.entries) {
-      INSTANCE.load();
-    }
-    if (INSTANCE.entries.containsKey(id)) {
-      return INSTANCE.entries.get(id);
+  public SourcePluginEntry getSourcePluginEntry(String id) {
+    if (entries.containsKey(id)) {
+      return entries.get(id);
     }
     return null;
+  }
+
+  /**
+   * Provide the {@link SourcePlugin} allocated for the plugin id.
+   * 
+   * @param pluginId key for locating {@code SourcePlugin} instance
+   * @return requested {@code SourcePlugin} instance
+   * @throws IllegalArgumentException for unknown {@code pluginId}s
+   */
+  public static SourcePlugin getSourcePlugin(String pluginId) {
+    try {
+      return getEntry(pluginId).getInstance();
+    } catch (CoreException errCore) {
+      throw new IllegalArgumentException(
+          "Unrecognized plugin id " + pluginId, errCore);
+    }
+  }
+
+  /**
+   * Convert an array of analyzer plugin ids into a list of the actual
+   * plugins.
+   */
+  public static List<SourcePlugin> buildPluginList(String... pluginIds) {
+    List<SourcePlugin> result =
+        Lists.newArrayListWithExpectedSize(pluginIds.length);
+    for (String pluginId : pluginIds) {
+      result.add(getSourcePlugin(pluginId));
+    }
+    return result;
+  }
+
+  public static String getPluginId(SourcePlugin plugin) {
+    return getInstance().pluginToId.get(plugin);
   }
 
   /**
    * @return a collection of SourcePlugin instances.
    */
   public static Collection<SourcePlugin> getInstances() {
-    if (null == INSTANCE.pluginList) {
-      INSTANCE.load();
-    }
-    return INSTANCE.pluginList;
+    return getInstance().pluginToId.keySet();
   }
 
   /**
    * Load the plugins from the extension point, and fill the lists of entries.
    */
   private void load() {
-    entries = Maps.newHashMap();
-    pluginList = Lists.newArrayList();
-    transformers = Maps.newHashMap();
     IExtensionRegistry registry = Platform.getExtensionRegistry();
     IExtensionPoint point = registry.getExtensionPoint(EXTENTION_POINT);
     // for each extension
@@ -152,7 +195,7 @@ public class SourcePluginRegistry {
           // try to instantiate the plugin
           SourcePlugin p = entry.getInstance();
           // if the instantiation succeed, add the plugin to the list
-          pluginList.add(p);
+          pluginToId.put(p, entry.getId());
           // create the ElementTransformer for this plugin
           ElementTransformers t = new ElementTransformers(entry,
               p.getElementImageProvider(),
@@ -175,6 +218,15 @@ public class SourcePluginRegistry {
   }
 
   /**
+   * Get the correct transformer for this element.  This method ensure correct
+   * allocation of the singleton instance.
+   */
+  private static ElementTransformers getTransformers(Element element) {
+    ElementTransformers t = getInstance().transformers.get(element.getClass());
+    return t;
+  }
+
+  /**
    * Get an {@link Image} for the corresponding {@link Element}. The image is
    * an icon for this type of elements, and is provided by the plugin handling
    * the given element.
@@ -183,7 +235,7 @@ public class SourcePluginRegistry {
    * element.
    */
   public static Image getImage(Element element) {
-    ElementTransformers t = INSTANCE.transformers.get(element.getClass());
+    ElementTransformers t = getTransformers(element);
     if (null != t) {
       return t.image.transform(element);
     }
@@ -197,7 +249,7 @@ public class SourcePluginRegistry {
    * handle the given element.
    */
   public static ImageDescriptor getImageDescriptor(Element element) {
-    ElementTransformers t = INSTANCE.transformers.get(element.getClass());
+    ElementTransformers t = getTransformers(element);
     if (null != t) {
       return t.imageDescriptor.transform(element);
     }
@@ -212,7 +264,7 @@ public class SourcePluginRegistry {
    * given element.
    */
   public static Color getColor(Element element) {
-    ElementTransformers t = INSTANCE.transformers.get(element.getClass());
+    ElementTransformers t = getTransformers(element);
     if (null != t) {
       return t.color.transform(element);
     }
@@ -227,7 +279,7 @@ public class SourcePluginRegistry {
    * the given element.
    */
   public static GLEntity getShape(Element element) {
-    ElementTransformers t = INSTANCE.transformers.get(element.getClass());
+    ElementTransformers t = getTransformers(element);
     if (null != t) {
       return t.shape.transform(element);
     }
@@ -242,7 +294,7 @@ public class SourcePluginRegistry {
    * can handle the given element.
    */
   public static Class<? extends ElementEditor> getEditor(Element element) {
-    ElementTransformers t = INSTANCE.transformers.get(element.getClass());
+    ElementTransformers t = getTransformers(element);
     if (null != t) {
       return t.editor.transform(element.getClass());
     }
@@ -262,8 +314,8 @@ public class SourcePluginRegistry {
    * or 0 if they are equal.
    */
   public static int compare(Element e1, Element e2) {
-    ElementTransformers t1 = INSTANCE.transformers.get(e1.getClass());
-    ElementTransformers t2 = INSTANCE.transformers.get(e2.getClass());
+    ElementTransformers t1 = getTransformers(e1);
+    ElementTransformers t2 = getTransformers(e2);
     if ((null != t1) && (null != t2)) {
       if (t1 == t2) {
         // both elements are from the same plugin, we can easily compare them:
@@ -281,11 +333,11 @@ public class SourcePluginRegistry {
    * plugin.
    */
   public static Collection<ElementTransformers> getTransformers() {
-    return INSTANCE.transformers.values();
+    return getInstance().transformers.values();
   }
 
-  private static void ensurePluginClassLoader() {
-    if (null == INSTANCE.pluginClassLoader) {
+  private static synchronized void ensurePluginClassLoader() {
+    if (null == getInstance().pluginClassLoader) {
       INSTANCE.pluginClassLoader =
           new PluginClassLoader(INSTANCE.entries.values());
     }
@@ -302,7 +354,7 @@ public class SourcePluginRegistry {
     }
 
     ensurePluginClassLoader();
-    INSTANCE.pluginClassLoader.config(xstream);
+    getInstance().pluginClassLoader.config(xstream);
   }
 
   /**

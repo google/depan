@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.eclipse.wizards;
 
+import com.google.devtools.depan.eclipse.editors.GraphDocument;
 import com.google.devtools.depan.eclipse.utils.WorkspaceTools;
 
 import org.eclipse.core.resources.IContainer;
@@ -202,8 +203,8 @@ public class AnalysisOutputPart {
     int dotLoc = fileName.lastIndexOf('.');
     if (dotLoc != -1) {
       String ext = fileName.substring(dotLoc + 1);
-      if (!ext.equalsIgnoreCase("dpang")) {
-        return "File extension must be \"dpang\"";
+      if (!ext.equalsIgnoreCase(GraphDocument.EXTENSION)) {
+        return "File extension must be \"." + GraphDocument.EXTENSION + "\"";
       }
     }
     return null;

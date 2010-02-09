@@ -16,9 +16,9 @@
 
 package com.google.devtools.depan.eclipse.persist;
 
+import com.google.devtools.depan.eclipse.editors.GraphDocument;
 import com.google.devtools.depan.eclipse.editors.GraphModelReference;
 import com.google.devtools.depan.eclipse.editors.ResourceCache;
-import com.google.devtools.depan.model.GraphModel;
 
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
@@ -75,7 +75,7 @@ public class GraphModelReferenceConverter implements Converter {
 
     IFile graphFile = unmarshallGraphLocation(context);
 
-    GraphModel graph = ResourceCache.fetchGraphModel(graphFile);
+    GraphDocument graph = ResourceCache.fetchGraphDocument(graphFile);
     return new GraphModelReference(graphFile, graph);
     }
 

@@ -18,7 +18,6 @@ package com.google.devtools.depan.eclipse.editors;
 
 import com.google.common.collect.Maps;
 import com.google.devtools.depan.eclipse.persist.GraphModelXmlPersist;
-import com.google.devtools.depan.model.GraphModel;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -35,11 +34,11 @@ import java.net.URI;
 import java.util.Map;
 
 /**
- * Cache large resources (mostly .dpang files) so we don't have to reload
+ * Cache large resources (mostly .dgi files) so we don't have to reload
  * them on every reference.
- * <p>
- * Uses workspace relative IPaths obtained from the IFile as keys for the
- * loaded GraphModels.  Uses raw resource URIs obtained from the IFile if
+ *
+ * <p>Uses workspace relative IPaths obtained from the IFile as keys for the
+ * loaded GraphDocumentss.  Uses raw resource URIs obtained from the IFile if
  * the graph needs to be loaded.
  *
  * @author <a href='mailto:leeca@google.com'>Lee Carver</a>
@@ -47,12 +46,12 @@ import java.util.Map;
 public class ResourceCache implements IResourceChangeListener {
 
   /**
-   * Cache of previously loaded graph models.
+   * Cache of previously loaded graph documents.
    */
-  private Map<IPath, GraphModel> loadedGraphs = Maps.newHashMap();
+  private Map<IPath, GraphDocument> loadedGraphs = Maps.newHashMap();
 
   /////////////////////////////////////
-  // GraphModel cache
+  // GraphDocument cache
   private static ResourceCache INSTANCE = new ResourceCache();
 
   static {
@@ -60,20 +59,20 @@ public class ResourceCache implements IResourceChangeListener {
     INSTANCE.attachWorkspace(workspace);
   }
 
-  protected GraphModel retrieveGraphModel(IFile file) {
+  protected GraphDocument retrieveGraphDocument(IFile file) {
     return loadedGraphs.get(file.getFullPath());
   }
 
-  protected void installGraphModel(IFile file, GraphModel graph) {
+  protected void installGraphDocument(IFile file, GraphDocument graph) {
     loadedGraphs.put(file.getFullPath(), graph);
   }
 
-  public static GraphModel loadGraphModel(IFile file) {
+  public static GraphDocument loadGraphDocument(IFile file) {
     GraphModelXmlPersist loader = new GraphModelXmlPersist();
     return loader.load(file.getRawLocationURI());
   }
 
-  public static void saveGraphModel(IFile file, GraphModel graph)
+  public static void saveGraphDocument(IFile file, GraphDocument graph)
       throws CoreException {
     GraphModelXmlPersist loader = new GraphModelXmlPersist();
     loader.save(file.getRawLocationURI(), graph);
@@ -81,84 +80,85 @@ public class ResourceCache implements IResourceChangeListener {
   }
 
   /**
-   * Provide the graph model located for the given file.
-   * If the file has already be loaded, the graph model is provided from an
+   * Provide the graph document located for the given file.
+   * If the file has already be loaded, the graph document is provided from an
    * internal cache.  If the file has not been loaded, read it from the
    * location and also add it to the internal cache.
    * 
-   * @param file location for the graph model
-   * @return graph model obtained from the location
+   * @param file location for the graph document
+   * @return graph document obtained from the location
    */
-  public static GraphModel fetchGraphModel(IFile file) {
-    return INSTANCE.getGraphModel(file);
+  public static GraphDocument fetchGraphDocument(IFile file) {
+    return INSTANCE.getGraphDocument(file);
   }
 
   /**
-   * Provide the graph model located at the given file.
-   * If the files has already be loaded, the graph model is provided from an
+   * Provide the graph document located at the given file.
+   * If the files has already be loaded, the graph document is provided from an
    * internal cache.  If the file has not been loaded, read it from the location
    * but do not add it to the internal cache.
    * 
-   * @param uri location (and cache key) for the graph model
-   * @return graph model provided by the uri
+   * @param uri location (and cache key) for the graph document
+   * @return graph document provided by the uri
    */
-  public static GraphModel importGraphModel(IFile file) {
-    return INSTANCE.provideGraphModel(file);
+  public static GraphDocument importGraphDocument(IFile file) {
+    return INSTANCE.provideGraphDocument(file);
   }
 
   /**
-   * Write a new graph model into both the file system and the cache.
-   * @param file location for the graph model
+   * Write a new graph document into both the file system and the cache.
+   * 
+   * @param file location for the graph document
    * @param graph graph to save
    */
-  public static void storeGraphModel(IFile file, GraphModel graph)
+  public static void storeGraphDocument(IFile file, GraphDocument graph)
       throws CoreException {
-    INSTANCE.insertGraphModel(file, graph);
+    INSTANCE.insertGraphDocument(file, graph);
   }
 
   /**
-   * Provide the graph model, adding it to the cache if it isn't there.
+   * Provide the graph document, adding it to the cache if it isn't there.
    * 
-   * @param file location for the graph model
-   * @return graph model provided by the location
+   * @param file location for the graph document
+   * @return graph document provided by the location
    */
-  protected GraphModel getGraphModel(IFile file) {
-    GraphModel result = retrieveGraphModel(file);
+  protected GraphDocument getGraphDocument(IFile file) {
+    GraphDocument result = retrieveGraphDocument(file);
 
     if (null == result) {
-      result = loadGraphModel(file);
-      installGraphModel(file, result);
+      result = loadGraphDocument(file);
+      installGraphDocument(file, result);
     }
 
     return result;
   }
 
   /**
-   * Provide the graph model without adding it to the cache.  If it is in the
+   * Provide the graph document without adding it to the cache.  If it is in the
    * cache, use that rather then re-reading it from the URI.
    * 
-   * @param file location for the graph model
-   * @return graph model provided by the location
+   * @param file location for the graph document
+   * @return graph document provided by the location
    */
-  protected GraphModel provideGraphModel(IFile file) {
-    GraphModel result = retrieveGraphModel(file);
+  protected GraphDocument provideGraphDocument(IFile file) {
+    GraphDocument result = retrieveGraphDocument(file);
 
     if (null != result) {
       return result;
     }
 
-    return loadGraphModel(file);
+    return loadGraphDocument(file);
   }
 
   /**
-   * Write a new graph model into both the file system and the cache.
-   * @param file location for the graph model
+   * Write a new graph document into both the file system and the cache.
+   * @param file location for the graph document
    * @param graph graph to save
    */
-  protected void insertGraphModel(IFile file, GraphModel graph)
+  protected void insertGraphDocument(IFile file, GraphDocument graph)
       throws CoreException {
-    saveGraphModel(file, graph);
-    installGraphModel(file, graph);
+    saveGraphDocument(file, graph);
+    installGraphDocument(file, graph);
   }
 
   protected void attachWorkspace(IWorkspace workspace) {

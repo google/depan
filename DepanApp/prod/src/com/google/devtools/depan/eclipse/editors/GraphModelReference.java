@@ -16,8 +16,6 @@
 
 package com.google.devtools.depan.eclipse.editors;
 
-import com.google.devtools.depan.model.GraphModel;
-
 import org.eclipse.core.resources.IResource;
 
 /**
@@ -29,9 +27,9 @@ import org.eclipse.core.resources.IResource;
  */
 public class GraphModelReference {
   private final IResource location;
-  private final GraphModel graph;
+  private final GraphDocument graph;
 
-  public GraphModelReference(IResource location, GraphModel graph) {
+  public GraphModelReference(IResource location, GraphDocument graph) {
     super();
     this.location = location;
     this.graph = graph;
@@ -47,7 +45,7 @@ public class GraphModelReference {
   /**
    * @return the graph
    */
-  public GraphModel getGraph() {
+  public GraphDocument getGraph() {
     return graph;
   }
 }

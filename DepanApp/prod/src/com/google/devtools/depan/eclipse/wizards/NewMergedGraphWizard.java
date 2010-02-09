@@ -16,7 +16,10 @@
 
 package com.google.devtools.depan.eclipse.wizards;
 
+import com.google.common.collect.Lists;
+import com.google.devtools.depan.eclipse.editors.GraphDocument;
 import com.google.devtools.depan.eclipse.editors.ResourceCache;
+import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
@@ -37,8 +40,8 @@ import java.util.List;
  *   dependency graphs are included.
  * - renaming nodes from one dependency graph to match the identities in
  *   another graph (e.g. add parent directories to Directory and File nodes).
- * - richer UI presentation of .dpang resources from multiple projects.  For
- *   example, right now it is hard for the user to tell which Java.dpang from
+ * - richer UI presentation of .dgi resources from multiple projects.  For
+ *   example, right now it is hard for the user to tell which Java.dgi from
  *   multiple projects to include.  For now, the user just has to be careful.
  *   This is not a problem if all analyzes are in a single DepAn project.
  * 
@@ -86,27 +89,38 @@ public class NewMergedGraphWizard extends AbstractAnalysisWizard {
     return 1 + (2 * page.getMergeGraphs().size());
   }
 
+  /**
+   * @return a composite graph document, or {@code null} if the merge list
+   *     is emtpy.  This should not happen with well behaved UIs.
+   */
   @Override
-  protected GraphModel generateAnalysisGraph(IProgressMonitor monitor) {
-
-    monitor.setTaskName("Creating result graph...");
-    GraphModel result = new GraphModel();
-    monitor.worked(1);
+  protected GraphDocument generateAnalysisDocument(IProgressMonitor monitor) {
 
     List<IResource> mergeGraphs = page.getMergeGraphs();
+    if (mergeGraphs.size() <= 0) {
+      return null;
+    }
+
+    monitor.setTaskName("Creating result graph...");
+    GraphModel resultModel = new GraphModel();
+    List<SourcePlugin> analyzers = Lists.newArrayList();
+    monitor.worked(1);
+
     for (IResource graphResource : mergeGraphs) {
       String graphName = graphResource.getName();
       monitor.setTaskName("Loading dependency graph " + graphName + "...");
-      GraphModel nextGraph =
-          ResourceCache.importGraphModel((IFile) graphResource);
+      GraphDocument nextGraph =
+          ResourceCache.importGraphDocument((IFile) graphResource);
       monitor.worked(1);
 
       monitor.setTaskName("Merging dependency graph " + graphName + "...");
-      mergeGraph(result, nextGraph);
+      mergeGraph(resultModel, nextGraph.getGraph());
+      analyzers.addAll(nextGraph.getAnalyzers());
       monitor.worked(1);
     }
 
-    return result;
+    GraphDocument resultDoc = new GraphDocument(resultModel, analyzers);
+    return resultDoc;
   }
 
   // TODO(leeca): move this to DepanCore once the dependency graph

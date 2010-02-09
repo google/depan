@@ -39,7 +39,7 @@ import java.io.File;
 /**
  * The "New" wizard page allows setting the container for the new file as well
  * as the file name. The page will only accept file name without the extension
- * OR with the extension that matches the expected one (dpang).
+ * OR with the extension that matches the expected one (dgi).
  */
 public class NewGraphPage extends AbstractAnalysisPage {
 
@@ -63,9 +63,9 @@ public class NewGraphPage extends AbstractAnalysisPage {
    */
   public NewGraphPage(ISelection selection) {
     super(selection, PAGE_LABEL,
-        "This wizard creates a new *.dpang file"
-            + " from an analysis of Java .class files.",
-        "Java.dpang");
+        "This wizard creates a new dependency graph"
+        + " from an analysis of Java .class files.",
+        createFilename("Java"));
   }
 
   @Override

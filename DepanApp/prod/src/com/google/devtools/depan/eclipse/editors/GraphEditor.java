@@ -27,7 +27,6 @@ import com.google.devtools.depan.eclipse.utils.LayoutPickerControl;
 import com.google.devtools.depan.eclipse.utils.RelationshipSelectorListener;
 import com.google.devtools.depan.eclipse.utils.RelationshipSetPickerControl;
 import com.google.devtools.depan.eclipse.visualization.layout.Layouts;
-import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.RelationshipSet;
 
@@ -68,7 +67,7 @@ public class GraphEditor
       Logger.getLogger(GraphEditor.class.getName());
 
   private IFile file = null;
-  private GraphModel graph = null;
+  private GraphDocument graph = null;
 
   private CheckboxTreeViewer tree = null;
   private List associatedViews = null;
@@ -318,11 +317,11 @@ public class GraphEditor
 
     logger.info("Reading " + file.getRawLocationURI());
 
-    graph = ResourceCache.fetchGraphModel(file);
+    graph = ResourceCache.fetchGraphDocument(file);
 
     logger.info("  DONE");
 
-    hierarchies = new HierarchyCache<GraphNode>(this, graph);
+    hierarchies = new HierarchyCache<GraphNode>(this, graph.getGraph());
     if (null != checkNodeTreeView) {
       logger.info("Initialize graph...");
       selectedSetChanged(DefaultRelationshipSet.SET);

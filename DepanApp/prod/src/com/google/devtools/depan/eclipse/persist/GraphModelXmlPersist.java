@@ -16,13 +16,13 @@
 
 package com.google.devtools.depan.eclipse.persist;
 
-import com.google.devtools.depan.model.GraphModel;
+import com.google.devtools.depan.eclipse.editors.GraphDocument;
 
 import java.io.IOException;
 import java.net.URI;
 
 /**
- * Provide easy to use load and save methods for {@link GraphModel}s.
+ * Provide easy to use load and save methods for {@link GraphDocument}s.
  * 
  * @author <a href="mailto:leeca@google.com">Lee Carver</a>
  */
@@ -35,16 +35,16 @@ public class GraphModelXmlPersist {
         new ObjectXmlPersist(XStreamFactory.getSharedGraphXStream());
   }
 
-  public GraphModel load(URI uri) {
+  public GraphDocument load(URI uri) {
     try {
-      return (GraphModel) xmlPersist.load(uri);
+      return (GraphDocument) xmlPersist.load(uri);
     } catch (IOException errIo) {
       throw new RuntimeException(
           "Unable to load GraphModel from " + uri, errIo);
     }
   }
 
-  public void save(URI uri, GraphModel graph) {
+  public void save(URI uri, GraphDocument graph) {
     try {
       xmlPersist.save(uri, graph);
     } catch (IOException errIo) {

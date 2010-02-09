@@ -25,16 +25,14 @@ import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
  * @author <a href="mailto:leeca@google.com">Lee Carver</a>
  */
 public class NewDepanProjectWizard extends BasicNewProjectResourceWizard {
-  
+
+  @SuppressWarnings("hiding")  // Interfering with cheap Project wizard
   public static final String WIZARD_ID =
       "com.google.devtools.depan.eclipse.natures.NewDepanProjectWizard";
 
   private final static String[] DEPAN_NATURES =
       { DepAnNature.DEPAN_ID };
 
-  /* (non-Javadoc)
-   * @see org.eclipse.jface.wizard.IWizard#performFinish()
-   */
   @Override
   public boolean performFinish() {
     if (false == super.performFinish()) {

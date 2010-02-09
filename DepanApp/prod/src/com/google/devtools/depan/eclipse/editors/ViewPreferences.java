@@ -90,6 +90,7 @@ public class ViewPreferences {
   /**
    * Defines the relationship set used to define the view hierarchy
    */
+  @SuppressWarnings("unused")  // Should be useful soon.
   private DirectedRelationFinder treeRelationshipSet;
 
   /////////////////////////////////////

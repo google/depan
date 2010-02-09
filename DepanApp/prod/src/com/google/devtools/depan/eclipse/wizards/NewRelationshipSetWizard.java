@@ -58,6 +58,7 @@ public class NewRelationshipSetWizard extends Wizard implements INewWizard {
   /**
    * {@link DirectedRelationFinder} describing the {@link RelationshipSet}.
    */
+  @SuppressWarnings("unused")  // This needs rework.
   private final DirectedRelationFinder finder;
 
   /**

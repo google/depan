@@ -90,7 +90,7 @@ public class ViewDocument {
   // Simple accessors (direct, delegating, and wrappers)
 
   public GraphModel getParentGraph() {
-    return parentGraph.getGraph();
+    return parentGraph.getGraph().getGraph();
   }
 
   public IResource getGraphModelLocation() {
@@ -176,7 +176,7 @@ public class ViewDocument {
   // Factories for derived instances
 
   public GraphModel buildGraphView() {
-    GraphModel parent = parentGraph.getGraph();
+    GraphModel parent = parentGraph.getGraph().getGraph();
     GraphModel result = parent.newView();
 
     // add the nodes

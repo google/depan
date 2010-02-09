@@ -235,7 +235,7 @@
             class="com.google.devtools.depan.eclipse.editors.ViewEditor"/>
       <editor id="com.google.devtools.depan.eclipse.editors.GraphEditor"
             name="Graph Editor"
-            extensions="dpang"
+            extensions="dgi"
             icon="icons/sample.gif"
             class="com.google.devtools.depan.eclipse.editors.GraphEditor"/>
       <editor id="com.google.devtools.depan.eclipse.editors.RemapEditor"

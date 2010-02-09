@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.eclipse.wizards;
 
+import com.google.devtools.depan.eclipse.editors.GraphDocument;
 import com.google.devtools.depan.eclipse.utils.WorkspaceTools;
 
 import org.eclipse.core.resources.IContainer;
@@ -58,6 +59,13 @@ public abstract class AbstractAnalysisPage extends WizardPage {
 
     setTitle(pageLabel);
     setDescription(pageDescription);
+  }
+
+  /**
+   * Add the graph document's file extension to the filename.
+   */
+  protected static String createFilename(String filename) {
+    return filename + '.' + GraphDocument.EXTENSION;
   }
 
   @Override

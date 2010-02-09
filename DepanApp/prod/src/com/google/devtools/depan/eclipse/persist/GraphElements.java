@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.eclipse.persist;
 
+import com.google.devtools.depan.eclipse.editors.GraphDocument;
 import com.google.devtools.depan.eclipse.editors.GraphModelReference;
 import com.google.devtools.depan.eclipse.editors.ViewDocument;
 import com.google.devtools.depan.eclipse.editors.ViewPreferences;
@@ -45,12 +46,17 @@ public class GraphElements {
   public static final Config GRAPH_XML_PERSIST = new Config() {
     public void  config(XStream xstream) {
 
+      xstream.alias("graph-info", GraphDocument.class);
+
       xstream.alias(GraphModelConverter.GRAPH_DEF_TAG, GraphModel.class);
       xstream.registerConverter(new GraphModelConverter(xstream.getMapper()));
 
       xstream.alias(EdgeConverter.EDGE_DEF_TAG, GraphEdge.class);
       xstream.registerConverter(new EdgeConverter(xstream.getMapper()));
+
+      SourcePluginConverter.configXStream(xstream);
     }
+
   };
 
   public static final Config REF_XML_PERSIST = new Config() {
