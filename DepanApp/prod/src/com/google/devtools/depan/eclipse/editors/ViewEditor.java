@@ -21,6 +21,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.devtools.depan.eclipse.persist.ObjectXmlPersist;
 import com.google.devtools.depan.eclipse.persist.XStreamFactory;
+import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
 import com.google.devtools.depan.eclipse.preferences.ColorPreferencesIds;
 import com.google.devtools.depan.eclipse.preferences.LabelPreferencesIds;
 import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds;
@@ -32,6 +33,8 @@ import com.google.devtools.depan.eclipse.trees.GraphData;
 import com.google.devtools.depan.eclipse.utils.ListenerManager;
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.utils.Tools;
+import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptor;
+import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptors;
 import com.google.devtools.depan.eclipse.views.tools.RelationCount;
 import com.google.devtools.depan.eclipse.visualization.RendererChangeListener;
 import com.google.devtools.depan.eclipse.visualization.SelectionChangeListener;
@@ -44,6 +47,7 @@ import com.google.devtools.depan.graph.api.DirectedRelationFinder;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
+import com.google.devtools.depan.model.RelationshipSet;
 import com.google.devtools.depan.view.CollapseData;
 import com.google.devtools.depan.view.EdgeDisplayProperty;
 import com.google.devtools.depan.view.NodeDisplayProperty;
@@ -94,6 +98,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -171,6 +176,8 @@ public class ViewEditor extends MultiPageEditorPart
   private RelationCount.Settings relationCountData =
     new RelationCount.Settings();
 
+  private List<RelSetDescriptor> relSetChoices;
+
   /////////////////////////////////////
   // Basic Getters and Setters
 
@@ -190,6 +197,22 @@ public class ViewEditor extends MultiPageEditorPart
    */
   public View getRenderer() {
     return renderer;
+  }
+
+  public List<SourcePlugin> getBuiltinAnalysisPlugins() {
+    return viewInfo.getBuiltinAnalysisPlugins();
+  }
+
+  public Collection<RelationshipSet> getBuiltinAnalysisRelSets() {
+    return viewInfo.getBuiltinAnalysisRelSets();
+  }
+
+  public RelationshipSet getContainerRelSet() {
+    return viewInfo.getDefaultContainerRelSet();
+  }
+
+  public List<RelSetDescriptor> getRelSetChoices() {
+    return relSetChoices;
   }
 
   /////////////////////////////////////
@@ -362,6 +385,8 @@ public class ViewEditor extends MultiPageEditorPart
     hierarchies = new HierarchyCache<NodeDisplayProperty>(
         viewInfo.getNodeDisplayPropertyProvider(),
         getViewGraph());
+
+    relSetChoices = RelSetDescriptors.buildViewChoices(viewInfo);
 
     // Listen to changes in the underlying ViewModel
     viewPrefsListener = new Listener();

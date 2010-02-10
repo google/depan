@@ -16,12 +16,13 @@
 
 package com.google.devtools.depan.eclipse.views.tools;
 
-import com.google.devtools.depan.eclipse.utils.DefaultRelationshipSet;
 import com.google.devtools.depan.eclipse.utils.LayoutPickerControl;
 import com.google.devtools.depan.eclipse.utils.RelationshipSetPickerControl;
 import com.google.devtools.depan.eclipse.utils.Resources;
+import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptor;
 import com.google.devtools.depan.eclipse.views.ViewEditorTool;
 import com.google.devtools.depan.eclipse.visualization.layout.Layouts;
+import com.google.devtools.depan.model.RelationshipSet;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -34,6 +35,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -73,7 +75,6 @@ public class SubLayoutTool extends ViewEditorTool {
     Label selectLabel = RelationshipSetPickerControl.createPickerLabel(baseComposite);
 
     relationshipSetselector = new RelationshipSetPickerControl(baseComposite);
-    relationshipSetselector.selectSet(DefaultRelationshipSet.SET);
     relationshipSetselector.setLayoutData(
       new GridData(SWT.FILL, SWT.CENTER, true, false));
 
@@ -103,17 +104,17 @@ public class SubLayoutTool extends ViewEditorTool {
       }
     });
 
-    initSelector();
-
     return baseComposite;
   }
 
-  /**
-   * Initialize the relationship set selector with the
-   * {@link BuiltinRelationshipSets#CONTAINER} set.
-   */
-  private void initSelector() {
-    relationshipSetselector.selectSet(DefaultRelationshipSet.SET);
+  @Override
+  protected void updateControls() {
+    super.updateControls();
+
+    // Update the RelSet picker for auto-collapse.
+    RelationshipSet selectedRelSet = getEditor().getContainerRelSet();
+    List<RelSetDescriptor> choices = getEditor().getRelSetChoices();
+    relationshipSetselector.setInput(selectedRelSet, choices );
   }
 
   protected void apply() {

@@ -18,10 +18,14 @@ package com.google.devtools.depan.eclipse.editors;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
 import com.google.devtools.depan.model.GraphModel;
+import com.google.devtools.depan.model.RelationshipSet;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * A document that provides information about a dependency graph.  In addition
@@ -135,6 +139,18 @@ public class GraphDocument {
     if (!graphAnalyzers.contains(analysis)) {
       graphAnalyzers.add(analysis);
     }
+  }
+
+  /**
+   * Provide a complete list of all RelationshipSets that are built-in by
+   * any of the analysis plug-ins.
+   */
+  public Collection<RelationshipSet> getBuiltinAnalysisRelSets() {
+    Set<RelationshipSet> result = Sets.newHashSet();
+    for (SourcePlugin plugin : getAnalyzers()) {
+      result.addAll(plugin.getBuiltinRelationshipSets());
+    }
+    return result;
   }
 
   /////////////////////////////////////

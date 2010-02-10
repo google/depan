@@ -18,7 +18,9 @@ package com.google.devtools.depan.eclipse.views.tools;
 
 import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.utils.RelationshipPicker;
+import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptor;
 import com.google.devtools.depan.filters.PathMatcher;
+import com.google.devtools.depan.model.RelationshipSet;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -28,6 +30,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+
+import java.util.List;
 
 /**
  * @author <a href="leeca@google.com">Lee Carver</a>
@@ -74,6 +78,10 @@ public class RelationNodeSelectorPart
 
   @Override
   public void updateControl(ViewEditor viewEditor) {
-    // TODO Get control state from view
+    relationshipPicker.updateTable(viewEditor.getBuiltinAnalysisPlugins());
+
+    RelationshipSet selectedRelSet = viewEditor.getContainerRelSet();
+    List<RelSetDescriptor> choices = viewEditor.getRelSetChoices();
+    relationshipPicker.updateRelSetPicker(selectedRelSet, choices );
   }
 }

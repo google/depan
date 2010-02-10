@@ -16,11 +16,11 @@
 
 package com.google.devtools.depan.eclipse.views.tools;
 
-import com.google.devtools.depan.eclipse.utils.DefaultRelationshipSet;
 import com.google.devtools.depan.eclipse.utils.RelationshipSelectorListener;
 import com.google.devtools.depan.eclipse.utils.RelationshipSetPickerControl;
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.utils.TableContentProvider;
+import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptor;
 import com.google.devtools.depan.eclipse.views.ViewSelectionListenerTool;
 import com.google.devtools.depan.graph.api.DirectedRelationFinder;
 import com.google.devtools.depan.model.GraphNode;
@@ -41,6 +41,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Collapse Tool. Provide a GUI to collapse and uncollapse nodes under another
@@ -56,6 +57,9 @@ public class CollapseTool extends ViewSelectionListenerTool
    * to choose the master node for a new collapse group.
    */
   private TableContentProvider<GraphNode> collapseMaster = null;
+
+  /** Provides RelSet to use for autoCollapse operations */
+  private RelationshipSetPickerControl autoSetPicker;
 
   /**
    * TODO: use those options for uncollapsing.
@@ -169,9 +173,7 @@ public class CollapseTool extends ViewSelectionListenerTool
     Label pickerLabel = RelationshipSetPickerControl.createPickerLabel(autoCollapse);
     pickerLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 
-    final RelationshipSetPickerControl autoSetPicker =
-        new RelationshipSetPickerControl(autoCollapse);
-    autoSetPicker.selectSet(DefaultRelationshipSet.SET);
+    autoSetPicker = new RelationshipSetPickerControl(autoCollapse);
     autoSetPicker.setLayoutData(
         new GridData(SWT.FILL, SWT.CENTER, true, false));
 
@@ -200,9 +202,19 @@ public class CollapseTool extends ViewSelectionListenerTool
     return result;
   }
 
+  @Override
+  protected void updateControls() {
+    super.updateControls();
+
+    // Update the RelSet picker for auto-collapse.
+    RelationshipSet selectedRelSet = getEditor().getContainerRelSet();
+    List<RelSetDescriptor> choices = getEditor().getRelSetChoices();
+    autoSetPicker.setInput(selectedRelSet, choices );
+  }
+
   /**
    * Autocollapse the current graph.
-   * Redraws are triggered by event propogation.
+   * Redraws are triggered by event propagation.
    *
    * @param finder
    */

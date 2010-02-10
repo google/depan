@@ -23,6 +23,7 @@ import com.google.devtools.depan.eclipse.utils.ListContentProvider;
 import com.google.devtools.depan.eclipse.utils.RelationshipSelectorListener;
 import com.google.devtools.depan.eclipse.utils.RelationshipSetPickerControl;
 import com.google.devtools.depan.eclipse.utils.Resources;
+import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptor;
 import com.google.devtools.depan.eclipse.views.ViewEditorTool;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.EdgeIncludePlugin;
 import com.google.devtools.depan.eclipse.wizards.NewRelationshipSetWizard;
@@ -66,7 +67,7 @@ public class RelationPickerTool extends ViewEditorTool
   /**
    * The {@link RelationshipSetSelector} to choose a named set.
    */
-  private RelationshipSetPickerControl selector;
+  private RelationshipSetPickerControl relSetPicker;
 
   /**
    * Shell used to open dialogs (SaveAs dialog in this case).
@@ -100,7 +101,13 @@ public class RelationPickerTool extends ViewEditorTool
 
   @Override
   protected void updateControls() {
+    super.updateControls();
     updateView();
+
+    // Update the RelSet picker for auto-collapse.
+    RelationshipSet selectedRelSet = getEditor().getContainerRelSet();
+    List<RelSetDescriptor> choices = getEditor().getRelSetChoices();
+    relSetPicker.setInput(selectedRelSet, choices );
   }
 
   @Override
@@ -159,9 +166,9 @@ public class RelationPickerTool extends ViewEditorTool
     Label pickerLabel = RelationshipSetPickerControl.createPickerLabel(region);
     pickerLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
-    selector = new RelationshipSetPickerControl(region);
-    selector.addChangeListener(this);
-    selector.setLayoutData(
+    relSetPicker = new RelationshipSetPickerControl(region);
+    relSetPicker.addChangeListener(this);
+    relSetPicker.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, false));
 
     Button save = new Button(region, SWT.PUSH);
@@ -213,7 +220,7 @@ public class RelationPickerTool extends ViewEditorTool
   }
 
   /**
-   * Update the view after a change in the model
+   * Update the view after a change in the model.
    */
   private void updateView() {
     if (!hasEditor()) {

@@ -17,9 +17,10 @@
 package com.google.devtools.depan.eclipse.utils;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
 import com.google.devtools.depan.eclipse.plugins.SourcePluginRegistry;
+import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptor;
+import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptors;
 import com.google.devtools.depan.eclipse.wizards.NewRelationshipSetWizard;
 import com.google.devtools.depan.filters.PathExpression;
 import com.google.devtools.depan.filters.PathMatcher;
@@ -53,6 +54,7 @@ import org.eclipse.swt.widgets.Table;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -107,7 +109,10 @@ public class RelationshipPicker
    * The quick selector on top of this widget applying a selection to the list
    * of relationship.
    */
-  private RelationshipSetPickerControl relationshipSetPicker = null;
+  private RelationshipSetPickerControl relSetPicker = null;
+
+  /** RelSets received from parent, without any temporary RelSets. */
+  List<RelSetDescriptor> baseChoices;
 
   /**
    * A shell necessary to open dialogs.
@@ -181,8 +186,6 @@ public class RelationshipPicker
       }
     });
 
-    fill();
-    fillSets();
     return panel;
   }
 
@@ -192,12 +195,10 @@ public class RelationshipPicker
     region.setLayout(new GridLayout(3, false));
 
     Label pickerLabel = RelationshipSetPickerControl.createPickerLabel(region);
-    pickerLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 
-    relationshipSetPicker = new RelationshipSetPickerControl(region);
-    relationshipSetPicker.selectSet(DefaultRelationshipSet.SET);
-    relationshipSetPicker.addChangeListener(this);
-    relationshipSetPicker.setLayoutData(
+    relSetPicker = new RelationshipSetPickerControl(region);
+    relSetPicker.addChangeListener(this);
+    relSetPicker.setLayoutData(
         new GridData(SWT.FILL, SWT.CENTER, true, false));
 
     Button save = new Button(region, SWT.PUSH);
@@ -348,9 +349,10 @@ public class RelationshipPicker
   /**
    * Fill the list with {@link Relation}s.
    */
-  private void fill() {
+  public void updateTable(List<SourcePlugin> plugins) {
+    relationPickerContent.clear();
     contentMap = new HashMap<Relation, DirectedRelation>();
-    for (SourcePlugin p : SourcePluginRegistry.getInstances()) {
+    for (SourcePlugin p : plugins) {
       for (Relation r : p.getRelations()) {
         DirectedRelation directedRelation = new BasicDirectedRelation(r);
         // add to the content provider
@@ -363,22 +365,12 @@ public class RelationshipPicker
   }
 
   /**
-   * Fill the quick selection list for existing named sets of relationships.
-   * Prefixes means:
-   * - * is a built-in relationship set
-   * - // is the temporary relationship set
-   * - + are user-defined sets.
-   *
-   * We look for sets in every opened project in the current workspace.
+   * Update the RelSetPicker with the current set of choices.
    */
-  private void fillSets() {
-    Map<RelationshipSet, String> sets = Maps.newHashMap();
-    sets.put(instanceSet, "Temporary set");
-
-    relationshipSetPicker.addSets(sets);
-    // select the temporary set
-    selectRelationshipSet(instanceSet);
-    relationshipSetPicker.selectSet(instanceSet);
+  public void updateRelSetPicker(
+      RelationshipSet selectedRelSet, List<RelSetDescriptor> choices) {
+    baseChoices = choices;
+    relSetPicker.setInput(selectedRelSet, choices);
   }
 
   /**
@@ -625,13 +617,15 @@ public class RelationshipPicker
    */
   private void copyToAndSelectInstanceSet() {
     for (DirectedRelation relation : contentMap.values()) {
-      instanceSet.setMatchForward(relation.getRelation(),
-          relation.matchForward());
-      instanceSet.setMatchBackward(relation.getRelation(),
-          relation.matchBackward());
+      instanceSet.setMatchForward(
+          relation.getRelation(), relation.matchForward());
+      instanceSet.setMatchBackward(
+          relation.getRelation(), relation.matchBackward());
     }
     this.selectedSet = instanceSet;
-    relationshipSetPicker.selectSet(instanceSet);
+    List<RelSetDescriptor> tempRelSets =  RelSetDescriptors.addTemporaryRelSet(
+        baseChoices, "Temporary set", instanceSet);
+    relSetPicker.setInput(instanceSet, tempRelSets);
   }
 
   /*
@@ -712,9 +706,9 @@ public class RelationshipPicker
    * if a valid {@link RelationshipSetSelector} object is not found.
    */
   public RelationshipSet getSelectedRelationshipSet() {
-    if (relationshipSetPicker == null) {
+    if (relSetPicker == null) {
       return RelationshipSetAdapter.EMTPY;
     }
-    return relationshipSetPicker.getSelection();
+    return relSetPicker.getSelection();
   }
 }

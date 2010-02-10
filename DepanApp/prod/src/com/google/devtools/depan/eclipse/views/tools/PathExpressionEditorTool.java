@@ -24,10 +24,12 @@ import com.google.devtools.depan.eclipse.utils.EditColTableDef;
 import com.google.devtools.depan.eclipse.utils.RelationshipPicker;
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.utils.TableContentProvider;
+import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptor;
 import com.google.devtools.depan.filters.PathExpression;
 import com.google.devtools.depan.filters.PathMatcher;
 import com.google.devtools.depan.filters.PathMatcherTerm;
 import com.google.devtools.depan.graph.basic.MultipleDirectedRelationFinder;
+import com.google.devtools.depan.model.RelationshipSet;
 import com.google.devtools.depan.model.RelationshipSetAdapter;
 
 import org.eclipse.core.resources.IFile;
@@ -61,6 +63,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * A <code>Composite</code> used to create filters for Path Expression analysis.
@@ -163,6 +166,11 @@ public class PathExpressionEditorTool
 
   @Override
   public void updateControl(ViewEditor viewEditor) {
+    relationshipPicker.updateTable(viewEditor.getBuiltinAnalysisPlugins());
+
+    RelationshipSet selectedRelSet = viewEditor.getContainerRelSet();
+    List<RelSetDescriptor> choices = viewEditor.getRelSetChoices();
+    relationshipPicker.updateRelSetPicker(selectedRelSet, choices );
   }
 
   /**

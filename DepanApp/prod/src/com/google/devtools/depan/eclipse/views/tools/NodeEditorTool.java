@@ -22,12 +22,12 @@ import com.google.devtools.depan.eclipse.trees.GraphData;
 import com.google.devtools.depan.eclipse.trees.NodeTreeProvider;
 import com.google.devtools.depan.eclipse.trees.NodeTreeView;
 import com.google.devtools.depan.eclipse.trees.NodeTreeView.NodeWrapper;
-import com.google.devtools.depan.eclipse.utils.DefaultRelationshipSet;
 import com.google.devtools.depan.eclipse.utils.EditColTableDef;
 import com.google.devtools.depan.eclipse.utils.RelationshipSelectorListener;
 import com.google.devtools.depan.eclipse.utils.RelationshipSetPickerControl;
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.utils.Tools;
+import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptor;
 import com.google.devtools.depan.eclipse.views.NodeEditorLabelProvider;
 import com.google.devtools.depan.eclipse.views.ViewSelectionListenerTool;
 import com.google.devtools.depan.graph.api.DirectedRelationFinder;
@@ -54,6 +54,7 @@ import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 
 import java.awt.Color;
+import java.util.List;
 
 /**
  * Tool for Node edition. Associate to each node a {@link NodeDisplayProperty}
@@ -104,18 +105,6 @@ public class NodeEditorTool extends ViewSelectionListenerTool
   @Override
   public String getName() {
     return Resources.NAME_NODEEDITOR;
-  }
-
-  @Override
-  public void setEditor(ViewEditor viewEditor) {
-    if (hasEditor()) {
-      GraphData<NodeDisplayProperty> hierarchy = getEditorHierarchy();
-      hierarchy.saveExpandState(
-          nodeTreeView.getTreeViewer().getExpandedTreePaths());
-    }
-
-    super.setEditor(viewEditor);
-    refresh();
   }
 
   @Override
@@ -174,30 +163,91 @@ public class NodeEditorTool extends ViewSelectionListenerTool
     pickerLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 
     relationshipSetPicker = new RelationshipSetPickerControl(region);
-    relationshipSetPicker.selectSet(DefaultRelationshipSet.SET);
     relationshipSetPicker.addChangeListener(this);
     relationshipSetPicker.setLayoutData(
         new GridData(SWT.FILL, SWT.CENTER, true, false));
   }
 
-  /*
-   * (non-Javadoc)
-   * return true if the property can be edited.
-   *
-   * @see org.eclipse.jface.viewers.ICellModifier#canModify(java.lang.Object,
-   *      java.lang.String)
+  /////////////////////////////////////
+  // Tool life-cycle methods
+
+  public void x_setEditor(ViewEditor viewEditor) {
+    if (hasEditor()) {
+      GraphData<NodeDisplayProperty> hierarchy = getEditorHierarchy();
+      hierarchy.saveExpandState(
+          nodeTreeView.getTreeViewer().getExpandedTreePaths());
+    }
+
+    super.setEditor(viewEditor);
+    refresh();
+  }
+
+  @Override
+  public void releaseResources() {
+    GraphData<NodeDisplayProperty> hierarchy = getEditorHierarchy();
+    hierarchy.saveExpandState(
+        nodeTreeView.getTreeViewer().getExpandedTreePaths());
+    }
+
+  @Override
+  protected void updateControls() {
+    super.updateControls();
+
+    // Update the RelSet picker for auto-collapse.
+    RelationshipSet selectedRelSet = getEditor().getContainerRelSet();
+    List<RelSetDescriptor> choices = getEditor().getRelSetChoices();
+    relationshipSetPicker.setInput(selectedRelSet, choices );
+  }
+
+  /**
+   * after a change of editor, reset the content of the tree.
    */
+  protected void refresh() {
+    // TODO(leeca): how can this tool be active and not have a valid editor?
+    if (!hasEditor()) {
+      return;
+    }
+
+    GraphData<NodeDisplayProperty> hierarchy = getEditorHierarchy();
+    nodeTreeView.updateData(hierarchy);
+  }
+
+  @Override
+  public void editorClosed(ViewEditor viewEditor) {
+    GraphData<NodeDisplayProperty> hierarchy = getEditorHierarchy();
+    hierarchy.saveExpandState(
+        nodeTreeView.getTreeViewer().getExpandedTreePaths());
+    super.editorClosed(viewEditor);
+  }
+
+  @Override
+  public void emptySelection() {
+    refresh();
+  }
+
+  private GraphData<NodeDisplayProperty> getEditorHierarchy() {
+    GraphData<NodeDisplayProperty> hierarchy =
+        getEditor().getHierarchy(getHierarchyRelSet());
+    return hierarchy;
+  }
+
+  private DirectedRelationFinder getHierarchyRelSet() {
+    RelationshipSet relSet = relationshipSetPicker.getSelection();
+    if (null != relSet) {
+      return relSet;
+    }
+    return getEditor().getContainerRelSet();
+  }
+
+  /////////////////////////////////////
+  // Node selection methods
+
+  @Override
   public boolean canModify(Object element, String property) {
     return EditColTableDef.get(TABLE_DEF, property).isEditable();
   }
 
-  /*
-   * (non-Javadoc)
-   * return the value to be edited for the given element and property.
-   *
-   * @see org.eclipse.jface.viewers.ICellModifier#getValue(java.lang.Object,
-   *      java.lang.String)
-   */
+  @Override
   @SuppressWarnings("unchecked")
   public Object getValue(Object element, String property) {
     if (element instanceof NodeWrapper) {
@@ -266,43 +316,9 @@ public class NodeEditorTool extends ViewSelectionListenerTool
     nodeTreeView.getTreeViewer().update(o, new String[] {property});
   }
 
-  /**
-   * after a change of editor, reset the content of the tree.
-   */
-  protected void refresh() {
-    // TODO(leeca): how can this tool be active and not have a valid editor?
-    if (!hasEditor()) {
-      return;
-    }
-
-    GraphData<NodeDisplayProperty> hierarchy = getEditorHierarchy();
-    nodeTreeView.updateData(hierarchy);
-  }
-
-  private GraphData<NodeDisplayProperty> getEditorHierarchy() {
-    RelationshipSet relSet = relationshipSetPicker.getSelection();
-    DirectedRelationFinder relFinder = relSet;
-    GraphData<NodeDisplayProperty> hierarchy =
-        getEditor().getHierarchy(relFinder);
-    return hierarchy;
-  }
-
   @Override
   public NodeDisplayProperty getObject(GraphNode node) {
     return getEditor().getNodeProperty(node);
-  }
-
-  @Override
-  public void editorClosed(ViewEditor viewEditor) {
-    GraphData<NodeDisplayProperty> hierarchy = getEditorHierarchy();
-    hierarchy.saveExpandState(
-        nodeTreeView.getTreeViewer().getExpandedTreePaths());
-    super.editorClosed(viewEditor);
-  }
-
-  @Override
-  public void emptySelection() {
-    refresh();
   }
 
   /**

@@ -18,12 +18,14 @@ package com.google.devtools.depan.eclipse.views.tools;
 
 import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.utils.RelationshipPicker;
+import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptor;
 import com.google.devtools.depan.eclipse.views.tools.RelationCount.RangeData;
 import com.google.devtools.depan.eclipse.views.tools.RelationCount.RangeOption;
 import com.google.devtools.depan.eclipse.views.tools.RelationCount.Settings;
 import com.google.devtools.depan.filters.PathMatcher;
 import com.google.devtools.depan.filters.RelationCountMatcher;
 import com.google.devtools.depan.filters.RelationCountMatcher.EdgeCountPredicate;
+import com.google.devtools.depan.model.RelationshipSet;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -36,6 +38,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
+
+import java.util.List;
 
 /**
  * Allow the user to select nodes based on a count of the forward (departing)
@@ -112,6 +116,12 @@ public class RelationCountNodeSelectorTool extends Composite {
    */
   public void updateControls(ViewEditor editor) {
     updateControls(getEditorSettings(editor));
+
+    relationshipPicker.updateTable(editor.getBuiltinAnalysisPlugins());
+
+    RelationshipSet selectedRelSet = editor.getContainerRelSet();
+    List<RelSetDescriptor> choices = editor.getRelSetChoices();
+    relationshipPicker.updateRelSetPicker(selectedRelSet, choices );
   }
 
   @Override

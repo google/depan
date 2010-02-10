@@ -16,12 +16,14 @@
 
 package com.google.devtools.depan.eclipse.editors;
 
+import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
 import com.google.devtools.depan.eclipse.trees.NodeTreeProvider;
 import com.google.devtools.depan.eclipse.visualization.layout.Layouts;
 import com.google.devtools.depan.graph.api.DirectedRelationFinder;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
+import com.google.devtools.depan.model.RelationshipSet;
 import com.google.devtools.depan.model.interfaces.GraphBuilder;
 import com.google.devtools.depan.view.EdgeDisplayProperty;
 import com.google.devtools.depan.view.NodeDisplayProperty;
@@ -30,6 +32,7 @@ import org.eclipse.core.resources.IResource;
 
 import java.awt.geom.Point2D;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -95,6 +98,18 @@ public class ViewDocument {
 
   public IResource getGraphModelLocation() {
     return parentGraph.getLocation();
+  }
+
+  public RelationshipSet getDefaultContainerRelSet() {
+    return parentGraph.getGraph().getDefaultAnalysis().getDefaultRelationshipSet();
+  }
+
+  public List<SourcePlugin> getBuiltinAnalysisPlugins() {
+    return parentGraph.getGraph().getAnalyzers();
+  }
+
+  public Collection<RelationshipSet> getBuiltinAnalysisRelSets() {
+    return parentGraph.getGraph().getBuiltinAnalysisRelSets();
   }
 
   public Collection<GraphNode> getViewNodes() {
