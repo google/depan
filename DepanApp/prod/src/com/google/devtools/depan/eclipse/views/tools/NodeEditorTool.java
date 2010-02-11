@@ -171,17 +171,6 @@ public class NodeEditorTool extends ViewSelectionListenerTool
   /////////////////////////////////////
   // Tool life-cycle methods
 
-  public void x_setEditor(ViewEditor viewEditor) {
-    if (hasEditor()) {
-      GraphData<NodeDisplayProperty> hierarchy = getEditorHierarchy();
-      hierarchy.saveExpandState(
-          nodeTreeView.getTreeViewer().getExpandedTreePaths());
-    }
-
-    super.setEditor(viewEditor);
-    refresh();
-  }
-
   @Override
   public void releaseResources() {
     GraphData<NodeDisplayProperty> hierarchy = getEditorHierarchy();
