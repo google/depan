@@ -207,12 +207,23 @@ public class ViewEditor extends MultiPageEditorPart
     return viewInfo.getBuiltinAnalysisRelSets();
   }
 
+  public List<RelSetDescriptor> getRelSetChoices() {
+    return relSetChoices;
+  }
+
   public RelationshipSet getContainerRelSet() {
     return viewInfo.getDefaultContainerRelSet();
   }
 
-  public List<RelSetDescriptor> getRelSetChoices() {
-    return relSetChoices;
+  /**
+   * Provide the relationship set to use for excluding edges in the diagram.
+   * This should be a preference setting, and it should play well with the
+   * notion of relationship set roles, but both of those efforts are pending.
+   * 
+   * @return the EMPTY relationship set.
+   */
+  public RelationshipSet getEdgeDisplayRelSet() {
+    return RelationshipSet.EMTPY;
   }
 
   /////////////////////////////////////

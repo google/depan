@@ -59,7 +59,7 @@ public interface RelationshipSet extends DirectedRelationFinder {
      */
     @Override
     public String getName() {
-      return "";
+      return "None";
     }
 
     /**

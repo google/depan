@@ -158,22 +158,14 @@ public class RelSetDescriptors {
   public static void addKnownSets(
       List<RelSetDescriptor> relsets,
       Collection<RelationshipSet> builtinAnalysisRelSets) {
+    addDepanRelSets(relsets);
     addBuiltinRelSets(relsets, builtinAnalysisRelSets);
     addProjectRelSets(relsets);
     // addTemporaryRelSets(relsets);
   }
 
-  /**
-   * Add all the given sets as temporary sets.
-   * 
-   * @param sets a map from a relationshipSet to its "title".
-   */
-  public static void addTemporaryRelSets(
-      List<RelSetDescriptor> relsets,
-      Map<RelationshipSet, String> tempRelSets) {
-    for (Map.Entry<RelationshipSet, String> entries : tempRelSets.entrySet()) {
-      relsets.add(new TempRelSetDescriptor(entries.getValue(), entries.getKey()));
-    }
+  private static void addDepanRelSets(List<RelSetDescriptor> relsets) {
+    relsets.add(new BuiltinRelSetDescriptor(RelationshipSet.EMTPY));
   }
 
   /**
@@ -214,6 +206,19 @@ public class RelSetDescriptors {
   }
 
   /**
+   * Add all the given sets as temporary sets.
+   * 
+   * @param sets a map from a relationshipSet to its "title".
+   */
+  public static void addTemporaryRelSets(
+      List<RelSetDescriptor> relsets,
+      Map<RelationshipSet, String> tempRelSets) {
+    for (Map.Entry<RelationshipSet, String> entries : tempRelSets.entrySet()) {
+      relsets.add(new TempRelSetDescriptor(entries.getValue(), entries.getKey()));
+    }
+  }
+
+  /**
    * @param input
    * @param instanceSet
    */
@@ -223,6 +228,5 @@ public class RelSetDescriptors {
     List<RelSetDescriptor> result = Lists.newArrayList(baseRelSets);
     result.add(new TempRelSetDescriptor(relSetName, tempRelSet));
     return result;
-    
   }
 }

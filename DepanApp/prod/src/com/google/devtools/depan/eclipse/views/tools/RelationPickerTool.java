@@ -105,7 +105,7 @@ public class RelationPickerTool extends ViewEditorTool
     updateView();
 
     // Update the RelSet picker for auto-collapse.
-    RelationshipSet selectedRelSet = getEditor().getContainerRelSet();
+    RelationshipSet selectedRelSet = getEditor().getEdgeDisplayRelSet();
     List<RelSetDescriptor> choices = getEditor().getRelSetChoices();
     relSetPicker.setInput(selectedRelSet, choices );
   }
