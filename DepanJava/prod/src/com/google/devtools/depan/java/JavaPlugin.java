@@ -100,7 +100,7 @@ public class JavaPlugin implements SourcePlugin {
 
   @Override
   public RelationshipSet getDefaultRelationshipSet() {
-    return JavaRelationSets.CONTAINER;
+    return JavaRelationSets.PKG_MEMBER;
   }
 
   @Override

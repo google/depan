@@ -83,12 +83,6 @@ public class JavaRelationSets {
   public static final RelationshipSetAdapter ALL =
       new RelationshipSetAdapter("All Java");
 
-  /**
-   * A set matching no relations.
-   */
-  public static final RelationshipSetAdapter NONE =
-    new RelationshipSetAdapter("None");
-
   static {
     // container relationships
     CONTAINER.addOrReplaceRelation(
@@ -169,6 +163,5 @@ public class JavaRelationSets {
     builtins.add(USES);
     builtins.add(CONTAINER);
     builtins.add(ALL);
-    builtins.add(NONE);
   }
 }
