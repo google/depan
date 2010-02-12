@@ -53,7 +53,7 @@ public class ElementKindPicker extends Composite {
   private static final String ELEMENT_SOURCE_LABEL = "Source";
 
   /** Table viewer used to adapt set of known Element kinds for table */
-  private TableViewer elementKindPicker = null;
+  private TableViewer elementKindViewer = null;
 
   /** Definition of columns used to display Element kinds. */
   private static final EditColTableDef[] TABLE_DEF =
@@ -90,11 +90,11 @@ public class ElementKindPicker extends Composite {
     EditColTableDef.setupTable(TABLE_DEF, elementKindTable);
 
     // Configure the table viewer
-    elementKindPicker = new TableViewer(elementKindTable);
-    elementKindPicker.setContentProvider(new ArrayContentProvider());
+    elementKindViewer = new TableViewer(elementKindTable);
+    elementKindViewer.setContentProvider(new ArrayContentProvider());
 
     LabelProvider labelProvider = new LabelProvider();
-    elementKindPicker.setLabelProvider(labelProvider);
+    elementKindViewer.setLabelProvider(labelProvider);
 
     configSorters(elementKindTable);
     setSortColumn(elementKindTable.getColumn(0), 0, SWT.DOWN);
@@ -119,7 +119,7 @@ public class ElementKindPicker extends Composite {
       public void widgetSelected(SelectionEvent e) {
         StructuredSelection nextSelection =
             new StructuredSelection(getInput().toArray());
-        elementKindPicker.setSelection(nextSelection, true);
+        elementKindViewer.setSelection(nextSelection, true);
       }
     });
 
@@ -129,7 +129,7 @@ public class ElementKindPicker extends Composite {
       @Override
       public void widgetSelected(SelectionEvent e) {
         StructuredSelection nextSelection = new StructuredSelection();
-        elementKindPicker.setSelection(nextSelection, true);
+        elementKindViewer.setSelection(nextSelection, true);
       }
     });
 
@@ -180,7 +180,7 @@ public class ElementKindPicker extends Composite {
   @SuppressWarnings("unchecked")
   private Collection<ElementKindDescriptor> getInput() {
     Collection<ElementKindDescriptor> result = 
-        (Collection<ElementKindDescriptor>) elementKindPicker.getInput();
+        (Collection<ElementKindDescriptor>) elementKindViewer.getInput();
     if (null == result) {
       return ImmutableList.of();
     }
@@ -188,7 +188,7 @@ public class ElementKindPicker extends Composite {
   }
 
   public void setInput(Collection<ElementKindDescriptor> elementKinds) {
-    elementKindPicker.setInput(elementKinds);
+    elementKindViewer.setInput(elementKinds);
   }
 
   private void updateSortColumn(TableColumn column, int colIndex) {
@@ -196,7 +196,7 @@ public class ElementKindPicker extends Composite {
   }
 
   private int getSortDirection(TableColumn column) {
-    Table tableControl = (Table) elementKindPicker.getControl();
+    Table tableControl = (Table) elementKindViewer.getControl();
     if (column != tableControl.getSortColumn()) {
       return SWT.DOWN;
     }
@@ -209,15 +209,15 @@ public class ElementKindPicker extends Composite {
       TableColumn column, int colIndex, int direction) {
 
     ITableLabelProvider labelProvider =
-        (ITableLabelProvider) elementKindPicker.getLabelProvider();
+        (ITableLabelProvider) elementKindViewer.getLabelProvider();
     ViewerSorter sorter = new AlphabeticSorter(
         new LabelProviderToString(labelProvider, colIndex));
     if (SWT.UP == direction) {
       sorter = new InverseSorter(sorter);
     }
 
-    Table tableControl = (Table) elementKindPicker.getControl();
-    elementKindPicker.setSorter(sorter);
+    Table tableControl = (Table) elementKindViewer.getControl();
+    elementKindViewer.setSorter(sorter);
     tableControl.setSortColumn(column);
     tableControl.setSortDirection(direction);
   }
@@ -230,13 +230,14 @@ public class ElementKindPicker extends Composite {
         invert.add(descr);
       }
     }
-    StructuredSelection nextSelection = new StructuredSelection(invert);
-    elementKindPicker.setSelection(nextSelection, true);
+    StructuredSelection nextSelection =
+        new StructuredSelection(invert.toArray());
+    elementKindViewer.setSelection(nextSelection, true);
   }
 
   private IStructuredSelection getSelection() {
     IStructuredSelection selectedElementKinds = 
-        (IStructuredSelection) elementKindPicker.getSelection();
+        (IStructuredSelection) elementKindViewer.getSelection();
     return selectedElementKinds;
   }
 
