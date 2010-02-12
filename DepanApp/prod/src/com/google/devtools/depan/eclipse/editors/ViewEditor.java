@@ -33,6 +33,8 @@ import com.google.devtools.depan.eclipse.trees.GraphData;
 import com.google.devtools.depan.eclipse.utils.ListenerManager;
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.utils.Tools;
+import com.google.devtools.depan.eclipse.utils.elementkinds.ElementKindDescriptor;
+import com.google.devtools.depan.eclipse.utils.elementkinds.ElementKindDescriptors;
 import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptor;
 import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptors;
 import com.google.devtools.depan.eclipse.views.tools.RelationCount;
@@ -178,6 +180,8 @@ public class ViewEditor extends MultiPageEditorPart
 
   private List<RelSetDescriptor> relSetChoices;
 
+  private Collection<ElementKindDescriptor> elementKindChoices;
+
   /////////////////////////////////////
   // Basic Getters and Setters
 
@@ -224,6 +228,13 @@ public class ViewEditor extends MultiPageEditorPart
    */
   public RelationshipSet getEdgeDisplayRelSet() {
     return RelationshipSet.EMTPY;
+  }
+
+  /**
+   * @return
+   */
+  public Collection<ElementKindDescriptor> getElementKinds() {
+    return elementKindChoices;
   }
 
   /////////////////////////////////////
@@ -398,6 +409,7 @@ public class ViewEditor extends MultiPageEditorPart
         getViewGraph());
 
     relSetChoices = RelSetDescriptors.buildViewChoices(viewInfo);
+    elementKindChoices = ElementKindDescriptors.buildViewChoices(viewInfo);
 
     // Listen to changes in the underlying ViewModel
     viewPrefsListener = new Listener();

@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.eclipse.plugins;
+package com.google.devtools.depan.eclipse.utils.elementkinds;
 
+import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
 import com.google.devtools.depan.model.Element;
 
 /**
@@ -24,7 +25,6 @@ import com.google.devtools.depan.model.Element;
  * 
  * @author <a href="leeca@google.com">Lee Carver</a>
  */
-// TODO(leeca): obtain these directly from each plugin.
 public class PrimitiveElementKindDescriptor
     implements ElementKindDescriptor {
   private static final String ELEMENT_TEXT = "Element";

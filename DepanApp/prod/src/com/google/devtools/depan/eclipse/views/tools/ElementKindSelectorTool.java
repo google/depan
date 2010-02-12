@@ -60,7 +60,7 @@ public class ElementKindSelectorTool extends Composite {
    * @param editor source of settings for UI configuration
    */
   public void updateControls(ViewEditor editor) {
-    // Nothing, for now
+    elementKindPicker.setInput(editor.getElementKinds());
   }
 
   @Override

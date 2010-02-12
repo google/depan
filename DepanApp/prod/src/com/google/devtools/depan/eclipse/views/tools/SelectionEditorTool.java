@@ -35,6 +35,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -79,6 +80,7 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
    * Holds the relationship picker and the path expression editor.
    */
   private TabFolder selectorTab = null;
+  private TabSelectorListener selectorTabListener;
 
   /** List of node selectors installed in the selector tab */
   private List<NodeSelectorPart> selectorTabParts = Lists.newArrayList();
@@ -177,8 +179,10 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
     Control selectedNodesControl = setupSelectedNodesContent(innerSash);
 
     // Create the tab folder that will hold the various node selectors
-    selectorTab = new TabFolder(innerSash, SWT.BORDER);
     selectorTabParts = Lists.newArrayList();
+    selectorTab = new TabFolder(innerSash, SWT.BORDER);
+    selectorTabListener = new TabSelectorListener();
+    selectorTab.addSelectionListener(selectorTabListener);
 
     NodeSelectorPart relationPickerPart = new RelationNodeSelectorPart();
     installNodeSelectorTab("Relation Path Selector", relationPickerPart);
@@ -287,6 +291,32 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
     return modeControl;
   }
 
+  /////////////////////////////////////
+  // Handle NodeSelectorParts
+
+  private class TabSelectorListener implements SelectionListener {
+
+    @Override
+    public void widgetDefaultSelected(SelectionEvent event) {
+      widgetSelected(event);
+    }
+
+    @Override
+    public void widgetSelected(SelectionEvent event) {
+      // It would be better to use event.item, but its still hard to
+      // get from that to the selectorTabPart that needs to receive the
+      // updateControl() call.
+      ViewEditor editor = getEditor();
+      if (null == editor) {
+        return;
+      }
+      int activeTab = selectorTab.getSelectionIndex();
+      if (activeTab >= 0) {
+        selectorTabParts.get(activeTab).updateControl(editor);
+      }
+    }
+  }
+
   /**
    * Install a new node selector part into the selectors tab.
    * 
@@ -299,11 +329,11 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
         selectorPart.createControl(selectorTab, SWT.NONE, getEditor());
     selectionControl.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, true));
+    selectorTabParts.add(selectorPart);
 
     TabItem tabItem = new TabItem(selectorTab, SWT.NONE);
     tabItem.setText(label);
     tabItem.setControl(selectionControl);
-    selectorTabParts.add(selectorPart);
   }
 
   private Control setupPreviewList(Composite parent) {

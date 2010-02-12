@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.eclipse.plugins;
+package com.google.devtools.depan.eclipse.utils.elementkinds;
 
 import com.google.devtools.depan.model.Element;
 
@@ -42,5 +42,4 @@ public interface ElementKindDescriptor {
    * @return actual class for this Element kind
    */
   public Class<? extends Element> getElementKind();
-
 }

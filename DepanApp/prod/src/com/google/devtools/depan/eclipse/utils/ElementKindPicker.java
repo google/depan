@@ -16,10 +16,9 @@
 
 package com.google.devtools.depan.eclipse.utils;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import com.google.devtools.depan.eclipse.plugins.ElementKindDescriptor;
-import com.google.devtools.depan.eclipse.plugins.PrimitiveElementKindDescriptor;
-import com.google.devtools.depan.eclipse.plugins.SourcePluginRegistry;
+import com.google.devtools.depan.eclipse.utils.elementkinds.ElementKindDescriptor;
 import com.google.devtools.depan.model.Element;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -42,7 +41,6 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * A control for selecting a set of Element types.
@@ -54,16 +52,8 @@ public class ElementKindPicker extends Composite {
   private static final String ELEMENT_KIND_LABEL = "Element Type";
   private static final String ELEMENT_SOURCE_LABEL = "Source";
 
-  /** Table control that renders set of known Element kinds */
-  private Table elementKindTable;
-
   /** Table viewer used to adapt set of known Element kinds for table */
   private TableViewer elementKindPicker = null;
-
-  private LabelProvider labelProvider;
-
-  /** Element kinds known to this selection tool. */
-  private Collection<PrimitiveElementKindDescriptor> elementKindDescriptors;
 
   /** Definition of columns used to display Element kinds. */
   private static final EditColTableDef[] TABLE_DEF =
@@ -82,7 +72,6 @@ public class ElementKindPicker extends Composite {
    */
   public ElementKindPicker(Composite parent, int style) {
     super(parent, style);
-    elementKindDescriptors = SourcePluginRegistry.getElementKindDescriptors();
 
     setLayout(new GridLayout());
 
@@ -92,7 +81,7 @@ public class ElementKindPicker extends Composite {
         new GridData(SWT.LEFT, SWT.CENTER, false, false));
 
     // Initialize the table control
-    elementKindTable = new Table(
+    Table elementKindTable = new Table(
         parent, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
     elementKindTable.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -104,9 +93,8 @@ public class ElementKindPicker extends Composite {
     elementKindPicker = new TableViewer(elementKindTable);
     elementKindPicker.setContentProvider(new ArrayContentProvider());
 
-    labelProvider = new LabelProvider();
+    LabelProvider labelProvider = new LabelProvider();
     elementKindPicker.setLabelProvider(labelProvider);
-    elementKindPicker.setInput(elementKindDescriptors);
 
     configSorters(elementKindTable);
     setSortColumn(elementKindTable.getColumn(0), 0, SWT.DOWN);
@@ -130,7 +118,7 @@ public class ElementKindPicker extends Composite {
       @Override
       public void widgetSelected(SelectionEvent e) {
         StructuredSelection nextSelection =
-            new StructuredSelection(elementKindDescriptors.toArray());
+            new StructuredSelection(getInput().toArray());
         elementKindPicker.setSelection(nextSelection, true);
       }
     });
@@ -189,36 +177,55 @@ public class ElementKindPicker extends Composite {
     return result;
   }
 
+  @SuppressWarnings("unchecked")
+  private Collection<ElementKindDescriptor> getInput() {
+    Collection<ElementKindDescriptor> result = 
+        (Collection<ElementKindDescriptor>) elementKindPicker.getInput();
+    if (null == result) {
+      return ImmutableList.of();
+    }
+    return result;
+  }
+
+  public void setInput(Collection<ElementKindDescriptor> elementKinds) {
+    elementKindPicker.setInput(elementKinds);
+  }
+
   private void updateSortColumn(TableColumn column, int colIndex) {
     setSortColumn(column, colIndex, getSortDirection(column));
   }
 
   private int getSortDirection(TableColumn column) {
-    if (column != elementKindTable.getSortColumn()) {
+    Table tableControl = (Table) elementKindPicker.getControl();
+    if (column != tableControl.getSortColumn()) {
       return SWT.DOWN;
     }
     // If it is unsorted (SWT.NONE), assume down sort
-    return (SWT.DOWN == elementKindTable.getSortDirection())
+    return (SWT.DOWN == tableControl.getSortDirection())
         ? SWT.UP : SWT.DOWN;
   }
 
   private void setSortColumn(
       TableColumn column, int colIndex, int direction) {
 
+    ITableLabelProvider labelProvider =
+        (ITableLabelProvider) elementKindPicker.getLabelProvider();
     ViewerSorter sorter = new AlphabeticSorter(
         new LabelProviderToString(labelProvider, colIndex));
     if (SWT.UP == direction) {
       sorter = new InverseSorter(sorter);
     }
+
+    Table tableControl = (Table) elementKindPicker.getControl();
     elementKindPicker.setSorter(sorter);
-    elementKindTable.setSortColumn(column);
-    elementKindTable.setSortDirection(direction);
+    tableControl.setSortColumn(column);
+    tableControl.setSortDirection(direction);
   }
 
   private void invertSelection() {
-    List<?> currSelection = getSelection().toList();
-    List<PrimitiveElementKindDescriptor> invert = Lists.newArrayList();
-    for (PrimitiveElementKindDescriptor descr: elementKindDescriptors ) {
+    Collection<?> currSelection = getSelection().toList();
+    Collection<ElementKindDescriptor> invert = Lists.newArrayList();
+    for (ElementKindDescriptor descr: getInput()) {
       if (!currSelection.contains(descr)) {
         invert.add(descr);
       }
