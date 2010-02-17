@@ -18,6 +18,7 @@ package com.google.devtools.depan.java.bytecode.eclipse;
 
 import com.google.common.collect.Lists;
 import com.google.devtools.depan.eclipse.editors.GraphDocument;
+import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.wizards.AbstractAnalysisWizard;
 import com.google.devtools.depan.eclipse.wizards.ProgressListenerMonitor;
 import com.google.devtools.depan.filesystem.FileSystemResources;
@@ -131,7 +132,8 @@ public class NewGraphWizard extends AbstractAnalysisWizard {
     monitor.worked(1);
 
     return createGraphDocument(resultGraph,
-      JavaResources.PLUGIN_ID, FileSystemResources.PLUGIN_ID);
+      JavaResources.PLUGIN_ID, FileSystemResources.PLUGIN_ID,
+      Resources.PLUGIN_ID);
   }
 
   /**

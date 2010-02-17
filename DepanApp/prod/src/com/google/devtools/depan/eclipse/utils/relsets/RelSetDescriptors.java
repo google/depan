@@ -158,14 +158,9 @@ public class RelSetDescriptors {
   public static void addKnownSets(
       List<RelSetDescriptor> relsets,
       Collection<RelationshipSet> builtinAnalysisRelSets) {
-    addDepanRelSets(relsets);
     addBuiltinRelSets(relsets, builtinAnalysisRelSets);
     addProjectRelSets(relsets);
     // addTemporaryRelSets(relsets);
-  }
-
-  private static void addDepanRelSets(List<RelSetDescriptor> relsets) {
-    relsets.add(new BuiltinRelSetDescriptor(RelationshipSet.EMTPY));
   }
 
   /**

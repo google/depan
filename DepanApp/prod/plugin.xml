@@ -357,5 +357,14 @@
          </run>
       </runtime>
    </extension>
+   <extension
+         point="com.google.devtools.depan.eclipse.sourceplugin">
+      <languagespecific
+            class="com.google.devtools.depan.eclipse.plugins.depan.DepanPlugin"
+            description="Analysis tools provided by the base application."
+            id="com.google.devtools.depan"
+            source="DepanApp">
+      </languagespecific>
+   </extension>
 </plugin>
 
