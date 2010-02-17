@@ -25,7 +25,7 @@ import org.eclipse.jface.viewers.ViewerSorter;
  *
  * @author <a href="leeca@google.com">Lee Carver</a>
  */
-class InverseSorter extends ViewerSorter {
+public class InverseSorter extends ViewerSorter {
 
   private ViewerComparator sorter;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008 Google Inc.
+ * Copyright 2010 Google Inc.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,30 +20,40 @@ import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
 import com.google.devtools.depan.model.Element;
 
 /**
- * Implement a simplistic {@code ElementKindDescriptor} that is suitable
- * for retro-fitting non-compliant plugins.
+ * Support views of ElementKinds that have simulated node types (e.g. Total,
+ * Other, etc.).
  * 
  * @author <a href="leeca@google.com">Lee Carver</a>
  */
-public class PrimitiveElementKindDescriptor 
-     extends PluginElementKindDescriptor {
+public class PsuedoElementKindDescriptor
+    extends PluginElementKindDescriptor {
 
-  private final Class<? extends Element> elementKind;
+  private final String kindName;
 
-  public PrimitiveElementKindDescriptor(
-      Class<? extends Element> elementKind, SourcePlugin plugin) {
+  /**
+   * @param plugin
+   */
+  public PsuedoElementKindDescriptor(String kindName, SourcePlugin plugin) {
     super(plugin);
-    this.elementKind = elementKind;
+    this.kindName = kindName;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * <p>This implementation throws {@code UnsupportedOperationException} if
+   * this method is called on an instance.
+   * 
+   * @throws UnsupportedOperationException if this method is called
+   *     on an instance.
+   */
+  @Override
+  public Class<? extends Element> getElementKind() {
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public String getElementKindName() {
-    String className = elementKind.getSimpleName();
-    return stripSuffix(className, ELEMENT_TEXT);
-  }
-
-  @Override
-  public Class<? extends Element> getElementKind() {
-    return elementKind;
+    return kindName;
   }
 }

@@ -29,6 +29,7 @@ import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.LabelPos
 import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeColors;
 import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeShape;
 import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeSize;
+import com.google.devtools.depan.eclipse.stats.ElementKindStats;
 import com.google.devtools.depan.eclipse.trees.GraphData;
 import com.google.devtools.depan.eclipse.utils.ListenerManager;
 import com.google.devtools.depan.eclipse.utils.Resources;
@@ -182,6 +183,8 @@ public class ViewEditor extends MultiPageEditorPart
 
   private Collection<ElementKindDescriptor> elementKindChoices;
 
+  private Collection<ElementKindStats.Info> elementKindStats;
+
   /////////////////////////////////////
   // Basic Getters and Setters
 
@@ -235,6 +238,10 @@ public class ViewEditor extends MultiPageEditorPart
    */
   public Collection<ElementKindDescriptor> getElementKinds() {
     return elementKindChoices;
+  }
+
+  public Collection<ElementKindStats.Info> getElementKindStats() {
+    return elementKindStats;
   }
 
   /////////////////////////////////////
@@ -400,6 +407,24 @@ public class ViewEditor extends MultiPageEditorPart
     }
 
     // Synthesize derived graph perspectives
+    deriveDetails();
+
+    // Listen to changes in the underlying ViewModel
+    viewPrefsListener = new Listener();
+    viewInfo.addPrefsListener(viewPrefsListener);
+
+    // TODO(leeca): What does this do?
+    // listen the changes in the configuration
+    new InstanceScope().getNode(Resources.PLUGIN_ID)
+        .addPreferenceChangeListener(this);
+  }
+
+  /**
+   * Derive a number of alternative presentations and details from the
+   * newly open graph view.
+   */
+  private void deriveDetails() {
+    // Synthesize derived graph perspectives
     viewGraph = viewInfo.buildGraphView();
     jungGraph = createJungGraph(getViewGraph());
     updateExposedGraph();
@@ -411,14 +436,9 @@ public class ViewEditor extends MultiPageEditorPart
     relSetChoices = RelSetDescriptors.buildViewChoices(viewInfo);
     elementKindChoices = ElementKindDescriptors.buildViewChoices(viewInfo);
 
-    // Listen to changes in the underlying ViewModel
-    viewPrefsListener = new Listener();
-    viewInfo.addPrefsListener(viewPrefsListener);
-
-    // TODO(leeca): What does this do?
-    // listen the changes in the configuration
-    new InstanceScope().getNode(Resources.PLUGIN_ID)
-        .addPreferenceChangeListener(this);
+    ElementKindStats stats = new ElementKindStats(elementKindChoices);
+    stats.incrStats(viewInfo.getViewNodes());
+    elementKindStats = stats.createStats();
   }
 
   /**

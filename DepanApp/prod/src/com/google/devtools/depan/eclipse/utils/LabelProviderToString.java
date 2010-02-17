@@ -23,7 +23,7 @@ import org.eclipse.jface.viewers.ITableLabelProvider;
  *
  * @author <a href="leeca@google.com">Lee Carver</a>
  */
-class LabelProviderToString implements ViewerObjectToString {
+public class LabelProviderToString implements ViewerObjectToString {
 
   private final ITableLabelProvider labelProvider;
   private final int sortColumn;
