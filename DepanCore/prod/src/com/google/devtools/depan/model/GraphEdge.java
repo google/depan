@@ -64,11 +64,11 @@ public class GraphEdge extends BasicEdge<String> {
    */
   @Override
   public int hashCode() {
-    int hash = 1;
+    int hash = 17;
     hash = hash * 31 + (null == getHead() ? 0 : getHead().hashCode());
     hash = hash * 31 + (null == getTail() ? 0 : getTail().hashCode());
     hash = hash * 31 + (null == getRelation() ? 0 : getRelation().hashCode());
-    return super.hashCode();
+    return hash;
   }
 
   /* (non-Javadoc)
