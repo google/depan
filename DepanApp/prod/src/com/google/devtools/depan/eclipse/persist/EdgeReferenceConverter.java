@@ -46,8 +46,13 @@ public class EdgeReferenceConverter implements Converter {
 
   private final Mapper mapper;
 
-  public EdgeReferenceConverter(Mapper mapper) {
+  /** Source of information about known edges and nodes. */
+  private final ViewDocumentConverter viewConverter;
+
+  public EdgeReferenceConverter(
+      Mapper mapper, ViewDocumentConverter viewConverter) {
     this.mapper = mapper;
+    this.viewConverter = viewConverter;
   }
 
   @Override
@@ -95,7 +100,7 @@ public class EdgeReferenceConverter implements Converter {
   public Object unmarshal(HierarchicalStreamReader reader,
       UnmarshallingContext context) {
     try {
-      GraphModel graph = (GraphModel) context.get(GraphModel.class);
+      GraphModel graph = viewConverter.getGraphModel(context);
 
       reader.moveDown();
       Relation relation = unmarshallRelation(reader, context);

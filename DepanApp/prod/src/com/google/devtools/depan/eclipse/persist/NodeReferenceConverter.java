@@ -36,6 +36,15 @@ public class NodeReferenceConverter implements Converter {
 
   public static final String NODE_REF_TAG = "node-ref";
 
+  private final ViewDocumentConverter viewConverter;
+
+  /**
+   * @param viewConverter
+   */
+  public NodeReferenceConverter(ViewDocumentConverter viewConverter) {
+    this.viewConverter = viewConverter;
+  }
+
   @Override
   @SuppressWarnings("unchecked")  // Parent type uses raw type Class
   public boolean canConvert(Class type) {
@@ -51,7 +60,7 @@ public class NodeReferenceConverter implements Converter {
   @Override
   public Object unmarshal(HierarchicalStreamReader reader,
       UnmarshallingContext context) {
-    GraphModel graph = (GraphModel) context.get(GraphModel.class);
+    GraphModel graph = viewConverter.getGraphModel(context);
     String nodeId = reader.getValue();
     GraphNode result = (GraphNode) graph.findNode(nodeId);
     if (null == result) {

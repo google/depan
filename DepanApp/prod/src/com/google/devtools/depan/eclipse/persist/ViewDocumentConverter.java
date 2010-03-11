@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.eclipse.persist;
 
+import com.google.devtools.depan.eclipse.editors.GraphDocument;
 import com.google.devtools.depan.eclipse.editors.GraphModelReference;
 import com.google.devtools.depan.eclipse.editors.ViewDocument;
 import com.google.devtools.depan.eclipse.editors.ViewPreferences;
@@ -50,6 +51,25 @@ public class ViewDocumentConverter implements Converter {
 
   public ViewDocumentConverter(Mapper mapper) {
     this.mapper = mapper;
+  }
+
+  /** Provide access to the referenced {@code GraphDocument}. */
+  public GraphDocument getGraphDocument(UnmarshallingContext context) {
+    return (GraphDocument) context.get(GraphDocument.class);
+  }
+
+  /**
+   * Provide access to the {@code GraphModel} of the referenced
+   * {@code GraphDocument}.
+   */
+  public GraphModel getGraphModel(UnmarshallingContext context) {
+    return getGraphDocument(context).getGraph();
+  }
+
+  /** Save a reference to the referenced {@code GraphDocument}. */
+  public void putGraphDocument(
+      UnmarshallingContext context, GraphDocument graphDoc) {
+    context.put(GraphDocument.class, graphDoc);
   }
 
   @Override
@@ -100,10 +120,12 @@ public class ViewDocumentConverter implements Converter {
       HierarchicalStreamReader reader, UnmarshallingContext context) {
     // There should not be two graphs in the same serialization,
     // but just in case ....
-    Object prior = context.get(GraphModel.class);
+    GraphDocument prior = getGraphDocument(context);
 
     try {
-      GraphModelReference viewInfo = (GraphModelReference) unmarshalObject(reader, context);
+      GraphModelReference viewInfo =
+          (GraphModelReference) unmarshalObject(reader, context);
+      putGraphDocument(context, viewInfo.getGraph());
       context.put(GraphModel.class, viewInfo.getGraph());
 
       Collection<GraphNode> viewNodes = loadGraphNodes(reader, context);
@@ -113,7 +135,7 @@ public class ViewDocumentConverter implements Converter {
 
       return new ViewDocument(viewInfo, viewNodes, viewPrefs);
     } finally {
-      context.put(GraphModel.class, prior);
+      putGraphDocument(context, prior);
     }
   }
 

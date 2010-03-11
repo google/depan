@@ -68,15 +68,19 @@ public class GraphElements {
       xstream.registerConverter(
           new GraphModelReferenceConverter(xstream.getMapper()));
 
+      // View converter knows how to handle a referenced GraphDocument.
+      ViewDocumentConverter viewConverter =
+          new ViewDocumentConverter(xstream.getMapper());
+
       xstream.aliasType(EdgeReferenceConverter.EDGE_REF_TAG, GraphEdge.class);
       xstream.registerConverter(
-          new EdgeReferenceConverter(xstream.getMapper()));
+          new EdgeReferenceConverter(xstream.getMapper(), viewConverter));
 
       xstream.aliasType(NodeReferenceConverter.NODE_REF_TAG, GraphNode.class);
-      xstream.registerConverter(new NodeReferenceConverter());
+      xstream.registerConverter(new NodeReferenceConverter(viewConverter));
 
       xstream.alias(ViewDocumentConverter.VIEW_INFO_TAG, ViewDocument.class);
-      xstream.registerConverter(new ViewDocumentConverter(xstream.getMapper()));
+      xstream.registerConverter(viewConverter);
 
       xstream.alias("view-prefs", ViewPreferences.class);
 
