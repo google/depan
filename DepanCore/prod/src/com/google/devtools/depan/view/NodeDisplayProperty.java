@@ -31,13 +31,12 @@ import java.util.Map;
 public class NodeDisplayProperty {
 
   public static final int DEFAULT_SIZE = 20;
-  
+
   private boolean isVisible = true;
   private Size size = Size.getDefault();
   private int givenSize = DEFAULT_SIZE;
   private Color color = null;
-  private boolean isSelected = false;
-  
+
   /**
    * Possible size functions for a node.
    * 
@@ -111,16 +110,13 @@ public class NodeDisplayProperty {
    * @param isVisible if the node should be visible or not.
    * @param size method used to give a size to a node.
    * @param color node's color
-   * @param isSelected if the node is selected or not.
    */
-  public NodeDisplayProperty(
-      boolean isVisible, Size size, Color color, boolean isSelected) {
+  public NodeDisplayProperty(boolean isVisible, Size size, Color color) {
     this.isVisible = isVisible;
     this.size = size;
     this.color = color;
-    this.isSelected = isSelected;
   }
-  
+
   /**
    * @return the isVisible
    */
@@ -168,20 +164,6 @@ public class NodeDisplayProperty {
    */
   public Color getColor() {
     return color;
-  }
-
-  /**
-   * @return true if the node is selected
-   */
-  public boolean isSelected() {
-    return isSelected;
-  }
-
-  /**
-   * @param setSelected the selection state to set for the node.
-   */
-  public void setSelected(boolean setSelected) {
-    this.isSelected = setSelected;
   }
 
   /**

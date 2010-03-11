@@ -51,41 +51,31 @@ public abstract class GLScene {
   private static final Logger logger =
       Logger.getLogger(GLScene.class.getName());
 
+  private SceneGrip grip;
   private GLCanvas canvas;
-  private GLData data;
   private final GLContext context;
   public final GL gl;
   public final GLU glu;
 
   public static boolean hyperbolic = false;
 
-  private enum RenderingMode {
-    /** Do not render. */
-    NOTHING,
-    /** Draw the scene. */
-    UPDATE,
-    /** Draw the scene, and draw a selection rectangle. */
-    UPDATE_SELECT_RECT,
-  }
-  private RenderingMode cmd = RenderingMode.UPDATE;
-
   /** Latest received mouse positions. */
   private int mouseX, mouseY;
+
   /** Latest mouse coordinate when rectangle selection started */
+  private boolean drawSelectRectangle = false;
   private int startSelectX, startSelectY;
   private int selectionWidth, selectionHeight;
-
-  private SceneGrip grip;
 
   private Color foregroundColor = Color.WHITE;
 
   public GLScene(Composite parent) {
-    data = new GLData();
+    GLData data = new GLData();
     data.doubleBuffer = true;
     data.depthSize = 16;
     canvas = new GLCanvas(parent, SWT.NO_BACKGROUND, data);
     canvas.setCurrent();
-    
+
     context = createGLContext();
 
     gl = context.getGL();
@@ -194,7 +184,7 @@ public abstract class GLScene {
     gl.glPushMatrix();
     drawScene(elapsedTime);
     gl.glPopMatrix();
-    if (cmd == RenderingMode.UPDATE_SELECT_RECT) {
+    if (drawSelectRectangle) {
       drawRectangle();
     }
     canvas.swapBuffers();
@@ -317,31 +307,22 @@ public abstract class GLScene {
    */
   protected abstract IntBuffer getSelectBuffer();
 
-  /**
-   * Say if the object represented by given id is already selected.
-   */
   protected abstract boolean isSelected(int id);
+
   /**
-   * Set the object represented by the given set of ids as the only one
-   * selected.
+   * Activate selection rendering for the exactly the listed nodes.
    */
   protected abstract void setSelection(int[] ids);
+
   /**
-   * Set the object represented by the given set of ids as unselected.
+   * Turn on selection rendering for the listed nodes.
    */
-  protected abstract void unselect(int[] ids);
+  protected abstract void extendSelection(int[] ids);
+
   /**
-   * unselect the object with the given id.
+   * Turn off selection rendering for the listed nodes.
    */
-  protected abstract void unselect(int id);
-  /**
-   * Set the object represented by the given set of ids as selected.
-   */
-  protected abstract void select(int[] ids);
-  /**
-   * select the object with the given id.
-   */
-  protected abstract void select(int id);
+  protected abstract void reduceSelection(int[] ids);
 
   /**
    * Move every selected objects relatively. Movement is given relatively
@@ -367,8 +348,8 @@ public abstract class GLScene {
   }
 
   /**
-   * A key stroke received by the OpenGL canvas wasn't used by the previous
-   * layers: give a change to someone else to use it.
+   * A key stroke was received by the OpenGL canvas but it wasn't used by the
+   * previous layers.  Give someone else a chance to use it.
    *
    * @param keyCode
    * @param character
@@ -454,21 +435,21 @@ public abstract class GLScene {
       this.selectionHeight  = startY - toY;
       this.mouseY = toY + selectionHeight / 2;
     }
-    cmd = RenderingMode.UPDATE;
+    drawSelectRectangle = false;
     return renderWithPicking();
   }
 
   /**
-   * Set the drawing mode to render an overlay rectangle for selection.
+   * Activate and define an overlay rectangle that shows the selection area.
    *
    * @param fromX
    * @param fromY
    * @param mouseX
    * @param mouseY
    */
-  public void drawSelectionRectangle(int fromX, int fromY, int mouseX,
-      int mouseY) {
-    cmd = RenderingMode.UPDATE_SELECT_RECT;
+  public void activateSelectionRectangle(
+      int fromX, int fromY, int mouseX, int mouseY) {
+    drawSelectRectangle = true;
     this.mouseX = mouseX;
     this.mouseY = mouseY;
     this.startSelectX = fromX;

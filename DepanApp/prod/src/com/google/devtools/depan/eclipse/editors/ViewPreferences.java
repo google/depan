@@ -233,7 +233,7 @@ public class ViewPreferences {
     listeners.fireEvent(new SimpleDispatcher() {
       @Override
       public void dispatch(ViewPrefsListener listener) {
-        listener.nodeLocationsChanged(newLocations);
+        listener.nodeLocationsSet(newLocations);
       }
     });
   }
@@ -252,7 +252,7 @@ public class ViewPreferences {
     listeners.fireEvent(new SimpleDispatcher() {
       @Override
       public void dispatch(ViewPrefsListener listener) {
-        listener.locationsChanged(newLocations, author);
+        listener.nodeLocationsChanged(newLocations, author);
       }
     });
   }

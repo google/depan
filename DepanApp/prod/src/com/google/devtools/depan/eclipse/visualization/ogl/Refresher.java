@@ -16,21 +16,23 @@
 
 package com.google.devtools.depan.eclipse.visualization.ogl;
 
+import com.google.common.base.Preconditions;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
- * A refresher, that periodically repaint a GLScene.
+ * A refresher that periodically repaints a GLScene.
  *
  * @author Yohann Coppel
- *
  */
 public class Refresher extends Thread {
+  private static Logger logger =
+      Logger.getLogger(Refresher.class.getName());
+
   public static final int DELAY = 10;
 
-  // values to compute the number of FPS.
-  private long frames = 0;
-  private long time = 0;
-  private long lastTime = System.currentTimeMillis();
-
-  private GLScene scene;
+  private final GLScene scene;
 
   /**
    * Construct a refresher for the given scene.
@@ -38,13 +40,35 @@ public class Refresher extends Thread {
    * @param scene the GLScene to refresh periodically.
    */
   public Refresher(GLScene scene) {
+    Preconditions.checkNotNull(scene);
     this.scene = scene;
   }
 
-  private Runnable action = new Runnable() {
+  private static class SceneRefresher implements Runnable {
+
+    private final GLScene scene;
+
+    // values to compute the number of FPS.
+    private long frames = 0;
+    private long time = 0;
+    private long lastTime = System.currentTimeMillis();
+
+    /**
+     * @param scene
+     */
+    public SceneRefresher(GLScene scene) {
+      this.scene = scene;
+    }
+
+    public boolean isDrawable() {
+      if (scene.getContext() == null) {
+        return false;
+      }
+      return !scene.getContext().isDisposed();
+    }
+
     public void run() {
-      if (scene != null && scene.getContext() != null
-          && !scene.getContext().isDisposed()) {
+      if (isDrawable()) {
         scene.render(DELAY);
 
         // computations for FPS
@@ -54,24 +78,24 @@ public class Refresher extends Thread {
         frames++;
         // printing the FPS number every 10 seconds.
         if (time > 10000) {
-          /*System.out.println(""
-              + ((float) frames / (float) time * 1000f) + " FPS");*/
+          logger.fine(((float) frames / (float) time * 1000f) + " FPS");
           time = 0;
           frames = 0;
         }
       }
     }
-  };
+  }
 
   @Override
   public void run() {
-    while ((this.scene != null) && (this.scene.getContext() != null)
-        && (!this.scene.getContext().isDisposed())) {
-      this.scene.getContext().getDisplay().syncExec(action);
+    SceneRefresher sceneRefresher = new SceneRefresher(scene);
+
+    while (sceneRefresher.isDrawable()) {
+      scene.getContext().getDisplay().syncExec(sceneRefresher);
       try {
         Thread.sleep(DELAY);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
+      } catch (InterruptedException err) {
+        logger.log(Level.SEVERE, "Rendering loop interrupted", err);
       }
     }
   }

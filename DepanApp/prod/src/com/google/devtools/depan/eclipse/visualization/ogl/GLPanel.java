@@ -18,11 +18,9 @@ package com.google.devtools.depan.eclipse.visualization.ogl;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds;
 import com.google.devtools.depan.eclipse.visualization.RendererChangeListener;
-import com.google.devtools.depan.eclipse.visualization.SelectionChangeListener;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
@@ -38,8 +36,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -50,7 +46,6 @@ import java.util.logging.Logger;
  * a listener.
  *
  * @author Yohann Coppel
- *
  */
 public class GLPanel extends GLScene {
 
@@ -90,7 +85,7 @@ public class GLPanel extends GLScene {
    */
   private IntBuffer selectBuffer;
 
-    /**
+  /**
    * Rendering pipe.
    */
   RenderingPipe renderer;
@@ -108,31 +103,13 @@ public class GLPanel extends GLScene {
   Map<GraphEdge, EdgeRenderingProperty> edgePropMap = Maps.newHashMap();
 
   /**
-   * The selection listener notified when the selection changes.
+   * Source of information about the graph.
    */
-  protected SelectionChangeListener selectionListener;
+  private ViewEditor editor;
 
-  /**
-   * The location listener notified when the graph or visualization
-   * properties change.
-   */
-  protected RendererChangeListener changeListener;
-
-  /**
-   * Set of currently selected nodes.
-   */
-  protected Set<NodeRenderingProperty> selection;
-
-  public GLPanel(
-      Composite parent, ViewEditor editor,
-      SelectionChangeListener selectionListener,
-      RendererChangeListener changeListener,
-      Map<GraphNode, Double> nodeRanking) {
+  public GLPanel(Composite parent, ViewEditor editor) {
     super(parent);
-    this.selectionListener = selectionListener;
-    this.changeListener = changeListener;
-
-    selection = Sets.newHashSet();
+    this.editor = editor;
 
     GraphModel viewGraph = editor.getViewGraph();
 
@@ -168,7 +145,7 @@ public class GLPanel extends GLScene {
     // Allocate the select buffer needed for these graphic elements.
     selectBuffer = allocSelectBuffer();
 
-    renderer = new RenderingPipe(gl, glu, this, editor, nodeRanking);
+    renderer = new RenderingPipe(gl, glu, this, editor);
     dryRun();
 
     Refresher r = new Refresher(this);
@@ -224,17 +201,6 @@ public class GLPanel extends GLScene {
   }
 
   @Override
-  public void moveSelectionDelta(float x, float y) {
-    for (NodeRenderingProperty prop : selection) {
-      prop.positionX += x;
-      prop.positionY += y;
-      prop.targetPositionX += x;
-      prop.targetPositionY += y;
-    }
-    notifyHardLocationChange(selection);
-  }
-
-  @Override
   public void uncaughtKey(int keyCode, char character, boolean keyCtrlState,
       boolean keyAltState, boolean keyShiftState) {
     boolean caught = renderer.uncaughtKey(keyCode, character, keyCtrlState,
@@ -287,28 +253,6 @@ public class GLPanel extends GLScene {
   /**
    *  check if the given id matches a node and is correct.
    */
-  private boolean isEdgeId(int id) {
-    if ((id & ID_MASK) != EDGE_MASK) {
-      return false;
-    }
-    int n = id & ID_MASK_INV;
-    if (n < 0 || n >= edgesProperties.length) {
-      return false;
-    }
-    return true;
-  }
-
-  private EdgeRenderingProperty getEdgeRenderer(int id) {
-    if (!isEdgeId(id)) {
-      return null;
-    }
-    int n = id & ID_MASK_INV;
-    return edgesProperties[n];
-  }
-
-  /**
-   *  check if the given id matches a node and is correct.
-   */
   private boolean isNodeId(int id) {
     if ((id & ID_MASK) != NODE_MASK) {
       return false;
@@ -328,24 +272,23 @@ public class GLPanel extends GLScene {
     return nodesProperties[n];
   }
 
-  private NodeRenderingProperty[] getNodeRenderers(int[] ids) {
-    Collection<NodeRenderingProperty> result = Lists.newArrayList();
-    for (int id : ids) {
-      NodeRenderingProperty p = getNodeRenderer(id);
-      if (null != p) {
-        result.add(p);
-      }
+  private GraphNode getGraphNode(int id) {
+    NodeRenderingProperty prop = getNodeRenderer(id);
+    if (null != prop) {
+      return prop.node;
     }
-    return result.toArray(new NodeRenderingProperty[0]);
+    return null;
   }
 
-  private GraphNode[] getGraphNodes(NodeRenderingProperty[] props) {
-    GraphNode[] nodes = new GraphNode[props.length];
-    int n = 0;
-    for (NodeRenderingProperty prop : props) {
-      nodes[n++] = prop.node;
+  private Collection<GraphNode> getGraphNodes(int[] ids) {
+    List<GraphNode> result = Lists.newArrayListWithCapacity(ids.length);
+    for (int id : ids) {
+      NodeRenderingProperty prop = getNodeRenderer(id);
+      if (null != prop) {
+        result.add(prop.node);
+      }
     }
-    return nodes;
+    return result;
   }
 
   /**
@@ -416,20 +359,6 @@ public class GLPanel extends GLScene {
     node2property(node).isVisible = isVisible;
   }
 
-  /**
-   * Sets if a node is selected and updates the selection list.
-   *
-   * @param node Node whose selection status is modified.
-   * @param selected Shows whether this node is selected.
-   */
-  public void setSelected(GraphNode node, boolean selected) {
-    node2property(node).setSelected(selected);
-    if (selected) {
-      select(node);
-    } else {
-      unselect(node);
-    }
-  }
   ///////////////////////
   // Modifying selection
 
@@ -451,177 +380,50 @@ public class GLPanel extends GLScene {
     return selectBuffer;
   }
 
-  public void setSelection(Collection<GraphNode> pickedNodes) {
-    NodeRenderingProperty[] props = nodes2properties(pickedNodes);
-    // unselect selected nodes
-    unselect(selection.toArray(new NodeRenderingProperty[0]));
-    // select new ones.
-    select(props);
-  }
-
-  @Override
-  protected void setSelection(int[] ids) {
-    // unselect selected nodes
-    unselect(selection.toArray(new NodeRenderingProperty[0]));
-
-    // Report the selection, if problems
-    logIds(Level.FINE, ids);
-
-    // select new ones.
-    select(getNodeRenderers(ids));
-  }
-
-  private void logIds(Level level, int[] ids) {
-    // Early exit if no ids will be logged.
-    if (!logger.isLoggable(level)) {
-      return;
-    }
-    int item = 0;
-    for (int id : ids) {
-      logger.log(level, "item #" + item++ + "; " + idInfo(id));
-    }
-  }
-
-  private String idInfo(int id) {
-    if (0 == id) {
-      // What are these objects?  Unnamed text for node names?
-      return "zero id";
-    }
-
-    NodeRenderingProperty p = getNodeRenderer(id);
-    if (p != null) {
-      return "Node=" + p.node.friendlyString();
-    }
-
-    EdgeRenderingProperty edge = getEdgeRenderer(id);
-    if (edge != null) {
-      return "Edge=" + edge.edge.toString();
-    }
-
-    return "unknown";
-  }
-
-  // single [un]select: create a notify.
-
-  @Override
-  protected void select(int id) {
-    selectNotify(getNodeRenderer(id), true);
-  }
-
-  public void select(GraphNode node) {
-    selectNotify(node2property(node), true);
-  }
-
-  @Override
-  protected void unselect(int id) {
-    unselectNotify(getNodeRenderer(id), true);
-  }
-
-  public void unselect(GraphNode node) {
-    unselectNotify(node2property(node), true);
-  }
-
-  // multiple [un]select: create only one notify at the end.
-
-  @Override
-  protected void select(int[] ids) {
-    select(getNodeRenderers(ids));
-  }
-
-  private void select(NodeRenderingProperty[] props) {
-    for (NodeRenderingProperty prop : props) {
-      selectNotify(prop, false);
-    }
-    notifySelected(props);
-  }
-
-  @Override
-  protected void unselect(int[] ids) {
-    unselect(getNodeRenderers(ids));
-  }
-
-  private void unselect(NodeRenderingProperty[] props) {
-    for (NodeRenderingProperty prop : props) {
-      unselectNotify(prop, false);
-    }
-    notifyUnselected(props);
-  }
-
-  ////////////////////////
-  // information retrieval
-
-  public GraphNode[] getSelectedNodes() {
-    return getGraphNodes(selection.toArray(new NodeRenderingProperty[0]));
-  }
-
   @Override
   protected boolean isSelected(int id) {
-    return selection.contains(getNodeRenderer(id));
-  }
-
-  ///////////////////////////////////////////////
-  // apply selection and notification to listener
-
-  private void selectNotify(NodeRenderingProperty prop, boolean notify) {
-    if (null != prop) {
-      prop.setSelected(true);
-      selection.add(prop);
-      if (notify) {
-        notifySelected(prop);
-      }
+    GraphNode node = getGraphNode(id);
+    if (null == node) {
+      return false;
     }
+    return editor.isSelected(node);
   }
 
-  private void unselectNotify(NodeRenderingProperty prop, boolean notify) {
-    if (null != prop) {
-      prop.setSelected(false);
-      selection.remove(prop);
-      if (notify) {
-        notifyUnselected(prop);
-      }
+  private RendererChangeListener getRendererCallback() {
+    return editor.getRendererCallback();
+  }
+
+  @Override
+  protected void setSelection(int[] picked) {
+    getRendererCallback().selectionChanged(getGraphNodes(picked));
+  }
+
+  @Override
+  protected void extendSelection(int[] extend) {
+    getRendererCallback().selectionExtended(getGraphNodes(extend));
+  }
+
+  @Override
+  protected void reduceSelection(int[] remove) {
+    getRendererCallback().selectionReduced(getGraphNodes(remove));
+  }
+
+  @Override
+  public void moveSelectionDelta(float x, float y) {
+    getRendererCallback().selectionMoved(x, y);
+  }
+
+  public void updateSelection(
+      Collection<GraphNode> clearedNodes,
+      Collection<GraphNode> selectedNodes) {
+
+    // Unselect all the cleared Nodes
+    for (GraphNode node : clearedNodes) {
+      node2property(node).setSelected(false);
     }
-  }
-
-  private void notifySelected(NodeRenderingProperty prop) {
-    selectionListener.notifyAddedToSelection(new GraphNode[] {prop.node});
-  }
-
-  private void notifySelected(NodeRenderingProperty[] props) {
-    if (props.length ==0) {
-      return;
+    for (GraphNode node : selectedNodes) {
+      node2property(node).setSelected(true);
     }
-    selectionListener.notifyAddedToSelection(getGraphNodes(props));
-  }
-
-  private void notifyUnselected(NodeRenderingProperty prop) {
-    selectionListener.notifyRemovedFromSelection(new GraphNode[] {prop.node});
-  }
-
-  private void notifyUnselected(NodeRenderingProperty[] props) {
-    if (props.length ==0) {
-      return;
-    }
-    selectionListener.notifyRemovedFromSelection(getGraphNodes(props));
-  }
-
-  /**
-   * Update the position of all nodes in the collection, regardless of their
-   * current location.
-   * 
-   * <p>This method is called after mouse-drag moves.
-   * 
-   * @param movedNodes collection of moved nodes.
-   */
-  private void notifyHardLocationChange(
-      Collection<? extends NodeRenderingProperty>  movedNodes) {
-    Map<GraphNode, Point2D> changes =
-        Maps.newHashMapWithExpectedSize(movedNodes.size());
-    for (NodeRenderingProperty node : movedNodes) {
-      Point2D position = new Point2D.Float(
-          node.targetPositionX, node.targetPositionY);
-      changes.put(node.node, position);
-    }
-    changeListener.locationsChanged(changes);
   }
 
   /**
@@ -645,7 +447,7 @@ public class GLPanel extends GLScene {
         changes.put(node.node, position);
       }
     }
-    changeListener.locationsChanged(changes);
+    getRendererCallback().locationsChanged(changes);
   }
 
   public void notifyLocationChange() {

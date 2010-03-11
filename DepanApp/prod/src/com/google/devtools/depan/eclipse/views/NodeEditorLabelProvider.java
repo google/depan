@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.eclipse.views;
 
+import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.trees.NodeTreeView.NodeWrapper;
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.utils.Tools;
@@ -35,6 +36,11 @@ import java.awt.Color;
  */
 public class NodeEditorLabelProvider extends LabelProvider implements
     ITableLabelProvider {
+  private NodeEditorTool tool;
+
+  public NodeEditorLabelProvider(NodeEditorTool tool) {
+    this.tool = tool;
+  }
 
   /*
    * (non-Javadoc)
@@ -58,11 +64,19 @@ public class NodeEditorLabelProvider extends LabelProvider implements
     case NodeEditorTool.INDEX_VISIBLE:
       return Resources.getOnOff(property.isVisible());
     case NodeEditorTool.INDEX_SELECTED:
-      return Resources.getOnOff(property.isSelected());
+      return Resources.getOnOff(isNodeSelected(wrapper.getNode()));
     default:
       break;
     }
     return null;
+  }
+
+  private boolean isNodeSelected(GraphNode node) {
+    ViewEditor viewEditor = tool.getEditor();
+    if (null == viewEditor) {
+      return false;
+    }
+    return viewEditor.isSelected(node);
   }
 
   /*

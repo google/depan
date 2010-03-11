@@ -32,10 +32,10 @@ import org.eclipse.swt.widgets.Listener;
  * a {@link GLScene}.
  *
  * @author Yohann Coppel
- *
  */
-public class SceneGrip extends MouseAdapter implements MouseMoveListener,
-    MouseWheelListener, Listener, KeyListener, MouseListener {
+public class SceneGrip extends MouseAdapter
+    implements KeyListener, Listener,
+    MouseListener, MouseMoveListener, MouseWheelListener {
 
   /** eye position */
   private float xrot;
@@ -53,6 +53,7 @@ public class SceneGrip extends MouseAdapter implements MouseMoveListener,
 
   /** speed for moves */
   private static final int SPEED = 5;
+
   /** Camera z position, if zoom value is set to "100%". */
   private static final float HUNDRED_PERCENT_ZOOM = 300f;
 
@@ -63,6 +64,7 @@ public class SceneGrip extends MouseAdapter implements MouseMoveListener,
   private boolean keyCtrlState = false;
   private boolean keyShiftState = false;
   private boolean keyAltState = false;
+
   /** Mouse button states. */
   private boolean[] mouseButtonState = {false, false, false, false, false};
 
@@ -239,7 +241,7 @@ public class SceneGrip extends MouseAdapter implements MouseMoveListener,
         break;
       case RectangleSelection:
         // draw selection rectangle
-        scene.drawSelectionRectangle(mouseDownX, mouseDownY, e.x, e.y);
+        scene.activateSelectionRectangle(mouseDownX, mouseDownY, e.x, e.y);
         break;
       default:
       }
@@ -270,18 +272,25 @@ public class SceneGrip extends MouseAdapter implements MouseMoveListener,
     mouseDownY = e.y;
 
     int[] hits = scene.pickObjectsAt(mouseDownX, mouseDownY);
+
+    // The user clicked on an object without control or shift
+    // Entry move mode, and make the picked node the select node if it
+    // is not part of the current selection.
     if (hits.length > 0 && !keyCtrlState && !keyShiftState) {
-      // clicked on an object...
       if (!scene.isSelected(hits[0])) {
         // ..not already selected: make it the new selection
         scene.setSelection(new int[]{hits[0]});
       }
       state = State.MovingObject;
-    } else if (hits.length > 0 && keyCtrlState) {
-      // start a rectangle selection
+    }
+
+    // Start a rectangle selection
+    else if (hits.length > 0 && keyCtrlState) {
       state = State.RectangleSelection;
-    } else if (keyShiftState) {
-      // clicked with shift: start moving camera
+    }
+
+    // Clicked with shift: start moving camera
+    else if (keyShiftState) {
       state = State.Moving;
     } else {
       // clicked on the background.
@@ -303,31 +312,31 @@ public class SceneGrip extends MouseAdapter implements MouseMoveListener,
         // instead of moving the node, the mouse stayed at the same place.
         // we replace the selection.
         scene.setSelection(scene.pickObjectsAt(e.x, e.y));
-      } else if (mouseDownX == e.x && mouseDownY == e.y
+      }
+      else if (mouseDownX == e.x && mouseDownY == e.y
           && state == State.RectangleSelection) {
         // a rectangle when the mouse hasn't moved... select nothing
-        if (keyCtrlState) {
-          if (keyAltState) {
-            scene.unselect(scene.pickObjectsAt(e.x, e.y));
-          } else {
-            scene.select(scene.pickObjectsAt(e.x, e.y));
-          }
-        } else {
+        if (!keyCtrlState) {
           int[] newHits = new int[0];
           scene.setSelection(newHits);
         }
-      } else if (state == State.RectangleSelection) {
-        if (keyCtrlState) {
-          if (keyAltState) {
-            scene.unselect(
-                scene.pickRectangle(mouseDownX, mouseDownY, e.x, e.y));
-          } else {
-            scene.select(scene.pickRectangle(mouseDownX, mouseDownY, e.x, e.y));
-          }
-        } else {
-          scene.setSelection(
-              scene.pickRectangle(mouseDownX, mouseDownY, e.x, e.y));
+        else if (keyAltState) {
+          scene.reduceSelection(scene.pickObjectsAt(e.x, e.y));
         }
+        else {
+          scene.extendSelection(scene.pickObjectsAt(e.x, e.y));
+        }
+      }
+      else if (state == State.RectangleSelection) {
+        int[] picked = scene.pickRectangle(mouseDownX, mouseDownY, e.x, e.y);
+        if (!keyCtrlState) {
+          scene.setSelection(picked);
+        }
+        else if (keyAltState) {
+          scene.reduceSelection(picked);
+        }
+        else
+          scene.extendSelection(picked);
       }
     }
     state = State.None;

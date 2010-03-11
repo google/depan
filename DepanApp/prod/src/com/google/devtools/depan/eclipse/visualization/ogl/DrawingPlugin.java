@@ -16,21 +16,21 @@
 
 package com.google.devtools.depan.eclipse.visualization.ogl;
 
+import com.google.devtools.depan.eclipse.visualization.plugins.core.EdgeRenderingPlugin;
+import com.google.devtools.depan.eclipse.visualization.plugins.core.NodeRenderingPlugin;
+
+import com.sun.opengl.util.texture.Texture;
+import com.sun.opengl.util.texture.TextureCoords;
+
 import java.awt.Color;
 import java.awt.geom.Point2D;
 
 import javax.media.opengl.GL;
 
-import com.google.devtools.depan.eclipse.visualization.plugins.core.EdgeRenderingPlugin;
-import com.google.devtools.depan.eclipse.visualization.plugins.core.NodeRenderingPlugin;
-import com.sun.opengl.util.texture.Texture;
-import com.sun.opengl.util.texture.TextureCoords;
-
 /**
  * Plugin drawing nodes and edges on an openGL canvas.
  *
  * @author Yohann Coppel
- *
  */
 public class DrawingPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
 
@@ -116,7 +116,6 @@ public class DrawingPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
       gl.glEnd();
     }
 
-
     gl.glPopMatrix();
 
     return true;
@@ -160,7 +159,7 @@ public class DrawingPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
   }
 
   /**
-   * Redner a label for the given edge at the given position (center of the
+   * Render a label for the given edge at the given position (center of the
    * label)
    * @param property
    * @param p center point where to draw the label.

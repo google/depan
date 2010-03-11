@@ -57,6 +57,7 @@ import com.google.devtools.depan.view.NodeDisplayProperty;
 
 import com.thoughtworks.xstream.XStream;
 
+import edu.uci.ics.jung.algorithms.importance.PageRank;
 import edu.uci.ics.jung.algorithms.layout.AbstractLayout;
 import edu.uci.ics.jung.algorithms.util.IterativeContext;
 import edu.uci.ics.jung.graph.DirectedGraph;
@@ -98,7 +99,6 @@ import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -122,6 +122,9 @@ public class ViewEditor extends MultiPageEditorPart
   private static final Logger logger =
       Logger.getLogger(ViewEditor.class.getName());
 
+  private static final List<GraphNode> EMPTY_NODE_LIST =
+      Collections.<GraphNode>emptyList();
+
   /////////////////////////////////////
   // Editor state for persistence
 
@@ -133,15 +136,6 @@ public class ViewEditor extends MultiPageEditorPart
 
   /** Dirty state. */
   private boolean isDirty = true;
-
-  /////////////////////////////////////
-  // Alternate graph perspectives
-
-  private GraphModel viewGraph;
-
-  private DirectedGraph<GraphNode, GraphEdge> jungGraph;
-
-  private GraphModel exposedGraph;
 
   /**
    * Skip layout on initial render if existing positions should 
@@ -161,11 +155,8 @@ public class ViewEditor extends MultiPageEditorPart
   /** The visualization View that handles rendering. */
   private View renderer;
 
-  /** Receiver for selection changes in the renderer. */
-  private SelectionChangeListener rendererSelectionListener;
-
-  /** Receiver for property changes from the renderer. */
-  private RendererChangeListener rendererChangeListener;
+  /** Callback for changes from the renderer. */
+  private RendererChangeListener rendererCallback;
 
   /**
    * Forward only selection change events to interested parties.
@@ -174,7 +165,16 @@ public class ViewEditor extends MultiPageEditorPart
       new ListenerManager<SelectionChangeListener>();
 
   /////////////////////////////////////
-  // Tool/view data
+  // Alternate graph perspectives and derived data
+  // used in various tools and viewers
+
+  private GraphModel viewGraph;
+
+  private GraphModel exposedGraph;
+
+  private DirectedGraph<GraphNode, GraphEdge> jungGraph;
+
+  private Map<GraphNode, Double> ranking;
 
   private RelationCount.Settings relationCountData =
     new RelationCount.Settings();
@@ -204,6 +204,10 @@ public class ViewEditor extends MultiPageEditorPart
    */
   public View getRenderer() {
     return renderer;
+  }
+
+  public RendererChangeListener getRendererCallback() {
+    return rendererCallback;
   }
 
   public List<SourcePlugin> getBuiltinAnalysisPlugins() {
@@ -244,6 +248,10 @@ public class ViewEditor extends MultiPageEditorPart
     return elementKindStats;
   }
 
+  public Map<GraphNode, Double> getNodeRanking() {
+    return ranking;
+  }
+
   /////////////////////////////////////
   // Manage dirty state for editor
 
@@ -275,7 +283,6 @@ public class ViewEditor extends MultiPageEditorPart
   protected void createPages() {
     createDiagramPage();
     createDetailsPage();
-
   }
 
   private void createDiagramPage() {
@@ -285,6 +292,7 @@ public class ViewEditor extends MultiPageEditorPart
     parent.setLayout(pageLayout);
 
     // bottom composite containing main diagram
+    rendererCallback = new RendererChangeReceiver();
     renderer = new View(parent, SWT.NONE, this);
 
     renderer.getControl().setLayoutData(
@@ -293,15 +301,7 @@ public class ViewEditor extends MultiPageEditorPart
     // Configure the rendering pipe before listening for changes.
     layoutKludge();
     setPreferences();
-
-    // The low-level OGL renderer does not directly notify the user preferences
-    // of location changes.  Instead, it notifies the editor of these changes,
-    // and it relays them to the underlying preference store.
-    rendererSelectionListener = new RendererSelectionChangeListener();
-    renderer.registerListener(rendererSelectionListener);
-
-    rendererChangeListener = new RendererChangeReceiver();
-    renderer.addLocationListener(rendererChangeListener);
+    initSelectedNodes(viewInfo.getSelectedNodes());
 
     int index = addPage(parent);
     setPageText(index, "Graph View");
@@ -439,6 +439,28 @@ public class ViewEditor extends MultiPageEditorPart
     ElementKindStats stats = new ElementKindStats(elementKindChoices);
     stats.incrStats(viewInfo.getViewNodes());
     elementKindStats = stats.createStats();
+
+    ranking = rankGraph();
+  }
+
+  /**
+   * Associate to each node a value based on it's "importance" in the graph.
+   * The selected algorithm is a Page Rank algorithm.
+   *
+   * The result is stored in the map {@link #ranking}.
+   */
+  private Map<GraphNode, Double> rankGraph() {
+    Map<GraphNode, Double> result = Maps.newHashMap();
+
+    PageRank<GraphNode, GraphEdge> pageRank =
+        new PageRank<GraphNode, GraphEdge>(jungGraph, 0.15);
+    pageRank.setRemoveRankScoresOnFinalize(false);
+    pageRank.evaluate();
+
+    for (GraphNode node : exposedGraph.getNodes()) {
+      result.put(node, pageRank.getVertexRankScore(node));
+    }
+    return result;
   }
 
   /**
@@ -457,19 +479,13 @@ public class ViewEditor extends MultiPageEditorPart
       hierarchies = null;
     }
 
-    if (null != rendererSelectionListener) {
-      renderer.unRegisterListener(rendererSelectionListener);
-      rendererSelectionListener = null;
-    }
-
-    if (null != rendererChangeListener) {
-      renderer.removeLocationListener(rendererChangeListener);
-      rendererSelectionListener = null;
-    }
-
     if (null != renderer) {
       renderer.dispose();
       renderer = null;
+    }
+
+    if (null != rendererCallback) {
+      rendererCallback = null;
     }
 
     super.dispose();
@@ -785,7 +801,7 @@ public class ViewEditor extends MultiPageEditorPart
 
   /**
    * Provide a {@code NodeDisplayProperty} for any {@code GraphNode}.
-   * If there is no persistent value, synthesize one, but it won't be save
+   * If there is no persistent value, synthesize one, but it won't be saved
    * until some process (e.g. NodeEditor) modifies it's properties.
    */
   public NodeDisplayProperty getNodeProperty(GraphNode node) {
@@ -856,8 +872,8 @@ public class ViewEditor extends MultiPageEditorPart
     return viewInfo.getNodeLocations();
   }
 
-  private void updateNodeLocations(Map<GraphNode, Point2D> nodeLocations) {
-    renderer.updateNodeLocations(nodeLocations);
+  private void editNodeLocations(Map<GraphNode, Point2D> nodeLocations) {
+    renderer.editNodeLocations(nodeLocations);
   }
 
   /**
@@ -968,7 +984,7 @@ public class ViewEditor extends MultiPageEditorPart
     // one line below:
     // viewInfo.setNodeLocations(nodeLocations);
 
-    updateNodeLocations(nodeLocations);
+    editNodeLocations(nodeLocations);
     renderer.computeBestScalingFactor();
     
   }
@@ -1094,6 +1110,14 @@ public class ViewEditor extends MultiPageEditorPart
   // TODO(leeca): Consolidate all Selection change notifications into a
   // uniform data structure (e.g. always Collection<GraphNode> or GraphNode[]).
 
+  public Collection<GraphNode> getSelectedNodes() {
+    return viewInfo.getSelectedNodes();
+  }
+
+  public boolean isSelected(GraphNode test) {
+    return getSelectedNodes().contains(test);
+  }
+
   public void selectAllNodes() {
     selectNodes(viewInfo.getViewNodes(), this);
   }
@@ -1106,8 +1130,34 @@ public class ViewEditor extends MultiPageEditorPart
     viewInfo.setSelectedNodes(nodes, author);
   }
 
-  public Collection<GraphNode> getSelectedNodes() {
-    return viewInfo.getSelectedNodes();
+  public void extendSelection(
+      Collection<GraphNode> extendNodes, Object author) {
+    viewInfo.editSelectedNodes(EMPTY_NODE_LIST, extendNodes, author);
+  }
+
+  public void reduceSelection(
+      Collection<GraphNode> reduceNodes, Object author) {
+    viewInfo.editSelectedNodes(reduceNodes, EMPTY_NODE_LIST, author);
+  }
+
+  public void moveSelectionDelta(float xDelta, float yDelta) {
+    Map<GraphNode, Point2D> changes = Maps.newHashMap();
+    Map<GraphNode, Point2D> locations = viewInfo.getNodeLocations();
+    for (GraphNode node : viewInfo.getSelectedNodes()) {
+      changes.put(node, createDeltaPoint2D(node, xDelta, yDelta));
+    }
+    viewInfo.editNodeLocations(changes, renderer);
+  }
+
+  private Point2D createDeltaPoint2D(
+      GraphNode node, float xDelta, float yDelta) {
+    Point2D curr = viewInfo.getNodeLocations().get(node);
+    if (null == curr) {
+      return new Point2D.Float(xDelta, yDelta);
+    }
+    float xNew = (float) (curr.getX() + xDelta);
+    float yNew = (float) (curr.getY() + yDelta);
+    return new Point2D.Float(xNew, yNew);
   }
 
   public GraphNode[] getSelectedNodeArray() {
@@ -1134,33 +1184,30 @@ public class ViewEditor extends MultiPageEditorPart
     return nodes.toArray(result);
   }
 
-  private void forwardAddedToSelectionEvent(
-      Collection<GraphNode> previous, Collection<GraphNode> current) {
-    if (current.isEmpty()) {
+  private void forwardSelectionExtendEvent(Collection<GraphNode> extend) {
+    if (extend.isEmpty()) {
       return;
     }
 
-    final GraphNode[] nodes =
-        createNodeArray(subtractNodes(current, previous));
+    final GraphNode[] extendArg = createNodeArray(extend);
     selectionListeners.fireEvent(new SimpleDispatcher() {
       @Override
       public void dispatch(SelectionChangeListener listener) {
-        listener.notifyAddedToSelection(nodes);
+        listener.notifyAddedToSelection(extendArg);
       }
     });
   }
 
-  private void forwardRemovedFromSelectionEvent(
-      Collection<GraphNode> previous, Collection<GraphNode> current) {
-    if (previous.isEmpty()) {
+  private void forwardSelectionRemoveEvent(Collection<GraphNode> remove) {
+    if (remove.isEmpty()) {
       return;
     }
-    final GraphNode[] nodes =
-        createNodeArray(subtractNodes(previous, current));
+
+    final GraphNode[] removeArg = createNodeArray(remove);
     selectionListeners.fireEvent(new SimpleDispatcher() {
       @Override
       public void dispatch(SelectionChangeListener listener) {
-        listener.notifyRemovedFromSelection(nodes);
+        listener.notifyRemovedFromSelection(removeArg);
       }
     });
   }
@@ -1170,7 +1217,7 @@ public class ViewEditor extends MultiPageEditorPart
     if (minus.isEmpty()) {
       return from;
     }
-    ArrayList<GraphNode> result = Lists.newArrayList(from);
+    List<GraphNode> result = Lists.newArrayList(from);
     result.removeAll(minus);
     return result;
   }
@@ -1179,35 +1226,21 @@ public class ViewEditor extends MultiPageEditorPart
       Collection<GraphNode> previous,
       Collection<GraphNode> current, Object author) {
 
+    Collection<GraphNode> removeNodes = subtractNodes(previous, current);
+    Collection<GraphNode> extendNodes = subtractNodes(current, previous);
     if (author != renderer) {
-      renderer.setPickedNodes(current);
+      renderer.updateSelectedNodes(removeNodes, extendNodes);
     }
-    forwardRemovedFromSelectionEvent(previous, current);
-    forwardAddedToSelectionEvent(previous, current);
+    forwardSelectionRemoveEvent(removeNodes);
+    forwardSelectionExtendEvent(extendNodes);
   }
 
-  private class RendererSelectionChangeListener
-      implements SelectionChangeListener {
-
-    @Override
-    public void notifyAddedToSelection(GraphNode[] selected) {
-      viewInfo.editSelectedNodes(
-          Collections.<GraphNode>emptyList(),
-          Lists.newArrayList(selected),
-          renderer);
-    }
-
-    @Override
-    public void notifyRemovedFromSelection(GraphNode[] unselected) {
-      viewInfo.editSelectedNodes(
-          Lists.newArrayList(unselected),
-          Collections.<GraphNode>emptyList(),
-          renderer);
-    }
+  private void initSelectedNodes(Collection<GraphNode> selection) {
+    updateSelectedNodes(EMPTY_NODE_LIST, selection, null);
   }
 
   /////////////////////////////////////
-  // Renderer change notification support
+  // Callbacks from the rendering engine
 
   private class RendererChangeReceiver
       implements RendererChangeListener {
@@ -1215,6 +1248,26 @@ public class ViewEditor extends MultiPageEditorPart
     @Override
     public void locationsChanged(Map<GraphNode, Point2D> changes) {
       viewInfo.editNodeLocations(changes, renderer);
+    }
+
+    @Override
+    public void selectionMoved(float x, float y) {
+      moveSelectionDelta(x, y);
+    }
+
+    @Override
+    public void selectionChanged(Collection<GraphNode> pickedNodes) {
+      selectNodes(pickedNodes);
+    }
+
+    @Override
+    public void selectionExtended(Collection<GraphNode> extendNodes) {
+      extendSelection(extendNodes, null);
+    }
+
+    @Override
+    public void selectionReduced(Collection<GraphNode> reduceNodes) {
+      reduceSelection(reduceNodes, null);
     }
   }
 
@@ -1314,16 +1367,20 @@ public class ViewEditor extends MultiPageEditorPart
     }
 
     @Override
-    public void nodeLocationsChanged(Map<GraphNode, Point2D> newLocations) {
-      updateNodeLocations(newLocations);
+    public void nodeLocationsSet(Map<GraphNode, Point2D> newLocations) {
+      editNodeLocations(newLocations);
       markDirty();
     }
 
     @Override
-    public void locationsChanged(
+    public void nodeLocationsChanged(
         Map<GraphNode, Point2D> newLocations, Object author) {
-      if (author != renderer) {
-        renderer.changeNodeLocations(newLocations);
+      // Skip animation if the renderer itself made the move
+      if (author == renderer) {
+        renderer.updateNodeLocations(newLocations);
+      }
+      else {
+        renderer.editNodeLocations(newLocations);
       }
       markDirty();
     }

@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.eclipse.views.tools;
 
+import com.google.common.collect.Lists;
 import com.google.devtools.depan.eclipse.editors.NodeWrapperTreeSorter;
 import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.trees.GraphData;
@@ -54,6 +55,7 @@ import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 
 import java.awt.Color;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -145,7 +147,7 @@ public class NodeEditorTool extends ViewSelectionListenerTool
     // (re) set the label provider, for one which can handle multiple
     // columns.
     nodeTreeView.getTreeViewer().setLabelProvider(
-        new NodeEditorLabelProvider());
+        new NodeEditorLabelProvider(this));
 
     // set a cell modifier
     nodeTreeView.getTreeViewer().setCellModifier(this);
@@ -240,11 +242,12 @@ public class NodeEditorTool extends ViewSelectionListenerTool
   @SuppressWarnings("unchecked")
   public Object getValue(Object element, String property) {
     if (element instanceof NodeWrapper) {
-      NodeDisplayProperty p = getProp((NodeWrapper) element);
+      NodeWrapper wrapper = (NodeWrapper) element;
+      NodeDisplayProperty p = getProp(wrapper);
       if (property.equals(COL_VISIBLE)) {
         return p.isVisible();
       } else if (property.equals(COL_SELECTED)) {
-        return p.isSelected();
+        return getEditor().isSelected(wrapper.getNode());
       } else if (property.equals(COL_SIZE)) {
         return p.getSize().ordinal();
       } else if (property.equals(COL_COLOR)) {
@@ -292,7 +295,7 @@ public class NodeEditorTool extends ViewSelectionListenerTool
     if (property.equals(COL_VISIBLE) && (value instanceof Boolean)) {
       p.setVisible((Boolean) value);
     } else if (property.equals(COL_SELECTED) && (value instanceof Boolean)) {
-      p.setSelected((Boolean) value);
+      selectNode(node, (Boolean) value);
     } else if (property.equals(COL_SIZE) && (value instanceof Integer)) {
       p.setSize(Size.values()[(Integer) value]);
     } else if (property.equals(COL_COLOR) && (value instanceof String)) {
@@ -303,6 +306,15 @@ public class NodeEditorTool extends ViewSelectionListenerTool
     getEditor().setNodeProperty(node, p);
     // update the column / line we just modified
     nodeTreeView.getTreeViewer().update(o, new String[] {property});
+  }
+
+  private void selectNode(GraphNode node, boolean extend) {
+    Collection<GraphNode> selectGroup = Lists.newArrayList(node);
+    if (extend) {
+      getEditor().extendSelection(selectGroup, this);
+      return;
+    }
+    getEditor().reduceSelection(selectGroup, this);
   }
 
   @Override
@@ -318,20 +330,21 @@ public class NodeEditorTool extends ViewSelectionListenerTool
    */
   private void setSelectedState(GraphNode node, boolean value) {
     NodeDisplayProperty prop = getEditor().getNodeProperty(node);
-    if (null != prop) {
-      // set the property
-      prop.setSelected(value);
-      NodeWrapper<NodeDisplayProperty> nodeWrapper =
-          nodeTreeView.getNodeWrapper(node);
-
-      if (null != nodeWrapper) {
-        // update the value in the table. this might be faster than updating
-        // all the list at the end. because a selection generally doesn't
-        // change a lot.
-        nodeTreeView.getTreeViewer().update(nodeWrapper,
-            new String[] { COL_SELECTED });
-      }
+    if (null == prop) {
+      return;
     }
+
+    NodeWrapper<NodeDisplayProperty> nodeWrapper =
+        nodeTreeView.getNodeWrapper(node);
+    if (null == nodeWrapper) {
+      return;
+    }
+
+    // update the value in the table. this might be faster than updating
+    // all the list at the end. because a selection generally doesn't
+    // change a lot.
+    nodeTreeView.getTreeViewer().update(
+        nodeWrapper, new String[] { COL_SELECTED });
   }
 
   /**
@@ -368,15 +381,14 @@ public class NodeEditorTool extends ViewSelectionListenerTool
   public void updateSelectionTo(GraphNode[] selection) {
     for (GraphNode node : getEditor().getViewGraph().getNodes()) {
       NodeDisplayProperty nodeProps = getEditor().getNodeProperty(node);
-      nodeProps.setSelected(false);
       NodeWrapper<NodeDisplayProperty> nodeWrapper =
           nodeTreeView.getNodeWrapper(node);
       if (null != nodeWrapper) {
         // update the value in the table. this might be faster than updating
         // all the list at the end. because a selection generally doesn't
         // change a lot.
-        nodeTreeView.getTreeViewer().update(nodeWrapper,
-            new String[] { COL_SELECTED });
+        nodeTreeView.getTreeViewer().update(
+            nodeWrapper, new String[] { COL_SELECTED });
       }
     }
     updateSelectedAdd(selection);

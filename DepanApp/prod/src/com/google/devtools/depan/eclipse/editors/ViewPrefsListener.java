@@ -54,7 +54,7 @@ public interface ViewPrefsListener {
     }
 
     @Override
-    public void locationsChanged(
+    public void nodeLocationsChanged(
         Map<GraphNode, Point2D> newLocations, Object author) {
     }
 
@@ -68,7 +68,7 @@ public interface ViewPrefsListener {
     }
 
     @Override
-    public void nodeLocationsChanged(Map<GraphNode, Point2D> newLocations) {
+    public void nodeLocationsSet(Map<GraphNode, Point2D> newLocations) {
     }
   }
 
@@ -79,12 +79,22 @@ public interface ViewPrefsListener {
       GraphEdge node, EdgeDisplayProperty newProperty);
 
   /**
-   * Callback when nodes change location.
+   * Callback when nodes locations are set.  Any nodes omitted from the map
+   * are assumed to be at the origin (0.0, 0.0).
    * 
    * @param collection of nodes at new locations.
    * @param author the initiator of the change.
    */
-  public void locationsChanged(
+  public void nodeLocationsSet(Map<GraphNode, Point2D> newLocations);
+
+  /**
+   * Callback when node locations change.  Any nodes omitted from the map
+   * remain at the current location.
+   * 
+   * @param collection of nodes at new locations.
+   * @param author the initiator of the change.
+   */
+  public void nodeLocationsChanged(
       Map<GraphNode, Point2D> newLocations, Object author);
 
   /**
@@ -113,5 +123,4 @@ public interface ViewPrefsListener {
 
   public void descriptionChanged(String description);
 
-  public void nodeLocationsChanged(Map<GraphNode, Point2D> newLocations);
 }

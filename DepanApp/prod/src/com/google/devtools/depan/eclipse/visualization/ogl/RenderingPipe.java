@@ -48,7 +48,7 @@ import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 
 /**
- * A class that take care of every rendering plugins.
+ * A class that takes care of every rendering plugins.
  * Every element to render is passed through each adapted plugin. Each
  * plugin can modify the properties for the element to render. They
  * also have the ability to get the element out of the pipe, if they don't want
@@ -87,9 +87,10 @@ public class RenderingPipe {
   private EdgeIncludePlugin edgeInclude;
 
 
-  public RenderingPipe(GL gl, GLU glu, GLPanel panel,
-      ViewEditor editor, Map<GraphNode, Double> nodeRanking) {
+  public RenderingPipe(GL gl, GLU glu, GLPanel panel, ViewEditor editor) {
     Graph<GraphNode, GraphEdge> graph = editor.getJungGraph();
+    Map<GraphNode, Double> nodeRanking = editor.getNodeRanking();
+
     shortcuts = new LayoutShortcutsPlugin(editor);
     layout = new LayoutPlugin(editor.getNodeLocations());
     nodeColors = new NodeColorPlugin<GraphEdge>(graph, nodeRanking);
@@ -152,66 +153,56 @@ public class RenderingPipe {
   }
 
   public void dryRun(NodeRenderingProperty nrp) {
-    for (NodeRenderingPlugin p : nodePlugins) {
-      p.dryRun(nrp);
+    for (NodeRenderingPlugin plugin : nodePlugins) {
+      plugin.dryRun(nrp);
     }
   }
 
   public void dryRun(EdgeRenderingProperty erp) {
-    for (EdgeRenderingPlugin p : edgePlugins) {
-      p.dryRun(erp);
-    }
-  }
-
-  public void preFrame(float elapsedTime) {
-    for (int i = 0; i < plugins.length; ++i) {
-      plugins[i].preFrame(elapsedTime);
+    for (EdgeRenderingPlugin plugin : edgePlugins) {
+      plugin.dryRun(erp);
     }
   }
 
   public void render(NodeRenderingProperty nrp) {
-    boolean mustBeRendered = true;
-    for (int i = 0; mustBeRendered && i < nodePlugins.length; ++i) {
-      mustBeRendered = nodePlugins[i].apply(nrp);
+    for (NodeRenderingPlugin plugin : nodePlugins) {
+      if (!plugin.apply(nrp)) {
+        return;
+      }
     }
   }
 
-  public void render(EdgeRenderingProperty nrp) {
-    boolean mustBeRendered = true;
-    for (int i = 0; mustBeRendered && i < edgePlugins.length; ++i) {
-      mustBeRendered = edgePlugins[i].apply(nrp);
+  public void render(EdgeRenderingProperty erp) {
+    for (EdgeRenderingPlugin plugin : edgePlugins) {
+      if (!plugin.apply(erp)) {
+        return;
+      }
+    }
+  }
+
+  public void preFrame(float elapsedTime) {
+    for (Plugin plugin : plugins) {
+      plugin.preFrame(elapsedTime);
     }
   }
 
   public void postFrame() {
-    for (int i = 0; i < plugins.length; ++i) {
-      plugins[i].postFrame();
+    for (Plugin plugin : plugins) {
+      plugin.postFrame();
     }
   }
 
-  public boolean uncaughtKey(int keycode, char character, boolean keyCtrlState,
-      boolean keyAltState, boolean keyShiftState) {
-    boolean isCaught = false;
-    for (int i = 0; i < plugins.length && !isCaught; ++i) {
-      isCaught = plugins[i].keyPressed(keycode, character, keyCtrlState,
-          keyAltState, keyShiftState);
+  public boolean uncaughtKey(int keycode, char character,
+      boolean keyCtrlState, boolean keyAltState, boolean keyShiftState) {
+    for (Plugin plugin : plugins) {
+      if (plugin.keyPressed(keycode, character,
+          keyCtrlState, keyAltState, keyShiftState))
+        return true;
     }
-    return isCaught;
+    return false;
   }
 
   // getters for each plugin.
-
-  public NodeRenderingPlugin[] getNodePlugins() {
-    return nodePlugins;
-  }
-
-  public EdgeRenderingPlugin[] getEdgePlugins() {
-    return edgePlugins;
-  }
-
-  public Plugin[] getPlugins() {
-    return plugins;
-  }
 
   public LayoutPlugin getLayout() {
     return layout;

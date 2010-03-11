@@ -34,12 +34,11 @@ import java.util.Map;
  * plugins stop waiting for a number.
  *
  * @author Yohann Coppel
- *
  */
 public class LayoutPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
-
   private Map<GraphNode, Point2D> layout;
-  private boolean hasChanged = false;
+  private boolean inferPos;
+  private boolean animate;
 
   /**
    * Apply a layout to the node in the rendering pipe.
@@ -49,7 +48,8 @@ public class LayoutPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
    */
   public LayoutPlugin(Map<GraphNode, Point2D> layoutMap) {
     this.layout = layoutMap;
-    this.hasChanged = false;
+    this.inferPos = true;
+    this.animate = false;
   }
 
   public void preFrame(float elapsedTime) {
@@ -58,16 +58,26 @@ public class LayoutPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
 
   @Override
   public boolean apply(NodeRenderingProperty p) {
-    if (!hasChanged) {
+    if (null == layout) {
       return true;
     }
+
     Point2D point = layout.get(p.node);
     if (null != point) {
       p.targetPositionX = (float) point.getX();
       p.targetPositionY = (float) point.getY();
-    } else {
+    }
+    else if (inferPos) {
       p.targetPositionX = 0;
       p.targetPositionY = 0;
+    }
+    else {
+      return true;
+    }
+  
+    if (!animate) {
+      p.positionX = p.targetPositionX;
+      p.positionY = p.targetPositionY;
     }
     return true;
   }
@@ -84,10 +94,12 @@ public class LayoutPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
   }
 
   public void postFrame() {
-    if (!hasChanged) {
+    if (null == layout) {
       return;
     }
-    hasChanged = false;
+
+    // After the update, release the layout map so it can be GC'ed.
+    layout = null;
   }
 
   @Override
@@ -107,12 +119,20 @@ public class LayoutPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
   }
 
   public void setLayout(Map<GraphNode, Point2D> layoutMap) {
-    this.layout = layoutMap;
-    this.hasChanged = true;
+    layout = layoutMap;
+    inferPos = true;
+    animate = true;
   }
 
   public void editLayout(Map<GraphNode, Point2D> newLocations) {
-    this.layout.putAll(newLocations);
-    this.hasChanged = true;
+    layout = newLocations;
+    inferPos = false;
+    animate = true;
+  }
+
+  public void updateLayout(Map<GraphNode, Point2D> newLocations) {
+    layout = newLocations;
+    inferPos = false;
+    animate = false;
   }
 }

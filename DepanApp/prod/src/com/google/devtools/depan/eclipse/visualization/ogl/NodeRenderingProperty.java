@@ -31,7 +31,7 @@ import java.util.Map;
 /**
  * This class is used to store the rendering properties for a node.
  * It is accessed for every node, at every frame, by every RenderingPlugin.
- * Therefore, acessing and updating values must be fast. That's why
+ * Therefore, accessing and updating values must be fast. That's why
  * members are are mostly native types, and public.
  */
 public class NodeRenderingProperty extends RenderingProperty {
@@ -117,7 +117,7 @@ public class NodeRenderingProperty extends RenderingProperty {
    * a space where each NodeRenderingPlugin can store an object for this node.
    * The key must be the plugin that stores the value.
    * <p>
-   * This is not presisted.
+   * This is not persisted.
    */
   public Map<NodeRenderingPlugin, Object> pluginStore = Maps.newHashMap();
 

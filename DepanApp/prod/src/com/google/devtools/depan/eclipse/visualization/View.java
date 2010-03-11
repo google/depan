@@ -16,15 +16,10 @@
 
 package com.google.devtools.depan.eclipse.visualization;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds;
-import com.google.devtools.depan.eclipse.utils.ListenerManager;
-import com.google.devtools.depan.eclipse.utils.ListenerManager.Dispatcher;
 import com.google.devtools.depan.eclipse.visualization.ogl.ArrowHead;
 import com.google.devtools.depan.eclipse.visualization.ogl.GLPanel;
-import com.google.devtools.depan.eclipse.visualization.ogl.RenderingPipe;
 import com.google.devtools.depan.eclipse.visualization.ogl.SceneGrip;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.CollapsePlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.EdgeIncludePlugin;
@@ -35,17 +30,12 @@ import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeShapePlu
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeSizePlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeStrokePlugin;
 import com.google.devtools.depan.model.GraphEdge;
-import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.view.CollapseData;
 import com.google.devtools.depan.view.EdgeDisplayProperty;
 import com.google.devtools.depan.view.NodeDisplayProperty;
 import com.google.devtools.depan.view.EdgeDisplayProperty.LineStyle;
 import com.google.devtools.depan.view.NodeDisplayProperty.Size;
-
-import edu.uci.ics.jung.algorithms.importance.PageRank;
-import edu.uci.ics.jung.graph.DirectedGraph;
-import edu.uci.ics.jung.graph.Graph;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -58,45 +48,15 @@ import java.util.Map;
 
 /**
  * @author ycoppel@google.com (Yohann Coppel)
- *
  */
-public class View
-    implements SelectionChangeListener, RendererChangeListener {
+public class View {
 
-  /**
-   * The JUNG graph that is use for rendering and presentation.
-   * It is derived and rebuild from the ViewEditor on demand,
-   * based on ViewPreferences notion of exposed nodes and edges .
-   */
-  private DirectedGraph<GraphNode, GraphEdge> jungGraph;
-
-  /**
-   * The ranking values for each nodes (using a page rank algorithm).
-   */
-  // TODO(leeca): move this to ViewEditor to provide a) shared resource,
-  // b) robust Job (async execution) support.
-  private Map<GraphNode, Double> ranking;
-
-  /**
-   * Collection of listeners listening for a change in the node selection.
-   */
-  private Collection<SelectionChangeListener> selectionListeners =
-      Lists.newArrayList();
-
-  private ListenerManager<RendererChangeListener> changeListeners =
-      new ListenerManager<RendererChangeListener>();
+  private final ViewEditor editor;
 
   /**
    * Rendering object.
    */
   private GLPanel glPanel;
-
-  /**
-   * Rendering pipe.
-   */
-  RenderingPipe renderer;
-
-  private GraphModel exposedGraph;
 
   /**
    * Create a new View, with the given model and initialize the layout.
@@ -107,11 +67,9 @@ public class View
    */
   public View(
       Composite parent, int style, ViewEditor editor) {
-    this.exposedGraph = editor.getExposedGraph();
-    this.jungGraph = editor.getJungGraph();
+    this.editor = editor;
 
-    rankGraph();
-    glPanel = new GLPanel(parent, editor, this, this, ranking);
+    glPanel = new GLPanel(parent, editor);
   }
 
   public void dispose() {
@@ -162,6 +120,12 @@ public class View
 
   /////////////////////////////////////
 
+  public void updateSelectedNodes(
+      Collection<GraphNode> removeNodes,
+      Collection<GraphNode> extendNodes) {
+    glPanel.updateSelection(removeNodes, extendNodes);
+  }
+
   /**
    * Updates various properties of the given <code>GraphEdge</code> such as
    * edge color, line style and arrow head using the given
@@ -200,9 +164,6 @@ public class View
     // set if this node is visible
     glPanel.setVisible(node, property.isVisible());
 
-    // set if this node is selected
-    glPanel.setSelected(node, property.isSelected());
-
     // Set the size of this node
     Size nodeSize = property.getSize();
     if (nodeSize != null) {
@@ -215,38 +176,8 @@ public class View
   /////////////////////////////////////
   // Basic Getters and Setters
 
-  /**
-   * @return a map of importance, i.e. a map associating a value to each node,
-   *         determined after applying a ranking algorithm to the underlying
-   *         graph.
-   */
-  public Map<GraphNode, Double> getNodeImportanceMap() {
-    return ranking;
-  }
-
-  public Graph<GraphNode, GraphEdge> getJungGraph() {
-    return jungGraph;
-  }
-
   public Control getControl() {
     return glPanel.getContext();
-  }
-
-  /**
-   * @return a list of currently selected nodes.
-   */
-  public GraphNode[] getPickedNodes() {
-    return glPanel.getSelectedNodes();
-  }
-
-  /**
-   * Unselect all currently selected nodes, and select only the nodes in the
-   * given list.
-   *
-   * @param pickedNodes set of nodes to select.
-   */
-  public void setPickedNodes(Collection<GraphNode> pickedNodes) {
-    glPanel.setSelection(pickedNodes);
   }
 
   public BufferedImage takeScreenshot() {
@@ -255,28 +186,6 @@ public class View
 
   /////////////////////////////////////
   // Rendering support
-
-  /**
-   * Associate to each node a value based on it's "importance" in the graph.
-   * The selected algorithm is a Page Rank algorithm.
-   *
-   * The result is stored in the map {@link #ranking}.
-   */
-  private void rankGraph() {
-    if (null == ranking) {
-      ranking = Maps.newHashMap();
-    }
-    ranking.clear();
-
-    PageRank<GraphNode, GraphEdge> pageRank =
-        new PageRank<GraphNode, GraphEdge>(jungGraph, 0.15);
-    pageRank.setRemoveRankScoresOnFinalize(false);
-    pageRank.evaluate();
-
-    for (GraphNode node : exposedGraph.getNodes()) {
-      ranking.put(node, pageRank.getVertexRankScore(node));
-    }
-  }
 
   public void updateCollapseChanges(
       Collection<CollapseData> created,
@@ -307,23 +216,36 @@ public class View
   }
 
   /**
-   * Set the target locations for each node.  This leads to animated moves of
-   * the nodes to the new location.  No location changed event is generated.
+   * Set the target locations for each node.  Target locations for view nodes
+   * omitted from the map are set to the origin (0.0, 0.0).  This leads to 
+   * animated moves of the nodes to the new location.
    * 
    * @param nodeLocations new locations for nodes
    */
-  public void updateNodeLocations(Map<GraphNode, Point2D> newLocations) {
+  public void setNodeLocations(Map<GraphNode, Point2D> newLocations) {
     glPanel.getRenderingPipe().getLayout().setLayout(newLocations);
   }
 
   /**
-   * Change the target locations for nodes in the location map.  These leads
-   * to animated moves the nodes.  No location changed event is generated.
+   * Edit the target locations for nodes in the location map.  View nodes
+   * omitted from the map are not moved.  These leads to animated moves of the
+   * nodes.
    * 
    * @param newLocations new locations for nodes
    */
-  public void changeNodeLocations(Map<GraphNode, Point2D> newLocations) {
+  public void editNodeLocations(Map<GraphNode, Point2D> newLocations) {
     glPanel.getRenderingPipe().getLayout().editLayout(newLocations);
+  }
+
+  /**
+   * Update the target locations for nodes in the location map.  View nodes
+   * omitted from the map are not moved.  The nodes are moved directly,
+   * without animation.
+   * 
+   * @param newLocations new locations for nodes
+   */
+  public void updateNodeLocations(Map<GraphNode, Point2D> newLocations) {
+    glPanel.getRenderingPipe().getLayout().updateLayout(newLocations);
   }
 
   /**
@@ -335,72 +257,5 @@ public class View
    */
   public void computeBestScalingFactor() {
     glPanel.getRenderingPipe().getFactor().computeBestScalingFactor();
-  }
-
-  /////////////////////////////////////
-  // OpenGL selection change support
-  // The View registers itself with the GLPanel as it's sole listener.
-  // It then forwards any updates that it receives to any
-  // SelectionChangListener that has register with it.
-
-  public void registerListener(SelectionChangeListener listener) {
-    if (!selectionListeners.contains(listener)) {
-      selectionListeners.add(listener);
-    }
-  }
-
-  public void unRegisterListener(SelectionChangeListener listener) {
-    if (selectionListeners.contains(listener)) {
-      selectionListeners.remove(listener);
-    }
-  }
-
-  /**
-   * Notify listeners that there were nodes added to the current selection.
-   */
-  @Override
-  public void notifyAddedToSelection(GraphNode[] selected) {
-    for (SelectionChangeListener listener : selectionListeners) {
-      listener.notifyAddedToSelection(selected);
-    }
-  }
-
-  /**
-   * Notify listeners that there were nodes removed from the current selection.
-   */
-  @Override
-  public void notifyRemovedFromSelection(GraphNode[] unselected) {
-    for (SelectionChangeListener listener : selectionListeners) {
-      listener.notifyRemovedFromSelection(unselected);
-    }
-  }
-
-  /////////////////////////////////////
-  // Handle location changed notification
-  // TODO(leeca): This should be merged with selection notification,
-  // but we'll get to that later.
-
-  public void addLocationListener(RendererChangeListener listener) {
-    changeListeners.addListener(listener);
-  }
-
-  public void removeLocationListener(RendererChangeListener listener) {
-    changeListeners.removeListener(listener);
-  }
-
-  @Override
-  public void locationsChanged(final Map<GraphNode, Point2D> changes) {
-    changeListeners.fireEvent(new Dispatcher<RendererChangeListener>() {
-
-      @Override
-      public void captureException(RuntimeException errAny) {
-        // Ignore these
-      }
-
-      @Override
-      public void dispatch(RendererChangeListener listener) {
-        listener.locationsChanged(changes);
-      }
-    });
   }
 }
