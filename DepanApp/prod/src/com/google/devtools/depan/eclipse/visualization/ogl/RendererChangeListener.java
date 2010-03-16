@@ -14,7 +14,7 @@
  * the License.
  */
 
-package com.google.devtools.depan.eclipse.visualization;
+package com.google.devtools.depan.eclipse.visualization.ogl;
 
 import com.google.devtools.depan.model.GraphNode;
 

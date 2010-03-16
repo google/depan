@@ -39,10 +39,10 @@ import com.google.devtools.depan.eclipse.utils.elementkinds.ElementKindDescripto
 import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptor;
 import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptors;
 import com.google.devtools.depan.eclipse.views.tools.RelationCount;
-import com.google.devtools.depan.eclipse.visualization.RendererChangeListener;
 import com.google.devtools.depan.eclipse.visualization.SelectionChangeListener;
 import com.google.devtools.depan.eclipse.visualization.View;
 import com.google.devtools.depan.eclipse.visualization.layout.Layouts;
+import com.google.devtools.depan.eclipse.visualization.ogl.RendererChangeListener;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeColorPlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeShapePlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeSizePlugin;
