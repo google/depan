@@ -18,6 +18,8 @@ package com.google.devtools.depan.eclipse.editors;
 
 import com.google.devtools.depan.model.GraphNode;
 
+import java.util.Collection;
+
 /**
  * A listener to notify when a set of nodes associated with a {@link ViewEditor}
  * have their selection state changed.
@@ -29,10 +31,10 @@ public interface SelectionChangeListener {
   /**
    * Notify that the given set of node was selected.
    */
-  public void notifyAddedToSelection(GraphNode[] selected);
+  public void extendSelection(Collection<GraphNode> extension);
 
   /**
    * Notify that the given set of node was unselected.
    */
-  public void notifyRemovedFromSelection(GraphNode[] unselected);
+  public void reduceSelection(Collection<GraphNode> reduction);
 }

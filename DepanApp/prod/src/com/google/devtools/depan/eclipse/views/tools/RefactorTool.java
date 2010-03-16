@@ -28,6 +28,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
+import java.util.Collection;
+
 /**
  * A refactoring tool. For now, only shows a {@link DoubleElementEditorChooser}
  * associated with the first selected Element.
@@ -74,23 +76,21 @@ public class RefactorTool extends ViewSelectionListenerTool {
   }
 
   @Override
-  public void updateSelectedAdd(GraphNode[] selection) {
-    if (selection.length > 0) {
-      setNode(selection[0]);
-    } else {
+  public void updateSelectedExtend(Collection<GraphNode> extension) {
+    if (extension.size() == 0) {
       emptySelection();
     }
+    setNode(extension.iterator().next());
   }
 
   @Override
-  public void updateSelectedRemove(GraphNode[] selection) {
+  public void updateSelectedReduce(Collection<GraphNode> reduction) {
     emptySelection();
   }
 
   @Override
-  public void updateSelectionTo(GraphNode[] selection) {
+  public void updateSelectionTo(Collection<GraphNode> selection) {
     emptySelection();
-    updateSelectedAdd(selection);
+    updateSelectedExtend(selection);
   }
-
 }

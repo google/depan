@@ -300,7 +300,7 @@ public class ViewEditor extends MultiPageEditorPart
     // Configure the rendering pipe before listening for changes.
     layoutKludge();
     setPreferences();
-    initSelectedNodes(viewInfo.getSelectedNodes());
+    initSelectedNodes(getSelectedNodes());
 
     int index = addPage(parent);
     setPageText(index, "Graph View");
@@ -1022,7 +1022,7 @@ public class ViewEditor extends MultiPageEditorPart
    * @param relationFinder a relation finder if needed by the layout.
    */
   public void cluster(Layouts layout, DirectedRelationFinder relationFinder) {
-    Collection<GraphNode> picked = viewInfo.getSelectedNodes();
+    Collection<GraphNode> picked = getSelectedNodes();
     if (0 == picked.size()) {
       applyLayout(layout, relationFinder);
       return;
@@ -1142,7 +1142,7 @@ public class ViewEditor extends MultiPageEditorPart
   public void moveSelectionDelta(float xDelta, float yDelta) {
     Map<GraphNode, Point2D> changes = Maps.newHashMap();
     Map<GraphNode, Point2D> locations = viewInfo.getNodeLocations();
-    for (GraphNode node : viewInfo.getSelectedNodes()) {
+    for (GraphNode node : getSelectedNodes()) {
       changes.put(node, createDeltaPoint2D(node, xDelta, yDelta));
     }
     viewInfo.editNodeLocations(changes, renderer);
@@ -1157,10 +1157,6 @@ public class ViewEditor extends MultiPageEditorPart
     float xNew = (float) (curr.getX() + xDelta);
     float yNew = (float) (curr.getY() + yDelta);
     return new Point2D.Float(xNew, yNew);
-  }
-
-  public GraphNode[] getSelectedNodeArray() {
-    return createNodeArray(viewInfo.getSelectedNodes());
   }
 
   /////////////////////////////////////
@@ -1181,35 +1177,30 @@ public class ViewEditor extends MultiPageEditorPart
     selectionListeners.removeListener(listener);
   }
 
-  private GraphNode[] createNodeArray(Collection<GraphNode> nodes) {
-    GraphNode[] result = new GraphNode[nodes.size()];
-    return nodes.toArray(result);
-  }
-
-  private void forwardSelectionExtendEvent(Collection<GraphNode> extend) {
-    if (extend.isEmpty()) {
+  private void fireExtendSelection(
+      final Collection<GraphNode> extension) {
+    if (extension.isEmpty()) {
       return;
     }
 
-    final GraphNode[] extendArg = createNodeArray(extend);
     selectionListeners.fireEvent(new SimpleDispatcher() {
       @Override
       public void dispatch(SelectionChangeListener listener) {
-        listener.notifyAddedToSelection(extendArg);
+        listener.extendSelection(extension);
       }
     });
   }
 
-  private void forwardSelectionRemoveEvent(Collection<GraphNode> remove) {
-    if (remove.isEmpty()) {
+  private void fireReduceSelection(
+      final Collection<GraphNode> reduction) {
+    if (reduction.isEmpty()) {
       return;
     }
 
-    final GraphNode[] removeArg = createNodeArray(remove);
     selectionListeners.fireEvent(new SimpleDispatcher() {
       @Override
       public void dispatch(SelectionChangeListener listener) {
-        listener.notifyRemovedFromSelection(removeArg);
+        listener.reduceSelection(reduction);
       }
     });
   }
@@ -1233,44 +1224,12 @@ public class ViewEditor extends MultiPageEditorPart
     if (author != renderer) {
       renderer.updateSelectedNodes(removeNodes, extendNodes);
     }
-    forwardSelectionRemoveEvent(removeNodes);
-    forwardSelectionExtendEvent(extendNodes);
+    fireReduceSelection(removeNodes);
+    fireExtendSelection(extendNodes);
   }
 
   private void initSelectedNodes(Collection<GraphNode> selection) {
     updateSelectedNodes(EMPTY_NODE_LIST, selection, null);
-  }
-
-  /////////////////////////////////////
-  // Callbacks from the rendering engine
-
-  private class RendererChangeReceiver
-      implements RendererChangeListener {
-
-    @Override
-    public void locationsChanged(Map<GraphNode, Point2D> changes) {
-      viewInfo.editNodeLocations(changes, renderer);
-    }
-
-    @Override
-    public void selectionMoved(float x, float y) {
-      moveSelectionDelta(x, y);
-    }
-
-    @Override
-    public void selectionChanged(Collection<GraphNode> pickedNodes) {
-      selectNodes(pickedNodes);
-    }
-
-    @Override
-    public void selectionExtended(Collection<GraphNode> extendNodes) {
-      extendSelection(extendNodes, null);
-    }
-
-    @Override
-    public void selectionReduced(Collection<GraphNode> reduceNodes) {
-      reduceSelection(reduceNodes, null);
-    }
   }
 
   /////////////////////////////////////
@@ -1310,30 +1269,43 @@ public class ViewEditor extends MultiPageEditorPart
     return viewInfo.newViewDocument(nodes);
   }
 
-  /**
-   * Activate a new ViewEditor.
-   * This is an asynchronous active, as the new editor will execute separately
-   * from the other workbench windows.
-   * 
-   * @param newInfo graph to display
-   * @param skipLayout {@code true} if layout should be skipped on initial
-   *     rendering.
-   */
-  public static void startViewEditor(
-      ViewDocument newInfo, boolean skipLayout) {
-    final ViewEditorInput input = new ViewEditorInput(newInfo, skipLayout);
-    getWorkbenchDisplay().asyncExec(new Runnable() {
-      public void run() {
-        IWorkbenchPage page = PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getActivePage();
-        try {
-          page.openEditor(input, ViewEditor.ID);
-        } catch (PartInitException e) {
-          e.printStackTrace();
-        }
-      }
-    });
+  /////////////////////////////////////
+  // Callbacks from the rendering engine
+  // Most events are converted to ViewDocument method calls, and those
+  // changes lead to change events for the tools and the renderer.
+
+  private class RendererChangeReceiver
+      implements RendererChangeListener {
+
+    @Override
+    public void locationsChanged(Map<GraphNode, Point2D> changes) {
+      viewInfo.editNodeLocations(changes, renderer);
+    }
+
+    @Override
+    public void selectionMoved(float x, float y) {
+      moveSelectionDelta(x, y);
+    }
+
+    @Override
+    public void selectionChanged(Collection<GraphNode> pickedNodes) {
+      selectNodes(pickedNodes);
+    }
+
+    @Override
+    public void selectionExtended(Collection<GraphNode> extendNodes) {
+      extendSelection(extendNodes, null);
+    }
+
+    @Override
+    public void selectionReduced(Collection<GraphNode> reduceNodes) {
+      reduceSelection(reduceNodes, null);
+    }
   }
+
+  /////////////////////////////////////
+  // Receiver for notifications from the ViewDocument
+  // Most events are mapped to standard re-dispatch methods.
 
   /**
    * Handle notifications from ViewDocument (mostly UserPreferences) that
@@ -1401,4 +1373,33 @@ public class ViewEditor extends MultiPageEditorPart
       markDirty();
     }
   }
+
+  /////////////////////////////////////
+  // Run the new ViewEditor
+
+  /**
+   * Activate a new ViewEditor.
+   * This is an asynchronous active, as the new editor will execute separately
+   * from the other workbench windows.
+   * 
+   * @param newInfo graph to display
+   * @param skipLayout {@code true} if layout should be skipped on initial
+   *     rendering.
+   */
+  public static void startViewEditor(
+      ViewDocument newInfo, boolean skipLayout) {
+    final ViewEditorInput input = new ViewEditorInput(newInfo, skipLayout);
+    getWorkbenchDisplay().asyncExec(new Runnable() {
+      public void run() {
+        IWorkbenchPage page = PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow().getActivePage();
+        try {
+          page.openEditor(input, ViewEditor.ID);
+        } catch (PartInitException e) {
+          e.printStackTrace();
+        }
+      }
+    });
+  }
+
 }

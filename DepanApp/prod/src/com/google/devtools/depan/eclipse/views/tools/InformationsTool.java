@@ -35,6 +35,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+import java.util.Collection;
 import java.util.Collections;
 
 /**
@@ -158,12 +159,11 @@ public class InformationsTool extends ViewSelectionListenerTool
    * Set this tool to display information about the first selected node.
    */
   @Override
-  public void updateSelectedAdd(GraphNode[] selection) {
-    if (selection.length > 0) {
-      setNode(selection[0]);
-    } else {
+  public void updateSelectedExtend(Collection<GraphNode> extension) {
+    if (extension.size() == 0) {
       emptySelection();
     }
+    setNode(extension.iterator().next());
   }
 
   /**
@@ -172,12 +172,11 @@ public class InformationsTool extends ViewSelectionListenerTool
    * (the user clicked on it)
    */
   @Override
-  public void updateSelectedRemove(GraphNode[] selection) {
-    if (selection.length > 0) {
-      setNode(selection[0]);
-    } else {
+  public void updateSelectedReduce(Collection<GraphNode> reduction) {
+    if (reduction.size() == 0) {
       emptySelection();
     }
+    setNode(reduction.iterator().next());
   }
 
   /**
@@ -185,7 +184,7 @@ public class InformationsTool extends ViewSelectionListenerTool
    * @see #updateSelectedAdd(GraphNode[])
    */
   @Override
-  public void updateSelectionTo(GraphNode[] selection) {
-    updateSelectedAdd(selection);
+  public void updateSelectionTo(Collection<GraphNode> selection) {
+    updateSelectedExtend(selection);
   }
 }

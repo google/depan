@@ -19,6 +19,8 @@ package com.google.devtools.depan.eclipse.views;
 import com.google.devtools.depan.eclipse.editors.SelectionChangeListener;
 import com.google.devtools.depan.model.GraphNode;
 
+import java.util.Collection;
+
 /**
  * Provide an abstract Tool implementation for tools that operates
  * on ViewEditor contents and tracks the currently selected Nodes.
@@ -51,7 +53,7 @@ public abstract class ViewSelectionListenerTool extends ViewEditorTool
 
   @Override
   protected void updateControls() {
-    updateSelectionTo(getEditor().getSelectedNodeArray());
+    updateSelectionTo(getEditor().getSelectedNodes());
   }
 
   /**
@@ -62,8 +64,8 @@ public abstract class ViewSelectionListenerTool extends ViewEditorTool
    *      #notifyEndOfRepaint()
    */
   @Override
-  public void notifyAddedToSelection(GraphNode[] selected) {
-    updateSelectedAdd(selected);
+  public void extendSelection(Collection<GraphNode> extension) {
+    updateSelectedExtend(extension);
   }
 
   /**
@@ -74,8 +76,8 @@ public abstract class ViewSelectionListenerTool extends ViewEditorTool
    *      #notifyEndOfRepaint()
    */
   @Override
-  public void notifyRemovedFromSelection(GraphNode[] unselected) {
-    updateSelectedRemove(unselected);
+  public void reduceSelection(Collection<GraphNode> reduction) {
+    updateSelectedReduce(reduction);
   }
 
   /**
@@ -83,9 +85,9 @@ public abstract class ViewSelectionListenerTool extends ViewEditorTool
    *
    * @param selection Map of nodes and selection states
    */
-  public abstract void updateSelectedAdd(GraphNode[] selection);
-  public abstract void updateSelectedRemove(GraphNode[] selection);
-  public abstract void updateSelectionTo(GraphNode[] selection);
+  public abstract void updateSelectedExtend(Collection<GraphNode> extension);
+  public abstract void updateSelectedReduce(Collection<GraphNode> reduction);
+  public abstract void updateSelectionTo(Collection<GraphNode> selection);
 
   /**
    * Extending classes implement this to empty their node selection control.

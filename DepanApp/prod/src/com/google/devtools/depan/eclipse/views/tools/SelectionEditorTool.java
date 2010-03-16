@@ -47,6 +47,7 @@ import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -456,8 +457,8 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
    * Add the given nodes to the list of selected nodes.
    */
   @Override
-  public void updateSelectedAdd(GraphNode[] selection) {
-    for (GraphNode node : selection) {
+  public void updateSelectedExtend(Collection<GraphNode> extension) {
+    for (GraphNode node : extension) {
       selectedNodesContent.add(node);
     }
     selectedNodes.refresh(false);
@@ -468,8 +469,8 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
    * Remove the given nodes from the list of selected nodes.
    */
   @Override
-  public void updateSelectedRemove(GraphNode[] selection) {
-    for (GraphNode node : selection) {
+  public void updateSelectedReduce(Collection<GraphNode> reduction) {
+    for (GraphNode node : reduction) {
       selectedNodesContent.remove(node);
     }
     selectedNodes.refresh(false);
@@ -480,8 +481,8 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
    * Set the list of selected nodes to contains exactly the given set of nodes.
    */
   @Override
-  public void updateSelectionTo(GraphNode[] selection) {
+  public void updateSelectionTo(Collection<GraphNode> selection) {
     selectedNodesContent.clear();
-    updateSelectedAdd(selection);
+    updateSelectedExtend(selection);
   }
 }

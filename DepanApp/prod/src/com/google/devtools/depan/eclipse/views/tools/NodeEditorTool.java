@@ -352,8 +352,8 @@ public class NodeEditorTool extends ViewSelectionListenerTool
    * @param selection set of nodes
    */
   @Override
-  public void updateSelectedAdd(GraphNode[] selection) {
-    for (GraphNode node : selection) {
+  public void updateSelectedExtend(Collection<GraphNode> extension) {
+    for (GraphNode node : extension) {
       setSelectedState(node, true);
     }
   }
@@ -366,8 +366,8 @@ public class NodeEditorTool extends ViewSelectionListenerTool
    *      #updateSelectedRemove(com.google.devtools.depan.model.GraphNode[])
    */
   @Override
-  public void updateSelectedRemove(GraphNode[] selection) {
-    for (GraphNode node : selection) {
+  public void updateSelectedReduce(Collection<GraphNode> reduction) {
+    for (GraphNode node : reduction) {
       setSelectedState(node, false);
     }
   }
@@ -378,7 +378,7 @@ public class NodeEditorTool extends ViewSelectionListenerTool
    * <code>selection</code> argument are added.
    */
   @Override
-  public void updateSelectionTo(GraphNode[] selection) {
+  public void updateSelectionTo(Collection<GraphNode> selection) {
     for (GraphNode node : getEditor().getViewGraph().getNodes()) {
       NodeDisplayProperty nodeProps = getEditor().getNodeProperty(node);
       NodeWrapper<NodeDisplayProperty> nodeWrapper =
@@ -391,7 +391,7 @@ public class NodeEditorTool extends ViewSelectionListenerTool
             nodeWrapper, new String[] { COL_SELECTED });
       }
     }
-    updateSelectedAdd(selection);
+    updateSelectedExtend(selection);
   }
 
   @Override

@@ -292,8 +292,8 @@ public class CollapseTool extends ViewSelectionListenerTool
    * Add newly selected nodes to the content of the collapseMaster combo.
    */
   @Override
-  public void updateSelectedAdd(GraphNode[] selection) {
-    for (GraphNode node : selection) {
+  public void updateSelectedExtend(Collection<GraphNode> extension) {
+    for (GraphNode node : extension) {
       collapseMaster.add(node);
     }
     masterViewer.refresh(false);
@@ -304,8 +304,8 @@ public class CollapseTool extends ViewSelectionListenerTool
    * Remove unselected nodes from the content of the collapseMaster combo.
    */
   @Override
-  public void updateSelectedRemove(GraphNode[] selection) {
-    for (GraphNode node : selection) {
+  public void updateSelectedReduce(Collection<GraphNode> reduction) {
+    for (GraphNode node : reduction) {
       collapseMaster.remove(node);
     }
     masterViewer.refresh(false);
@@ -316,10 +316,8 @@ public class CollapseTool extends ViewSelectionListenerTool
    * Refresh the content of the collapseMaster combo with selected nodes.
    */
   @Override
-  public void updateSelectionTo(GraphNode[] selection) {
+  public void updateSelectionTo(Collection<GraphNode> selection) {
     emptySelection();
-    updateSelectedAdd(selection);
-    masterViewer.refresh(false);
-    masterViewer.getCombo().select(0);
+    updateSelectedExtend(selection);
   }
 }
