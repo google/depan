@@ -14,15 +14,15 @@
  * the License.
  */
 
-package com.google.devtools.depan.eclipse.visualization;
+package com.google.devtools.depan.eclipse.editors;
 
 import com.google.devtools.depan.model.GraphNode;
 
 /**
- * A listener to notify when a set of nodes have their selection state changed.
+ * A listener to notify when a set of nodes associated with a {@link ViewEditor}
+ * have their selection state changed.
  *
  * @author ycoppel@google.com (Yohann Coppel)
- *
  */
 public interface SelectionChangeListener {
 

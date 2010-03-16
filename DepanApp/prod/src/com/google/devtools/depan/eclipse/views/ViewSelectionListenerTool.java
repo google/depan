@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.eclipse.views;
 
-import com.google.devtools.depan.eclipse.visualization.SelectionChangeListener;
+import com.google.devtools.depan.eclipse.editors.SelectionChangeListener;
 import com.google.devtools.depan.model.GraphNode;
 
 /**
