@@ -79,6 +79,7 @@ public class RefactorTool extends ViewSelectionListenerTool {
   public void updateSelectedExtend(Collection<GraphNode> extension) {
     if (extension.size() == 0) {
       emptySelection();
+      return;
     }
     setNode(extension.iterator().next());
   }

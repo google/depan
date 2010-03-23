@@ -92,12 +92,12 @@ public class RenderingPipe {
     Map<GraphNode, Double> nodeRanking = editor.getNodeRanking();
 
     shortcuts = new LayoutShortcutsPlugin(editor);
-    layout = new LayoutPlugin(editor.getNodeLocations());
+    layout = new LayoutPlugin();
     nodeColors = new NodeColorPlugin<GraphEdge>(graph, nodeRanking);
     edgeColors = new EdgeColorPlugin();
     stepper = new SteperPlugin();
     drawing = new DrawingPlugin(gl, panel);
-    factor = new FactorPlugin(panel);
+    factor = new FactorPlugin(panel, editor);
     nodeSize = new NodeSizePlugin<GraphEdge>(graph, nodeRanking);
     nodeStroke = new NodeStrokePlugin<GraphEdge>(panel, graph);
     nodeShape = new NodeShapePlugin<GraphEdge>(graph);

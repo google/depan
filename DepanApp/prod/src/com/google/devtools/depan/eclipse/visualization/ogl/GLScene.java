@@ -244,6 +244,14 @@ public abstract class GLScene {
     return viewPort;
   }
 
+  public GLRegion getOGLViewport() {
+    int[] osViewport = getViewport();
+    double[] topLeft = getOGLPos(osViewport[0], osViewport[1]);
+    double[] bottomRight = getOGLPos(osViewport[2], osViewport[3]);
+    return new GLRegion(
+        topLeft[0], topLeft[1], bottomRight[0], bottomRight[1]);
+  }
+
   /**
    * Return the position in the openGL coordinates, given a window-relative
    * position. For instance to know what are the coordinate for the point
@@ -331,7 +339,7 @@ public abstract class GLScene {
    * @param dx movement on x axis.
    * @param dy movement on y axis.
    */
-  protected abstract void moveSelectionDelta(float dx, float dy);
+  protected abstract void moveSelectionDelta(double dx, double dy);
 
   /**
    * Move every selected objects relatively. Movement is given relatively
@@ -343,8 +351,9 @@ public abstract class GLScene {
   public void moveSelectedObjectsTo(int x, int y) {
     double[] worldPosOrigin = getOGLPos(0, 0);
     double[] worldPos = getOGLPos(x, y);
-    moveSelectionDelta((float) (-worldPos[0] + worldPosOrigin[0]),
-        (float) (-worldPos[1] + worldPosOrigin[1]));
+    moveSelectionDelta(
+        -worldPos[0] + worldPosOrigin[0],
+        -worldPos[1] + worldPosOrigin[1]);
   }
 
   /**

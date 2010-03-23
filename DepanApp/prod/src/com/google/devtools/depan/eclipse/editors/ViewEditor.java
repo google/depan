@@ -41,6 +41,7 @@ import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptors;
 import com.google.devtools.depan.eclipse.views.tools.RelationCount;
 import com.google.devtools.depan.eclipse.visualization.View;
 import com.google.devtools.depan.eclipse.visualization.layout.Layouts;
+import com.google.devtools.depan.eclipse.visualization.ogl.GLRegion;
 import com.google.devtools.depan.eclipse.visualization.ogl.RendererChangeListener;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeColorPlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeShapePlugin;
@@ -123,6 +124,18 @@ public class ViewEditor extends MultiPageEditorPart
 
   private static final List<GraphNode> EMPTY_NODE_LIST =
       Collections.<GraphNode>emptyList();
+
+  /** How much room to consume for full viewport layout scaling. */
+  private static final double FULLSCALE_MARGIN = 0.9;
+
+  /**
+   * Defines the OpenGL distance between two points that should be considered
+   * equivalent to zero.
+   * 
+   * <p>Ideally, this should be obtained from the GLPanel/View, perhaps as the
+   * half the OpenGL distance between two pixels.  But that will have to wait.
+   */
+  private static final double ZERO_THRESHOLD = 0.1;
 
   /////////////////////////////////////
   // Editor state for persistence
@@ -863,6 +876,10 @@ public class ViewEditor extends MultiPageEditorPart
   /////////////////////////////////////
   // Update Graph Layouts
 
+  private static Point2D newPoint2D(double xPos, double yPos) {
+    return Point2dUtils.newPoint2D(xPos, yPos);
+  }
+
   public Layouts getSelectedLayout() {
     return viewInfo.getSelectedLayout();
   }
@@ -876,91 +893,185 @@ public class ViewEditor extends MultiPageEditorPart
   }
 
   /**
-   * Determine which range to use as scaling factor, to keep the same
-   * proportions.
-   *
-   * @param rangeX
-   * @param rangeY
-   * @return
+   * Provides the OpenGL distance between two points that should be considered
+   * equivalent to zero.
+   * 
+   * <p>Ideally, this should be obtained from the member field for GLPanel/View.
+   * A reasonable value might be half the OpenGL distance between two pixels.
+   * But that will have to wait.
    */
-  private double computeScale(double rangeX, double rangeY) {
-    // determine which one to use, to keep the same proportions.
-    if (rangeX == 0f && rangeY == 0f) {
-      return 1.0;
-    }
-    if (rangeX == 0) {
-      return rangeY;
-    }
-    if (rangeY == 0) {
-      return rangeX;
-    }
-    return Math.max(rangeX, rangeY);
+  private double getZeroThreshold() {
+    return ZERO_THRESHOLD;
   }
 
-  private Map<GraphNode, Point2D> computeLayoutLocations(
-      Layouts layoutDef, DirectedRelationFinder relationfinder) {
-    AbstractLayout<GraphNode, GraphEdge> newLayout =
-        layoutDef.getLayout(this, relationfinder);
+  private double scaleWithMargin(
+      LayoutScaler scaler, GLRegion viewport) {
+    return FULLSCALE_MARGIN
+        * scaler.getFullViewScale(viewport, getZeroThreshold());
+    
+  }
 
-    if (newLayout instanceof IterativeContext) {
-      IterativeContext it = (IterativeContext) newLayout;
-      int maxSteps = 1000;
-      while (maxSteps > 0 && !it.done()) {
-        it.step();
-        maxSteps--;
-      }
-    }
-
-    double minX = Double.MAX_VALUE;
-    double minY = Double.MAX_VALUE;
-    double maxX = Double.MIN_VALUE;
-    double maxY = Double.MIN_VALUE;
-
-    // compute the min and max values for each coordinate of all points
-    for (GraphNode n : getViewGraph().getNodes()) {
-      double x = newLayout.getX(n);
-      double y = newLayout.getY(n);
-      minX = Math.min(minX, x);
-      maxX = Math.max(maxX, x);
-
-      minY = Math.min(minY, y);
-      maxY = Math.max(maxY, y);
-    }
-
-    // scale everything to [-0.5:0.5] range
-    // find the range for each dimension
-    double rangeX = maxX - minX;
-    double rangeY = maxY - minY;
-    double factor = computeScale(rangeX, rangeY);
-
-    if (rangeX == 0f && rangeY == 0f) {
-      factor = 1;
-    } else if (rangeX == 0) {
-      factor = rangeY;
-    } else if (rangeY == 0) {
-      factor = rangeX;
-    } else {
-      factor = Math.max(rangeX, rangeY);
-    }
-
-    double shiftX = rangeX / factor / 2;
-    double shiftY = rangeY / factor / 2;
-
+  /**
+   * For the listed nodes, move their provided location by the given delta
+   * values.  The location map can be the node's current location, or a newly
+   * computed location for the nodes.  If a listed node has no entry in the
+   * location map, the node's location is moved relative to the origin and will
+   * be (xDelta, yDelta).
+   * 
+   * @param moveNodes defines the nodes to move
+   * @param locations defines the initial locations of nodes
+   * @param xDelta amount of x shift for node move
+   * @param yDelta amount of y shift for node move
+   */
+  private static Map<GraphNode, Point2D> translateNodes(
+      Collection<GraphNode> moveNodes,
+      Map<GraphNode, Point2D> locations,
+      Point2dUtils.Translater translater) {
     Map<GraphNode, Point2D> result = Maps.newHashMap();
-    for (GraphNode n : getViewGraph().getNodes()) {
-      double x = newLayout.getX(n);
-      double y = newLayout.getY(n);
-      double newX = (x - minX) / factor - shiftX;
-      double newY = (y - minY) / factor - shiftY;
-
-      // minus Y, since in openGL, y coordinates are inverted
-      result.put(n, new Point2D.Double(newX, -newY));
+    for (GraphNode node : moveNodes) {
+      Point2D location = locations.get(node);
+      result.put(node, translater.translate(location));
     }
     return result;
   }
 
-  public void applyLayout(Layouts layout) {
-    applyLayout(layout, viewInfo.getLayoutFinder());
+  /**
+   * Scale and position the nodes so that they fit in the viewport, and they
+   * are within the viewport.
+   * 
+   * @param layoutNodes
+   * @param layoutLocations
+   * @param viewport
+   * @return updated node locations that are within the viewport
+   */
+  private Map<GraphNode, Point2D> computeInViewportLocations(
+      Collection<GraphNode> layoutNodes,
+      Map<GraphNode, Point2D> layoutLocations,
+      GLRegion viewport) {
+    Map<GraphNode, Point2D> result = Maps.newHashMap();
+    if (layoutNodes.size() <= 0) {
+      return result;
+    }
+
+    // If there is only one node, force it to the center of the viewport
+    if (layoutNodes.size() <= 1) {
+      result.put(layoutNodes.iterator().next(), viewport.getCenter());
+      return result;
+    }
+
+    LayoutScaler scaler = new LayoutScaler(layoutNodes, layoutLocations);
+    double scaleView = scaleWithMargin(scaler, viewport);
+    double originX = scaler.getCenterX();
+    double originY = scaler.getCenterY();
+    Point2dUtils.Translater translater = Point2dUtils.newAdjustTranslater(
+        -originX, -originY, scaleView, scaleView);
+
+    return translateNodes(layoutNodes, layoutLocations, translater);
+  }
+
+  /**
+   * Scale the nodes so that they would fit in the viewport, but don't force
+   * them into the viewport.
+   * 
+   * @param layoutNodes
+   * @param locations
+   * @param viewport
+   * @return updated node locations that are the same size as the viewport
+   */
+  private Map<GraphNode, Point2D> computeFullViewScale(
+      Collection<GraphNode> layoutNodes,
+      Map<GraphNode, Point2D> locations,
+      GLRegion viewport) {
+    Map<GraphNode, Point2D> result = Maps.newHashMap();
+    if (layoutNodes.size() <= 0) {
+      return result;
+    }
+
+    // If there is only one node, don't change its location
+    if (layoutNodes.size() == 1) {
+      GraphNode singletonNode = layoutNodes.iterator().next();
+      Point2D singletonLocation = locations.get(singletonNode);
+      if (null != singletonLocation) {
+        result.put(singletonNode, singletonLocation);
+      }
+      return result;
+    }
+
+    // Scale all the nodes to fit within the indicated region
+    LayoutScaler scaler = new LayoutScaler(layoutNodes, locations);
+    double scaleView = scaleWithMargin(scaler, viewport);
+    Point2dUtils.Translater translater =
+        Point2dUtils.newScaleTranslater(scaleView, scaleView);
+    return translateNodes(layoutNodes, locations, translater);
+  }
+
+  /**
+   * Run a canned layout over the set of nodes.  The computed locations may
+   * be nowhere near the OpenGL viewport.
+   * 
+   * @param layoutDef
+   * @param relationfinder
+   * @return
+   */
+  private Map<GraphNode, Point2D> computeLayoutLocations(
+    Layouts layoutDef, DirectedRelationFinder relationfinder) {
+  AbstractLayout<GraphNode, GraphEdge> newLayout =
+      layoutDef.getLayout(this, relationfinder);
+
+  // Run the layout until it stabilizes.
+  if (newLayout instanceof IterativeContext) {
+    IterativeContext it = (IterativeContext) newLayout;
+    int maxSteps = 1000;
+    while (maxSteps > 0 && !it.done()) {
+      it.step();
+      maxSteps--;
+    }
+  }
+
+  // Convert the layout positions to standard node positions.
+  Map<GraphNode, Point2D> result = Maps.newHashMap();
+  for (GraphNode n : getViewGraph().getNodes()) {
+
+    // minus Y, since in openGL, y coordinates are inverted
+    result.put(n, newPoint2D(newLayout.getX(n), -newLayout.getY(n)));
+  }
+  return result;
+}
+
+  /////////////////////////////////////
+  // Update node positions in the View Document
+
+  /**
+   * Scale the coordinates for all exposed nodes as indicated by the paramters.
+   * 
+   * @param scaleX scale factor for X coordinates
+   * @param scaleY scale factor for Y coordinates
+   */
+  public void layoutScale(double scaleX, double scaleY) {
+    Point2dUtils.Translater translater =
+        Point2dUtils.newScaleTranslater(scaleX, scaleY);
+    Map<GraphNode, Point2D> changes = translateNodes(
+        getExposedGraph().getNodes(), getNodeLocations(),
+        translater);
+
+    viewInfo.editNodeLocations(changes, null);
+  }
+
+  private void layoutBestFit(
+      Collection<GraphNode> layoutNodes, Map<GraphNode, Point2D> locations) {
+    GLRegion viewport = renderer.getOGLViewport();
+    Map<GraphNode, Point2D> changes =
+        computeFullViewScale(layoutNodes, locations, viewport);
+    viewInfo.editNodeLocations(changes, null);
+  }
+
+  /**
+   * Scale the exposed nodes so they would fit in the viewport, if the viewport
+   * was centered over the nodes.  This has been the historical behavior of the
+   * {@code FactorPlugin}.
+   */
+  public void layoutBestFit() {
+    layoutBestFit(getExposedGraph().getNodes(), getNodeLocations());
   }
 
   /**
@@ -973,19 +1084,24 @@ public class ViewEditor extends MultiPageEditorPart
    */
   public void applyLayout(
       Layouts newLayout, DirectedRelationFinder relationfinder) {
-    Map<GraphNode, Point2D> nodeLocations =
+
+    // Run the layout process to compute new locations.
+    Map<GraphNode, Point2D> layoutLocations =
         computeLayoutLocations(newLayout, relationfinder);
 
-    // TODO(leeca): get the layout code above to scale to viewport correctly
-    // In the interim, push the new locations to the renderer, and then
-    // trigger a "best scaling" event which will propagate location changed
-    // event all the way to the viewInfo.  Much more round-about then the
-    // one line below:
-    // viewInfo.setNodeLocations(nodeLocations);
+    // Adjust those locations to be at the origin 
+    // and scaled to fill the current viewport.
+    Collection<GraphNode> layoutNodes = getExposedGraph().getNodes();
+    GLRegion viewport = renderer.getOGLViewport().newOriginRegion();
+    Map<GraphNode, Point2D> changes =
+        computeInViewportLocations(layoutNodes, layoutLocations, viewport);
 
-    editNodeLocations(nodeLocations);
-    renderer.computeBestScalingFactor();
-    
+    // Change the node locations.
+    viewInfo.editNodeLocations(changes, null);
+  }
+
+  public void applyLayout(Layouts layout) {
+    applyLayout(layout, viewInfo.getLayoutFinder());
   }
 
   public void clusterize(Layouts layout, DirectedRelationFinder finder) {
@@ -1139,24 +1255,14 @@ public class ViewEditor extends MultiPageEditorPart
     viewInfo.editSelectedNodes(reduceNodes, EMPTY_NODE_LIST, author);
   }
 
-  public void moveSelectionDelta(float xDelta, float yDelta) {
-    Map<GraphNode, Point2D> changes = Maps.newHashMap();
-    Map<GraphNode, Point2D> locations = viewInfo.getNodeLocations();
-    for (GraphNode node : getSelectedNodes()) {
-      changes.put(node, createDeltaPoint2D(node, xDelta, yDelta));
-    }
-    viewInfo.editNodeLocations(changes, renderer);
-  }
+  public void moveSelectionDelta(
+      double deltaX, double deltaY, Object author) {
+    Point2dUtils.Translater translater =
+        Point2dUtils.newDeltaTranslater(deltaX, deltaY);
 
-  private Point2D createDeltaPoint2D(
-      GraphNode node, float xDelta, float yDelta) {
-    Point2D curr = viewInfo.getNodeLocations().get(node);
-    if (null == curr) {
-      return new Point2D.Float(xDelta, yDelta);
-    }
-    float xNew = (float) (curr.getX() + xDelta);
-    float yNew = (float) (curr.getY() + yDelta);
-    return new Point2D.Float(xNew, yNew);
+    Map<GraphNode, Point2D> changes = translateNodes(
+        getSelectedNodes(), getNodeLocations(), translater);
+    viewInfo.editNodeLocations(changes, author);
   }
 
   /////////////////////////////////////
@@ -1283,8 +1389,8 @@ public class ViewEditor extends MultiPageEditorPart
     }
 
     @Override
-    public void selectionMoved(float x, float y) {
-      moveSelectionDelta(x, y);
+    public void selectionMoved(double x, double y) {
+      moveSelectionDelta(x, y, renderer);
     }
 
     @Override
@@ -1401,5 +1507,4 @@ public class ViewEditor extends MultiPageEditorPart
       }
     });
   }
-
 }

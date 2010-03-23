@@ -69,5 +69,5 @@ public interface RendererChangeListener {
    * Notify the receiver that the position all of currently selected nodes
    * should be adjusted by the relative amounts.
    */
-  public void selectionMoved(float x, float y);
+  public void selectionMoved(double x, double y);
 }

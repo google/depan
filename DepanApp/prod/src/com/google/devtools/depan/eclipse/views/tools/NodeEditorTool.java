@@ -205,9 +205,11 @@ public class NodeEditorTool extends ViewSelectionListenerTool
 
   @Override
   public void editorClosed(ViewEditor viewEditor) {
-    GraphData<NodeDisplayProperty> hierarchy = getEditorHierarchy();
-    hierarchy.saveExpandState(
-        nodeTreeView.getTreeViewer().getExpandedTreePaths());
+    if (hasEditor()) {
+      GraphData<NodeDisplayProperty> hierarchy = getEditorHierarchy();
+      hierarchy.saveExpandState(
+          nodeTreeView.getTreeViewer().getExpandedTreePaths());
+    }
     super.editorClosed(viewEditor);
   }
 

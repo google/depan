@@ -33,7 +33,6 @@ import org.eclipse.swt.widgets.Label;
 
 /**
  * @author ycoppel@google.com (Yohann Coppel)
- *
  */
 public class ScaleTool extends ViewEditorTool {
 
@@ -149,7 +148,7 @@ public class ScaleTool extends ViewEditorTool {
     if (!hasEditor()) {
       return;
     }
-    getEditor().getRenderer().getFactor().applyFactor(scale);
+    getEditor().layoutScale(scale, scale);
   }
 
   /**
@@ -171,6 +170,6 @@ public class ScaleTool extends ViewEditorTool {
     if (!hasEditor()) {
       return;
     }
-    getEditor().getRenderer().getFactor().computeBestScalingFactor();
+    getEditor().layoutBestFit();
   }
 }

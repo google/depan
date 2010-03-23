@@ -20,10 +20,6 @@ import com.google.devtools.depan.eclipse.visualization.ogl.EdgeRenderingProperty
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeRenderingProperty;
 import com.google.devtools.depan.eclipse.visualization.plugins.core.EdgeRenderingPlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.core.NodeRenderingPlugin;
-import com.google.devtools.depan.model.GraphNode;
-
-import java.awt.geom.Point2D;
-import java.util.Map;
 
 /**
  * Plugin applying a new layout in case of layout change.
@@ -36,49 +32,14 @@ import java.util.Map;
  * @author Yohann Coppel
  */
 public class LayoutPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
-  private Map<GraphNode, Point2D> layout;
-  private boolean inferPos;
-  private boolean animate;
 
-  /**
-   * Apply a layout to the node in the rendering pipe.
-   * The layout, when applied, gives every point a position between -0.5 and
-   * 0.5.
-   * @param view
-   */
-  public LayoutPlugin(Map<GraphNode, Point2D> layoutMap) {
-    this.layout = layoutMap;
-    this.inferPos = true;
-    this.animate = false;
-  }
-
+  @Override
   public void preFrame(float elapsedTime) {
     // nothing to do
   }
 
   @Override
   public boolean apply(NodeRenderingProperty p) {
-    if (null == layout) {
-      return true;
-    }
-
-    Point2D point = layout.get(p.node);
-    if (null != point) {
-      p.targetPositionX = (float) point.getX();
-      p.targetPositionY = (float) point.getY();
-    }
-    else if (inferPos) {
-      p.targetPositionX = 0;
-      p.targetPositionY = 0;
-    }
-    else {
-      return true;
-    }
-  
-    if (!animate) {
-      p.positionX = p.targetPositionX;
-      p.positionY = p.targetPositionY;
-    }
     return true;
   }
 
@@ -94,17 +55,13 @@ public class LayoutPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
   }
 
   public void postFrame() {
-    if (null == layout) {
-      return;
-    }
-
-    // After the update, release the layout map so it can be GC'ed.
-    layout = null;
   }
 
   @Override
   public boolean keyPressed(int keycode, char character, boolean ctrl,
       boolean alt, boolean shift) {
+    // TODO(leeca): restore support for keyboard layout shortcuts.
+    // See revision 100
     return false;
   }
 
@@ -116,23 +73,5 @@ public class LayoutPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
   @Override
   public void dryRun(NodeRenderingProperty p) {
     // nothing to do
-  }
-
-  public void setLayout(Map<GraphNode, Point2D> layoutMap) {
-    layout = layoutMap;
-    inferPos = true;
-    animate = true;
-  }
-
-  public void editLayout(Map<GraphNode, Point2D> newLocations) {
-    layout = newLocations;
-    inferPos = false;
-    animate = true;
-  }
-
-  public void updateLayout(Map<GraphNode, Point2D> newLocations) {
-    layout = newLocations;
-    inferPos = false;
-    animate = false;
   }
 }

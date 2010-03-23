@@ -31,7 +31,6 @@ import org.eclipse.swt.widgets.Composite;
 import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.nio.IntBuffer;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -106,6 +105,9 @@ public class GLPanel extends GLScene {
    */
   private ViewEditor editor;
 
+  /////////////////////////////////////
+  // Lifecycle management
+
   public GLPanel(Composite parent, ViewEditor editor) {
     super(parent);
     this.editor = editor;
@@ -151,19 +153,20 @@ public class GLPanel extends GLScene {
     r.start();
   }
 
-  public void initializeNodeLocations(Map<GraphNode, Point2D> locations) {
-    for (NodeRenderingProperty nodeProp : nodesProperties) {
-
-      // Set the initial location, if any
-      Point2D pos = locations.get(nodeProp.node);
-      if (null != pos) {
-        nodeProp.positionX = (float) pos.getX();
-        nodeProp.positionY = (float) pos.getY();
-        nodeProp.targetPositionX = nodeProp.positionX; 
-        nodeProp.targetPositionY = nodeProp.positionY;
-      }
-    }
+  @Override
+  public void dispose() {
+    super.dispose();
   }
+
+  /////////////////////////////////////
+  // Accessors
+
+  public RenderingPipe getRenderingPipe() {
+    return renderer;
+  }
+
+  /////////////////////////////////////
+  // Rendering methods.
 
   /**
    * Perform a dry run in the rendering pipe, so that every plugin knows about
@@ -205,17 +208,8 @@ public class GLPanel extends GLScene {
     boolean caught = renderer.uncaughtKey(keyCode, character, keyCtrlState,
         keyAltState, keyShiftState);
     if (!caught) {
-      logger.info("Lost key press: " + keyCode + "(" + character + ")");
+      logger.info("Lost key press: " + keyCode + " (" + character + ")");
     }
-  }
-
-  @Override
-  public void dispose() {
-    super.dispose();
-  }
-
-  public RenderingPipe getRenderingPipe() {
-    return renderer;
   }
 
   /////////////////////
@@ -289,6 +283,99 @@ public class GLPanel extends GLScene {
     }
     return result;
   }
+
+  /////////////////////////////////////
+  // Update node locations.
+
+  /**
+   * Define how node position data is changed.
+   * 
+   * <p>This allows different derived instances to default for unknown values
+   * or configure animation without lots of tests in the logic to assign
+   * position data.  This is most useful when the position data for multiple
+   * nodes is being updated in the same fashion.
+   * @author leeca@google.com (Your Name Here)
+   *
+   */
+  private interface PositionChanger {
+    void setPosition(NodeRenderingProperty nodeProp, Point2D position);
+  }
+
+  private static enum PositionChangers implements PositionChanger {
+    DIRECT() {
+      @Override
+      public void setPosition(
+          NodeRenderingProperty nodeProp, Point2D position) {
+        if (null == position) {
+          return;
+        }
+        nodeProp.positionX = (float) position.getX();
+        nodeProp.positionY = (float) position.getY();
+        nodeProp.targetPositionX = nodeProp.positionX; 
+        nodeProp.targetPositionY = nodeProp.positionY;
+      }
+    },
+
+    INFERS() {
+      @Override
+      public void setPosition(
+          NodeRenderingProperty nodeProp, Point2D position) {
+        if (null == position) {
+          nodeProp.positionX = 0.0f;
+          nodeProp.positionY = 0.0f;
+        }
+        else {
+          nodeProp.positionX = (float) position.getX();
+          nodeProp.positionY = (float) position.getY();
+        }
+        nodeProp.targetPositionX = nodeProp.positionX; 
+        nodeProp.targetPositionY = nodeProp.positionY;
+      }
+    },
+
+    ANIMATE() {
+      @Override
+      public void setPosition(
+          NodeRenderingProperty nodeProp, Point2D position) {
+        if (null == position) {
+          return;
+        }
+        nodeProp.targetPositionX = (float) position.getX();
+        nodeProp.targetPositionY = (float) position.getY();
+      }
+    };
+
+    public abstract void setPosition(
+        NodeRenderingProperty nodeProp, Point2D position);
+  }
+
+  private void changeNodeLocations(
+      PositionChanger setter, Map<GraphNode, Point2D> locations) {
+
+    for (NodeRenderingProperty nodeProp : nodesProperties) {
+      Point2D pos = locations.get(nodeProp.node);
+      setter.setPosition(nodeProp, pos);
+    }
+  }
+
+  public void initializeNodeLocations(Map<GraphNode, Point2D> locations) {
+    changeNodeLocations(PositionChangers.INFERS, locations);
+  }
+
+  public void setNodeLocations(Map<GraphNode, Point2D> locations) {
+    changeNodeLocations(PositionChangers.INFERS, locations);
+  }
+
+  public void editNodeLocations(Map<GraphNode, Point2D> locations) {
+    changeNodeLocations(PositionChangers.ANIMATE, locations);
+  }
+
+  public void updateNodeLocations(Map<GraphNode, Point2D> locations) {
+    changeNodeLocations(PositionChangers.DIRECT, locations);
+  }
+
+  /////////////////////////////////////
+  // Node and edge property methods
 
   /**
    * Sets the <code>Color</code> of the given edge.
@@ -408,7 +495,7 @@ public class GLPanel extends GLScene {
   }
 
   @Override
-  public void moveSelectionDelta(float x, float y) {
+  public void moveSelectionDelta(double x, double y) {
     getRendererCallback().selectionMoved(x, y);
   }
 
@@ -416,40 +503,14 @@ public class GLPanel extends GLScene {
       Collection<GraphNode> clearedNodes,
       Collection<GraphNode> selectedNodes) {
 
-    // Unselect all the cleared Nodes
+    // Unselect all the cleared nodes.
     for (GraphNode node : clearedNodes) {
       node2property(node).setSelected(false);
     }
+
+    // Select all the chosen nodes.
     for (GraphNode node : selectedNodes) {
       node2property(node).setSelected(true);
     }
-  }
-
-  /**
-   * Update the position of nodes in the collections that actually have a
-   * target location that is different from their current position.
-   * 
-   * <p>The {@link FactorPlugin} calls this after computing new scaled positions
-   * for each node.
-   * 
-   * @param movedNodes collection of moved nodes, often all nodes
-   */
-  private void notifySoftLocationChange(
-      Collection<? extends NodeRenderingProperty> movedNodes) {
-    Map<GraphNode, Point2D> changes =
-        Maps.newHashMapWithExpectedSize(movedNodes.size());
-    for (NodeRenderingProperty node : movedNodes) {
-      if ((node.targetPositionX != node.positionX) 
-          || (node.targetPositionY != node.positionY)) {
-        Point2D position = new Point2D.Float(
-            node.targetPositionX, node.targetPositionY);
-        changes.put(node.node, position);
-      }
-    }
-    getRendererCallback().locationsChanged(changes);
-  }
-
-  public void notifyLocationChange() {
-    notifySoftLocationChange(Arrays.asList(nodesProperties));
   }
 }

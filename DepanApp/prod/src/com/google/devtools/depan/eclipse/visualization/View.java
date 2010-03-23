@@ -20,6 +20,7 @@ import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds;
 import com.google.devtools.depan.eclipse.visualization.ogl.ArrowHead;
 import com.google.devtools.depan.eclipse.visualization.ogl.GLPanel;
+import com.google.devtools.depan.eclipse.visualization.ogl.GLRegion;
 import com.google.devtools.depan.eclipse.visualization.ogl.SceneGrip;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.CollapsePlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.EdgeIncludePlugin;
@@ -118,6 +119,9 @@ public class View {
     return glPanel.getGrip();
   }
 
+  public GLRegion getOGLViewport() {
+    return glPanel.getOGLViewport();
+  }
   /////////////////////////////////////
 
   public void updateSelectedNodes(
@@ -223,7 +227,7 @@ public class View {
    * @param nodeLocations new locations for nodes
    */
   public void setNodeLocations(Map<GraphNode, Point2D> newLocations) {
-    glPanel.getRenderingPipe().getLayout().setLayout(newLocations);
+    glPanel.setNodeLocations(newLocations);
   }
 
   /**
@@ -234,7 +238,7 @@ public class View {
    * @param newLocations new locations for nodes
    */
   public void editNodeLocations(Map<GraphNode, Point2D> newLocations) {
-    glPanel.getRenderingPipe().getLayout().editLayout(newLocations);
+    glPanel.editNodeLocations(newLocations);
   }
 
   /**
@@ -245,17 +249,6 @@ public class View {
    * @param newLocations new locations for nodes
    */
   public void updateNodeLocations(Map<GraphNode, Point2D> newLocations) {
-    glPanel.getRenderingPipe().getLayout().updateLayout(newLocations);
-  }
-
-  /**
-   * Automatically scale the graph while rendering it.  Once the scale is
-   * computed, the renderer moves the nodes the new locations and fires
-   * a location changed event.
-   * 
-   * @param nodeLocations new locations for nodes
-   */
-  public void computeBestScalingFactor() {
-    glPanel.getRenderingPipe().getFactor().computeBestScalingFactor();
+    glPanel.updateNodeLocations(newLocations);
   }
 }
