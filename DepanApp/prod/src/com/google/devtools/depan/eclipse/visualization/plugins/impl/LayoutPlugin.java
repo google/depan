@@ -24,11 +24,6 @@ import com.google.devtools.depan.eclipse.visualization.plugins.core.NodeRenderin
 /**
  * Plugin applying a new layout in case of layout change.
  *
- * This plugin has some key shortcuts: Pressing "l" (or 'L') followed by any
- * number from 1 to 9, apply the corresponding layout to the current view. If
- * 'l' is followed by a key that do not correspond to a layout number, the
- * plugins stop waiting for a number.
- *
  * @author Yohann Coppel
  */
 public class LayoutPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
@@ -47,6 +42,7 @@ public class LayoutPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
   public boolean apply(EdgeRenderingProperty p) {
     // for edges, always reposition them, because nodes can
     // be moved by the mouse, without notice to this plugin.
+    // TODO(leeca): Is this still necessary?
     p.p1X = p.node1.positionX;
     p.p1Y = p.node1.positionY;
     p.p2X = p.node2.positionX;
