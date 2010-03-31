@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.eclipse.editors;
 
+import com.google.common.collect.ImmutableList;
 import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
 import com.google.devtools.depan.eclipse.trees.NodeTreeProvider;
 import com.google.devtools.depan.eclipse.visualization.layout.Layouts;
@@ -205,9 +206,10 @@ public class ViewDocument {
   }
 
   public ViewDocument newViewDocument(Collection<GraphNode> nodes) {
+    ImmutableList<GraphNode> newView = ImmutableList.copyOf(nodes);
     ViewPreferences newPrefs =
-        ViewPreferences.buildFilteredNodes(userPrefs, nodes);
-    return new ViewDocument(parentGraph, nodes, newPrefs);
+        ViewPreferences.buildFilteredNodes(userPrefs, newView);
+    return new ViewDocument(parentGraph, newView, newPrefs);
   }
 
   /////////////////////////////////////

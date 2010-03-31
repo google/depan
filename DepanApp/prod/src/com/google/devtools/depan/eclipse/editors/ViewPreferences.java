@@ -322,7 +322,8 @@ public class ViewPreferences {
       Collection<GraphNode> newSelection, final Object author) {
     final Collection<GraphNode> previous = selectedNodes;
 
-    selectedNodes = newSelection;
+    // Make a defensive copy
+    selectedNodes = Lists.newArrayList(newSelection);
 
     listeners.fireEvent(new SimpleDispatcher() {
       @Override
