@@ -73,6 +73,8 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.jface.dialogs.IPageChangedListener;
+import org.eclipse.jface.dialogs.PageChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -336,7 +338,12 @@ public class ViewEditor extends MultiPageEditorPart
     // Re-layout nodes if necessary.
     Layouts selectedLayout = viewInfo.getSelectedLayout();
     if (null != selectedLayout ) {
-      applyLayout(selectedLayout, viewInfo.getLayoutFinder());
+      // Run the layout process to compute new locations.
+      Map<GraphNode, Point2D> locations =
+          computeLayoutLocations(selectedLayout, viewInfo.getLayoutFinder());
+
+      // Change the node locations.
+      viewInfo.editNodeLocations(locations, null);
     }
 
     // Otherwise, just use default positions - user will need to choose layout.
