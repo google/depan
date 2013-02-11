@@ -18,7 +18,9 @@ package com.google.devtools.depan.eclipse.actions;
 
 import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.visualization.View;
-import com.google.devtools.depan.eclipse.visualization.layout.Layouts;
+import com.google.devtools.depan.eclipse.visualization.layout.JungLayoutGenerator;
+import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerator;
+import com.google.devtools.depan.eclipse.visualization.layout.TreeLayoutGenerator;
 
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
@@ -105,13 +107,13 @@ public class ViewEditorActionDelegate implements IEditorActionDelegate {
 
     // layouts
     if (id.equals(FRLAYOUT_ID)) {
-      applyLayout(Layouts.FRLayout);
+      applyLayout(JungLayoutGenerator.FRLayoutBuilder);
     } else if (id.equals(SPRINGLAYOUT_ID)) {
-      applyLayout(Layouts.SpringLayout);
+      applyLayout(JungLayoutGenerator.SpringLayoutBuilder);
     } else if (id.equals(TREELAYOUT_ID))  {
-      applyLayout(Layouts.UniversalTreeLayout);
+      applyLayout(TreeLayoutGenerator.NewTreeLayoutBuilder);
     } else if (id.equals(RADIALLAYOUT_ID)) {
-      applyLayout(Layouts.UniversalRadialLayout);
+      applyLayout(TreeLayoutGenerator.NewRadialLayoutBuilder);
 
     // visualization options
     } else if (id.equals(ROOTHIGHLIGHT_ID)) {
@@ -133,7 +135,7 @@ public class ViewEditorActionDelegate implements IEditorActionDelegate {
     }
   }
 
-  private void applyLayout(Layouts layout) {
+  private void applyLayout(LayoutGenerator layout) {
     targetEditor.applyLayout(layout);
   }
 

@@ -1,0 +1,116 @@
+/*
+ * Copyright 2013 ServiceNow.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.google.devtools.depan.eclipse.visualization.layout;
+
+import com.google.devtools.depan.graph.api.DirectedRelationFinder;
+import com.google.devtools.depan.graph.basic.ForwardIdentityRelationFinder;
+import com.google.devtools.depan.model.GraphEdge;
+import com.google.devtools.depan.model.GraphModel;
+import com.google.devtools.depan.model.GraphNode;
+
+import com.google.common.collect.Sets;
+
+import edu.uci.ics.jung.graph.DirectedGraph;
+import edu.uci.ics.jung.graph.DirectedSparseMultigraph;
+import edu.uci.ics.jung.graph.Graph;
+
+import java.util.Collection;
+import java.util.Set;
+
+/**
+ * Construct a JUNG graph from the supplied subset on nodes and edges.
+ * 
+ * Extracted from previous versions of ViewEditor.
+ * 
+ * @author <a href='mailto:lee.carver@servicenow.com'>Lee Carver</a>
+ */
+public class JungBuilder {
+  private final GraphModel graphModel;
+  private Collection<GraphNode> movableNodes = GraphNode.EMPTY_NODE_LIST;
+  private Collection<GraphNode> fixedNodes = GraphNode.EMPTY_NODE_LIST;
+  private DirectedRelationFinder relationFinder = 
+          ForwardIdentityRelationFinder.FINDER;
+
+  public JungBuilder(GraphModel graphModel) {
+    this.graphModel = graphModel;
+  }
+
+  public void setMovableNodes(Collection<GraphNode> movableNodes) {
+    this.movableNodes = movableNodes;
+  }
+
+  public void setFixedNodes(Collection<GraphNode> fixedNodes) {
+    this.fixedNodes = fixedNodes;
+  }
+
+  public void setRelations(DirectedRelationFinder relations) {
+    this.relationFinder = relations;
+  }
+
+  public DirectedGraph<GraphNode, GraphEdge> build() {
+    DirectedGraph<GraphNode, GraphEdge> result =
+            new DirectedSparseMultigraph<GraphNode, GraphEdge>();
+
+    Set<GraphNode> includedNodes = Sets.newHashSet();
+
+    for (GraphNode node : movableNodes) {
+      result.addVertex(node);
+      includedNodes.add(node);
+    }
+
+    for (GraphNode node : fixedNodes) {
+      result.addVertex(node);
+      includedNodes.add(node);
+    }
+
+    addEdges(result, includedNodes);
+    return result;
+  }
+
+  // TODO: Reconcile with GraphModel.computeSuccessorHierarchy().
+  private void addEdges(
+          DirectedGraph<GraphNode, GraphEdge> result,
+          Set<GraphNode> includedNodes) {
+
+    for (GraphEdge edge : graphModel.getEdges()) {
+      // Filter on nodes first
+      if (!includedNodes.contains(edge.getHead()))
+        continue;
+
+      if (!includedNodes.contains(edge.getTail()))
+        continue;
+
+      if (relationFinder.matchForward(edge.getRelation())) {
+        addForwardEdge(result, edge);
+      }
+      else if (relationFinder.matchBackward(edge.getRelation())) {
+        addReverseEdge(result, edge);
+      }
+    }
+  }
+
+  private void addForwardEdge(
+          Graph<GraphNode, GraphEdge> graph,
+          GraphEdge edge) {
+    graph.addEdge(edge, edge.getHead(), edge.getTail());
+  }
+
+  private void addReverseEdge(
+          Graph<GraphNode, GraphEdge> graph,
+          GraphEdge edge) {
+    graph.addEdge(edge, edge.getTail(), edge.getHead());
+  }
+}

@@ -16,10 +16,8 @@
 
 package com.google.devtools.depan.eclipse.editors;
 
-import com.google.common.collect.ImmutableList;
 import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
 import com.google.devtools.depan.eclipse.trees.NodeTreeProvider;
-import com.google.devtools.depan.eclipse.visualization.layout.Layouts;
 import com.google.devtools.depan.graph.api.DirectedRelationFinder;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
@@ -30,6 +28,8 @@ import com.google.devtools.depan.view.EdgeDisplayProperty;
 import com.google.devtools.depan.view.NodeDisplayProperty;
 
 import org.eclipse.core.resources.IResource;
+
+import com.google.common.collect.ImmutableList;
 
 import java.awt.geom.Point2D;
 import java.util.Collection;
@@ -148,11 +148,11 @@ public class ViewDocument {
     userPrefs.setEdgeProperty(edge, newProperty);
   }
 
-  public void setSelectedLayout(Layouts layout) {
-    userPrefs.setSelectedLayout(layout);
+  public void setSelectedLayout(String layoutName) {
+    userPrefs.setSelectedLayout(layoutName);
   }
 
-  public Layouts getSelectedLayout() {
+  public String getSelectedLayout() {
     return userPrefs.getSelectedLayout();
   }
 

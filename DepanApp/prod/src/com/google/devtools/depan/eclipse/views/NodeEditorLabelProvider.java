@@ -29,6 +29,8 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 
 import java.awt.Color;
+import java.awt.geom.Point2D;
+import java.text.NumberFormat;
 
 /**
  * @author ycoppel@google.com (Yohann Coppel)
@@ -36,6 +38,10 @@ import java.awt.Color;
  */
 public class NodeEditorLabelProvider extends LabelProvider implements
     ITableLabelProvider {
+
+  private static final NumberFormat POS_FORMATTER = 
+      NumberFormat.getNumberInstance();
+
   private NodeEditorTool tool;
 
   public NodeEditorLabelProvider(NodeEditorTool tool) {
@@ -97,6 +103,10 @@ public class NodeEditorLabelProvider extends LabelProvider implements
   public String getColumnText(
       NodeWrapper<NodeDisplayProperty> element, int columnIndex) {
     switch (columnIndex) {
+    case NodeEditorTool.INDEX_XPOS:
+      return formatXPos(getPosition(element.getNode()));
+    case NodeEditorTool.INDEX_YPOS:
+      return formatYPos(getPosition(element.getNode()));
     case NodeEditorTool.INDEX_NAME:
       return element.getNode().friendlyString();
     case NodeEditorTool.INDEX_VISIBLE:
@@ -115,5 +125,28 @@ public class NodeEditorLabelProvider extends LabelProvider implements
       break;
     }
     return "";
+  }
+
+  private Point2D getPosition(GraphNode graphNode) {
+    ViewEditor viewEditor = tool.getEditor();
+    if (null == viewEditor) {
+      return null;
+    }
+
+    return viewEditor.getPosition(graphNode);
+  }
+
+  private String formatXPos(Point2D pos) {
+    if (null == pos) {
+      return "";
+    }
+    return POS_FORMATTER.format(pos.getX());
+  }
+
+  private String formatYPos(Point2D pos) {
+    if (null == pos) {
+      return "";
+    }
+    return POS_FORMATTER.format(pos.getY());
   }
 }

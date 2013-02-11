@@ -21,6 +21,8 @@ import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 
+import com.google.common.collect.Maps;
+
 import edu.uci.ics.jung.graph.Graph;
 
 import java.awt.Dimension;
@@ -68,6 +70,8 @@ public class NewRadialLayout extends NewTreeLayout {
     // Now assign locations
     HierarchicalLayoutTool layoutTool =
         new RadialLayoutTool(graphModel, relations, dryRun.getLeafCount());
+
+    positions = Maps.newHashMapWithExpectedSize(graphModel.getNodes().size());
     layoutTool.layoutTree();
   }
 
@@ -162,7 +166,7 @@ public class NewRadialLayout extends NewTreeLayout {
       double yPos = Math.sin(radians) * level;
       // logAssign(node, level, offset, xPos, yPos);
       Point2D point = new Point2D.Double(xPos, yPos);
-      locations.get(node).setLocation(point);
+      positions.put(node, point);
     }
   }
 }

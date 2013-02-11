@@ -17,8 +17,11 @@
 package com.google.devtools.depan.eclipse.visualization.plugins.impl;
 
 import com.google.devtools.depan.eclipse.editors.ViewEditor;
-import com.google.devtools.depan.eclipse.visualization.layout.Layouts;
+import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerator;
+import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerators;
 import com.google.devtools.depan.eclipse.visualization.plugins.core.Plugin;
+
+import java.util.List;
 
 /**
  * Plugin that implements some editor shortcuts for layout options.
@@ -79,19 +82,38 @@ public class LayoutShortcutsPlugin implements Plugin {
         return true;
       }
       break;
+
     case LISTENING:
       this.keyState = KeyState.WAITING;
-      Layouts[] choices = Layouts.values();
-      if (character >= '1' && character <= choices.length + '0') {
-        System.out.println(
-            "Apply layout " + choices[character - '1'].name());
-        editor.applyLayout(choices[character - '1']);
-        return true;
-      }
-      break;
+      String layoutName = getLayoutName(character);
+      if (null == layoutName)
+        break;
+
+      System.out.println("Apply layout " + layoutName);
+      LayoutGenerator layout = LayoutGenerators.getByName(layoutName);
+      editor.applyLayout(layout);
+      return true;
+
     default:
       break;
     }
     return false;
+  }
+
+  private String getLayoutName(int character) {
+    if (character < '1') {
+      return null;
+    }
+    if (character > '9') {
+      return null;
+    }
+
+    int index = '1' - character;
+    List<String> choices = LayoutGenerators.getLayoutNames();
+    if (index >= choices.size()) {
+      return null;
+    }
+
+    return choices.get(index);
   }
 }

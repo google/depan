@@ -80,19 +80,25 @@ public class NodeEditorTool extends ViewSelectionListenerTool
   private RelationshipSetPickerControl relationshipSetPicker = null;
 
   protected static final String COL_NAME = "Name";
+  protected static final String COL_XPOS = "X";
+  protected static final String COL_YPOS = "Y";
   protected static final String COL_VISIBLE = "Visible";
   protected static final String COL_SELECTED = "Selected";
   protected static final String COL_SIZE = "Size";
   protected static final String COL_COLOR = "Color (R,G,B - empty = default)";
 
   public static final int INDEX_NAME = 0;
-  public static final int INDEX_VISIBLE = 1;
-  public static final int INDEX_SELECTED = 2;
-  public static final int INDEX_SIZE = 3;
-  public static final int INDEX_COLOR = 4;
+  public static final int INDEX_XPOS = 1;
+  public static final int INDEX_YPOS = 2;
+  public static final int INDEX_VISIBLE = 3;
+  public static final int INDEX_SELECTED = 4;
+  public static final int INDEX_SIZE = 5;
+  public static final int INDEX_COLOR = 6;
 
   private static final EditColTableDef[] TABLE_DEF = new EditColTableDef[] {
     new EditColTableDef(COL_NAME, false, COL_NAME, 180),
+    new EditColTableDef(COL_XPOS, false, COL_XPOS, 50),
+    new EditColTableDef(COL_YPOS, false, COL_YPOS, 50),
     new EditColTableDef(COL_VISIBLE, true, COL_VISIBLE, 20),
     new EditColTableDef(COL_SELECTED, true, COL_SELECTED, 20),
     new EditColTableDef(COL_SIZE, true, COL_SIZE, 80),
@@ -132,8 +138,10 @@ public class NodeEditorTool extends ViewSelectionListenerTool
       col.setWidth(d.getWidth());
     }
 
-    CellEditor[] cellA = new CellEditor[5];
+    CellEditor[] cellA = new CellEditor[TABLE_DEF.length];
     cellA[INDEX_NAME] = null;
+    cellA[INDEX_XPOS] = null;
+    cellA[INDEX_YPOS] = null;
     cellA[INDEX_VISIBLE] = new CheckboxCellEditor(tree);
     cellA[INDEX_SELECTED] = new CheckboxCellEditor(tree);
     cellA[INDEX_SIZE] = new ComboBoxCellEditor(tree,
@@ -245,14 +253,24 @@ public class NodeEditorTool extends ViewSelectionListenerTool
   public Object getValue(Object element, String property) {
     if (element instanceof NodeWrapper) {
       NodeWrapper wrapper = (NodeWrapper) element;
+      if (COL_XPOS.equals(property)) {
+        return getEditor().getXPos(wrapper.getNode());
+      }
+      if (COL_XPOS.equals(property)) {
+        return getEditor().getYPos(wrapper.getNode());
+      }
+      if (property.equals(COL_SELECTED)) {
+        return getEditor().isSelected(wrapper.getNode());
+      } 
+
       NodeDisplayProperty p = getProp(wrapper);
       if (property.equals(COL_VISIBLE)) {
         return p.isVisible();
-      } else if (property.equals(COL_SELECTED)) {
-        return getEditor().isSelected(wrapper.getNode());
-      } else if (property.equals(COL_SIZE)) {
+      }
+      if (property.equals(COL_SIZE)) {
         return p.getSize().ordinal();
-      } else if (property.equals(COL_COLOR)) {
+      }
+      if (property.equals(COL_COLOR)) {
         return p.getColor() == null ? "" : p.getColor().toString();
       }
     }

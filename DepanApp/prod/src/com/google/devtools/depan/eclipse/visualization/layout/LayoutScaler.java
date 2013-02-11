@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.eclipse.editors;
+package com.google.devtools.depan.eclipse.visualization.layout;
 
 import com.google.devtools.depan.eclipse.visualization.ogl.GLRegion;
 import com.google.devtools.depan.model.GraphNode;

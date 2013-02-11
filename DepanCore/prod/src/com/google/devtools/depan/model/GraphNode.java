@@ -18,6 +18,9 @@ package com.google.devtools.depan.model;
 
 import com.google.devtools.depan.graph.basic.BasicNode;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
  * A wrapper for Element, implementing the interface Node.
  *
@@ -30,4 +33,8 @@ public abstract class GraphNode extends BasicNode<String> implements Element {
    * @return a friendly name for this element.
    */
   public abstract String friendlyString();
+
+  /** Empty collection */
+  public static final List<GraphNode> EMPTY_NODE_LIST =
+          Collections.<GraphNode>emptyList();
 }

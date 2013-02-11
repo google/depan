@@ -16,12 +16,15 @@
 
 package com.google.devtools.depan.eclipse.utils;
 
-import com.google.devtools.depan.eclipse.visualization.layout.Layouts;
+import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerator;
+import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerators;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
+
+import java.util.List;
 
 /**
  * A control for selecting a {@link Layouts } (graph layout) option.
@@ -32,9 +35,11 @@ public class LayoutPickerControl extends Composite {
 
   private static final String LAYOUT_KEEP = "Keep positions";
 
-  private CCombo layoutChoice;
+  private final boolean allowKeep;
 
-  private boolean allowKeep;
+  private final CCombo layoutChoice;
+
+  private final List<String> layoutNames;
 
   /**
    * @param parent Containing composite
@@ -46,6 +51,7 @@ public class LayoutPickerControl extends Composite {
 
     this.allowKeep = allowKeep;
 
+    layoutNames = LayoutGenerators.getLayoutNames();
     layoutChoice = new CCombo(this, SWT.READ_ONLY | SWT.BORDER);
 
     // Populate the dropdown's choices.
@@ -53,9 +59,10 @@ public class LayoutPickerControl extends Composite {
       layoutChoice.add(LAYOUT_KEEP);
     }
 
-    for (Layouts l : Layouts.values()) {
-      layoutChoice.add(l.toString());
+    for (String name : layoutNames) {
+      layoutChoice.add(name);
     }
+
     layoutChoice.select(0);
   }
 
@@ -64,16 +71,32 @@ public class LayoutPickerControl extends Composite {
    * 
    * @param layout selected {@code Layouts} to show in control
    */
-  public void setLayoutChoice(Layouts layout) {
-    if (allowKeep && (null == layout)) {
+  public void setLayoutChoice(String layoutName) {
+    if (allowKeep && (null == layoutName)) {
       layoutChoice.select(0);
       return;
     }
-    if (null == layout) {
+    if (null == layoutName) {
       return;
     }
+
     int base = (allowKeep) ? 1 : 0;
-    layoutChoice.select(base + Layouts.indexOf(layout));
+    layoutChoice.select(base + LayoutGenerators.getLayoutIndex(layoutName));
+  }
+
+  public String getLayoutName() {
+    int index = layoutChoice.getSelectionIndex();
+    if (allowKeep && (index == 0)) {
+      return null;
+    }
+    if (allowKeep) {
+      index--;
+    }
+    if (index >= layoutNames.size()) {
+      return null;
+    }
+
+    return layoutNames.get(index);
   }
 
   /**
@@ -83,22 +106,7 @@ public class LayoutPickerControl extends Composite {
    * @throws IllegalArgumentException if the current selection is not a
    *     valid {@link Layouts} instance.
    */
-  public Layouts getLayoutChoice() {
-    int index = getSelectionIndex();
-    if (allowKeep && (index == 0)) {
-      return null;
-    }
-    Layouts result = Layouts.valueOf(layoutChoice.getItem(index));
-    return result;
-  }
-
-  /**
-   * Provide the selection index from underlying CCombo control.
-   * Mostly useful for debugging and error messages.
-   * 
-   * @return selection index from underlying CCombo control
-   */
-  public int getSelectionIndex() {
-    return layoutChoice.getSelectionIndex();
+  public LayoutGenerator getLayoutChoice() {
+    return LayoutGenerators.getByName(getLayoutName());
   }
 }

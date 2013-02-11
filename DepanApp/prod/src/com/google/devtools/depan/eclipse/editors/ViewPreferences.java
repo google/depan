@@ -16,12 +16,8 @@
 
 package com.google.devtools.depan.eclipse.editors;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.devtools.depan.eclipse.trees.NodeTreeProvider;
 import com.google.devtools.depan.eclipse.utils.ListenerManager;
-import com.google.devtools.depan.eclipse.visualization.layout.Layouts;
 import com.google.devtools.depan.graph.api.DirectedRelationFinder;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
@@ -31,6 +27,10 @@ import com.google.devtools.depan.view.Collapser;
 import com.google.devtools.depan.view.EdgeDisplayProperty;
 import com.google.devtools.depan.view.NodeDisplayProperty;
 import com.google.devtools.depan.view.TreeModel;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import java.awt.geom.Point2D;
 import java.util.Collection;
@@ -77,7 +77,7 @@ public class ViewPreferences {
 
   private Collection<GraphNode> selectedNodes = ImmutableList.of();
 
-  private Layouts selectedLayout;
+  private String selectedLayout;
 
   private String description;
 
@@ -265,12 +265,12 @@ public class ViewPreferences {
     layoutFinder = finder;
   }
 
-  public Layouts getSelectedLayout() {
+  public String getSelectedLayout() {
     return selectedLayout;
   }
 
-  public void setSelectedLayout(Layouts layout) {
-    selectedLayout = layout;
+  public void setSelectedLayout(String layoutName) {
+    selectedLayout = layoutName;
   }
 
   /////////////////////////////////////

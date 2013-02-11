@@ -16,7 +16,6 @@
 
 package com.google.devtools.depan.eclipse.views.tools;
 
-import com.google.common.collect.Lists;
 import com.google.devtools.depan.eclipse.editors.ViewDocument;
 import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.utils.LayoutPickerControl;
@@ -25,7 +24,6 @@ import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.utils.Sasher;
 import com.google.devtools.depan.eclipse.utils.TableContentProvider;
 import com.google.devtools.depan.eclipse.views.ViewSelectionListenerTool;
-import com.google.devtools.depan.eclipse.visualization.layout.Layouts;
 import com.google.devtools.depan.filters.PathMatcher;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
@@ -45,6 +43,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
+
+import com.google.common.collect.Lists;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -276,7 +276,7 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
    */
   private void updateSelectedLayout() {
     if (null != getEditor()) {
-      layoutPicker.setLayoutChoice(getEditor().getSelectedLayout());
+      layoutPicker.setLayoutChoice(getEditor().getLayoutName());
     }
   }
 
@@ -385,7 +385,7 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
     ViewDocument viewDoc = getEditor().buildNewViewDocument(
         previewListContent.getObjects());
 
-    Layouts chosenLayout = layoutPicker.getLayoutChoice();
+    String chosenLayout = layoutPicker.getLayoutName();
     viewDoc.setSelectedLayout(chosenLayout);
 
     ViewEditor.startViewEditor(viewDoc, null == chosenLayout);

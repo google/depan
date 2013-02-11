@@ -16,9 +16,6 @@
 
 package com.google.devtools.depan.eclipse.editors;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.devtools.depan.eclipse.persist.ObjectXmlPersist;
 import com.google.devtools.depan.eclipse.persist.XStreamFactory;
 import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
@@ -40,13 +37,19 @@ import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptor;
 import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptors;
 import com.google.devtools.depan.eclipse.views.tools.RelationCount;
 import com.google.devtools.depan.eclipse.visualization.View;
-import com.google.devtools.depan.eclipse.visualization.layout.Layouts;
+import com.google.devtools.depan.eclipse.visualization.layout.JungBuilder;
+import com.google.devtools.depan.eclipse.visualization.layout.LayoutContext;
+import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerator;
+import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerators;
+import com.google.devtools.depan.eclipse.visualization.layout.LayoutScaler;
+import com.google.devtools.depan.eclipse.visualization.layout.LayoutUtil;
 import com.google.devtools.depan.eclipse.visualization.ogl.GLRegion;
 import com.google.devtools.depan.eclipse.visualization.ogl.RendererChangeListener;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeColorPlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeShapePlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeSizePlugin;
 import com.google.devtools.depan.graph.api.DirectedRelationFinder;
+import com.google.devtools.depan.graph.basic.ForwardIdentityRelationFinder;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
@@ -55,26 +58,15 @@ import com.google.devtools.depan.view.CollapseData;
 import com.google.devtools.depan.view.EdgeDisplayProperty;
 import com.google.devtools.depan.view.NodeDisplayProperty;
 
-import com.thoughtworks.xstream.XStream;
-
-import edu.uci.ics.jung.algorithms.importance.PageRank;
-import edu.uci.ics.jung.algorithms.layout.AbstractLayout;
-import edu.uci.ics.jung.algorithms.util.IterativeContext;
-import edu.uci.ics.jung.graph.DirectedGraph;
-import edu.uci.ics.jung.graph.DirectedSparseMultigraph;
-import edu.uci.ics.jung.graph.Graph;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
-import org.eclipse.jface.dialogs.IPageChangedListener;
-import org.eclipse.jface.dialogs.PageChangedEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -96,6 +88,15 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.SaveAsDialog;
 import org.eclipse.ui.part.MultiPageEditorPart;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.thoughtworks.xstream.XStream;
+
+import edu.uci.ics.jung.algorithms.importance.PageRank;
+import edu.uci.ics.jung.graph.DirectedGraph;
+
+import javax.imageio.ImageIO;
+
 import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
@@ -105,10 +106,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
-
-import javax.imageio.ImageIO;
 
 /**
  * An Editor for a DepAn ViewDocument.
@@ -124,11 +122,8 @@ public class ViewEditor extends MultiPageEditorPart
   private static final Logger logger =
       Logger.getLogger(ViewEditor.class.getName());
 
-  private static final List<GraphNode> EMPTY_NODE_LIST =
-      Collections.<GraphNode>emptyList();
-
   /** How much room to consume for full viewport layout scaling. */
-  private static final double FULLSCALE_MARGIN = 0.9;
+  public static final double FULLSCALE_MARGIN = 0.9;
 
   /**
    * Defines the OpenGL distance between two points that should be considered
@@ -186,6 +181,7 @@ public class ViewEditor extends MultiPageEditorPart
 
   private GraphModel exposedGraph;
 
+  /** Used for rendering and ranking in the rending pipe. */
   private DirectedGraph<GraphNode, GraphEdge> jungGraph;
 
   private Map<GraphNode, Double> ranking;
@@ -262,6 +258,10 @@ public class ViewEditor extends MultiPageEditorPart
     return elementKindStats;
   }
 
+  public DirectedGraph<GraphNode, GraphEdge> getJungGraph() {
+    return jungGraph;
+  }
+
   public Map<GraphNode, Double> getNodeRanking() {
     return ranking;
   }
@@ -335,18 +335,15 @@ public class ViewEditor extends MultiPageEditorPart
       return;
     }
 
-    // Re-layout nodes if necessary.
-    Layouts selectedLayout = viewInfo.getSelectedLayout();
-    if (null != selectedLayout ) {
-      // Run the layout process to compute new locations.
-      Map<GraphNode, Point2D> locations =
-          computeLayoutLocations(selectedLayout, viewInfo.getLayoutFinder());
-
-      // Change the node locations.
-      viewInfo.editNodeLocations(locations, null);
+    // Don't layout nodes if no layout is defined
+    LayoutGenerator selectedLayout = getSelectedLayout();
+    if (null == selectedLayout ) {
+      return;
     }
 
-    // Otherwise, just use default positions - user will need to choose layout.
+    // Run the layout process on all nodes in the view.
+    applyLayout(selectedLayout,
+        viewInfo.getLayoutFinder(), viewInfo.getViewNodes());
   }
 
   protected String edgeToolTip(GraphEdge edge) {
@@ -445,7 +442,6 @@ public class ViewEditor extends MultiPageEditorPart
   private void deriveDetails() {
     // Synthesize derived graph perspectives
     viewGraph = viewInfo.buildGraphView();
-    jungGraph = createJungGraph(getViewGraph());
     updateExposedGraph();
 
     hierarchies = new HierarchyCache<NodeDisplayProperty>(
@@ -459,7 +455,8 @@ public class ViewEditor extends MultiPageEditorPart
     stats.incrStats(viewInfo.getViewNodes());
     elementKindStats = stats.createStats();
 
-    ranking = rankGraph();
+    jungGraph = buildJungGraph();
+    ranking = rankGraph(jungGraph);
   }
 
   /**
@@ -468,18 +465,29 @@ public class ViewEditor extends MultiPageEditorPart
    *
    * The result is stored in the map {@link #ranking}.
    */
-  private Map<GraphNode, Double> rankGraph() {
-    Map<GraphNode, Double> result = Maps.newHashMap();
+  private Map<GraphNode, Double> rankGraph(
+          DirectedGraph<GraphNode, GraphEdge> graph) {
 
     PageRank<GraphNode, GraphEdge> pageRank =
-        new PageRank<GraphNode, GraphEdge>(jungGraph, 0.15);
+        new PageRank<GraphNode, GraphEdge>(graph, 0.15);
     pageRank.setRemoveRankScoresOnFinalize(false);
     pageRank.evaluate();
 
+    Map<GraphNode, Double> result = Maps.newHashMap();
     for (GraphNode node : exposedGraph.getNodes()) {
       result.put(node, pageRank.getVertexRankScore(node));
     }
+
     return result;
+  }
+
+  private DirectedGraph<GraphNode, GraphEdge> buildJungGraph( ) {
+    JungBuilder builder = new JungBuilder(getViewGraph());
+    builder.setMovableNodes(viewGraph.getNodes());
+
+    // TODO: Compute ranking based on selected relations
+    builder.setRelations(ForwardIdentityRelationFinder.FINDER);
+    return builder.build();
   }
 
   /**
@@ -630,46 +638,6 @@ public class ViewEditor extends MultiPageEditorPart
     if (event.getKey().startsWith(NodePreferencesIds.NODE_PREFIX)) {
       setNodePreferences();
     }
-  }
-
-  /////////////////////////////////////
-  // Provide the JUNG graph
-
-  public DirectedGraph<GraphNode, GraphEdge> getJungGraph() {
-    return jungGraph;
-  }
-
-  /**
-   * Create a JUNG Graph for the underlying ViewModel.
-   */
-  private DirectedGraph<GraphNode, GraphEdge> createJungGraph(
-      GraphModel exposedGraph) {
-    DirectedGraph<GraphNode, GraphEdge> result =
-        new DirectedSparseMultigraph<GraphNode, GraphEdge>();
-
-    for (GraphNode node : exposedGraph.getNodes()) {
-      result.addVertex(node);
-    }
-
-    for (GraphEdge edge : exposedGraph.getEdges()) {
-      addJungEdge(result, edge);
-    }
-
-    return result;
-  }
-
-  /**
-   * Add an edge to a jung graph.
-   * <p>
-   * This method exist primarily to limit the scope of the SuppressWarnings.
-   *
-   * @param graph
-   * @param edge
-   */
-  private static void addJungEdge(
-      Graph<GraphNode, GraphEdge> graph,
-      GraphEdge edge) {
-    graph.addEdge(edge, edge.getHead(), edge.getTail());
   }
 
   /////////////////////////////////////
@@ -883,12 +851,12 @@ public class ViewEditor extends MultiPageEditorPart
   /////////////////////////////////////
   // Update Graph Layouts
 
-  private static Point2D newPoint2D(double xPos, double yPos) {
-    return Point2dUtils.newPoint2D(xPos, yPos);
+  public String getLayoutName() {
+    return viewInfo.getSelectedLayout();
   }
 
-  public Layouts getSelectedLayout() {
-    return viewInfo.getSelectedLayout();
+  public LayoutGenerator getSelectedLayout() {
+    return LayoutGenerators.getByName(getLayoutName());
   }
 
   public Map<GraphNode, Point2D> getNodeLocations() {
@@ -897,25 +865,6 @@ public class ViewEditor extends MultiPageEditorPart
 
   private void editNodeLocations(Map<GraphNode, Point2D> nodeLocations) {
     renderer.editNodeLocations(nodeLocations);
-  }
-
-  /**
-   * Provides the OpenGL distance between two points that should be considered
-   * equivalent to zero.
-   * 
-   * <p>Ideally, this should be obtained from the member field for GLPanel/View.
-   * A reasonable value might be half the OpenGL distance between two pixels.
-   * But that will have to wait.
-   */
-  private double getZeroThreshold() {
-    return ZERO_THRESHOLD;
-  }
-
-  private double scaleWithMargin(
-      LayoutScaler scaler, GLRegion viewport) {
-    return FULLSCALE_MARGIN
-        * scaler.getFullViewScale(viewport, getZeroThreshold());
-    
   }
 
   /**
@@ -942,114 +891,20 @@ public class ViewEditor extends MultiPageEditorPart
     return result;
   }
 
-  /**
-   * Scale and position the nodes so that they fit in the viewport, and they
-   * are within the viewport.
-   * 
-   * @param layoutNodes
-   * @param layoutLocations
-   * @param viewport
-   * @return updated node locations that are within the viewport
-   */
-  private Map<GraphNode, Point2D> computeInViewportLocations(
-      Collection<GraphNode> layoutNodes,
-      Map<GraphNode, Point2D> layoutLocations,
-      GLRegion viewport) {
-    Map<GraphNode, Point2D> result = Maps.newHashMap();
-    if (layoutNodes.size() <= 0) {
-      return result;
-    }
-
-    // If there is only one node, force it to the center of the viewport
-    if (layoutNodes.size() <= 1) {
-      result.put(layoutNodes.iterator().next(), viewport.getCenter());
-      return result;
-    }
-
-    LayoutScaler scaler = new LayoutScaler(layoutNodes, layoutLocations);
-    double scaleView = scaleWithMargin(scaler, viewport);
-    double originX = scaler.getCenterX();
-    double originY = scaler.getCenterY();
-    Point2dUtils.Translater translater = Point2dUtils.newAdjustTranslater(
-        -originX, -originY, scaleView, scaleView);
-
-    return translateNodes(layoutNodes, layoutLocations, translater);
-  }
-
-  /**
-   * Scale the nodes so that they would fit in the viewport, but don't force
-   * them into the viewport.
-   * 
-   * @param layoutNodes
-   * @param locations
-   * @param viewport
-   * @return updated node locations that are the same size as the viewport
-   */
-  private Map<GraphNode, Point2D> computeFullViewScale(
-      Collection<GraphNode> layoutNodes,
-      Map<GraphNode, Point2D> locations,
-      GLRegion viewport) {
-    Map<GraphNode, Point2D> result = Maps.newHashMap();
-    if (layoutNodes.size() <= 0) {
-      return result;
-    }
-
-    // If there is only one node, don't change its location
-    if (layoutNodes.size() == 1) {
-      GraphNode singletonNode = layoutNodes.iterator().next();
-      Point2D singletonLocation = locations.get(singletonNode);
-      if (null != singletonLocation) {
-        result.put(singletonNode, singletonLocation);
-      }
-      return result;
-    }
-
-    // Scale all the nodes to fit within the indicated region
-    LayoutScaler scaler = new LayoutScaler(layoutNodes, locations);
-    double scaleView = scaleWithMargin(scaler, viewport);
-    Point2dUtils.Translater translater =
-        Point2dUtils.newScaleTranslater(scaleView, scaleView);
-    return translateNodes(layoutNodes, locations, translater);
-  }
-
-  /**
-   * Run a canned layout over the set of nodes.  The computed locations may
-   * be nowhere near the OpenGL viewport.
-   * 
-   * @param layoutDef
-   * @param relationfinder
-   * @return
-   */
-  private Map<GraphNode, Point2D> computeLayoutLocations(
-    Layouts layoutDef, DirectedRelationFinder relationfinder) {
-  AbstractLayout<GraphNode, GraphEdge> newLayout =
-      layoutDef.getLayout(this, relationfinder);
-
-  // Run the layout until it stabilizes.
-  if (newLayout instanceof IterativeContext) {
-    IterativeContext it = (IterativeContext) newLayout;
-    int maxSteps = 1000;
-    while (maxSteps > 0 && !it.done()) {
-      it.step();
-      maxSteps--;
-    }
-  }
-
-  // Convert the layout positions to standard node positions.
-  Map<GraphNode, Point2D> result = Maps.newHashMap();
-  for (GraphNode n : getViewGraph().getNodes()) {
-
-    // minus Y, since in openGL, y coordinates are inverted
-    result.put(n, newPoint2D(newLayout.getX(n), -newLayout.getY(n)));
-  }
-  return result;
-}
-
   /////////////////////////////////////
   // Update node positions in the View Document
 
   /**
-   * Scale the coordinates for all exposed nodes as indicated by the paramters.
+   * Scale the exposed nodes so they would fit in the viewport, if the viewport
+   * was centered over the nodes.  This has been the historical behavior of the
+   * {@code FactorPlugin}.
+   */
+  public void layoutBestFit() {
+    layoutBestFit(getExposedGraph().getNodes(), getNodeLocations());
+  }
+
+  /**
+   * Scale the coordinates for all exposed nodes as indicated by the parameters.
    * 
    * @param scaleX scale factor for X coordinates
    * @param scaleY scale factor for Y coordinates
@@ -1067,164 +922,120 @@ public class ViewEditor extends MultiPageEditorPart
   private void layoutBestFit(
       Collection<GraphNode> layoutNodes, Map<GraphNode, Point2D> locations) {
     GLRegion viewport = renderer.getOGLViewport();
-    Map<GraphNode, Point2D> changes =
-        computeFullViewScale(layoutNodes, locations, viewport);
+    Map<GraphNode, Point2D> changes = 
+            computeFullViewScale(layoutNodes, locations, viewport);
     viewInfo.editNodeLocations(changes, null);
   }
 
   /**
-   * Scale the exposed nodes so they would fit in the viewport, if the viewport
-   * was centered over the nodes.  This has been the historical behavior of the
-   * {@code FactorPlugin}.
+   * Scale the nodes so that they would fit in the viewport, but don't force
+   * them into the viewport.
+   * 
+   * @param layoutNodes
+   * @param locations
+   * @param viewport
+   * @return updated node locations that are the same size as the viewport
    */
-  public void layoutBestFit() {
-    layoutBestFit(getExposedGraph().getNodes(), getNodeLocations());
+  private Map<GraphNode, Point2D> computeFullViewScale(
+          Collection<GraphNode> layoutNodes,
+          Map<GraphNode, Point2D> locations,
+          GLRegion viewport) {
+
+    if (layoutNodes.size() <= 0) {
+      return Collections.emptyMap();
+    }
+
+    // If there is only one node, don't change its location
+    Map<GraphNode, Point2D> result = Maps.newHashMap();
+    if (layoutNodes.size() == 1) {
+      GraphNode singletonNode = layoutNodes.iterator().next();
+      Point2D singletonLocation = locations.get(singletonNode);
+      if (null != singletonLocation) {
+        result.put(singletonNode, singletonLocation);
+      }
+      return result;
+    }
+
+    // Scale all the nodes to fit within the indicated region
+    LayoutScaler scaler = new LayoutScaler(layoutNodes, locations);
+    double scaleView = scaleWithMargin(scaler, viewport);
+    Point2dUtils.Translater translater =
+            Point2dUtils.newScaleTranslater(scaleView, scaleView);
+    return translateNodes(layoutNodes, locations, translater);
+  }
+
+  private double scaleWithMargin(
+          LayoutScaler scaler, GLRegion viewport) {
+    return FULLSCALE_MARGIN
+            * scaler.getFullViewScale(viewport, ZERO_THRESHOLD);
+  }
+
+
+  /////////////////////////////////////
+  // Compute new positions based on a LayoutGenerator
+
+  public Point2D getPosition(GraphNode node) {
+    return viewInfo.getNodeLocations().get(node);
+  }
+
+  public double getXPos(GraphNode node) {
+    Point2D position = getPosition(node);
+    return position.getX();
+  }
+
+  public double getYPos(GraphNode node) {
+    Point2D position = getPosition(node);
+    return position.getY();
+  }
+
+  public void applyLayout(LayoutGenerator layout) {
+    applyLayout(layout, viewInfo.getLayoutFinder());
+  }
+
+  public void applyLayout(
+          LayoutGenerator layout, DirectedRelationFinder relationFinder) {
+
+    Collection<GraphNode> layoutNodes = getLayoutNodes();
+    if (layoutNodes.size() < 2) {
+      // TODO: Notify user that a single node cannot be positioned.
+      return;
+    }
+    applyLayout(layout, relationFinder, layoutNodes);
+  }
+
+  private Collection<GraphNode> getLayoutNodes() {
+    Collection<GraphNode> picked = getSelectedNodes();
+    if (0 == picked.size()) {
+      return getExposedGraph().getNodes();
+    }
+
+    return picked;
   }
 
   /**
    * Apply the given layout with the given {@link DirectedRelationFinder} to
    * build a tree if the layout need one, to the graph.
    *
-   * @param newLayout the new Layout to apply
-   * @param relationfinder {@link DirectedRelationFinder} helping to build a
-   *        tree if necessary
+   * @param layout the new Layout to apply
+   * @param relationFinder {@link DirectedRelationFinder} to restrict
+   *        relations for layout.
+   * @param layoutNodes nodes that participate in the layout
    */
-  public void applyLayout(
-      Layouts newLayout, DirectedRelationFinder relationfinder) {
+  private void applyLayout(
+      LayoutGenerator layout, DirectedRelationFinder relationFinder,
+      Collection<GraphNode> layoutNodes) {
 
-    // Run the layout process to compute new locations.
-    Map<GraphNode, Point2D> layoutLocations =
-        computeLayoutLocations(newLayout, relationfinder);
+    LayoutContext context = new LayoutContext();
+    context.setGraphModel(getExposedGraph());
+    context.setMovableNodes(layoutNodes);
+    context.setRelations(relationFinder);
+    context.setViewport(renderer.getOGLViewport().newOriginRegion());
 
-    // Adjust those locations to be at the origin 
-    // and scaled to fill the current viewport.
-    Collection<GraphNode> layoutNodes = getExposedGraph().getNodes();
-    GLRegion viewport = renderer.getOGLViewport().newOriginRegion();
-    Map<GraphNode, Point2D> changes =
-        computeInViewportLocations(layoutNodes, layoutLocations, viewport);
+    Map<GraphNode, Point2D> changes = LayoutUtil.calcPositions(
+            layout, context, layoutNodes);
 
     // Change the node locations.
     viewInfo.editNodeLocations(changes, null);
-  }
-
-  public void applyLayout(Layouts layout) {
-    applyLayout(layout, viewInfo.getLayoutFinder());
-  }
-
-  public void clusterize(Layouts layout, DirectedRelationFinder finder) {
-    applyLayout(layout, finder);
-  }
-
-  // TODO(leeca):  cleanup/consolidate applyLayout and clusterize
-  // The should be different entry points for the same algorithm.
-  // But with the broken cluster() below, making clusterize() == applyLayout(),
-  // at least something useful happens.
-  public void x_clusterize(Layouts layout, DirectedRelationFinder finder) {
-    cluster(layout, finder);
-
-    // TODO(leeca): Is this necessary if setNodeLocations
-    // fires an update event?
-    markDirty();
-  }
-
-  /**
-   * Call {@link #cluster(Layouts, DirectedRelationFinder)} with a
-   * default {@link DirectedRelationFinder}.
-   *
-   * @param layout
-   */
-  public void cluster(Layouts layout) {
-    cluster(layout, viewInfo.getLayoutFinder());
-  }
-
-  /**
-   * Try to clusterize the selected nodes (if more than two nodes are selected),
-   * or, if no nodes are selected, apply the layout to the entire graph.
-   *
-   * @param layout
-   * @param relationFinder a relation finder if needed by the layout.
-   */
-  public void cluster(Layouts layout, DirectedRelationFinder relationFinder) {
-    Collection<GraphNode> picked = getSelectedNodes();
-    if (0 == picked.size()) {
-      applyLayout(layout, relationFinder);
-      return;
-    }
-    if (2 < picked.size()) {
-      return;
-    }
-    int clusterSize = picked.size();
-
-    // Find the weighted center of all picked points to place the new node
-    // that represents the collapsed nodes.  Also compute the bounding box.
-    Map<GraphNode, Point2D> locations = viewInfo.getNodeLocations();
-    double minX = Double.MAX_VALUE;
-    double maxX = Double.MIN_VALUE;
-    double minY = Double.MAX_VALUE;
-    double maxY = Double.MIN_VALUE;
-    double spanX = 0.0;
-    double spanY = 0.0;
-    for (GraphNode node : picked) {
-      Point2D p = locations.get(node);
-      spanX += p.getX();
-      spanY += p.getY();
-      minX = Math.min(minX, p.getX());
-      maxX = Math.max(maxX, p.getX());
-      minY = Math.min(minY, p.getY());
-      maxY = Math.max(maxY, p.getY());
-    }
-    Point2D center = 
-        new Point2D.Double(spanX / clusterSize, spanY / clusterSize);
-
-    Graph<GraphNode, GraphEdge> subGraph =
-        new DirectedSparseMultigraph<GraphNode, GraphEdge>();
-
-    Set<GraphEdge> edges = Sets.newHashSet();
-    for (GraphNode node : picked) {
-      subGraph.addVertex(node);
-      edges.addAll(getJungGraph().getIncidentEdges(node));
-    }
-    for (GraphEdge edge : edges) {
-      GraphNode head = edge.getHead();
-      GraphNode tail = edge.getTail();
-      boolean containsHead = false;
-      boolean containsTail = false;
-      for (GraphNode node : picked) {
-        if (node == head) {
-          containsHead = true;
-        }
-        if (node == tail) {
-          containsTail = true;
-        }
-      }
-      subGraph.addEdge(edge, head, tail);
-    }
-
-    // FIXME: reimplement
-/*
-    // try to not move the not selected nodes
-    for (GraphNode node : viewModel.getGraph().getNodes()) {
-      if (picked.contains(node)) {
-        staticLayout.lock(node, false);
-      } else {
-        staticLayout.lock(node, true);
-      }
-    }
-
-    // add +0.5 to round to the upper bound.
-    Dimension size = new Dimension(
-          (int) (maxx - minx + 0.5), (int) (maxy - miny + 0.5));
-
-    AggregateLayout<GraphNode, GraphEdge> aggregate =
-       new AggregateLayout<GraphNode, GraphEdge>(staticLayout);
-
-    Layout<GraphNode, GraphEdge> subLayout;
-    subLayout = layout.getLayout(this, relationFinder);
-    subLayout.setInitializer(vv.getGraphLayout());
-    subLayout.setSize(size);
-    aggregate.put(subLayout, center);
-    vv.setGraphLayout(aggregate);
-    */
   }
 
   /////////////////////////////////////
@@ -1254,12 +1065,12 @@ public class ViewEditor extends MultiPageEditorPart
 
   public void extendSelection(
       Collection<GraphNode> extendNodes, Object author) {
-    viewInfo.editSelectedNodes(EMPTY_NODE_LIST, extendNodes, author);
+    viewInfo.editSelectedNodes(GraphNode.EMPTY_NODE_LIST, extendNodes, author);
   }
 
   public void reduceSelection(
       Collection<GraphNode> reduceNodes, Object author) {
-    viewInfo.editSelectedNodes(reduceNodes, EMPTY_NODE_LIST, author);
+    viewInfo.editSelectedNodes(reduceNodes, GraphNode.EMPTY_NODE_LIST, author);
   }
 
   public void moveSelectionDelta(
@@ -1342,7 +1153,7 @@ public class ViewEditor extends MultiPageEditorPart
   }
 
   private void initSelectedNodes(Collection<GraphNode> selection) {
-    updateSelectedNodes(EMPTY_NODE_LIST, selection, null);
+    updateSelectedNodes(GraphNode.EMPTY_NODE_LIST, selection, null);
   }
 
   /////////////////////////////////////

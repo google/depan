@@ -21,7 +21,7 @@ import com.google.devtools.depan.eclipse.utils.RelationshipSetPickerControl;
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptor;
 import com.google.devtools.depan.eclipse.views.ViewEditorTool;
-import com.google.devtools.depan.eclipse.visualization.layout.Layouts;
+import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerator;
 import com.google.devtools.depan.model.RelationshipSet;
 
 import org.eclipse.swt.SWT;
@@ -123,14 +123,14 @@ public class SubLayoutTool extends ViewEditorTool {
     }
 
     try {
-      Layouts layout = layoutPicker.getLayoutChoice();
-      getEditor().clusterize(layout, relationshipSetselector.getSelection());
+      LayoutGenerator layout = layoutPicker.getLayoutChoice();
+      getEditor().applyLayout(layout, relationshipSetselector.getSelection());
     } catch (IllegalArgumentException ex) {
       // bad layout. don't do anything for the layout, but still finish the
       // creation of the view.
       Logger logger = Logger.getLogger(SubLayoutTool.class.getName());
       logger.warning(
-          "Bad layout.  Selected " + layoutPicker.getSelectionIndex());
+          "Bad layout.  Selected " + layoutPicker.getLayoutName());
     }
   }
 }

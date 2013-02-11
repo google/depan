@@ -21,26 +21,30 @@ import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 
-import edu.uci.ics.jung.algorithms.layout.AbstractLayout;
+import com.google.common.collect.Maps;
+
 import edu.uci.ics.jung.graph.Graph;
 
 import java.awt.Dimension;
 import java.awt.geom.Point2D;
+import java.util.Map;
 
 /**
  * Assign locations to the graph nodes so they are rendered in a 
  * left-to-right hierarchy.  With suitable options top-to-bottom and other
  * layout variations are readily accommodated.
+ * 
  * @author <a href='mailto:leeca@google.com'>Lee Carver </a>
  */
-public class NewTreeLayout extends
-    AbstractLayout<GraphNode, GraphEdge> {
+public class NewTreeLayout {
 
   /** The source of nodes for layout. */
   protected GraphModel graphModel;
 
   /** The set of relations that define the hierarchy. */
   protected DirectedRelationFinder relations;
+
+  protected Map<GraphNode, Point2D> positions;
 
   /**
    * Create a JUNG Layout object from the available data.
@@ -52,7 +56,6 @@ public class NewTreeLayout extends
    */
   protected NewTreeLayout(Graph<GraphNode, GraphEdge> graph,
       GraphModel graphModel, DirectedRelationFinder relations, Dimension size) {
-    super(graph, size);
     this.graphModel = graphModel;
     this.relations = relations;
   }
@@ -60,15 +63,15 @@ public class NewTreeLayout extends
   /**
    * Does the complete left-to-right planar layout.
    */
-  @Override
   public void initialize() {
     LayoutTool layoutTool = new LayoutTool(graphModel, relations);
+
+    positions = Maps.newHashMapWithExpectedSize(graphModel.getNodes().size());
     layoutTool.layoutTree();
   }
 
-  @Override
-  public void reset() {
-    initialize();
+  public Point2D getPosition(GraphNode node) {
+    return positions.get(node);
   }
 
   /**
@@ -101,7 +104,7 @@ public class NewTreeLayout extends
       // TODO(): Come up with a better heuristic for non-overlapping placement
       // of the nodes.
       Point2D point = makePoint2D(level * EXPAND_X, offset);
-      locations.get(node).setLocation(point);
+      positions.put(node, point);
     }
   }
 }

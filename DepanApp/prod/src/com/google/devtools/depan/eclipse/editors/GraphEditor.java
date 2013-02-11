@@ -16,7 +16,6 @@
 
 package com.google.devtools.depan.eclipse.editors;
 
-import com.google.common.collect.Sets;
 import com.google.devtools.depan.eclipse.trees.CheckNodeTreeView;
 import com.google.devtools.depan.eclipse.trees.GraphData;
 import com.google.devtools.depan.eclipse.trees.NodeTreeProvider;
@@ -28,7 +27,10 @@ import com.google.devtools.depan.eclipse.utils.RelationshipSelectorListener;
 import com.google.devtools.depan.eclipse.utils.RelationshipSetPickerControl;
 import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptor;
 import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptors;
-import com.google.devtools.depan.eclipse.visualization.layout.Layouts;
+import com.google.devtools.depan.eclipse.visualization.layout.LayoutContext;
+import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerator;
+import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerators;
+import com.google.devtools.depan.eclipse.visualization.layout.LayoutUtil;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.RelationshipSet;
 
@@ -52,6 +54,8 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.MultiPageEditorPart;
+
+import com.google.common.collect.Sets;
 
 import java.util.Collection;
 import java.util.Set;
@@ -90,10 +94,6 @@ public class GraphEditor
 
   protected void setRecursiveSelect(boolean state) {
     this.recursiveTreeSelect = state;
-  }
-
-  protected Layouts getSelectedLayout() {
-    return layoutPicker.getLayoutChoice();
   }
 
   /////////////////////////////////////
@@ -288,11 +288,26 @@ public class GraphEditor
     GraphModelReference graphRef = new GraphModelReference(file, graph);
 
     ViewPreferences userPrefs = new ViewPreferences();
-    userPrefs.setSelectedLayout(getSelectedLayout());
+    String layoutName = layoutPicker.getLayoutName();
+    userPrefs.setSelectedLayout(layoutName);
     userPrefs.setLayoutFinder(relSetPicker.getSelection());
 
+    boolean doLayout = false;
+    if (null != layoutName) {
+      LayoutContext layoutContext = new LayoutContext();
+      layoutContext.setGraphModel(graph.getGraph());
+      layoutContext.setMovableNodes(nodes);
+      layoutContext.setRelations(userPrefs.getLayoutFinder());
+
+      // Do the layout for these nodes
+      LayoutGenerator layout = LayoutGenerators.getByName(layoutName);
+      userPrefs.setNodeLocations(
+          LayoutUtil.calcPositions(layout, layoutContext, nodes));
+      doLayout = true;
+    }
+
     ViewDocument viewInfo = new ViewDocument(graphRef, nodes, userPrefs);
-    ViewEditor.startViewEditor(viewInfo, false);
+    ViewEditor.startViewEditor(viewInfo, doLayout);
   }
 
   /**
