@@ -16,7 +16,10 @@
 package com.google.devtools.depan.eclipse.visualization.layout;
 
 import com.google.devtools.depan.eclipse.visualization.ogl.GLRegion;
+import com.google.devtools.depan.graph.api.DirectedRelationFinder;
+import com.google.devtools.depan.graph.basic.ForwardIdentityRelationFinder;
 import com.google.devtools.depan.model.GraphEdge;
+import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 
 import edu.uci.ics.jung.graph.DirectedGraph;
@@ -72,6 +75,22 @@ public class LayoutUtil {
 
     DirectedGraph<GraphNode, GraphEdge> result = builder.build();
     return result;
+  }
+
+  public static LayoutContext newLayoutContext(
+      GraphModel parentGraph,
+      Collection<GraphNode> viewNodes,
+      DirectedRelationFinder viewRelations) {
+    LayoutContext layoutContext = new LayoutContext();
+    layoutContext.setGraphModel(parentGraph);
+    layoutContext.setMovableNodes(viewNodes);
+
+    if (null == viewRelations) {
+      layoutContext.setRelations(ForwardIdentityRelationFinder.FINDER);
+    } else {
+      layoutContext.setRelations(viewRelations);
+    }
+    return layoutContext;
   }
 
   /**

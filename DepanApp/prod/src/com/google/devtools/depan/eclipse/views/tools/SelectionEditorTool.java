@@ -24,9 +24,15 @@ import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.utils.Sasher;
 import com.google.devtools.depan.eclipse.utils.TableContentProvider;
 import com.google.devtools.depan.eclipse.views.ViewSelectionListenerTool;
+import com.google.devtools.depan.eclipse.visualization.layout.LayoutContext;
+import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerator;
+import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerators;
+import com.google.devtools.depan.eclipse.visualization.layout.LayoutUtil;
 import com.google.devtools.depan.filters.PathMatcher;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
+
+import com.google.common.collect.Lists;
 
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
@@ -43,8 +49,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
-
-import com.google.common.collect.Lists;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -379,16 +383,29 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
   protected void createNewView() {
     // compute the result
     refreshPreview();
+    Collection<GraphNode> viewNodes = previewListContent.getObjects();
 
     // create a new ViewModel with the nodes
     // node locations for current nodes are copied to the new view
-    ViewDocument viewDoc = getEditor().buildNewViewDocument(
-        previewListContent.getObjects());
+    ViewEditor viewEditor = getEditor();
+    ViewDocument viewDoc = viewEditor.buildNewViewDocument(viewNodes);
 
-    String chosenLayout = layoutPicker.getLayoutName();
-    viewDoc.setSelectedLayout(chosenLayout);
+    String layoutName = layoutPicker.getLayoutName();
+    viewDoc.setSelectedLayout(layoutName);
 
-    ViewEditor.startViewEditor(viewDoc, null == chosenLayout);
+    boolean doLayout = false;
+    if (null != layoutName) {
+      LayoutContext layoutContext = LayoutUtil.newLayoutContext(
+          viewEditor.getParentGraph(), viewNodes, viewDoc.getLayoutFinder());
+
+      // Do the layout for these nodes
+      LayoutGenerator layout = LayoutGenerators.getByName(layoutName);
+      viewDoc.setNodeLocations(
+          LayoutUtil.calcPositions(layout, layoutContext, viewNodes));
+      doLayout = true;
+    }
+
+    ViewEditor.startViewEditor(viewDoc, doLayout);
   }
 
   /**

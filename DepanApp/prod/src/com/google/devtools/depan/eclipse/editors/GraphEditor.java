@@ -34,6 +34,8 @@ import com.google.devtools.depan.eclipse.visualization.layout.LayoutUtil;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.RelationshipSet;
 
+import com.google.common.collect.Sets;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
@@ -54,8 +56,6 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.MultiPageEditorPart;
-
-import com.google.common.collect.Sets;
 
 import java.util.Collection;
 import java.util.Set;
@@ -294,10 +294,8 @@ public class GraphEditor
 
     boolean doLayout = false;
     if (null != layoutName) {
-      LayoutContext layoutContext = new LayoutContext();
-      layoutContext.setGraphModel(graph.getGraph());
-      layoutContext.setMovableNodes(nodes);
-      layoutContext.setRelations(userPrefs.getLayoutFinder());
+      LayoutContext layoutContext = LayoutUtil.newLayoutContext(
+          graph.getGraph(), nodes, userPrefs.getLayoutFinder());
 
       // Do the layout for these nodes
       LayoutGenerator layout = LayoutGenerators.getByName(layoutName);
