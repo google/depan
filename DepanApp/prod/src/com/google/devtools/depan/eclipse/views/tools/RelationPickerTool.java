@@ -119,7 +119,8 @@ public class RelationPickerTool extends ViewEditorTool
     gridLayout.verticalSpacing = 10;
     topLevel.setLayout(gridLayout);
 
-    setupRelationPicker(topLevel);
+    Composite pickerRegion = setupRelationPicker(topLevel);
+    pickerRegion.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
     Button reverse = new Button(topLevel, SWT.PUSH);
     reverse.setText("Reverse selection");
@@ -158,7 +159,7 @@ public class RelationPickerTool extends ViewEditorTool
     return topLevel;
   }
 
-  private void setupRelationPicker(Composite parent) {
+  private Composite setupRelationPicker(Composite parent) {
     Composite region = new Composite(parent, SWT.None);
     region.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
     region.setLayout(new GridLayout(3, false));
@@ -182,6 +183,8 @@ public class RelationPickerTool extends ViewEditorTool
         saveSelection();
       }
     });
+    
+    return region;
   }
 
   private void fill() {

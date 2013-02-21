@@ -93,7 +93,7 @@ public abstract class TreeLayoutGenerator implements LayoutGenerator {
   // Canonical instances
 
   public static TreeLayoutGenerator NewTreeLayoutBuilder =
-          new TreeLayoutGenerator() {
+      new TreeLayoutGenerator() {
 
     @Override
     protected NewTreeLayout buildTreeLayout(LayoutContext context) {

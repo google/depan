@@ -170,8 +170,7 @@ public class CollapseTool extends ViewSelectionListenerTool
     autoGrid.marginHeight = 10;
     autoCollapse.setLayout(autoGrid);
 
-    Label pickerLabel = RelationshipSetPickerControl.createPickerLabel(autoCollapse);
-    pickerLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+    RelationshipSetPickerControl.createPickerLabel(autoCollapse);
 
     autoSetPicker = new RelationshipSetPickerControl(autoCollapse);
     autoSetPicker.setLayoutData(

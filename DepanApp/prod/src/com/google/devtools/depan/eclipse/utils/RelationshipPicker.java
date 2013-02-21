@@ -139,7 +139,8 @@ public class RelationshipPicker
     panel.setLayout(new GridLayout());
 
     // components inside the panel
-    setupRelationPicker(panel);
+    Composite pickerRegion = setupRelationPicker(panel);
+    pickerRegion.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
     Button reverseAll = new Button(panel, SWT.PUSH);
     reverseAll.setText("Reverse all lines");
@@ -189,12 +190,11 @@ public class RelationshipPicker
     return panel;
   }
 
-  private void setupRelationPicker(Composite parent) {
+  private Composite setupRelationPicker(Composite parent) {
     Composite region = new Composite(parent, SWT.NONE);
-    region.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
     region.setLayout(new GridLayout(3, false));
 
-    Label pickerLabel = RelationshipSetPickerControl.createPickerLabel(region);
+    RelationshipSetPickerControl.createPickerLabel(region);
 
     relSetPicker = new RelationshipSetPickerControl(region);
     relSetPicker.addChangeListener(this);
@@ -212,6 +212,8 @@ public class RelationshipPicker
         saveAsAction();
       }
     });
+
+    return region;
   }
 
   private void setupRelationToggles(Composite parent) {

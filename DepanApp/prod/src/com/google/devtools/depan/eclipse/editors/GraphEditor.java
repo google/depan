@@ -21,7 +21,6 @@ import com.google.devtools.depan.eclipse.trees.GraphData;
 import com.google.devtools.depan.eclipse.trees.NodeTreeProvider;
 import com.google.devtools.depan.eclipse.trees.NodeTreeView.NodeWrapper;
 import com.google.devtools.depan.eclipse.utils.DefaultRelationshipSet;
-import com.google.devtools.depan.eclipse.utils.LabeledControl;
 import com.google.devtools.depan.eclipse.utils.LayoutPickerControl;
 import com.google.devtools.depan.eclipse.utils.RelationshipSelectorListener;
 import com.google.devtools.depan.eclipse.utils.RelationshipSetPickerControl;
@@ -77,7 +76,7 @@ public class GraphEditor
 
   private CheckboxTreeViewer tree = null;
   private List associatedViews = null;
-  private boolean recursiveTreeSelect = false;
+  private boolean recursiveTreeSelect = true;
   private CheckNodeTreeView<GraphNode> checkNodeTreeView = null;
   private LayoutPickerControl layoutPicker = null;
 
@@ -114,6 +113,7 @@ public class GraphEditor
     // top panel ---------------
     Composite top = new Composite(composite, SWT.NONE);
     top.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+
     RowLayout toplayout = new RowLayout();
     toplayout.fill = true;
     toplayout.pack = true;
@@ -121,11 +121,20 @@ public class GraphEditor
     toplayout.type = SWT.HORIZONTAL;
     top.setLayout(toplayout);
 
-    setupRelationPicker(top);
+    Composite pickerRegion = setupRelationPicker(top);
 
-    // create layout choice selector
-    layoutPicker = LabeledControl.createLabeledLayoutPicker(
-        top, SWT.NONE, "Layout to use: ", false);
+    // recursive select options
+    final Button recursiveSelect = new Button(top, SWT.CHECK | SWT.BORDER);
+    recursiveSelect.setText("Recursive select in tree");
+    recursiveSelect.setSelection(recursiveTreeSelect);
+    recursiveSelect.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        setRecursiveSelect(recursiveSelect.getSelection());
+      }
+    });
+
+    Composite layoutRegion = setupLayoutChoice(top);
 
     Button create = new Button(top, SWT.PUSH);
     create.setText("Create view");
@@ -139,17 +148,6 @@ public class GraphEditor
           // creation of the view.
           System.err.println("Bad layout selected.");
         }
-      }
-    });
-
-    // recursive select options
-    final Button recursiveSelect = new Button(top, SWT.CHECK | SWT.BORDER);
-    recursiveSelect.setText("Recursive select in tree");
-    recursiveSelect.setSelection(recursiveTreeSelect);
-    recursiveSelect.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        setRecursiveSelect(recursiveSelect.getSelection());
       }
     });
 
@@ -176,8 +174,22 @@ public class GraphEditor
     setPageText(index, "New View");
   }
 
-  private void setupRelationPicker(Composite parent) {
-    Composite region = new Composite(parent, SWT.None);
+  private Composite setupLayoutChoice(Composite parent) {
+    Composite region = new Composite(parent, SWT.NONE);
+    region.setLayout(new GridLayout(2, false));
+
+    Label layoutLabel = new Label(region, SWT.NONE);
+    layoutLabel.setText("Layout for view: ");
+    layoutLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+
+    layoutPicker = new LayoutPickerControl(region, false);
+    layoutPicker.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+
+    return region;
+  }
+
+  private Composite setupRelationPicker(Composite parent) {
+    Composite region = new Composite(parent, SWT.NONE);
     region.setLayout(new GridLayout(2, false));
 
     Label relSetLabel = RelationshipSetPickerControl.createPickerLabel(region);
@@ -193,6 +205,8 @@ public class GraphEditor
     relSetPicker.addChangeListener(this);
     relSetPicker.setLayoutData(
         new GridData(SWT.FILL, SWT.CENTER, true, false));
+
+    return region;
   }
 
   private void createPage1() {

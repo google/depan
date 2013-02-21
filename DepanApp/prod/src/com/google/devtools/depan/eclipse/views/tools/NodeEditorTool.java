@@ -121,7 +121,8 @@ public class NodeEditorTool extends ViewSelectionListenerTool
     GridLayout grid = new GridLayout(1, false);
     baseComposite.setLayout(grid);
 
-    setupRelationPicker(baseComposite);
+    Composite pickerRegion = setupRelationPicker(baseComposite);
+    pickerRegion.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
     nodeTreeView = new NodeTreeView<NodeDisplayProperty>(baseComposite,
         SWT.VIRTUAL | SWT.FULL_SELECTION | SWT.BORDER);
@@ -164,9 +165,8 @@ public class NodeEditorTool extends ViewSelectionListenerTool
     return baseComposite;
   }
 
-  private void setupRelationPicker(Composite parent) {
+  private Composite setupRelationPicker(Composite parent) {
     Composite region = new Composite(parent, SWT.NONE);
-    region.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
     region.setLayout(new GridLayout(2, false));
 
     Label pickerLabel = RelationshipSetPickerControl.createPickerLabel(region);
@@ -176,6 +176,8 @@ public class NodeEditorTool extends ViewSelectionListenerTool
     relationshipSetPicker.addChangeListener(this);
     relationshipSetPicker.setLayoutData(
         new GridData(SWT.FILL, SWT.CENTER, true, false));
+
+    return region;
   }
 
   /////////////////////////////////////

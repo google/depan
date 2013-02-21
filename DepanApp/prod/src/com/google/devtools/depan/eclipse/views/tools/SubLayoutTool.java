@@ -72,11 +72,11 @@ public class SubLayoutTool extends ViewEditorTool {
     layoutPicker.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
 
-    Label selectLabel = RelationshipSetPickerControl.createPickerLabel(baseComposite);
+    RelationshipSetPickerControl.createPickerLabel(baseComposite);
 
     relationshipSetselector = new RelationshipSetPickerControl(baseComposite);
     relationshipSetselector.setLayoutData(
-      new GridData(SWT.FILL, SWT.CENTER, true, false));
+        new GridData(SWT.FILL, SWT.CENTER, true, false));
 
     Button apply = new Button(baseComposite, SWT.PUSH);
     apply.setText("Apply");
