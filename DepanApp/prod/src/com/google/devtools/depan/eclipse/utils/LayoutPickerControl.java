@@ -20,8 +20,8 @@ import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerator;
 import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerators;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 
 import java.util.List;
@@ -37,7 +37,7 @@ public class LayoutPickerControl extends Composite {
 
   private final boolean allowKeep;
 
-  private final CCombo layoutChoice;
+  private final Combo layoutChoice;
 
   private final List<String> layoutNames;
 
@@ -52,7 +52,8 @@ public class LayoutPickerControl extends Composite {
     this.allowKeep = allowKeep;
 
     layoutNames = LayoutGenerators.getLayoutNames();
-    layoutChoice = new CCombo(this, SWT.READ_ONLY | SWT.BORDER);
+    layoutChoice = new Combo(this, SWT.READ_ONLY | SWT.BORDER);
+    layoutChoice.setVisibleItemCount(1);
 
     // Populate the dropdown's choices.
     if (allowKeep) {

@@ -183,7 +183,7 @@ public class GraphEditor
     layoutLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 
     layoutPicker = new LayoutPickerControl(region, false);
-    layoutPicker.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+    layoutPicker.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
     return region;
   }

@@ -28,13 +28,13 @@ import com.google.devtools.depan.model.RelationshipSet;
 
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
@@ -114,8 +114,8 @@ public class CollapseTool extends ViewSelectionListenerTool
 
     Label labelUncollapse = createLabel(manualCollapse, "Uncollapse");
 
-    final CCombo uncollapseOpts =
-        new CCombo(manualCollapse, SWT.READ_ONLY | SWT.FLAT);
+    final Combo uncollapseOpts =
+        new Combo(manualCollapse, SWT.READ_ONLY | SWT.FLAT);
     for (String s : uncollapseOptions) {
       uncollapseOpts.add(s);
     }

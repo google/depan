@@ -36,7 +36,6 @@ import com.google.common.collect.Lists;
 
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -44,6 +43,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -72,7 +72,7 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
   private TableViewer previewList;
   private LayoutPickerControl layoutPicker;
 
-  private CCombo modeChoice = null;
+  private Combo modeChoice = null;
 
   // Define a static list of selection modes that are used in the UI
   // TODO(leeca): Maybe turn into extensible list
@@ -284,9 +284,9 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
     }
   }
 
-  private static CCombo createModeCombo(Composite parent,
+  private static Combo createModeCombo(Composite parent,
         List<SelectionMode> modeChoices, SelectionMode initialMode) {
-    CCombo modeControl = new CCombo(parent, SWT.READ_ONLY | SWT.BORDER);
+    Combo modeControl = new Combo(parent, SWT.READ_ONLY | SWT.BORDER);
     for (SelectionMode mode : modeChoices) {
       modeControl.add(mode.getLabel());
     }
