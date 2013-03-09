@@ -28,7 +28,6 @@ import com.google.devtools.depan.eclipse.views.tools.SubLayoutTool;
 
 /**
  * @author ycoppel@google.com (Yohann Coppel)
- *
  */
 public final class ToolList {
 

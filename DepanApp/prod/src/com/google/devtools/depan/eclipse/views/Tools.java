@@ -80,8 +80,9 @@ public class Tools extends ListeningViewViewPart<ViewEditor> {
 
     // top composite with buttons
     Composite composite = new Composite(parent, SWT.NONE);
-    RowLayout layout = new RowLayout();
     composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+
+    RowLayout layout = new RowLayout();
     layout.fill = true;
     layout.pack = false;
     layout.wrap = true;
