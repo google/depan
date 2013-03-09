@@ -24,6 +24,7 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -33,32 +34,26 @@ import java.util.List;
  */
 public class LayoutPickerControl extends Composite {
 
-  private static final String LAYOUT_KEEP = "Keep positions";
-
-  private final boolean allowKeep;
-
   private final Combo layoutChoice;
 
-  private final List<String> layoutNames;
+  private List<String> layoutNames = Collections.emptyList();
 
   /**
    * @param parent Containing composite
    * @param allowKeep use {@code true} if "Keep positions" is a valid choice.
    */
-  public LayoutPickerControl(Composite parent, boolean allowKeep) {
+  public LayoutPickerControl(Composite parent) {
     super(parent, SWT.NONE);
     setLayout(new FillLayout());
 
-    this.allowKeep = allowKeep;
-
-    layoutNames = LayoutGenerators.getLayoutNames();
     layoutChoice = new Combo(this, SWT.READ_ONLY | SWT.BORDER);
     layoutChoice.setVisibleItemCount(1);
 
-    // Populate the dropdown's choices.
-    if (allowKeep) {
-      layoutChoice.add(LAYOUT_KEEP);
-    }
+    layoutChoice.select(0);
+  }
+
+  public void setLayoutChoices(List<String> layoutNames) {
+    this.layoutNames = layoutNames;
 
     for (String name : layoutNames) {
       layoutChoice.add(name);
@@ -72,27 +67,25 @@ public class LayoutPickerControl extends Composite {
    * 
    * @param layout selected {@code Layouts} to show in control
    */
-  public void setLayoutChoice(String layoutName) {
-    if (allowKeep && (null == layoutName)) {
-      layoutChoice.select(0);
-      return;
-    }
+  public void selectLayout(String layoutName) {
     if (null == layoutName) {
       return;
     }
 
-    int base = (allowKeep) ? 1 : 0;
-    layoutChoice.select(base + LayoutGenerators.getLayoutIndex(layoutName));
+    layoutChoice.select(getLayoutIndex(layoutName));
+  }
+
+  private int getLayoutIndex(String layoutName) {
+    for (int index = 0; index < layoutNames.size(); index++) {
+      if (layoutNames.get(index).equals(layoutName)) {
+        return index;
+      }
+    }
+    return -1;
   }
 
   public String getLayoutName() {
     int index = layoutChoice.getSelectionIndex();
-    if (allowKeep && (index == 0)) {
-      return null;
-    }
-    if (allowKeep) {
-      index--;
-    }
     if (index >= layoutNames.size()) {
       return null;
     }

@@ -109,7 +109,7 @@ public class LayoutShortcutsPlugin implements Plugin {
     }
 
     int index = '1' - character;
-    List<String> choices = LayoutGenerators.getLayoutNames();
+    List<String> choices = LayoutGenerators.getLayoutNames(false);
     if (index >= choices.size()) {
       return null;
     }

@@ -28,6 +28,7 @@ import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptor;
 import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptors;
 import com.google.devtools.depan.eclipse.visualization.layout.LayoutContext;
 import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerator;
+import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerators;
 import com.google.devtools.depan.eclipse.visualization.layout.LayoutUtil;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.RelationshipSet;
@@ -178,6 +179,7 @@ public class GraphEditor
   private LayoutChoicesControl setupLayoutChoices(Composite parent) {
     LayoutChoicesControl result = new LayoutChoicesControl(
         parent, LayoutChoicesControl.Style.LINEAR);
+    result.setLayoutChoices(LayoutGenerators.getLayoutNames(false));
 
     RelationshipSet selectedRelSet =
         graph.getDefaultAnalysis().getDefaultRelationshipSet();
@@ -304,7 +306,7 @@ public class GraphEditor
     ViewPreferences userPrefs = new ViewPreferences();
     String layoutName = layoutChoices.getLayoutName();
     userPrefs.setSelectedLayout(layoutName);
-    userPrefs.setLayoutFinder(relSetPicker.getSelection());
+    userPrefs.setLayoutFinder(layoutChoices.getRelationSet());
 
     boolean doLayout = false;
     if (null != layoutName) {

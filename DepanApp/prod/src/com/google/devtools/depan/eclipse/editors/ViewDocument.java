@@ -175,6 +175,10 @@ public class ViewDocument {
     return userPrefs.getLayoutFinder();
   }
 
+  public void setLayoutFinder(DirectedRelationFinder finder) {
+    userPrefs.setLayoutFinder(finder);
+  }
+
   public NodeTreeProvider<NodeDisplayProperty>
       getNodeDisplayPropertyProvider() {
     return userPrefs.getNodeDisplayPropertyProvider();

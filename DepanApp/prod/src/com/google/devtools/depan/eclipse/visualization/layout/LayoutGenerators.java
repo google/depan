@@ -45,6 +45,9 @@ public class LayoutGenerators {
   private static Map<String, LayoutGenerator> layoutLookup =
       Maps.newHashMap();
 
+  private static NamedLayout KEEP_LOCATIONS_LAYOUT =
+      new NamedLayout("Keep positions", KeepLocationsGenerator.INSTANCE);
+
   static {
     layoutRegistry.add(new NamedLayout("FRLayout",
         JungLayoutGenerator.FRLayoutBuilder));
@@ -67,14 +70,21 @@ public class LayoutGenerators {
     layoutRegistry.add(new NamedLayout("NewRadialLayout",
         TreeLayoutGenerator.NewRadialLayoutBuilder));
 
+    // Support lookup of Keep Position, but it is not a registered choice
+    layoutLookup.put(KEEP_LOCATIONS_LAYOUT.name, KEEP_LOCATIONS_LAYOUT.layout);
+
+    // Add all registered layouts.
     for (NamedLayout info : layoutRegistry) {
       layoutLookup.put(info.name, info.layout);
     }
   }
 
-  public static List<String> getLayoutNames() {
-    List<String> result =
-            Lists.newArrayListWithExpectedSize(layoutRegistry.size());
+  public static List<String> getLayoutNames(boolean addKeepLocations) {
+    int size = layoutRegistry.size() + (addKeepLocations ? 1 : 0);
+    List<String> result = Lists.newArrayListWithExpectedSize(size);
+    if (addKeepLocations) {
+      result.add(KEEP_LOCATIONS_LAYOUT.name);
+    }
     for (NamedLayout info : layoutRegistry) {
       result.add(info.name);
     }

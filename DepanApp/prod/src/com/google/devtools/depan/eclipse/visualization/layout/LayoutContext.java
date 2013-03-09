@@ -21,7 +21,12 @@ import com.google.devtools.depan.graph.basic.ForwardIdentityRelationFinder;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 
+import com.google.common.collect.Maps;
+
+import java.awt.geom.Point2D;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
 
 /**
  * Provide a consistent means to access layout parameters without direct
@@ -44,6 +49,8 @@ public class LayoutContext {
 
   private Collection<GraphNode> fixedNodes = GraphNode.EMPTY_NODE_LIST;
 
+  private Map<GraphNode, Point2D> nodeLocations = Collections.emptyMap();
+
   public void setGraphModel(GraphModel context) {
     this.graphModel = context;
   }
@@ -64,6 +71,25 @@ public class LayoutContext {
     this.viewport = viewport;
   }
 
+  public void setNodeLocations(Map<GraphNode, Point2D> currPositions) {
+    nodeLocations = Maps.newHashMapWithExpectedSize(
+        movableNodes.size() + fixedNodes.size());
+
+    for (GraphNode node : movableNodes) {
+      Point2D point = currPositions.get(node);
+      if (null != point) {
+        nodeLocations.put(node, point);
+      }
+    }
+
+    for (GraphNode node : fixedNodes) {
+      Point2D point = currPositions.get(node);
+      if (null != point) {
+        nodeLocations.put(node, point);
+      }
+    }
+  }
+
   public GraphModel getGraphModel() {
     return graphModel;
   }
@@ -82,5 +108,9 @@ public class LayoutContext {
 
   public GLRegion getViewport() {
     return viewport;
+  }
+
+  public Map<GraphNode, Point2D> getNodeLocations() {
+    return nodeLocations;
   }
 }

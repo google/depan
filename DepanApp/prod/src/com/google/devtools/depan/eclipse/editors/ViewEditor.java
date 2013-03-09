@@ -1029,6 +1029,7 @@ public class ViewEditor extends MultiPageEditorPart
     context.setGraphModel(getExposedGraph());
     context.setMovableNodes(layoutNodes);
     context.setRelations(relationFinder);
+    context.setNodeLocations(getNodeLocations());
     context.setViewport(renderer.getOGLViewport().newOriginRegion());
 
     Map<GraphNode, Point2D> changes = LayoutUtil.calcPositions(

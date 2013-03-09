@@ -41,7 +41,7 @@ public class LayoutChoicesControl extends Composite {
     LINEAR {
       @Override
       GridLayoutFactory getLayoutFactory() {
-        return GridLayoutFactory.fillDefaults().numColumns(4);
+        return GridLayoutFactory.swtDefaults().numColumns(4);
       }
     },
     STACKED {
@@ -77,7 +77,7 @@ public class LayoutChoicesControl extends Composite {
     layoutLabel.setText("Layout graph: ");
     gridDataBldr.applyTo(layoutLabel);
 
-    layoutPicker = new LayoutPickerControl(this, false);
+    layoutPicker = new LayoutPickerControl(this);
     gridDataBldr.applyTo(layoutPicker);
 
     Label relSetLabel = new Label(this, SWT.NONE);
@@ -86,6 +86,14 @@ public class LayoutChoicesControl extends Composite {
 
     relSetPicker = new RelationshipSetPickerControl(this);
     gridDataBldr.applyTo(relSetPicker);
+  }
+
+  public void setLayoutChoices(List<String> layoutNames) {
+    layoutPicker.setLayoutChoices(layoutNames);
+  }
+
+  public void selectLayout(String layoutName) {
+    layoutPicker.selectLayout(layoutName);
   }
 
   public LayoutGenerator getLayoutGenerator() {

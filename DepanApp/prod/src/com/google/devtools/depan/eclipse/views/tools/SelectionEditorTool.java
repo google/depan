@@ -18,11 +18,12 @@ package com.google.devtools.depan.eclipse.views.tools;
 
 import com.google.devtools.depan.eclipse.editors.ViewDocument;
 import com.google.devtools.depan.eclipse.editors.ViewEditor;
-import com.google.devtools.depan.eclipse.utils.LayoutPickerControl;
+import com.google.devtools.depan.eclipse.utils.LayoutChoicesControl;
 import com.google.devtools.depan.eclipse.utils.NodeLabelProvider;
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.utils.Sasher;
 import com.google.devtools.depan.eclipse.utils.TableContentProvider;
+import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptor;
 import com.google.devtools.depan.eclipse.views.ViewSelectionListenerTool;
 import com.google.devtools.depan.eclipse.visualization.layout.LayoutContext;
 import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerator;
@@ -31,9 +32,11 @@ import com.google.devtools.depan.eclipse.visualization.layout.LayoutUtil;
 import com.google.devtools.depan.filters.PathMatcher;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
+import com.google.devtools.depan.model.RelationshipSet;
 
 import com.google.common.collect.Lists;
 
+import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -65,12 +68,14 @@ import java.util.Set;
  */
 public class SelectionEditorTool extends ViewSelectionListenerTool {
 
+  private Composite toolPanel;
+
   private TableContentProvider<GraphNode> selectedNodesContent = null;
   private TableViewer selectedNodes;
 
   private TableContentProvider<GraphNode> previewListContent = null;
   private TableViewer previewList;
-  private LayoutPickerControl layoutPicker;
+  private LayoutChoicesControl layoutChoices;
 
   private Combo modeChoice = null;
 
@@ -176,10 +181,13 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
 
   @Override
   public Control setupComposite(Composite parent) {
-    // Create components
-    Composite baseComposite = new Composite(parent, SWT.NONE);
+    toolPanel = new Composite(parent, SWT.NONE);
+    toolPanel.setLayout(new GridLayout(1, false));
 
-    Sasher outerSash = new Sasher(baseComposite, SWT.NONE);
+    Sasher outerSash = new Sasher(toolPanel, SWT.NONE);
+    outerSash.setLayoutData(
+        new GridData(SWT.FILL, SWT.FILL, true, true));
+
     Sasher innerSash = new Sasher(outerSash, SWT.NONE);
     Control selectedNodesControl = setupSelectedNodesContent(innerSash);
 
@@ -206,19 +214,18 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
     Control previewListControl = setupPreviewList(outerSash);
 
     // Create and configure the Selection Mode controls
-    new Label(baseComposite, SWT.NONE).setText("Creation mode");
-    modeChoice = createModeCombo(baseComposite,
+    Composite modeRegion = setupModeCombo(toolPanel,
         SELECTION_MODES, SelectionMode.INCLUDE_SELECTED);
-    modeChoice.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+    modeRegion.setLayoutData(
+        new GridData(SWT.BEGINNING, SWT.CENTER, true, false));
 
-    new Label(baseComposite, SWT.NONE).setText("Apply layout");
-    layoutPicker = new LayoutPickerControl(baseComposite, true);
+    layoutChoices = new LayoutChoicesControl(
+        toolPanel, LayoutChoicesControl.Style.LINEAR);
+    layoutChoices.setLayoutData(
+        new GridData(SWT.BEGINNING, SWT.CENTER, true, false));
+
+    layoutChoices.setLayoutChoices(LayoutGenerators.getLayoutNames(true));
     updateSelectedLayout();
-
-    Composite actionButtons = new Composite(baseComposite, SWT.NONE);
-    Button preview = new Button(actionButtons, SWT.PUSH);
-    Button justSelect = new Button(actionButtons, SWT.PUSH);
-    Button doit = new Button(actionButtons, SWT.PUSH);
 
     // the middle table (relationTable occupies 50% of all space, both
     // top (selectedNodes) and bottom (previewList) share the 50% left.
@@ -228,6 +235,56 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
     innerSash.setLimit(minSasherSize);
     outerSash.setLimit(2 * minSasherSize);
 
+    Composite actionButtons = createActionButtons(toolPanel);
+    actionButtons.setLayoutData(
+        new GridData(SWT.FILL, SWT.FILL, true, false));
+
+    return toolPanel;
+  }
+
+  /**
+   * Set the selected layout control to show the current layout for the editor.
+   */
+  private void updateSelectedLayout() {
+    if (null != getEditor()) {
+      layoutChoices.selectLayout(getEditor().getLayoutName());
+    }
+  }
+
+  private Composite setupModeCombo(Composite parent,
+        List<SelectionMode> modeChoices, SelectionMode initialMode) {
+    Composite result = new Composite(parent, SWT.NONE);
+    result.setLayout(new GridLayout(2, false));
+
+    Label label = new Label(result, SWT.NONE);
+    label.setLayoutData(
+        new GridData(SWT.FILL, SWT.CENTER, false, false));
+
+    label.setText("Creation mode:");
+
+    modeChoice = new Combo(result, SWT.READ_ONLY | SWT.BORDER);
+    modeChoice.setLayoutData(
+        new GridData(SWT.FILL, SWT.CENTER, true, false));
+
+    for (SelectionMode mode : modeChoices) {
+      modeChoice.add(mode.getLabel());
+    }
+
+    int modeIndex = modeChoices.indexOf(initialMode);
+    modeChoice.select(modeIndex >= 0 ? modeIndex : 0);
+
+    return result;
+  }
+
+  private Composite createActionButtons(Composite parent) {
+    Composite result = new Composite(parent, SWT.NONE);
+    result.setLayout(new GridLayout(3, true));
+
+    GridDataFactory buttonLayoutData =
+        GridDataFactory.fillDefaults().grab(true, false);
+
+    Button preview = new Button(result, SWT.PUSH);
+    buttonLayoutData.applyTo(preview);
     preview.setText("Preview");
     preview.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -236,6 +293,8 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
       }
     });
 
+    Button justSelect = new Button(result, SWT.PUSH);
+    buttonLayoutData.applyTo(justSelect);
     justSelect.setText("Select");
     justSelect.setToolTipText("Only select nodes present in the current View.");
     justSelect.addSelectionListener(new SelectionAdapter() {
@@ -245,6 +304,8 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
       }
     });
 
+    Button doit = new Button(result, SWT.PUSH);
+    buttonLayoutData.applyTo(doit);
     doit.setText("Create new view");
     doit.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -253,47 +314,7 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
       }
     });
 
-    // setup layouts
-    GridLayout baseGrid = new GridLayout();
-    baseGrid.numColumns = 2;
-    baseComposite.setLayout(baseGrid);
-
-    actionButtons.setLayout(new GridLayout(3, true));
-    outerSash.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
-    layoutPicker.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false));
-    actionButtons.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
-    preview.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false));
-    justSelect.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false));
-    doit.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false));
-
-    return baseComposite;
-  }
-
-  /**
-   * Set the selected layout control to show the current layout for the editor.
-   */
-  private void updateSelectedLayout() {
-    if (null != getEditor()) {
-      layoutPicker.setLayoutChoice(getEditor().getLayoutName());
-    }
-  }
-
-  private static Combo createModeCombo(Composite parent,
-        List<SelectionMode> modeChoices, SelectionMode initialMode) {
-    Combo modeControl = new Combo(parent, SWT.READ_ONLY | SWT.BORDER);
-    for (SelectionMode mode : modeChoices) {
-      modeControl.add(mode.getLabel());
-    }
-
-    int modeIndex = modeChoices.indexOf(initialMode);
-    modeControl.select(modeIndex >=0 ? modeIndex : 0);
-    return modeControl;
+    return result;
   }
 
   /////////////////////////////////////
@@ -390,16 +411,18 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
     ViewEditor viewEditor = getEditor();
     ViewDocument viewDoc = viewEditor.buildNewViewDocument(viewNodes);
 
-    String layoutName = layoutPicker.getLayoutName();
+    String layoutName = layoutChoices.getLayoutName();
     viewDoc.setSelectedLayout(layoutName);
+    viewDoc.setLayoutFinder(layoutChoices.getRelationSet());
 
     boolean doLayout = false;
     if (null != layoutName) {
       LayoutContext layoutContext = LayoutUtil.newLayoutContext(
-          viewEditor.getParentGraph(), viewNodes, viewDoc.getLayoutFinder());
+          viewEditor.getParentGraph(), viewNodes, layoutChoices.getRelationSet());
+      layoutContext.setNodeLocations(getEditor().getNodeLocations());
 
       // Do the layout for these nodes
-      LayoutGenerator layout = LayoutGenerators.getByName(layoutName);
+      LayoutGenerator layout = layoutChoices.getLayoutGenerator();
       viewDoc.setNodeLocations(
           LayoutUtil.calcPositions(layout, layoutContext, viewNodes));
       doLayout = true;
@@ -441,6 +464,12 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
     }
 
     super.updateControls();
+
+    // Update the RelSet picker
+    RelationshipSet selectedRelSet = getEditor().getContainerRelSet();
+    List<RelSetDescriptor> choices = getEditor().getRelSetChoices();
+    layoutChoices.setRelSetInput(selectedRelSet, choices );
+    toolPanel.layout();
   }
 
 

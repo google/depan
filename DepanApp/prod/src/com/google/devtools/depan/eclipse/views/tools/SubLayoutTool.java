@@ -21,6 +21,7 @@ import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptor;
 import com.google.devtools.depan.eclipse.views.ViewEditorTool;
 import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerator;
+import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerators;
 import com.google.devtools.depan.model.RelationshipSet;
 
 import org.eclipse.swt.SWT;
@@ -60,11 +61,12 @@ public class SubLayoutTool extends ViewEditorTool {
   @Override
   public Control setupComposite(Composite parent) {
     toolPanel = new Composite(parent, SWT.NONE);
-    GridLayout grid = new GridLayout(1, false);
-    toolPanel.setLayout(grid);
+    toolPanel.setLayout(new GridLayout(1, false));
 
     layoutChoices = new LayoutChoicesControl(toolPanel,
-        LayoutChoicesControl.Style.TIGHT);
+        LayoutChoicesControl.Style.LINEAR);
+    layoutChoices.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, true, false));
+    layoutChoices.setLayoutChoices(LayoutGenerators.getLayoutNames(false));
 
     Button apply = new Button(toolPanel, SWT.PUSH);
     apply.setText("Apply");
