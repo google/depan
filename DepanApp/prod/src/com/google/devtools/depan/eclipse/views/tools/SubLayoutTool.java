@@ -16,8 +16,7 @@
 
 package com.google.devtools.depan.eclipse.views.tools;
 
-import com.google.devtools.depan.eclipse.utils.LayoutPickerControl;
-import com.google.devtools.depan.eclipse.utils.RelationshipSetPickerControl;
+import com.google.devtools.depan.eclipse.utils.LayoutChoicesControl;
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptor;
 import com.google.devtools.depan.eclipse.views.ViewEditorTool;
@@ -33,22 +32,20 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
 
 import java.util.List;
 import java.util.logging.Logger;
 
 /**
  * @author ycoppel@google.com (Yohann Coppel)
- *
  */
 public class SubLayoutTool extends ViewEditorTool {
 
-  /** Drop down List of available layouts. */
-  private LayoutPickerControl layoutPicker = null;
+  /** Main tool form */
+  private Composite toolPanel;
 
-  /** Selector for named relationships sets. */
-  private RelationshipSetPickerControl relationshipSetselector = null;
+  /** Drop down List of available layouts. */
+  private LayoutChoicesControl layoutChoices = null;
 
   @Override
   public Image getIcon() {
@@ -62,41 +59,16 @@ public class SubLayoutTool extends ViewEditorTool {
 
   @Override
   public Control setupComposite(Composite parent) {
-    Composite baseComposite = new Composite(parent, SWT.NONE);
-    GridLayout grid = new GridLayout(2, false);
-    baseComposite.setLayout(grid);
+    toolPanel = new Composite(parent, SWT.NONE);
+    GridLayout grid = new GridLayout(1, false);
+    toolPanel.setLayout(grid);
 
-    // components
-    new Label(baseComposite, SWT.NONE).setText("Sub layout : ");
-    layoutPicker = new LayoutPickerControl(baseComposite, false);
-    layoutPicker.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
+    layoutChoices = new LayoutChoicesControl(toolPanel,
+        LayoutChoicesControl.Style.TIGHT);
 
-    RelationshipSetPickerControl.createPickerLabel(baseComposite);
-
-    relationshipSetselector = new RelationshipSetPickerControl(baseComposite);
-    relationshipSetselector.setLayoutData(
-        new GridData(SWT.FILL, SWT.CENTER, true, false));
-
-    Button apply = new Button(baseComposite, SWT.PUSH);
+    Button apply = new Button(toolPanel, SWT.PUSH);
     apply.setText("Apply");
-    apply.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
-
-    Label help = new Label(baseComposite, SWT.WRAP);
-    help.setText("The relationship set is used only in layouts requiring "
-        + "a hierarchy. Basically Tree layouts.\n\n"
-        + ""
-        + "If \"Set size to\" is not selected, the size used is the bounding "
-        + "box of all selected nodes. So if your nodes are in line, you will "
-        + "most likely get all your nodes at the same position.\n\n"
-        + ""
-        + "If there are no selected nodes, apply the layout / [default]size "
-        + "to the entire graph.");
-    help.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
-
-    // actions
+    apply.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true, false));
     apply.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -104,7 +76,7 @@ public class SubLayoutTool extends ViewEditorTool {
       }
     });
 
-    return baseComposite;
+    return toolPanel;
   }
 
   @Override
@@ -114,7 +86,8 @@ public class SubLayoutTool extends ViewEditorTool {
     // Update the RelSet picker for auto-collapse.
     RelationshipSet selectedRelSet = getEditor().getContainerRelSet();
     List<RelSetDescriptor> choices = getEditor().getRelSetChoices();
-    relationshipSetselector.setInput(selectedRelSet, choices );
+    layoutChoices.setRelSetInput(selectedRelSet, choices );
+    toolPanel.layout();
   }
 
   protected void apply() {
@@ -123,14 +96,14 @@ public class SubLayoutTool extends ViewEditorTool {
     }
 
     try {
-      LayoutGenerator layout = layoutPicker.getLayoutChoice();
-      getEditor().applyLayout(layout, relationshipSetselector.getSelection());
+      LayoutGenerator layout = layoutChoices.getLayoutGenerator();
+      getEditor().applyLayout(layout, layoutChoices.getRelationSet());
     } catch (IllegalArgumentException ex) {
       // bad layout. don't do anything for the layout, but still finish the
       // creation of the view.
       Logger logger = Logger.getLogger(SubLayoutTool.class.getName());
       logger.warning(
-          "Bad layout.  Selected " + layoutPicker.getLayoutName());
+          "Bad layout.  Selected " + layoutChoices.getLayoutName());
     }
   }
 }

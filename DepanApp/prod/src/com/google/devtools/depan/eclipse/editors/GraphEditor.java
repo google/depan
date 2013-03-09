@@ -21,14 +21,13 @@ import com.google.devtools.depan.eclipse.trees.GraphData;
 import com.google.devtools.depan.eclipse.trees.NodeTreeProvider;
 import com.google.devtools.depan.eclipse.trees.NodeTreeView.NodeWrapper;
 import com.google.devtools.depan.eclipse.utils.DefaultRelationshipSet;
-import com.google.devtools.depan.eclipse.utils.LayoutPickerControl;
+import com.google.devtools.depan.eclipse.utils.LayoutChoicesControl;
 import com.google.devtools.depan.eclipse.utils.RelationshipSelectorListener;
 import com.google.devtools.depan.eclipse.utils.RelationshipSetPickerControl;
 import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptor;
 import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptors;
 import com.google.devtools.depan.eclipse.visualization.layout.LayoutContext;
 import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerator;
-import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerators;
 import com.google.devtools.depan.eclipse.visualization.layout.LayoutUtil;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.RelationshipSet;
@@ -78,10 +77,11 @@ public class GraphEditor
   private List associatedViews = null;
   private boolean recursiveTreeSelect = true;
   private CheckNodeTreeView<GraphNode> checkNodeTreeView = null;
-  private LayoutPickerControl layoutPicker = null;
 
   // TODO(leeca): Figure out how to turn this back on
   // private Binop<GraphModel> binop = null;
+
+  private LayoutChoicesControl layoutChoices;
 
   /** Selector for named relationships sets. */
   private RelationshipSetPickerControl relSetPicker = null;
@@ -134,7 +134,8 @@ public class GraphEditor
       }
     });
 
-    Composite layoutRegion = setupLayoutChoice(top);
+    // Composite layoutRegion = setupLayoutChoice(top);
+    layoutChoices = setupLayoutChoices(top);
 
     Button create = new Button(top, SWT.PUSH);
     create.setText("Create view");
@@ -174,18 +175,17 @@ public class GraphEditor
     setPageText(index, "New View");
   }
 
-  private Composite setupLayoutChoice(Composite parent) {
-    Composite region = new Composite(parent, SWT.NONE);
-    region.setLayout(new GridLayout(2, false));
+  private LayoutChoicesControl setupLayoutChoices(Composite parent) {
+    LayoutChoicesControl result = new LayoutChoicesControl(
+        parent, LayoutChoicesControl.Style.LINEAR);
 
-    Label layoutLabel = new Label(region, SWT.NONE);
-    layoutLabel.setText("Layout for view: ");
-    layoutLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+    RelationshipSet selectedRelSet =
+        graph.getDefaultAnalysis().getDefaultRelationshipSet();
+    java.util.List<RelSetDescriptor> choices =
+        RelSetDescriptors.buildGraphChoices(graph);
+    result.setRelSetInput(selectedRelSet, choices);
 
-    layoutPicker = new LayoutPickerControl(region, false);
-    layoutPicker.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-
-    return region;
+    return result;
   }
 
   private Composite setupRelationPicker(Composite parent) {
@@ -302,17 +302,17 @@ public class GraphEditor
     GraphModelReference graphRef = new GraphModelReference(file, graph);
 
     ViewPreferences userPrefs = new ViewPreferences();
-    String layoutName = layoutPicker.getLayoutName();
+    String layoutName = layoutChoices.getLayoutName();
     userPrefs.setSelectedLayout(layoutName);
     userPrefs.setLayoutFinder(relSetPicker.getSelection());
 
     boolean doLayout = false;
     if (null != layoutName) {
       LayoutContext layoutContext = LayoutUtil.newLayoutContext(
-          graph.getGraph(), nodes, userPrefs.getLayoutFinder());
+          graph.getGraph(), nodes, layoutChoices.getRelationSet());
 
       // Do the layout for these nodes
-      LayoutGenerator layout = LayoutGenerators.getByName(layoutName);
+      LayoutGenerator layout = layoutChoices.getLayoutGenerator();
       userPrefs.setNodeLocations(
           LayoutUtil.calcPositions(layout, layoutContext, nodes));
       doLayout = true;
@@ -368,12 +368,10 @@ public class GraphEditor
 
   @Override
   public void doSave(IProgressMonitor monitor) {
-
   }
 
   @Override
   public void doSaveAs() {
-
   }
 
   @Override
