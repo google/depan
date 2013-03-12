@@ -39,14 +39,14 @@ public class SceneGrip extends MouseAdapter
 
   /** eye position */
   private float xrot;
-  private float yrot;
+  private float zrot;
   private float zoff;
   public float xoff;
   public float yoff;
 
   /** Target for eye position, for smooth moves */
   private float targetXrot;
-  private float targetYrot;
+  private float targetZrot;
   private float targetZoff;
   private float targetXoff;
   private float targetYoff;
@@ -90,7 +90,7 @@ public class SceneGrip extends MouseAdapter
   protected void init() {
     this.targetXrot = 0.0f;
     this.targetXoff = 0.0f;
-    this.targetYrot = 0.0f;
+    this.targetZrot = 0.0f;
     this.targetYoff = 0.0f;
     this.targetZoff = HUNDRED_PERCENT_ZOOM;
   }
@@ -110,32 +110,32 @@ public class SceneGrip extends MouseAdapter
         if ((e.stateMask & SWT.CTRL) != 0) {
           this.targetXrot -= 0.5f;
         } else {
-          this.targetYoff -= 5f * Math.cos(Math.toRadians(yrot));
-          this.targetXoff -= 5f * Math.sin(Math.toRadians(yrot));
+          this.targetYoff -= 5f * Math.cos(Math.toRadians(zrot));
+          this.targetXoff -= 5f * Math.sin(Math.toRadians(zrot));
         }
         break;
       case SWT.ARROW_DOWN:
         if ((e.stateMask & SWT.CTRL) != 0) {
           this.targetXrot += 0.5f;
         } else {
-          this.targetYoff += 5f * Math.cos(Math.toRadians(yrot));
-          this.targetXoff += 5f * Math.sin(Math.toRadians(yrot));
+          this.targetYoff += 5f * Math.cos(Math.toRadians(zrot));
+          this.targetXoff += 5f * Math.sin(Math.toRadians(zrot));
         }
         break;
       case SWT.ARROW_LEFT:
         if ((e.stateMask & SWT.CTRL) != 0) {
-          this.targetYrot -= 0.5f;
+          this.targetZrot -= 0.5f;
         } else {
-          this.targetXoff -= 5f * Math.sin(Math.toRadians(yrot-90));
-          this.targetYoff -= 5f * Math.cos(Math.toRadians(yrot-90));
+          this.targetXoff -= 5f * Math.sin(Math.toRadians(zrot-90));
+          this.targetYoff -= 5f * Math.cos(Math.toRadians(zrot-90));
         }
         break;
       case SWT.ARROW_RIGHT:
         if ((e.stateMask & SWT.CTRL) != 0) {
-          this.targetYrot += 0.5f;
+          this.targetZrot += 0.5f;
         } else {
-          this.targetXoff += 5f * Math.sin(Math.toRadians(yrot-90));
-          this.targetYoff += 5f * Math.cos(Math.toRadians(yrot-90));
+          this.targetXoff += 5f * Math.sin(Math.toRadians(zrot-90));
+          this.targetYoff += 5f * Math.cos(Math.toRadians(zrot-90));
         }
         break;
       case SWT.PAGE_UP:
@@ -182,10 +182,10 @@ public class SceneGrip extends MouseAdapter
     } else if (xoff > targetXoff) {
       xoff -= (xoff - targetXoff) / SPEED;
     }
-    if (yrot < targetYrot) {
-      yrot += (targetYrot - yrot) / SPEED;
-    } else if (yrot > targetYrot) {
-      yrot -= (yrot - targetYrot) / SPEED;
+    if (zrot < targetZrot) {
+      zrot += (targetZrot - zrot) / SPEED;
+    } else if (zrot > targetZrot) {
+      zrot -= (zrot - targetZrot) / SPEED;
     }
     if (xrot < targetXrot) {
       xrot += (targetXrot - xrot) / SPEED;
@@ -201,8 +201,8 @@ public class SceneGrip extends MouseAdapter
     step();
 
     if (!GLScene.hyperbolic) {
-      scene.gl.glRotatef(xrot,1.0f,0,0);
-      scene.gl.glRotatef(yrot,0,0,1.0f);
+      scene.gl.glRotatef(xrot, 1.0f, 0.0f, 0.0f);
+      scene.gl.glRotatef(zrot, 0.0f, 0.0f, 1.0f);
       scene.gl.glTranslatef(this.xoff, this.yoff, -this.zoff);
     } else {
       scene.glu.gluLookAt(0, 0, zoff, 0, 0, zoff - 1, 0, 1, 0);
@@ -227,11 +227,11 @@ public class SceneGrip extends MouseAdapter
         int dx = e.x - mouseX;
         int dy = e.y - mouseY;
 
-        xoff -= dx * Math.sin(Math.toRadians(yrot-90));
-        yoff -= dx * Math.cos(Math.toRadians(yrot-90));
+        xoff -= dx * Math.sin(Math.toRadians(zrot-90));
+        yoff -= dx * Math.cos(Math.toRadians(zrot-90));
 
-        yoff -= dy * Math.cos(Math.toRadians(yrot));
-        xoff -= dy * Math.sin(Math.toRadians(yrot));
+        yoff -= dy * Math.cos(Math.toRadians(zrot));
+        xoff -= dy * Math.sin(Math.toRadians(zrot));
 
         targetXoff = xoff;
         targetYoff = yoff;
@@ -252,8 +252,8 @@ public class SceneGrip extends MouseAdapter
         int dy = e.y - mouseY;
         xrot += dy / 10f;
         targetXrot = xrot;
-        yrot += -dx / 10f;
-        targetYrot = yrot;
+        zrot += -dx / 10f;
+        targetZrot = zrot;
         break;
       }
     }
