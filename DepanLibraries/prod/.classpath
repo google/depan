@@ -9,7 +9,7 @@
 	<classpathentry exported="true" kind="lib" path="jung-algorithms-2.0-beta1.jar"/>
 	<classpathentry exported="true" kind="lib" path="jung-api-2.0-beta1.jar"/>
 	<classpathentry exported="true" kind="lib" path="jung-graph-impl-2.0-beta1.jar"/>
-	<classpathentry exported="true" kind="lib" path="xstream-1.3.jar" sourcepath="/usr/local/google/leeca/DepAn/third_party/xstream/xstream-1.3/lib/xstream-1.3-sources.jar"/>
-	<classpathentry exported="true" kind="lib" path="xpp3_min-1.1.4c.jar"/>
+	<classpathentry exported="true" kind="lib" path="xstream-1.4.5.jar"/>
+	<classpathentry kind="lib" path="xpp3_min-1.1.4c.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

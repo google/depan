@@ -56,7 +56,7 @@ public class EdgeReferenceConverter implements Converter {
   }
 
   @Override
-  @SuppressWarnings("unchecked")  // Parent type uses raw type Class
+  @SuppressWarnings("rawtypes")  // Parent type uses raw type Class
   public boolean canConvert(Class type) {
     return GraphEdge.class.isAssignableFrom(type);
   }

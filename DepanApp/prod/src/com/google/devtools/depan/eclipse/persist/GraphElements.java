@@ -36,6 +36,7 @@ import java.awt.geom.Point2D;
  * @author <a href="mailto:leeca@google.com">Lee Carver</a>
  */
 public class GraphElements {
+  public static final String GRAPH_INFO_TAG = "graph-info";
 
   /**
    * Prevent instantiation of this name-space class.
@@ -44,9 +45,9 @@ public class GraphElements {
   }
 
   public static final Config GRAPH_XML_PERSIST = new Config() {
-    public void  config(XStream xstream) {
+    public void config(XStream xstream) {
 
-      xstream.alias("graph-info", GraphDocument.class);
+      xstream.alias(GRAPH_INFO_TAG, GraphDocument.class);
 
       xstream.alias(GraphModelConverter.GRAPH_DEF_TAG, GraphModel.class);
       xstream.registerConverter(new GraphModelConverter(xstream.getMapper()));

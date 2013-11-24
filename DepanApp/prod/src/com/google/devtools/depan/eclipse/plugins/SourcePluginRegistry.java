@@ -166,8 +166,8 @@ public class SourcePluginRegistry {
     return result;
   }
 
-  public static String getPluginId(SourcePlugin plugin) {
-    return getInstance().pluginToId.get(plugin);
+  public String getPluginId(SourcePlugin plugin) {
+    return pluginToId.get(plugin);
   }
 
   /**

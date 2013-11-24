@@ -51,9 +51,8 @@ public class SourcePluginConverter implements Converter {
   }
 
   @Override
-  @SuppressWarnings("unchecked")  // Parent type uses raw type Class
+  @SuppressWarnings("rawtypes")  // Parent type uses raw type Class
   public boolean canConvert(Class type) {
-    boolean result = SourcePlugin.class.isAssignableFrom(type);
     return SourcePlugin.class.isAssignableFrom(type);
   }
 
@@ -80,6 +79,6 @@ public class SourcePluginConverter implements Converter {
       HierarchicalStreamReader reader, UnmarshallingContext context) {
 
     String pluginId = (String) context.convertAnother(null, String.class);
-    return registry.getSourcePlugin(pluginId);
-    }
+    return SourcePluginRegistry.getSourcePlugin(pluginId);
+  }
 }
