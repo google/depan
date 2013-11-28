@@ -37,9 +37,9 @@
 			<locationURI>THIRD_PARTY_HOME/jung/jung2-beta1/colt-1.2.0.jar</locationURI>
 		</link>
 		<link>
-			<name>google-collect-snapshot-20090211.jar</name>
+			<name>guava-15.0.jar</name>
 			<type>1</type>
-			<locationURI>THIRD_PARTY_HOME/google-collections/google-collect-snapshot-20090211/google-collect-snapshot-20090211.jar</locationURI>
+			<locationURI>THIRD_PARTY_HOME/guava/guava-15.0/guava-15.0.jar</locationURI>
 		</link>
 		<link>
 			<name>joda-time-2.3.jar</name>
