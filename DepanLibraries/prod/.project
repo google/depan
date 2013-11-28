@@ -42,9 +42,9 @@
 			<locationURI>THIRD_PARTY_HOME/google-collections/google-collect-snapshot-20090211/google-collect-snapshot-20090211.jar</locationURI>
 		</link>
 		<link>
-			<name>joda-time-1.6.jar</name>
+			<name>joda-time-2.3.jar</name>
 			<type>1</type>
-			<locationURI>THIRD_PARTY_HOME/joda-time/joda-time-1.6/joda-time-1.6.jar</locationURI>
+			<locationURI>THIRD_PARTY_HOME/joda-time/joda-time-2.3/joda-time-2.3.jar</locationURI>
 		</link>
 		<link>
 			<name>jung-algorithms-2.0-beta1.jar</name>

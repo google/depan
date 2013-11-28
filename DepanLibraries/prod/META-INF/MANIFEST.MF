@@ -7,7 +7,7 @@ Bundle-Vendor: Google Inc.
 Bundle-ClassPath: collections-generic-4.01.jar,
  colt-1.2.0.jar,
  google-collect-snapshot-20090211.jar,
- joda-time-1.6.jar,
+ joda-time-2.3.jar,
  jung-algorithms-2.0-beta1.jar,
  jung-api-2.0-beta1.jar,
  jung-graph-impl-2.0-beta1.jar,
