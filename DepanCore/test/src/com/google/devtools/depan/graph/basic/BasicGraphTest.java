@@ -16,11 +16,16 @@
 
 package com.google.devtools.depan.graph.basic;
 
+import static org.junit.Assert.*;
+
+import org.junit.Test;
+
 /**
  * @author <a href='mailto:leeca@google.com'>Lee Carver</a>
  */
 public class BasicGraphTest extends BasicGraphTestCase {
 
+  @Test
   public void testBasic() {
     BasicGraph<String> graph = new BasicGraph<String>();
     assertNotNull(graph);
@@ -43,6 +48,7 @@ public class BasicGraphTest extends BasicGraphTestCase {
     assertSame(tail, simpleEdge.getTail());
   }
 
+  @Test
   public void test2Relations() {
     BasicGraph<String> graph = new BasicGraph<String>();
     assertNotNull(graph);
@@ -68,6 +74,7 @@ public class BasicGraphTest extends BasicGraphTestCase {
     assertSame(memberEdge, foundEdge);
   }
 
+  @Test
   public void testDuplicateNodes() {
     BasicGraph<String> graph = new BasicGraph<String>();
     assertNotNull(graph);
@@ -83,6 +90,7 @@ public class BasicGraphTest extends BasicGraphTestCase {
     }
   }
 
+  @Test
   public void testDuplicateEdges() {
     BasicGraph<String> graph = new BasicGraph<String>();
     assertNotNull(graph);

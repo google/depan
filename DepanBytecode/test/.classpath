@@ -2,11 +2,11 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="junit.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/DepanBytecode"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/DepanLibraries"/>
 	<classpathentry kind="src" path="/DepanCore"/>
 	<classpathentry kind="src" path="/DepanJava"/>
 	<classpathentry kind="src" path="/DepanFileSystem"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

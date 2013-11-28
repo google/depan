@@ -16,9 +16,7 @@
 
 package com.google.devtools.depan.graph.basic;
 
-import junit.framework.TestCase;
-
-public class BasicGraphTestCase extends TestCase {
+public class BasicGraphTestCase {
 
   protected BasicNode<String> createSimpleNode(String name) {
     return new SimpleNode<String>(name);

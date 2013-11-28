@@ -16,21 +16,16 @@
 
 package com.google.devtools.depan.graph.basic;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
 
+@RunWith(Suite.class)
+@SuiteClasses({
+  BasicNodeTest.class,
+  BasicEdgeTest.class,
+  BasicRelationTest.class,
+  BasicGraphTest.class})
 public class AllTests {
-
-  public static Test suite() {
-    TestSuite suite = new TestSuite(
-      "Test for com.google.devtools.depan.graph.basic");
-    //$JUnit-BEGIN$
-    suite.addTestSuite(BasicNodeTest.class);
-    suite.addTestSuite(BasicEdgeTest.class);
-    suite.addTestSuite(BasicRelationTest.class);
-    suite.addTestSuite(BasicGraphTest.class);
-    //$JUnit-END$
-    return suite;
-  }
 
 }

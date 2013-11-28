@@ -1,6 +1,26 @@
-// Copyright 2010 Google Inc. All Rights Reserved.
+/*
+ * Copyright 2010 Google Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package com.google.devtools.depan.filesystem.builder;
+
+import static org.junit.Assert.*;
+
+import java.io.File;
+
+import org.junit.Test;
 
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.model.ElementVisitor;
@@ -9,15 +29,12 @@ import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.interfaces.GraphBuilder;
 
-import junit.framework.TestCase;
-
-import java.io.File;
-
 /**
  * @author <a href="leeca@google.com">Lee Carver</a>
  */
-public class TreeBuilderTest extends TestCase {
+public class TreeBuilderTest {
 
+  @Test
   public void testInsertLeaf() {
     GraphModel test = new GraphModel();
 
@@ -25,11 +42,12 @@ public class TreeBuilderTest extends TestCase {
     MockPathInfo leafInfo = new MockPathInfo(new File("this/is/a test/path"));
     GraphNode leaf = treeBuilder.insertLeaf(leafInfo);
 
-    assertEquals("tst:this/is/a test/path", leaf.getId());
+    assertPaths("tst:this/is/a test/path", leaf.getId());
     assertEquals(4, test.getNodes().size());
     assertEquals(3, test.getEdges().size());
   }
 
+  @Test
   public void testInsertLeaf_withDuplicate() {
     GraphModel test = new GraphModel();
 
@@ -37,14 +55,14 @@ public class TreeBuilderTest extends TestCase {
     MockPathInfo leafInfo = new MockPathInfo(new File("this/is/a test/path"));
     GraphNode leaf = treeBuilder.insertLeaf(leafInfo);
 
-    assertEquals("tst:this/is/a test/path", leaf.getId());
+    assertPaths("tst:this/is/a test/path", leaf.getId());
     assertEquals(4, test.getNodes().size());
     assertEquals(3, test.getEdges().size());
 
     GraphNode dupl = treeBuilder.insertLeaf(leafInfo);
 
     assertEquals(leaf, dupl);
-    assertEquals("tst:this/is/a test/path", dupl.getId());
+    assertPaths("tst:this/is/a test/path", dupl.getId());
     assertEquals(4, test.getNodes().size());
     assertEquals(3, test.getEdges().size());
 }
@@ -141,5 +159,11 @@ public class TreeBuilderTest extends TestCase {
     public String getReverseName() {
       return "member";
     }
+  }
+
+  private static void assertPaths(String expectedPath, String actualPath) {
+    File expectedFile = new File(expectedPath);
+    File actualFile = new File(actualPath);
+    assertEquals(expectedFile.getPath(), actualFile.getPath());
   }
 }

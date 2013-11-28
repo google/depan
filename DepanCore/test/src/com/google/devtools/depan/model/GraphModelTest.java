@@ -16,10 +16,12 @@
 
 package com.google.devtools.depan.model;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
 
 import java.util.Map;
 import java.util.Set;
+
+import org.junit.Test;
 
 import com.google.devtools.depan.model.testing.TestUtils;
 import com.google.devtools.depan.view.SampleRelation;
@@ -27,16 +29,9 @@ import com.google.devtools.depan.view.SampleRelation;
 /**
  * @author <a href='mailto:leeca@google.com'>Lee Carver</a>
  */
-public class GraphModelTest extends TestCase {
+public class GraphModelTest {
 
-  @Override
-  public void setUp() throws Exception {
-  }
-
-  @Override
-  public void tearDown() throws Exception {
-  }
-
+  @Test
   public void testBasic() {
     GraphModel test = new GraphModel();
     TestUtils.buildComplete(test, 5, SampleRelation.sampleRelation);
@@ -45,6 +40,7 @@ public class GraphModelTest extends TestCase {
     assertEquals(10, test.getEdges().size());
   }
 
+  @Test
   public void testGetForwardRelationCount() {
     GraphModel test = new GraphModel();
     GraphNode[] nodeArray =
@@ -63,6 +59,7 @@ public class GraphModelTest extends TestCase {
     assertEquals(0, forwardMap.get(nodeArray[4]).intValue());
   }
 
+  @Test
   public void testGetReverseRelationCount() {
     GraphModel test = new GraphModel();
     GraphNode[] nodeArray =

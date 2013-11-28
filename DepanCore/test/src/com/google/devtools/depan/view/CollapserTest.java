@@ -14,8 +14,13 @@
  * the License.
  */
 
-
 package com.google.devtools.depan.view;
+
+import static org.junit.Assert.*;
+
+import java.util.Collection;
+
+import org.junit.Test;
 
 import com.google.common.collect.Lists;
 import com.google.devtools.depan.graph.basic.MultipleDirectedRelationFinder;
@@ -23,27 +28,13 @@ import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.testing.TestUtils;
 
-import junit.framework.TestCase;
-
-import java.util.Collection;
-
 /**
  * At least some tests for the ViewModel class.
  *
  * @author <a href='mailto:leeca@google.com'>Lee Carver</a>
  */
 // TODO(leeca): Rewrite without
-public class CollapserTest extends TestCase {
-
-  @Override
-  protected void setUp() throws Exception {
-    super.setUp();
-  }
-
-  @Override
-  protected void tearDown() throws Exception {
-    super.tearDown();
-  }
+public class CollapserTest {
 
   /**
    * Assert that the ViewModel provides the expected number of
@@ -63,6 +54,7 @@ public class CollapserTest extends TestCase {
    * Create a simple complete-5 graph, and verify that everything arrives
    * in the complete view.
    */
+  @Test
   public void testBasic() {
     GraphModel testGraph = new GraphModel();
     GraphNode srcNodes[] =
@@ -73,6 +65,7 @@ public class CollapserTest extends TestCase {
    * Create a simple complete-5 graph with a view, and then collapse
    * the least 2 significant nodes into a collapsed node.
    */
+  @Test
   public void testCollapse() {
     Collapser collapser = new Collapser();
     GraphModel testGraph = new GraphModel();
@@ -97,6 +90,7 @@ public class CollapserTest extends TestCase {
    * 2) collapse the next least significant node into the collapsed master
    * from step 1
    */
+  @Test
   public void testNestedCollapse() {
     Collapser collapser = new Collapser();
     GraphModel testGraph = new GraphModel();
@@ -132,6 +126,7 @@ public class CollapserTest extends TestCase {
    * Note that reusing the master and picked list demonstrates that the
    * collapse group does not change if the input variables are altered.
    */
+  @Test
   public void testDoubleCollapse() {
     Collapser collapser = new Collapser();
     GraphModel testGraph = new GraphModel();
@@ -160,6 +155,7 @@ public class CollapserTest extends TestCase {
     assertGraphNodesEdges(collapser.buildExposedGraph(testGraph), 3, 8);
   }
 
+  @Test
   public void testAutoCollapse() {
     Collapser collapser = new Collapser();
     GraphModel testGraph = new GraphModel();

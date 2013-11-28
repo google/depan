@@ -16,10 +16,15 @@
 
 package com.google.devtools.depan.graph.basic;
 
+import static org.junit.Assert.*;
+
+import org.junit.Test;
+
 import com.google.devtools.depan.graph.api.Relation;
 
 public class BasicEdgeTest extends BasicGraphTestCase {
 
+  @Test
   public void testBasic() {
     Relation relation = new BasicRelation("forward", "reverse");
 

@@ -26,7 +26,7 @@ import java.io.File;
  * @author <a href="leeca@google.com">Lee Carver</a>
  */
 public class TreeClimber {
-  private static final String PARENT_PATH = "/..";
+  private static final String PARENT_PATH = File.separator + "..";
 
   private File treeFile;
   private StringBuilder parentPath;

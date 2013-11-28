@@ -5,6 +5,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/DepanApp"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/DepanCore"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/DepanFileSystem"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

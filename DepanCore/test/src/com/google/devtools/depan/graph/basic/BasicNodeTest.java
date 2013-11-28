@@ -16,8 +16,13 @@
 
 package com.google.devtools.depan.graph.basic;
 
+import static org.junit.Assert.*;
+
+import org.junit.Test;
+
 public class BasicNodeTest extends BasicGraphTestCase {
 
+  @Test
   public void testBasic() {
     BasicNode<String> test = createSimpleNode("id");
 

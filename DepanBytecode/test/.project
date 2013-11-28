@@ -14,11 +14,4 @@
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>junit.jar</name>
-			<type>1</type>
-			<locationURI>THIRD_PARTY_HOME/junit/junit3.8.2/junit.jar</locationURI>
-		</link>
-	</linkedResources>
 </projectDescription>
