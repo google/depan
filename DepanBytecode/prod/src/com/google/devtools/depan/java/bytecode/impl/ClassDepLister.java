@@ -16,6 +16,14 @@
 
 package com.google.devtools.depan.java.bytecode.impl;
 
+import java.io.File;
+
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.FieldVisitor;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
+
 import com.google.devtools.depan.filesystem.graph.FileElement;
 import com.google.devtools.depan.java.graph.FieldElement;
 import com.google.devtools.depan.java.graph.InterfaceElement;
@@ -24,16 +32,6 @@ import com.google.devtools.depan.java.graph.MethodElement;
 import com.google.devtools.depan.java.graph.PackageElement;
 import com.google.devtools.depan.java.graph.TypeElement;
 import com.google.devtools.depan.model.builder.DependenciesListener;
-
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.Attribute;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
-
-import java.io.File;
 
 /**
  * Implements a visitor of the ASM package, to find the dependencies in a class
@@ -45,7 +43,7 @@ import java.io.File;
  *
  * @author ycoppel@google.com (Yohann Coppel)
  */
-public class ClassDepLister implements ClassVisitor {
+public class ClassDepLister extends ClassVisitor {
 
   /**
    * {@link DependenciesListener} called when a dependency is found.
@@ -71,6 +69,7 @@ public class ClassDepLister implements ClassVisitor {
    * @param fileNode node for the .class file containing this class
    */
   public ClassDepLister(DependenciesListener dl, FileElement fileNode) {
+    super(Opcodes.ASM4);
     this.dl = dl;
     this.fileNode = fileNode;
   }
@@ -116,21 +115,6 @@ public class ClassDepLister implements ClassVisitor {
   }
 
   @Override
-  public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
-    return null;
-  }
-
-  @Override
-  public void visitAttribute(Attribute attr) {
-    // TODO(ycoppel): Auto-generated method stub
-    // System.err.println(attr.type);
-  }
-
-  @Override
-  public void visitEnd() {
-  }
-
-  @Override
   public FieldVisitor visitField(int access, String name, String desc,
       String signature, Object value) {
     TypeElement type = TypeNameUtil.fromDescriptor(desc);
@@ -151,7 +135,7 @@ public class ClassDepLister implements ClassVisitor {
     // generic types in signature
     // TODO(ycoppel): how to get types in generics ? (signature)
 
-    return new FieldDepLister();
+    return FieldDepLister.LISTER;
   }
 
   @Override

@@ -16,9 +16,8 @@
 
 package com.google.devtools.depan.java.bytecode.impl;
 
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.Attribute;
 import org.objectweb.asm.FieldVisitor;
+import org.objectweb.asm.Opcodes;
 
 /**
  * Implements a visitor of the ASM package, to find the dependencies in a Field
@@ -28,36 +27,15 @@ import org.objectweb.asm.FieldVisitor;
  * To build the dependencies tree, it calls the methods of a
  * DependenciesListener.
  * 
- * @author ycoppel@google.com (Yohann Coppel)
+ * A singleton instance is provided for reuse.
  * 
+ * @author ycoppel@google.com (Yohann Coppel)
  */
-public class FieldDepLister implements FieldVisitor {
+public class FieldDepLister extends FieldVisitor {
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.objectweb.asm.FieldVisitor#visitAnnotation(java.lang.String,
-   *      boolean)
-   */
-  public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
-    return null;
+  public static FieldDepLister LISTER = new FieldDepLister();
+
+  private FieldDepLister() {
+    super(Opcodes.ASM4);
   }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.objectweb.asm.FieldVisitor
-   *      #visitAttribute(org.objectweb.asm.Attribute)
-   */
-  public void visitAttribute(Attribute attr) {
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.objectweb.asm.FieldVisitor#visitEnd()
-   */
-  public void visitEnd() {
-  }
-
 }

@@ -27,9 +27,9 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>asm-3.1.jar</name>
+			<name>asm-4.2.jar</name>
 			<type>1</type>
-			<locationURI>THIRD_PARTY_HOME/asm/asm-3.1/lib/asm-3.1.jar</locationURI>
+			<locationURI>THIRD_PARTY_HOME/asm/asm-4.2/lib/asm-4.2.jar</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>
