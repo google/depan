@@ -16,6 +16,51 @@
 
 package com.google.devtools.depan.eclipse.editors;
 
+import java.awt.Color;
+import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
+
+import javax.imageio.ImageIO;
+
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.dialogs.SaveAsDialog;
+import org.eclipse.ui.part.MultiPageEditorPart;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.devtools.depan.eclipse.persist.ObjectXmlPersist;
 import com.google.devtools.depan.eclipse.persist.XStreamFactory;
 import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
@@ -57,56 +102,10 @@ import com.google.devtools.depan.model.RelationshipSet;
 import com.google.devtools.depan.view.CollapseData;
 import com.google.devtools.depan.view.EdgeDisplayProperty;
 import com.google.devtools.depan.view.NodeDisplayProperty;
-
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
-import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.IActionBars;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.IFileEditorInput;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.dialogs.SaveAsDialog;
-import org.eclipse.ui.part.MultiPageEditorPart;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.thoughtworks.xstream.XStream;
 
-import edu.uci.ics.jung.algorithms.importance.PageRank;
+import edu.uci.ics.jung.algorithms.importance.KStepMarkov;
 import edu.uci.ics.jung.graph.DirectedGraph;
-
-import javax.imageio.ImageIO;
-
-import java.awt.Color;
-import java.awt.geom.Point2D;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
 
 /**
  * An Editor for a DepAn ViewDocument.
@@ -465,17 +464,29 @@ public class ViewEditor extends MultiPageEditorPart
    *
    * The result is stored in the map {@link #ranking}.
    */
-  private Map<GraphNode, Double> rankGraph(
+  private Map<GraphNode, Double> rankGraphX(
           DirectedGraph<GraphNode, GraphEdge> graph) {
 
-    PageRank<GraphNode, GraphEdge> pageRank =
-        new PageRank<GraphNode, GraphEdge>(graph, 0.15);
-    pageRank.setRemoveRankScoresOnFinalize(false);
-    pageRank.evaluate();
+    KStepMarkov<GraphNode, GraphEdge> ranker =
+        new KStepMarkov<GraphNode, GraphEdge>(graph, null, 6, null);
+    ranker.setRemoveRankScoresOnFinalize(false);
+    ranker.evaluate();
 
     Map<GraphNode, Double> result = Maps.newHashMap();
     for (GraphNode node : exposedGraph.getNodes()) {
-      result.put(node, pageRank.getVertexRankScore(node));
+      result.put(node, ranker.getVertexRankScore(node));
+    }
+
+    return result;
+  }
+
+  private Map<GraphNode, Double> rankGraph(
+      DirectedGraph<GraphNode, GraphEdge> graph) {
+
+    Double unit = 1.0;
+    Map<GraphNode, Double> result = Maps.newHashMap();
+    for (GraphNode node : exposedGraph.getNodes()) {
+      result.put(node, unit);
     }
 
     return result;
