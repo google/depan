@@ -21,7 +21,7 @@ import com.google.devtools.depan.view.EdgeDisplayProperty.ArrowheadStyle;
 import java.awt.geom.Point2D;
 import java.awt.geom.QuadCurve2D;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 /**
  * An arrow shape: the line, and the head.
@@ -62,7 +62,7 @@ public class Arrow extends OpenGLShape {
    * @param deviation
    * @return
    */
-  public Point2D linkShapes(GL gl, Point2D center1, Point2D center2,
+  public Point2D linkShapes(GL2 gl, Point2D center1, Point2D center2,
       GLEntity shape1, GLEntity shape2, float deviation) {
     Vec2 c1 = new Vec2(center1);
     Vec2 c2 = new Vec2(center2);
@@ -77,14 +77,14 @@ public class Arrow extends OpenGLShape {
 
     // enable GL_LINE_STIPPLE if edge must be dashed
     if (dashed) {
-      gl.glEnable(GL.GL_LINE_STIPPLE);
+      gl.glEnable(GL2.GL_LINE_STIPPLE);
       gl.glLineStipple(1, (short) 0xf0f0);
     }
     boolean ok = drawCurve(gl, center1, center2, curve, shape1, shape2, last);
 
     // now disable GL_LINE_STIPPLE if it was enabled
     if (dashed) {
-      gl.glDisable(GL.GL_LINE_STIPPLE);
+      gl.glDisable(GL2.GL_LINE_STIPPLE);
     }
 
     if (ok) {
@@ -142,7 +142,7 @@ public class Arrow extends OpenGLShape {
    * @param last last curve painted.
    * @return
    */
-  public boolean drawCurve(GL gl, Point2D center1, Point2D center2,
+  public boolean drawCurve(GL2 gl, Point2D center1, Point2D center2,
       QuadCurve2D curve, GLEntity shape1, GLEntity shape2, QuadCurve2D last) {
     double p1X = curve.getP1().getX();
     double p1Y = curve.getP1().getY();
@@ -206,7 +206,7 @@ public class Arrow extends OpenGLShape {
   /**
    * Divide the given curve in two half, and call drawCurve on each part.
    */
-  public boolean divideAndDraw(GL gl, Point2D center1, Point2D center2,
+  public boolean divideAndDraw(GL2 gl, Point2D center1, Point2D center2,
       QuadCurve2D curve, GLEntity shape1, GLEntity shape2, QuadCurve2D last) {
     QuadCurve2D left = new QuadCurve2D.Float();
     QuadCurve2D right = new QuadCurve2D.Float();
@@ -217,12 +217,12 @@ public class Arrow extends OpenGLShape {
   }
 
   @Override
-  public void draw(GL gl) {
+  public void draw(GL2 gl) {
     // drawing this shape is more complex. must be drawn with linkShapes.
   }
 
   @Override
-  public void fill(GL gl) {
+  public void fill(GL2 gl) {
     // can not fill this shape. nothing to do.
   }
 

@@ -24,7 +24,7 @@ import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 /**
  * A class capable of drawing <strong>simple</strong> AWT shapes on an openGL
@@ -47,7 +47,7 @@ public class AWTShape extends GLEntity {
   }
 
   @Override
-  public void draw(GL gl) {
+  public void draw(GL2 gl) {
     gl.glPushMatrix();
     gl.glTranslatef(translateX, translateY, translateZ);
     gl.glScalef(scaleX, scaleY, scaleZ);
@@ -56,7 +56,7 @@ public class AWTShape extends GLEntity {
   }
 
   @Override
-  public void fill(GL gl) {
+  public void fill(GL2 gl) {
     gl.glPushMatrix();
     gl.glTranslatef(translateX, translateY, translateZ);
     gl.glScalef(scaleX, scaleY, scaleZ);
@@ -71,8 +71,8 @@ public class AWTShape extends GLEntity {
    * @param gl
    * @param s the shape to render.
    */
-  public static void draw(GL gl, Shape s) {
-    gl.glBegin(GL.GL_LINE_STRIP);
+  public static void draw(GL2 gl, Shape s) {
+    gl.glBegin(GL2.GL_LINE_STRIP);
     drawShape(gl, s);
     gl.glEnd();
   }
@@ -84,8 +84,8 @@ public class AWTShape extends GLEntity {
    * @param gl
    * @param s the shape to render.
    */
-  public static void fill(GL gl, Shape s) {
-    gl.glBegin(GL.GL_TRIANGLE_FAN);
+  public static void fill(GL2 gl, Shape s) {
+    gl.glBegin(GL2.GL_TRIANGLE_FAN);
     drawShape(gl, s);
     gl.glEnd();
   }
@@ -96,7 +96,7 @@ public class AWTShape extends GLEntity {
    * @param gl
    * @param s
    */
-  private static void drawShape(GL gl, Shape s) {
+  private static void drawShape(GL2 gl, Shape s) {
     PathIterator it = s.getPathIterator(new AffineTransform(), shapeFlatness);
     float[] lastMoveTo = new float[6];
     float[] f = new float[6];

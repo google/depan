@@ -19,13 +19,13 @@ package com.google.devtools.depan.eclipse.visualization.ogl;
 import com.google.devtools.depan.eclipse.visualization.plugins.core.EdgeRenderingPlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.core.NodeRenderingPlugin;
 
-import com.sun.opengl.util.texture.Texture;
-import com.sun.opengl.util.texture.TextureCoords;
+import com.jogamp.opengl.util.texture.Texture;
+import com.jogamp.opengl.util.texture.TextureCoords;
 
 import java.awt.Color;
 import java.awt.geom.Point2D;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 /**
  * Plugin drawing nodes and edges on an openGL canvas.
@@ -34,10 +34,10 @@ import javax.media.opengl.GL;
  */
 public class DrawingPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
 
-  private GL gl;
+  private GL2 gl;
   private GLScene scene;
 
-  public DrawingPlugin(GL gl, GLScene scene) {
+  public DrawingPlugin(GL2 gl, GLScene scene) {
     this.gl = gl;
     this.scene = scene;
   }
@@ -95,7 +95,7 @@ public class DrawingPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
       double centerY = property.positionY+property.size/2;
       double halfWidth = 0.7;
       double halfHeight = 4;
-      gl.glBegin(GL.GL_QUADS);
+      gl.glBegin(GL2.GL_QUADS);
       gl.glColor4f(1f, 1f, 1f, 0.5f);
       // vertical line
       gl.glVertex2d(centerX - halfWidth, centerY + halfHeight);
@@ -167,7 +167,7 @@ public class DrawingPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
   private void paintLabel(EdgeRenderingProperty property, Point2D p) {
     // Use the GL_MODULATE texture function to effectively multiply
     // each pixel in the texture by the current alpha value
-    gl.glTexEnvi(GL.GL_TEXTURE_ENV, GL.GL_TEXTURE_ENV_MODE, GL.GL_MODULATE);
+    gl.glTexEnvi(GL2.GL_TEXTURE_ENV, GL2.GL_TEXTURE_ENV_MODE, GL2.GL_MODULATE);
 
     if (property.textIsDirty) {
       // recreate the texture, and save it.
@@ -185,7 +185,7 @@ public class DrawingPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
   private void paintLabel(NodeRenderingProperty property) {
     // Use the GL_MODULATE texture function to effectively multiply
     // each pixel in the texture by the current alpha value
-    gl.glTexEnvi(GL.GL_TEXTURE_ENV, GL.GL_TEXTURE_ENV_MODE, GL.GL_MODULATE);
+    gl.glTexEnvi(GL2.GL_TEXTURE_ENV, GL2.GL_TEXTURE_ENV_MODE, GL2.GL_MODULATE);
 
     if (property.textIsDirty) {
       // recreate the texture, and save it.
@@ -220,8 +220,8 @@ public class DrawingPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
     float ty2 = tc.bottom();
     float halfWidth = quarterValue(texture.getWidth());
     float halfHeight = quarterValue(texture.getHeight());
-    texture.bind();
-    texture.enable();
+    texture.bind(gl);
+    texture.enable(gl);
 
     Color foreground = scene.getForegroundColor();
     gl.glColor4f(foreground.getRed() / 255f,
@@ -232,7 +232,7 @@ public class DrawingPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
     gl.glPushMatrix();
     float[] translate = GLScene.P((float) centerX, (float) centerY);
     gl.glTranslatef(translate[0], translate[1], translate[2]);
-    gl.glBegin(GL.GL_QUADS);
+    gl.glBegin(GL2.GL_QUADS);
     // divided by 2 to get nicer textures
     // divided by 4 when we center it : 1/2 on each side of x axis for instance.
     gl.glTexCoord2f(tx1, ty1);
@@ -246,7 +246,7 @@ public class DrawingPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
     gl.glEnd();
     gl.glPopMatrix();
 
-    texture.disable();
+    texture.disable(gl);
   }
 
   /**

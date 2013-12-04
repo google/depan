@@ -44,7 +44,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 
 /**
@@ -86,8 +86,7 @@ public class RenderingPipe {
   private EdgeLabelPlugin edgeLabel;
   private EdgeIncludePlugin edgeInclude;
 
-
-  public RenderingPipe(GL gl, GLU glu, GLPanel panel, ViewEditor editor) {
+  public RenderingPipe(GL2 gl, GLU glu, GLPanel panel, ViewEditor editor) {
     Graph<GraphNode, GraphEdge> graph = editor.getJungGraph();
     Map<GraphNode, Double> nodeRanking = editor.getNodeRanking();
 

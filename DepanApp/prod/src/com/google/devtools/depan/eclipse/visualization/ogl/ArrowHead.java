@@ -20,7 +20,7 @@ import com.google.devtools.depan.view.EdgeDisplayProperty.ArrowheadStyle;
 
 import java.awt.geom.Point2D;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 /**
  * Abstract class that represents an arrow head.
@@ -100,13 +100,13 @@ public abstract class ArrowHead extends OpenGLShape {
    * @param gl Graphics object that will draw this object.
    */
   @Override
-  public void draw(GL gl) {
+  public void draw(GL2 gl) {
     gl.glPushMatrix();
     float[] translate = GLScene.P(translateX, translateY);
     gl.glTranslatef(translate[0], translate[1], translate[2]);
     gl.glScalef(scaleX, scaleY, scaleZ);
     gl.glRotated(rotation * 180 / Math.PI, 0, 0, 1);
-    gl.glBegin(GL.GL_LINE_STRIP);
+    gl.glBegin(GL2.GL_LINE_STRIP);
     GLPanel.V(gl, controlPoints[0].x, controlPoints[0].y);
     GLPanel.V(gl, controlPoints[1].x, controlPoints[1].y);
     GLPanel.V(gl, controlPoints[2].x, controlPoints[2].y);
@@ -126,14 +126,14 @@ public abstract class ArrowHead extends OpenGLShape {
    * @param gl Graphics object that will draw this object.
    */
   @Override
-  public void fill(GL gl) {
+  public void fill(GL2 gl) {
     // points must be use with the correct order (2-3-0-1) to use triangle fan.
     gl.glPushMatrix();
     float[] translate = GLScene.P(translateX, translateY);
     gl.glTranslatef(translate[0], translate[1], translate[2]);
     gl.glScalef(scaleX, scaleY, scaleZ);
     gl.glRotated(rotation * 180 / Math.PI, 0, 0, 1);
-    gl.glBegin(GL.GL_TRIANGLE_FAN);
+    gl.glBegin(GL2.GL_TRIANGLE_FAN);
     GLPanel.V(gl, controlPoints[2].x, controlPoints[2].y);
     // check if there exists 4 points before drawing the 4th point
     if (controlPoints.length == 4) {

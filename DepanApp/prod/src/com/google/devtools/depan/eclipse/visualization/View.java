@@ -71,6 +71,7 @@ public class View {
     this.editor = editor;
 
     glPanel = new GLPanel(parent, editor);
+    glPanel.start();
   }
 
   public void dispose() {

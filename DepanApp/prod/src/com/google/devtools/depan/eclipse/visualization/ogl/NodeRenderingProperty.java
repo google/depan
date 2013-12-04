@@ -22,8 +22,8 @@ import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeShap
 import com.google.devtools.depan.eclipse.visualization.plugins.core.NodeRenderingPlugin;
 import com.google.devtools.depan.model.GraphNode;
 
-import com.sun.opengl.util.j2d.TextureRenderer;
-import com.sun.opengl.util.texture.Texture;
+import com.jogamp.opengl.util.awt.TextureRenderer;
+import com.jogamp.opengl.util.texture.Texture;
 
 import java.awt.Color;
 import java.util.Map;

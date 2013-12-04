@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.eclipse.visualization.ogl;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 /**
  * Holds a number of Arrowhead implementation. This class cannot be
@@ -46,7 +46,7 @@ public class Arrowheads {
      * @param gl Graphics object that will draw this object.
      */
     @Override
-    public void draw(GL gl) {
+    public void draw(GL2 gl) {
       super.fill(gl);
     }
   }
@@ -69,7 +69,7 @@ public class Arrowheads {
      * @param gl Graphics object that will draw this object.
      */
     @Override
-    public void draw(GL gl) {
+    public void draw(GL2 gl) {
       super.fill(gl);
     }
   }
@@ -92,13 +92,13 @@ public class Arrowheads {
      * @param gl Graphics object that will draw this object.
      */
     @Override
-    public void draw(GL gl) {
+    public void draw(GL2 gl) {
       gl.glPushMatrix();
       float[] translate = GLScene.P(translateX, translateY);
       gl.glTranslatef(translate[0], translate[1], translate[2]);
       gl.glScalef(scaleX, scaleY, scaleZ);
       gl.glRotated(rotation * 180 / Math.PI, 0, 0, 1);
-      gl.glBegin(GL.GL_LINE_STRIP);
+      gl.glBegin(GL2.GL_LINE_STRIP);
       GLPanel.V(gl, controlPoints[1].x, controlPoints[1].y);
       GLPanel.V(gl, controlPoints[0].x, controlPoints[0].y);
       GLPanel.V(gl, controlPoints[2].x, controlPoints[2].y);
@@ -114,7 +114,7 @@ public class Arrowheads {
      * @param gl Graphics object that will draw this object.
      */
     @Override
-    public void fill(GL gl) {
+    public void fill(GL2 gl) {
       draw(gl);
     }
   }
@@ -138,7 +138,7 @@ public class Arrowheads {
      * @param gl Graphics object that will draw this object.
      */
     @Override
-    public void fill(GL gl) {
+    public void fill(GL2 gl) {
       super.draw(gl);
     }
   }

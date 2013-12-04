@@ -18,8 +18,8 @@ package com.google.devtools.depan.eclipse.visualization.ogl;
 
 import com.google.devtools.depan.model.GraphEdge;
 
-import com.sun.opengl.util.j2d.TextureRenderer;
-import com.sun.opengl.util.texture.Texture;
+import com.jogamp.opengl.util.awt.TextureRenderer;
+import com.jogamp.opengl.util.texture.Texture;
 
 import java.awt.Color;
 
@@ -128,6 +128,4 @@ public class EdgeRenderingProperty extends RenderingProperty {
     }
     return null;
   }
-
 }
-

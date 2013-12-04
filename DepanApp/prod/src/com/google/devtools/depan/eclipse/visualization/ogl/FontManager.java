@@ -23,10 +23,10 @@ import java.awt.font.FontRenderContext;
 import java.awt.font.TextLayout;
 import java.awt.geom.Rectangle2D;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
-import com.sun.opengl.util.j2d.TextRenderer;
-import com.sun.opengl.util.j2d.TextureRenderer;
+import com.jogamp.opengl.util.awt.TextRenderer;
+import com.jogamp.opengl.util.awt.TextureRenderer;
 
 /**
  * Simple class handling the drawing of text on an OpenGl canvas.
@@ -41,7 +41,7 @@ public final class FontManager {
   public static TextRenderer textRenderer = new TextRenderer(new Font(
       "SansSerif", Font.BOLD, 18), true, true);
 
-  public static void print(GL gl, String text, float x, float y, float z,
+  public static void print(GL2 gl, String text, float x, float y, float z,
       float magnify) {
     FontManager.textRenderer.beginRendering(10, 10);
     FontManager.textRenderer.draw(text, (int) x, (int) y);

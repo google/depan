@@ -4,10 +4,13 @@ Bundle-Name: DepanJogl Plug-in
 Bundle-SymbolicName: com.google.devtools.depan.jogl
 Bundle-Version: 0.0.2
 Bundle-Vendor: Google Inc.
-Export-Package: com.sun.opengl.util,
- com.sun.opengl.util.j2d,
- com.sun.opengl.util.texture,
+Export-Package: com.jogamp.opengl.util,
+ com.jogamp.opengl.util.awt,
+ com.jogamp.opengl.util.texture,
  javax.media.opengl,
+ javax.media.opengl.fixedfunc,
  javax.media.opengl.glu
-Bundle-ClassPath: jogl.jar,
- gluegen-rt.jar
+Bundle-ClassPath: jogl-all.jar,
+ jogl-all-natives-windows-amd64.jar,
+ gluegen-rt.jar,
+ gluegen-rt-natives-windows-amd64.jar

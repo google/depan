@@ -18,7 +18,7 @@ package com.google.devtools.depan.eclipse.visualization.ogl;
 
 import java.awt.geom.Point2D;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 /**
  * Create a star, or a regular polygon, depending on the insideness value.
@@ -79,11 +79,11 @@ public class Star extends OpenGLShape {
   }
 
   @Override
-  public void draw(GL gl) {
+  public void draw(GL2 gl) {
     //gl.glPushMatrix();
     //gl.glTranslatef(translateX, translateY, translateZ);
     //gl.glScalef(scaleX, scaleY, scaleZ);
-    gl.glBegin(GL.GL_LINE_STRIP);
+    gl.glBegin(GL2.GL_LINE_STRIP);
     for (Point2D.Float p : controlPoints) {
       GLScene.V(gl, p.x * scaleX + translateX, p.y * scaleY + translateY);
       //GLScene.V(gl,p.x, p.y);
@@ -96,11 +96,11 @@ public class Star extends OpenGLShape {
   }
 
   @Override
-  public void fill(GL gl) {
+  public void fill(GL2 gl) {
     //gl.glPushMatrix();
     //gl.glTranslatef(translateX, translateY, translateZ);
     //gl.glScalef(scaleX, scaleY, scaleZ);
-    gl.glBegin(GL.GL_TRIANGLE_FAN);
+    gl.glBegin(GL2.GL_TRIANGLE_FAN);
     GLScene.V(gl, translateX, translateY); // point 0:0 : center of this star
     //GLScene.V(gl, 0, 0);
     for (Point2D.Float p : controlPoints) {

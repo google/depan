@@ -18,7 +18,7 @@ package com.google.devtools.depan.eclipse.visualization.ogl;
 
 import java.awt.Shape;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 /**
  * Abstract class for any shape, that can be rendered on an openGL canvas.
@@ -43,9 +43,9 @@ public abstract class GLEntity implements Shape {
     this.scaleZ = z;
   }
 
-  public abstract void draw(GL gl);
+  public abstract void draw(GL2 gl);
 
-  public abstract void fill(GL gl);
+  public abstract void fill(GL2 gl);
 
 }
 

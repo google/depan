@@ -16,8 +16,6 @@
 
 package com.google.devtools.depan.eclipse.visualization.ogl;
 
-import com.sun.opengl.util.Screenshot;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
@@ -28,14 +26,18 @@ import org.eclipse.swt.opengl.GLCanvas;
 import org.eclipse.swt.opengl.GLData;
 import org.eclipse.swt.widgets.Composite;
 
+import com.jogamp.opengl.util.awt.Screenshot;
+
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.nio.IntBuffer;
 import java.util.logging.Logger;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 import javax.media.opengl.GLContext;
 import javax.media.opengl.GLDrawableFactory;
+import javax.media.opengl.GLProfile;
 import javax.media.opengl.glu.GLU;
 
 /**
@@ -54,7 +56,7 @@ public abstract class GLScene {
   private SceneGrip grip;
   private GLCanvas canvas;
   private final GLContext context;
-  public final GL gl;
+  public final GL2 gl;
   public final GLU glu;
 
   public static boolean hyperbolic = false;
@@ -78,7 +80,12 @@ public abstract class GLScene {
 
     context = createGLContext();
 
-    gl = context.getGL();
+    GL rawGL = context.getGL();
+    if (rawGL.isGL2()) {
+      gl = (GL2) rawGL;
+    } else {
+      gl = null;
+    }
     glu = new GLU();
 
     this.canvas.addControlListener(new ControlAdapter() {
@@ -110,7 +117,8 @@ public abstract class GLScene {
 
     try {
       logger.info("Create context...");
-      GLContext result = GLDrawableFactory.getFactory().createExternalGLContext();
+      GLProfile profile = GLProfile.getDefault();
+      GLContext result = GLDrawableFactory.getFactory(profile).createExternalGLContext();
       logger.info("    Done.");
 
       return result;
@@ -130,10 +138,10 @@ public abstract class GLScene {
 
     context.makeCurrent();
     gl.glViewport(0, 0, width, height);
-    gl.glMatrixMode(GL.GL_PROJECTION);
+    gl.glMatrixMode(GL2.GL_PROJECTION);
     gl.glLoadIdentity();
     glu.gluPerspective(90.0f, aspect, 0.4f, 1000.0f);
-    gl.glMatrixMode(GL.GL_MODELVIEW);
+    gl.glMatrixMode(GL2.GL_MODELVIEW);
     gl.glLoadIdentity();
     context.release();
   }
@@ -166,14 +174,27 @@ public abstract class GLScene {
     */
     gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     gl.glClearDepth(1.0f);
-    gl.glEnable(GL.GL_DEPTH_TEST);
-    gl.glEnable(GL.GL_BLEND);
-    gl.glEnable(GL.GL_TEXTURE_2D);
-    gl.glDepthFunc(GL.GL_LEQUAL);
-    gl.glShadeModel(GL.GL_SMOOTH);
-    gl.glHint(GL.GL_PERSPECTIVE_CORRECTION_HINT, GL.GL_NICEST);
-    gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+    gl.glEnable(GL2.GL_DEPTH_TEST);
+    gl.glEnable(GL2.GL_BLEND);
+    gl.glEnable(GL2.GL_TEXTURE_2D);
+    gl.glDepthFunc(GL2.GL_LEQUAL);
+    gl.glShadeModel(GL2.GL_SMOOTH);
+    gl.glHint(GL2.GL_PERSPECTIVE_CORRECTION_HINT, GL2.GL_NICEST);
+    gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
     context.release();
+  }
+
+  public void prepareResources() {
+    context.makeCurrent();
+    allocateResources();
+    context.release();
+  }
+
+  /**
+   * Hook method for derived classes to allocate resources within the
+   * GLContenxt
+   */
+  protected void allocateResources() {
   }
 
   public void render(float elapsedTime) {
@@ -198,15 +219,15 @@ public abstract class GLScene {
     context.makeCurrent();
 
     int[] viewPort = new int[4];
-    gl.glGetIntegerv(GL.GL_VIEWPORT, viewPort, 0);
+    gl.glGetIntegerv(GL2.GL_VIEWPORT, viewPort, 0);
 
     IntBuffer selectBuffer = getSelectBuffer();
     gl.glSelectBuffer(selectBuffer.capacity(), selectBuffer);
 
     // setup the view
-    gl.glRenderMode(GL.GL_SELECT);
+    gl.glRenderMode(GL2.GL_SELECT);
     gl.glInitNames();
-    gl.glMatrixMode(GL.GL_PROJECTION);
+    gl.glMatrixMode(GL2.GL_PROJECTION);
     gl.glPushMatrix();
     gl.glLoadIdentity();
 
@@ -222,11 +243,25 @@ public abstract class GLScene {
 
     gl.glPopMatrix();
     gl.glFlush();
-    int hits = gl.glRenderMode(GL.GL_RENDER);
-    gl.glMatrixMode(GL.GL_MODELVIEW);
+    int hits = gl.glRenderMode(GL2.GL_RENDER);
+    gl.glMatrixMode(GL2.GL_MODELVIEW);
 
     context.release();
     return processHits(hits, selectBuffer);
+  }
+
+  /**
+   * Clear the scene and adjust the camera position.
+   * 
+   * Hook method for derived types to render the image.  Extending types
+   * should call the super-method first to establish a clear image and
+   * the proper grip.
+   * 
+   * @param elapsedTime time since previous frame.
+   */
+  protected void drawScene(float elapsedTime) {
+    gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
+    grip.adjust();
   }
 
   public void printMousePos(int x, int y) {
@@ -240,7 +275,7 @@ public abstract class GLScene {
 
   public int[] getViewport() {
     int[] viewPort = new int[4];
-    gl.glGetIntegerv(GL.GL_VIEWPORT, viewPort, 0);
+    gl.glGetIntegerv(GL2.GL_VIEWPORT, viewPort, 0);
     return viewPort;
   }
 
@@ -266,16 +301,16 @@ public abstract class GLScene {
    * @return
    */
   public static double[] getOGLPos(
-      GL gl, GLU glu, SceneGrip grip, int x, int y) {
+      GL2 gl, GLU glu, SceneGrip grip, int x, int y) {
     int[] viewport = new int[4];
     double[] modelview = new double[16];
     double[] projection = new double[16];
     double[] wcoord0 = new double[3];
     double[] wcoord1 = new double[3];
 
-    gl.glGetDoublev(GL.GL_MODELVIEW_MATRIX, modelview, 0);
-    gl.glGetDoublev(GL.GL_PROJECTION_MATRIX, projection, 0);
-    gl.glGetIntegerv(GL.GL_VIEWPORT, viewport, 0);
+    gl.glGetDoublev(GL2.GL_MODELVIEW_MATRIX, modelview, 0);
+    gl.glGetDoublev(GL2.GL_PROJECTION_MATRIX, projection, 0);
+    gl.glGetIntegerv(GL2.GL_VIEWPORT, viewport, 0);
 
     double winX = x;
     double winY = (double) viewport[3] - (double) y;
@@ -393,7 +428,7 @@ public abstract class GLScene {
       offset++; // z1 (first z)
       offset++; // z2 (last z)
 
-      for (int j = 0;j < names; j++) {
+      for (int j = 0; j < names; j++) {
         if (j == (names - 1)) {
           hitsResults[i] = buffer.get(offset);
         }
@@ -465,23 +500,16 @@ public abstract class GLScene {
     this.startSelectY = fromY;
   }
 
-  /**
-   * Clear the scene and adjust the camera position.
-   * @param elapsedTime time since previous frame.
-   */
-  protected void drawScene(float elapsedTime) {
-    gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
-    grip.adjust();
-  }
+
 
   /**
    * Start 2D rendering mode.
    */
   protected void go2D() {
     /* Disable depth testing */
-    gl.glDisable(GL.GL_DEPTH_TEST);
+    gl.glDisable(GL2.GL_DEPTH_TEST);
     /* Select The Projection Matrix */
-    gl.glMatrixMode(GL.GL_PROJECTION);
+    gl.glMatrixMode(GL2.GL_PROJECTION);
     /* Store The Projection Matrix */
     gl.glPushMatrix();
     /* Reset The Projection Matrix */
@@ -489,7 +517,7 @@ public abstract class GLScene {
     /* Set Up An Ortho Screen */
     glu.gluOrtho2D(0.0, 1.0d, 0, 1.0d);
     /* Select The Modelview Matrix */
-    gl.glMatrixMode(GL.GL_MODELVIEW);
+    gl.glMatrixMode(GL2.GL_MODELVIEW);
     /* Stor the Modelview Matrix */
     gl.glPushMatrix();
     /* Reset The Modelview Matrix */
@@ -501,15 +529,15 @@ public abstract class GLScene {
    */
   protected void end2D() {
     /* Select The Projection Matrix */
-    gl.glMatrixMode(GL.GL_PROJECTION);
+    gl.glMatrixMode(GL2.GL_PROJECTION);
     /* Restore The Old Projection Matrix */
     gl.glPopMatrix();
     /* Select the Modelview Matrix */
-    gl.glMatrixMode(GL.GL_MODELVIEW);
+    gl.glMatrixMode(GL2.GL_MODELVIEW);
     /* Restore the Old Projection Matrix */
     gl.glPopMatrix();
     /* Re-enable Depth Testing */
-    gl.glEnable(GL.GL_DEPTH_TEST);
+    gl.glEnable(GL2.GL_DEPTH_TEST);
   }
 
   /**
@@ -517,7 +545,7 @@ public abstract class GLScene {
    */
   protected void drawRectangle() {
     int[] viewPort = new int[4];
-    gl.glGetIntegerv(GL.GL_VIEWPORT, viewPort, 0);
+    gl.glGetIntegerv(GL2.GL_VIEWPORT, viewPort, 0);
 
     // start point
     float sx = (float) startSelectX / (float) viewPort[2];
@@ -529,7 +557,7 @@ public abstract class GLScene {
     go2D();
 
     gl.glColor4f(0.0f, 0.0f, 0.8f, 0.3f);
-    gl.glBegin(GL.GL_QUADS);
+    gl.glBegin(GL2.GL_QUADS);
     gl.glVertex2f(sx, sy);
     gl.glVertex2f(ex, sy);
     gl.glVertex2f(ex, ey);
@@ -538,7 +566,7 @@ public abstract class GLScene {
 
     gl.glColor4f(0.0f, 0.0f, 0.6f, 1.0f);
     gl.glLineWidth(1.0f);
-    gl.glBegin(GL.GL_LINE_STRIP);
+    gl.glBegin(GL2.GL_LINE_STRIP);
     gl.glVertex2f(sx, sy);
     gl.glVertex2f(ex, sy);
     gl.glVertex2f(ex, ey);
@@ -599,7 +627,7 @@ public abstract class GLScene {
     }
   }
 
-  public static void V(GL gl, float x, float y) {
+  public static void V(GL2 gl, float x, float y) {
     if (!hyperbolic) {
       gl.glVertex2f(x, y);
     } else {
@@ -610,7 +638,7 @@ public abstract class GLScene {
     }
   }
 
-  public static void V(GL gl, double x, double y) {
+  public static void V(GL2 gl, double x, double y) {
     V(gl, (float)x, (float)y);
   }
 
@@ -640,15 +668,15 @@ public abstract class GLScene {
     return new float[]{x, y, z};
   }
 
-  public static void convertGLVertex(GL gl, float x, float y) {
+  public static void convertGLVertex(GL2 gl, float x, float y) {
     convertGLVertex(gl, x,y,0,1,1,1,0,0,0);
   }
 
-  public static void convertGLVertex(GL gl, float x, float y, float z) {
+  public static void convertGLVertex(GL2 gl, float x, float y, float z) {
     convertGLVertex(gl, x,y,z,1,1,1,0,0,0);
   }
 
-  public static void convertGLVertex(GL gl, float x, float y, float z, float a, float b, float c, float k, float h, float p) {
+  public static void convertGLVertex(GL2 gl, float x, float y, float z, float a, float b, float c, float k, float h, float p) {
     // solve the equation:
     // - (x-k)^2 / a^2 - (y-h)^2 / b^2 + (z-l)^2 / c^2 = 1
     // to get z.

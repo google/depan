@@ -24,12 +24,12 @@ import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 
-import com.sun.opengl.util.BufferUtil;
-
 import org.eclipse.swt.widgets.Composite;
 
 import java.awt.Color;
 import java.awt.geom.Point2D;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 import java.util.Collection;
 import java.util.List;
@@ -50,6 +50,8 @@ public class GLPanel extends GLScene {
   private static final Logger logger =
     Logger.getLogger(GLPanel.class.getName());
 
+  private static final int BYTES_PER_INT = (Integer.SIZE / Byte.SIZE);
+
   public static final int ID_MASK     = 0xC0000000; // 2 higher bits as tag
   // 2 higher bits are 0
   public static final int ID_MASK_INV = ID_MASK ^ 0xFFFFFFFF;
@@ -65,6 +67,16 @@ public class GLPanel extends GLScene {
    * 2 higher bits are "11" -> node
    */
   public static final int NODE_MASK   = 0xC0000000;
+
+  /**
+   * Source of information about the graph.
+   */
+  private final ViewEditor editor;
+
+  /**
+   * Rendering pipe.
+   */
+  private final RenderingPipe renderer;
 
   /**
    * Set of {@link NodeRenderingProperty}, one for each {@link GraphNode} to
@@ -84,11 +96,6 @@ public class GLPanel extends GLScene {
   private IntBuffer selectBuffer;
 
   /**
-   * Rendering pipe.
-   */
-  RenderingPipe renderer;
-
-  /**
    * Map to retrieve a {@link NodeRenderingProperty} given its
    * {@link GraphNode}.
    */
@@ -100,10 +107,6 @@ public class GLPanel extends GLScene {
    */
   Map<GraphEdge, EdgeRenderingProperty> edgePropMap = Maps.newHashMap();
 
-  /**
-   * Source of information about the graph.
-   */
-  private ViewEditor editor;
 
   /////////////////////////////////////
   // Lifecycle management
@@ -111,7 +114,10 @@ public class GLPanel extends GLScene {
   public GLPanel(Composite parent, ViewEditor editor) {
     super(parent);
     this.editor = editor;
+    this.renderer = new RenderingPipe(gl, glu, this, editor);
+  }
 
+  protected void allocateResources() {
     GraphModel viewGraph = editor.getViewGraph();
 
     // nodes
@@ -120,9 +126,10 @@ public class GLPanel extends GLScene {
     nodesProperties = new NodeRenderingProperty[nodes.length];
     for (int i = 0; i < nodes.length; ++i) {
       GraphNode n = nodes[i];
-      nodesProperties[i] =
-        new NodeRenderingProperty(i & ID_MASK_INV | NODE_MASK, n);
-      nodePropMap.put(n, nodesProperties[i]);
+      NodeRenderingProperty nodeProp =
+          new NodeRenderingProperty(i & ID_MASK_INV | NODE_MASK, n);
+      nodesProperties[i] = nodeProp; 
+      nodePropMap.put(n, nodeProp);
     }
 
     // edges
@@ -138,15 +145,18 @@ public class GLPanel extends GLScene {
       if (p1 == null || p2 == null) {
         continue;
       }
-      edgesProperties[i] =
-        new EdgeRenderingProperty(i & ID_MASK_INV | EDGE_MASK, edge, p1, p2);
-      edgePropMap.put(edge, edgesProperties[i]);
+      EdgeRenderingProperty edgesProp =
+          new EdgeRenderingProperty(i & ID_MASK_INV | EDGE_MASK, edge, p1, p2);
+      edgesProperties[i] = edgesProp;
+      edgePropMap.put(edge, edgesProp);
     }
 
     // Allocate the select buffer needed for these graphic elements.
     selectBuffer = allocSelectBuffer();
+  }
 
-    renderer = new RenderingPipe(gl, glu, this, editor);
+  public void start() {
+    prepareResources();
     dryRun();
 
     Refresher r = new Refresher(this);
@@ -458,7 +468,10 @@ public class GLPanel extends GLScene {
 
   private IntBuffer allocSelectBuffer() {
     int pickableCount = countAllPickable();
-    return BufferUtil.newIntBuffer(pickableCount * 6);
+    int allocBytes = pickableCount * 6 * BYTES_PER_INT;
+    ByteBuffer result = ByteBuffer.allocateDirect(allocBytes);
+    result.order(ByteOrder.nativeOrder());
+    return result.asIntBuffer();
   }
 
   @Override
