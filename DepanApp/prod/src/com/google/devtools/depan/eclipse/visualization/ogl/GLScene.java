@@ -16,6 +16,8 @@
 
 package com.google.devtools.depan.eclipse.visualization.ogl;
 
+import com.jogamp.opengl.util.awt.Screenshot;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
@@ -26,9 +28,8 @@ import org.eclipse.swt.opengl.GLCanvas;
 import org.eclipse.swt.opengl.GLData;
 import org.eclipse.swt.widgets.Composite;
 
-import com.jogamp.opengl.util.awt.Screenshot;
-
 import java.awt.Color;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.nio.IntBuffer;
 import java.util.logging.Logger;
@@ -279,12 +280,14 @@ public abstract class GLScene {
     return viewPort;
   }
 
-  public GLRegion getOGLViewport() {
+  public Rectangle2D getOGLViewport() {
     int[] osViewport = getViewport();
     double[] topLeft = getOGLPos(osViewport[0], osViewport[1]);
     double[] bottomRight = getOGLPos(osViewport[2], osViewport[3]);
-    return new GLRegion(
-        topLeft[0], topLeft[1], bottomRight[0], bottomRight[1]);
+    return new Rectangle2D.Double(
+        topLeft[0], bottomRight[1] /* left, bottom */ ,
+        bottomRight[0] - topLeft[0] /* width */,
+        topLeft[1] - bottomRight[1] /* height */ );
   }
 
   /**

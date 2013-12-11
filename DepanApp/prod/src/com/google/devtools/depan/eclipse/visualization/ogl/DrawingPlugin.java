@@ -24,6 +24,7 @@ import com.jogamp.opengl.util.texture.TextureCoords;
 
 import java.awt.Color;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 
 import javax.media.opengl.GL2;
 
@@ -36,6 +37,9 @@ public class DrawingPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
 
   private GL2 gl;
   private GLScene scene;
+
+  // Set to null for each rendering in preframe
+  private Rectangle2D drawingBounds;
 
   public DrawingPlugin(GL2 gl, GLScene scene) {
     this.gl = gl;
@@ -79,6 +83,9 @@ public class DrawingPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
       property.shape.draw(gl);
     }
 
+    Rectangle2D bounds = property.shape.getDrawingBounds();
+    updateDrawingBounds(bounds);
+
     // we don't want the label to be clickable,
     // so we just pop the name before drawing it.
     gl.glPopName();
@@ -119,6 +126,14 @@ public class DrawingPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
     gl.glPopMatrix();
 
     return true;
+  }
+
+  private void updateDrawingBounds(Rectangle2D bounds) {
+    if (null == drawingBounds) {
+      drawingBounds = bounds.getBounds2D();
+      return;
+    }
+    drawingBounds.add(bounds);
   }
 
   /**
@@ -267,6 +282,7 @@ public class DrawingPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
 
   @Override
   public void preFrame(float elapsedTime) {
+    drawingBounds = null;
   }
 
   @Override
@@ -280,5 +296,9 @@ public class DrawingPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
   public boolean keyPressed(int keycode, char character, boolean ctrl,
       boolean alt, boolean shift) {
     return false;
+  }
+
+  public Rectangle2D getDrawingBounds() {
+    return drawingBounds;
   }
 }

@@ -16,9 +16,12 @@
 
 package com.google.devtools.depan.eclipse.views;
 
-import com.google.common.collect.Maps;
+import static java.util.logging.Level.SEVERE;
+
 import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.utils.ListeningViewViewPart;
+
+import com.google.common.collect.Maps;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StackLayout;
@@ -33,6 +36,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * A ViewPart for embedding different tools.
@@ -43,6 +47,9 @@ import java.util.Map;
 public class Tools extends ListeningViewViewPart<ViewEditor> {
   public static final String VIEW_ID =
       "com.google.devtools.depan.eclipse.views.Tools";
+
+  private static final Logger logger =
+      Logger.getLogger(Tools.class.getName());
 
   private Composite panel;
   private StackLayout stackLayout;
@@ -98,29 +105,7 @@ public class Tools extends ListeningViewViewPart<ViewEditor> {
     guis.put(null, new Composite(panel, SWT.NONE));
 
     for (Tool tool : ToolList.tools) {
-      // Create the tool activation button
-      Button toolBtn = new Button(composite, SWT.PUSH);
-      toolBtn.setToolTipText(tool.getName());
-      toolBtn.addSelectionListener(new ToolSelection(tool));
-      toolBtn.setImage(tool.getIcon());
-
-      // Create the tool's GUI options
-      Composite toolPanel = buildToolPanel(tool);
-      Control control = tool.setupComposite(toolPanel);
-      if (null != control) {
-        // spans 2 columns, since there are the icon and name on 2 different
-        // columns in the toolPanel.
-        control.setLayoutData(
-            new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
-        guis.put(tool, toolPanel);
-      } else {
-        // if no control, we still need to put the Tool into the list
-        guis.put(tool, null);
-      }
-
-      // After GUI creation, tell the tool which editor it should listen to.
-      // Need to set the editor on creation if an editor is active.
-      tool.setEditor(getAcceptableEditor());
+      buildToolPanel(composite, tool);
     }
   }
 
@@ -129,12 +114,16 @@ public class Tools extends ListeningViewViewPart<ViewEditor> {
    * there are the icon and a label with the tool's name. Then, we can
    * add the tool options spanning those two columns.
    *
-   * @param parent parent Composite
-   * @param icon icon for the tool
-   * @param name tool's name
-   * @return a composite with a gridLayout using 2 columns.
+   * @param parent container for tab, panel, and tool control
+   * @param tool definition of tool to add to parent
    */
-  private Composite buildToolPanel(Tool tool) {
+  private void buildToolPanel(Composite parent, Tool tool) {
+    // Create the tool activation button
+    Button toolBtn = new Button(parent, SWT.PUSH);
+    toolBtn.setToolTipText(tool.getName());
+    toolBtn.addSelectionListener(new ToolSelection(tool));
+    toolBtn.setImage(tool.getIcon());
+
     Composite toolPanel = new Composite(panel, SWT.NONE);
     Label image = new Label(toolPanel, SWT.NONE);
     image.setImage(tool.getIcon());
@@ -142,7 +131,32 @@ public class Tools extends ListeningViewViewPart<ViewEditor> {
     title.setText(tool.getName());
 
     toolPanel.setLayout(new GridLayout(2, false));
-    return toolPanel;
+    Control control = createToolControl(toolPanel, tool);
+
+    if (null == control) {
+      // if no control, we still need to put the Tool into the list
+      guis.put(tool, null);
+      return;
+    }
+    guis.put(tool, toolPanel);
+
+    // spans 2 columns, since there are the icon and name on 2 different
+    // columns in the toolPanel.
+    control.setLayoutData(
+        new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
+
+    // Tell the tool which editor it should listen to.
+    // Need to set the editor on creation if an editor is active.
+    tool.setEditor(getAcceptableEditor());
+  }
+
+  private Control createToolControl(Composite toolPanel, Tool tool) {
+    try {
+      return tool.setupComposite(toolPanel);
+    } catch (RuntimeException errSetup) {
+      logger.log(SEVERE, "error creating tool " + tool.getName());
+    }
+    return null;
   }
 
   // TODO: Reconsider this implementation with tool.selected() and

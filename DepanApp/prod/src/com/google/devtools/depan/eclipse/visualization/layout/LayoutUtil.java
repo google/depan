@@ -15,7 +15,6 @@
  */
 package com.google.devtools.depan.eclipse.visualization.layout;
 
-import com.google.devtools.depan.eclipse.visualization.ogl.GLRegion;
 import com.google.devtools.depan.graph.api.DirectedRelationFinder;
 import com.google.devtools.depan.graph.basic.ForwardIdentityRelationFinder;
 import com.google.devtools.depan.model.GraphEdge;
@@ -26,6 +25,7 @@ import edu.uci.ics.jung.graph.DirectedGraph;
 
 import java.awt.Dimension;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 import java.util.Map;
 
@@ -98,11 +98,9 @@ public class LayoutUtil {
    * @return
    */
   public static Dimension buildJungDimension(LayoutContext context) {
-    GLRegion viewport = context.getViewport();
-    double xRange = viewport.top - viewport.bottom;
-    double yRange = viewport.right - viewport.left;
+    Rectangle2D viewport = context.getViewport();
 
     // TODO: improve scaling
-    return new Dimension((int) xRange, (int) yRange);
+    return new Dimension((int) viewport.getWidth(), (int) viewport.getHeight());
   }
 }

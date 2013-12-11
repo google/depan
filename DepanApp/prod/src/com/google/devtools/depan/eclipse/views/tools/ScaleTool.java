@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.eclipse.views.tools;
 
+import com.google.devtools.depan.eclipse.editors.DrawingListener;
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.views.ViewEditorTool;
 
@@ -31,10 +32,24 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
+import java.awt.geom.Rectangle2D;
+
 /**
  * @author ycoppel@google.com (Yohann Coppel)
  */
 public class ScaleTool extends ViewEditorTool {
+
+  private Label topDrawing;
+  private Label leftDrawing;
+  private Label rightDrawing;
+  private Label bottomDrawing;
+
+  private Label topViewport;
+  private Label leftViewport;
+  private Label rightViewport;
+  private Label bottomViewport;
+
+  private DrawingListener drawingListener;
 
   @Override
   public Image getIcon() {
@@ -90,6 +105,8 @@ public class ScaleTool extends ViewEditorTool {
         + "range of the openGL world, and you will not see anything. "
         + "Change to a higher value to get the drawings back.");
 
+    Composite metrics = setupMetrics(baseComposite);
+
     // layout
     baseComposite.setLayout(new GridLayout(4, false));
     autoStretch.setLayoutData(
@@ -99,6 +116,8 @@ public class ScaleTool extends ViewEditorTool {
     percents.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, false));
     zoomPercents.setLayoutData(
+        new GridData(SWT.FILL, SWT.FILL, true, false));
+    metrics.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, false));
 
     // actions
@@ -138,6 +157,64 @@ public class ScaleTool extends ViewEditorTool {
     });
 
     return baseComposite;
+  }
+
+  private Composite setupMetrics(Composite parent) {
+    Composite baseComposite = new Composite(parent, SWT.NONE);
+    baseComposite.setLayout(new GridLayout(3, false));
+
+    new Label(baseComposite, SWT.NONE).setText("Top ");
+    topDrawing = new Label(baseComposite, SWT.NONE);
+    topViewport = new Label(baseComposite, SWT.NONE);
+
+    new Label(baseComposite, SWT.NONE).setText("Left ");
+    leftDrawing = new Label(baseComposite, SWT.NONE);
+    leftViewport = new Label(baseComposite, SWT.NONE);
+
+    new Label(baseComposite, SWT.NONE).setText("Right ");
+    rightDrawing = new Label(baseComposite, SWT.NONE);
+    rightViewport = new Label(baseComposite, SWT.NONE);
+
+    new Label(baseComposite, SWT.NONE).setText("Bottom ");
+    bottomDrawing = new Label(baseComposite, SWT.NONE);
+    bottomViewport = new Label(baseComposite, SWT.NONE);
+
+    drawingListener = new DrawingListener() {
+      @Override
+      public void updateDrawingBounds(Rectangle2D drawing, Rectangle2D viewport) {
+        updateMetrics(drawing, viewport);
+      }
+    };
+
+    return baseComposite;
+  }
+
+  public void updateMetrics(Rectangle2D drawing, Rectangle2D viewport) {
+    topDrawing.setText(Double.toString(drawing.getMaxY()));
+    leftDrawing.setText(Double.toString(drawing.getMinX()));
+    rightDrawing.setText(Double.toString(drawing.getMaxX()));
+    bottomDrawing.setText(Double.toString(drawing.getMinY()));
+
+    topViewport.setText(Double.toString(viewport.getMaxY()));
+    leftViewport.setText(Double.toString(viewport.getMinX()));
+    rightViewport.setText(Double.toString(viewport.getMaxX()));
+    bottomViewport.setText(Double.toString(viewport.getMinY()));
+}
+
+  @Override
+  protected void acquireResources() {
+    super.acquireResources();
+    if (hasEditor()) {
+      getEditor().addDrawingListener(drawingListener);
+    }
+  }
+
+  @Override
+  protected void releaseResources() {
+    if (hasEditor()) {
+      getEditor().removeDrawingListener(drawingListener);
+    }
+    super.releaseResources();
   }
 
   /**

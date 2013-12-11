@@ -16,10 +16,10 @@
 
 package com.google.devtools.depan.eclipse.visualization.layout;
 
-import com.google.devtools.depan.eclipse.visualization.ogl.GLRegion;
 import com.google.devtools.depan.model.GraphNode;
 
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 import java.util.Map;
 
@@ -38,7 +38,7 @@ public class LayoutScaler {
 
   public final int nodeCnt;
   public final int emptyCnt;
-  public final GLRegion graphArea;
+  public final Rectangle2D graphArea;
 
   /**
    * Initialize the graph area from the set of layout nodes and positions
@@ -93,7 +93,7 @@ public class LayoutScaler {
     this.nodeCnt = nodeCnt;
     this.emptyCnt = emptyCnt;
 
-    this.graphArea = new GLRegion(minX, maxY, maxX, minY);
+    this.graphArea = new Rectangle2D.Double(minX, maxY, maxX, minY);
   }
 
   private static double scaleRange(double range, double view) {
@@ -122,23 +122,24 @@ public class LayoutScaler {
    * @param zeroThreshold minimum value that can be distinguished from zero.
    * @return
    */
-  public double getFullViewScale(GLRegion viewport, double zeroThreshold) {
+  public double getFullViewScale(Rectangle2D viewport, double zeroThreshold) {
     // Don't move the origin, 
-    double rangeX = graphArea.getRangeX();
-    double rangeY = graphArea.getRangeY();
+    double rangeY = graphArea.getHeight();
+    double rangeX = graphArea.getWidth();
 
     if ((rangeX < zeroThreshold) && (rangeY < zeroThreshold)) {
       return 1.0;
     }
-    if (rangeX < zeroThreshold) {
-      return scaleRange(rangeY, viewport.getRangeY());
-    }
+
     if (rangeY < zeroThreshold) {
-      return scaleRange(rangeX, viewport.getRangeX());
+      return scaleRange(rangeX, viewport.getWidth());
+    }
+    if (rangeX < zeroThreshold) {
+      return scaleRange(rangeY, viewport.getHeight());
     }
 
-    double scaleX = scaleRange(rangeX, viewport.getRangeX());
-    double scaleY = scaleRange(rangeY, viewport.getRangeY());
+    double scaleY = scaleRange(rangeY, viewport.getHeight());
+    double scaleX = scaleRange(rangeX, viewport.getWidth());
 
     return Math.min(scaleX, scaleY);
   }

@@ -15,7 +15,6 @@
  */
 package com.google.devtools.depan.eclipse.visualization.layout;
 
-import com.google.devtools.depan.eclipse.visualization.ogl.GLRegion;
 import com.google.devtools.depan.graph.api.DirectedRelationFinder;
 import com.google.devtools.depan.graph.basic.ForwardIdentityRelationFinder;
 import com.google.devtools.depan.model.GraphModel;
@@ -24,6 +23,7 @@ import com.google.devtools.depan.model.GraphNode;
 import com.google.common.collect.Maps;
 
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -35,15 +35,15 @@ import java.util.Map;
  * @author <a href='mailto:lee.carver@servicenow.com'>Lee Carver</a>
  */
 public class LayoutContext {
-  public final static GLRegion DEFAULT_REGION =
-      new GLRegion(0, 0, 1000.0, 1000.0);
+  public final static Rectangle2D DEFAULT_REGION =
+      new Rectangle2D.Double(0, 0, 1000.0, 1000.0);
 
   private GraphModel graphModel;
 
   private DirectedRelationFinder relations= 
       ForwardIdentityRelationFinder.FINDER;
 
-  private GLRegion viewport = DEFAULT_REGION;
+  private Rectangle2D viewport = DEFAULT_REGION;
 
   private Collection<GraphNode> movableNodes = GraphNode.EMPTY_NODE_LIST;
 
@@ -67,7 +67,7 @@ public class LayoutContext {
     this.relations = relations;
   }
 
-  public void setViewport(GLRegion viewport) {
+  public void setViewport(Rectangle2D viewport) {
     this.viewport = viewport;
   }
 
@@ -106,7 +106,7 @@ public class LayoutContext {
     return relations;
   }
 
-  public GLRegion getViewport() {
+  public Rectangle2D getViewport() {
     return viewport;
   }
 

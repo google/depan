@@ -16,9 +16,11 @@
 
 package com.google.devtools.depan.eclipse.visualization.ogl;
 
+import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.model.GraphNode;
 
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 import java.util.Map;
 
@@ -70,4 +72,9 @@ public interface RendererChangeListener {
    * should be adjusted by the relative amounts.
    */
   public void selectionMoved(double x, double y);
+
+  /**
+   * Notify the receiver of the total size for the drawing.
+   */
+  public void updateDrawingBounds(Rectangle2D drawing, Rectangle2D viewport);
 }

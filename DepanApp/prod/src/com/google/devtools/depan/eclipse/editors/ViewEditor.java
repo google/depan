@@ -16,18 +16,53 @@
 
 package com.google.devtools.depan.eclipse.editors;
 
-import java.awt.Color;
-import java.awt.geom.Point2D;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
+import com.google.devtools.depan.eclipse.persist.ObjectXmlPersist;
+import com.google.devtools.depan.eclipse.persist.XStreamFactory;
+import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
+import com.google.devtools.depan.eclipse.preferences.ColorPreferencesIds;
+import com.google.devtools.depan.eclipse.preferences.LabelPreferencesIds;
+import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds;
+import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.LabelPosition;
+import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeColors;
+import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeShape;
+import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeSize;
+import com.google.devtools.depan.eclipse.stats.ElementKindStats;
+import com.google.devtools.depan.eclipse.trees.GraphData;
+import com.google.devtools.depan.eclipse.utils.ListenerManager;
+import com.google.devtools.depan.eclipse.utils.Resources;
+import com.google.devtools.depan.eclipse.utils.Tools;
+import com.google.devtools.depan.eclipse.utils.elementkinds.ElementKindDescriptor;
+import com.google.devtools.depan.eclipse.utils.elementkinds.ElementKindDescriptors;
+import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptor;
+import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptors;
+import com.google.devtools.depan.eclipse.views.tools.RelationCount;
+import com.google.devtools.depan.eclipse.visualization.View;
+import com.google.devtools.depan.eclipse.visualization.layout.JungBuilder;
+import com.google.devtools.depan.eclipse.visualization.layout.LayoutContext;
+import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerator;
+import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerators;
+import com.google.devtools.depan.eclipse.visualization.layout.LayoutScaler;
+import com.google.devtools.depan.eclipse.visualization.layout.LayoutUtil;
+import com.google.devtools.depan.eclipse.visualization.ogl.RendererChangeListener;
+import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeColorPlugin;
+import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeShapePlugin;
+import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeSizePlugin;
+import com.google.devtools.depan.graph.api.DirectedRelationFinder;
+import com.google.devtools.depan.graph.basic.ForwardIdentityRelationFinder;
+import com.google.devtools.depan.model.GraphEdge;
+import com.google.devtools.depan.model.GraphModel;
+import com.google.devtools.depan.model.GraphNode;
+import com.google.devtools.depan.model.RelationshipSet;
+import com.google.devtools.depan.view.CollapseData;
+import com.google.devtools.depan.view.EdgeDisplayProperty;
+import com.google.devtools.depan.view.NodeDisplayProperty;
 
-import javax.imageio.ImageIO;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.thoughtworks.xstream.XStream;
+
+import edu.uci.ics.jung.algorithms.importance.KStepMarkov;
+import edu.uci.ics.jung.graph.DirectedGraph;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -59,53 +94,19 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.SaveAsDialog;
 import org.eclipse.ui.part.MultiPageEditorPart;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.devtools.depan.eclipse.persist.ObjectXmlPersist;
-import com.google.devtools.depan.eclipse.persist.XStreamFactory;
-import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
-import com.google.devtools.depan.eclipse.preferences.ColorPreferencesIds;
-import com.google.devtools.depan.eclipse.preferences.LabelPreferencesIds;
-import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds;
-import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.LabelPosition;
-import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeColors;
-import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeShape;
-import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeSize;
-import com.google.devtools.depan.eclipse.stats.ElementKindStats;
-import com.google.devtools.depan.eclipse.trees.GraphData;
-import com.google.devtools.depan.eclipse.utils.ListenerManager;
-import com.google.devtools.depan.eclipse.utils.Resources;
-import com.google.devtools.depan.eclipse.utils.Tools;
-import com.google.devtools.depan.eclipse.utils.elementkinds.ElementKindDescriptor;
-import com.google.devtools.depan.eclipse.utils.elementkinds.ElementKindDescriptors;
-import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptor;
-import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptors;
-import com.google.devtools.depan.eclipse.views.tools.RelationCount;
-import com.google.devtools.depan.eclipse.visualization.View;
-import com.google.devtools.depan.eclipse.visualization.layout.JungBuilder;
-import com.google.devtools.depan.eclipse.visualization.layout.LayoutContext;
-import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerator;
-import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerators;
-import com.google.devtools.depan.eclipse.visualization.layout.LayoutScaler;
-import com.google.devtools.depan.eclipse.visualization.layout.LayoutUtil;
-import com.google.devtools.depan.eclipse.visualization.ogl.GLRegion;
-import com.google.devtools.depan.eclipse.visualization.ogl.RendererChangeListener;
-import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeColorPlugin;
-import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeShapePlugin;
-import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeSizePlugin;
-import com.google.devtools.depan.graph.api.DirectedRelationFinder;
-import com.google.devtools.depan.graph.basic.ForwardIdentityRelationFinder;
-import com.google.devtools.depan.model.GraphEdge;
-import com.google.devtools.depan.model.GraphModel;
-import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.model.RelationshipSet;
-import com.google.devtools.depan.view.CollapseData;
-import com.google.devtools.depan.view.EdgeDisplayProperty;
-import com.google.devtools.depan.view.NodeDisplayProperty;
-import com.thoughtworks.xstream.XStream;
+import java.awt.Color;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
 
-import edu.uci.ics.jung.algorithms.importance.KStepMarkov;
-import edu.uci.ics.jung.graph.DirectedGraph;
+import javax.imageio.ImageIO;
 
 /**
  * An Editor for a DepAn ViewDocument.
@@ -172,6 +173,9 @@ public class ViewEditor extends MultiPageEditorPart
   private ListenerManager<SelectionChangeListener> selectionListeners =
       new ListenerManager<SelectionChangeListener>();
 
+  private ListenerManager<DrawingListener> drawingListeners =
+      new ListenerManager<DrawingListener>();
+
   /////////////////////////////////////
   // Alternate graph perspectives and derived data
   // used in various tools and viewers
@@ -193,6 +197,8 @@ public class ViewEditor extends MultiPageEditorPart
   private Collection<ElementKindDescriptor> elementKindChoices;
 
   private Collection<ElementKindStats.Info> elementKindStats;
+
+  private ViewScrollbarHandler scrollHandler;
 
   /////////////////////////////////////
   // Basic Getters and Setters
@@ -299,11 +305,11 @@ public class ViewEditor extends MultiPageEditorPart
   }
 
   private void createDiagramPage() {
-    Composite parent = new Composite(getContainer(), SWT.NONE);
+    Composite parent = new Composite(getContainer(), SWT.H_SCROLL | SWT.V_SCROLL);
+
     GridLayout pageLayout = new GridLayout();
     pageLayout.numColumns = 1;
     parent.setLayout(pageLayout);
-
     // bottom composite containing main diagram
     rendererCallback = new RendererChangeReceiver();
     renderer = new View(parent, SWT.NONE, this);
@@ -315,6 +321,15 @@ public class ViewEditor extends MultiPageEditorPart
     layoutKludge();
     setPreferences();
     initSelectedNodes(getSelectedNodes());
+
+    scrollHandler = new ViewScrollbarHandler(parent, renderer.getGrip());
+    scrollHandler.acquireResources();
+    addDrawingListener(new DrawingListener() {
+
+      @Override
+      public void updateDrawingBounds(Rectangle2D drawing, Rectangle2D viewport) {
+        scrollHandler.updateDrawingBounds(drawing, viewport);
+      }});
 
     int index = addPage(parent);
     setPageText(index, "Graph View");
@@ -932,7 +947,7 @@ public class ViewEditor extends MultiPageEditorPart
 
   private void layoutBestFit(
       Collection<GraphNode> layoutNodes, Map<GraphNode, Point2D> locations) {
-    GLRegion viewport = renderer.getOGLViewport();
+    Rectangle2D viewport = renderer.getOGLViewport();
     Map<GraphNode, Point2D> changes = 
             computeFullViewScale(layoutNodes, locations, viewport);
     viewInfo.editNodeLocations(changes, null);
@@ -950,7 +965,7 @@ public class ViewEditor extends MultiPageEditorPart
   private Map<GraphNode, Point2D> computeFullViewScale(
           Collection<GraphNode> layoutNodes,
           Map<GraphNode, Point2D> locations,
-          GLRegion viewport) {
+          Rectangle2D viewport) {
 
     if (layoutNodes.size() <= 0) {
       return Collections.emptyMap();
@@ -976,7 +991,7 @@ public class ViewEditor extends MultiPageEditorPart
   }
 
   private double scaleWithMargin(
-          LayoutScaler scaler, GLRegion viewport) {
+          LayoutScaler scaler, Rectangle2D viewport) {
     return FULLSCALE_MARGIN
             * scaler.getFullViewScale(viewport, ZERO_THRESHOLD);
   }
@@ -1041,13 +1056,24 @@ public class ViewEditor extends MultiPageEditorPart
     context.setMovableNodes(layoutNodes);
     context.setRelations(relationFinder);
     context.setNodeLocations(getNodeLocations());
-    context.setViewport(renderer.getOGLViewport().newOriginRegion());
+
+    Rectangle2D layoutViewport = buildOriginRegion(renderer.getOGLViewport());
+    context.setViewport(layoutViewport);
 
     Map<GraphNode, Point2D> changes = LayoutUtil.calcPositions(
             layout, context, layoutNodes);
 
     // Change the node locations.
     viewInfo.editNodeLocations(changes, null);
+  }
+
+  private Rectangle2D buildOriginRegion(Rectangle2D base) {
+    double rangeX = base.getWidth();
+    double rangeY = base.getHeight();
+    double newLeft = -rangeX / 2;
+    double newBottom = -rangeY / 2;
+    return new Rectangle2D.Double(
+        newLeft, rangeY + newBottom, rangeX + newLeft, newBottom);
   }
 
   /////////////////////////////////////
@@ -1093,6 +1119,30 @@ public class ViewEditor extends MultiPageEditorPart
     Map<GraphNode, Point2D> changes = translateNodes(
         getSelectedNodes(), getNodeLocations(), translater);
     viewInfo.editNodeLocations(changes, author);
+  }
+
+  /////////////////////////////////////
+  // Listeners for drawing metrics
+
+  public void addDrawingListener(DrawingListener listener) {
+    drawingListeners.addListener(listener);
+  }
+
+  public void removeDrawingListener(DrawingListener listener) {
+    drawingListeners.removeListener(listener);
+  }
+
+  private void fireUpdateDrawingBounds(
+      final Rectangle2D drawing, final Rectangle2D viewport) {
+    drawingListeners.fireEvent(new ListenerManager.Dispatcher<DrawingListener>() {
+      @Override
+      public void dispatch(DrawingListener listener) {
+        listener.updateDrawingBounds(drawing, viewport);
+      }
+      public void captureException(RuntimeException errAny) {
+        logger.warning(errAny.toString());
+      }
+    });
   }
 
   /////////////////////////////////////
@@ -1236,6 +1286,11 @@ public class ViewEditor extends MultiPageEditorPart
     @Override
     public void selectionReduced(Collection<GraphNode> reduceNodes) {
       reduceSelection(reduceNodes, null);
+    }
+
+    @Override
+    public void updateDrawingBounds(Rectangle2D drawing, Rectangle2D viewport) {
+      fireUpdateDrawingBounds(drawing, viewport);
     }
   }
 

@@ -16,18 +16,20 @@
 
 package com.google.devtools.depan.eclipse.visualization.ogl;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+
 import org.eclipse.swt.widgets.Composite;
 
 import java.awt.Color;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
@@ -210,6 +212,9 @@ public class GLPanel extends GLScene {
     }
 
     renderer.postFrame();
+    Rectangle2D drawing = renderer.getDrawing().getDrawingBounds();
+    Rectangle2D viewport = getOGLViewport();
+    getRendererCallback().updateDrawingBounds(drawing, viewport);
   }
 
   @Override

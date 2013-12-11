@@ -20,7 +20,6 @@ import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds;
 import com.google.devtools.depan.eclipse.visualization.ogl.ArrowHead;
 import com.google.devtools.depan.eclipse.visualization.ogl.GLPanel;
-import com.google.devtools.depan.eclipse.visualization.ogl.GLRegion;
 import com.google.devtools.depan.eclipse.visualization.ogl.SceneGrip;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.CollapsePlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.EdgeIncludePlugin;
@@ -34,8 +33,8 @@ import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.view.CollapseData;
 import com.google.devtools.depan.view.EdgeDisplayProperty;
-import com.google.devtools.depan.view.NodeDisplayProperty;
 import com.google.devtools.depan.view.EdgeDisplayProperty.LineStyle;
+import com.google.devtools.depan.view.NodeDisplayProperty;
 import com.google.devtools.depan.view.NodeDisplayProperty.Size;
 
 import org.eclipse.swt.widgets.Composite;
@@ -43,6 +42,7 @@ import org.eclipse.swt.widgets.Control;
 
 import java.awt.Color;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
 import java.util.Map;
@@ -120,7 +120,7 @@ public class View {
     return glPanel.getGrip();
   }
 
-  public GLRegion getOGLViewport() {
+  public Rectangle2D getOGLViewport() {
     return glPanel.getOGLViewport();
   }
   /////////////////////////////////////

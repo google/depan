@@ -83,15 +83,18 @@ public class SceneGrip extends MouseAdapter
   private State state = State.None;
 
   public SceneGrip(GLScene scene) {
-    this.init();
     this.scene = scene;
+    // Start with the drawing properly zoomed.
+    this.zoff = HUNDRED_PERCENT_ZOOM;
+    targetHome();
   }
 
-  protected void init() {
+  protected void targetHome() {
     this.targetXrot = 0.0f;
     this.targetXoff = 0.0f;
     this.targetZrot = 0.0f;
     this.targetYoff = 0.0f;
+
     this.targetZoff = HUNDRED_PERCENT_ZOOM;
   }
 
@@ -145,7 +148,7 @@ public class SceneGrip extends MouseAdapter
         this.targetZoff -= 5f;
         break;
       case SWT.HOME:
-        this.init();
+        targetHome();
         break;
       case SWT.SHIFT:
         this.keyShiftState = true;
@@ -254,6 +257,9 @@ public class SceneGrip extends MouseAdapter
         targetXrot = xrot;
         zrot += -dx / 10f;
         targetZrot = zrot;
+        break;
+      default:
+        // Explicitly ignore other state
         break;
       }
     }

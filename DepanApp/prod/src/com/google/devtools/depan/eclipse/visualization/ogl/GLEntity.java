@@ -17,6 +17,7 @@
 package com.google.devtools.depan.eclipse.visualization.ogl;
 
 import java.awt.Shape;
+import java.awt.geom.Rectangle2D;
 
 import javax.media.opengl.GL2;
 
@@ -41,6 +42,15 @@ public abstract class GLEntity implements Shape {
     this.scaleX = x;
     this.scaleY = y;
     this.scaleZ = z;
+  }
+
+  public Rectangle2D getDrawingBounds() {
+    Rectangle2D shapeBounds = getBounds2D();
+    double x = (shapeBounds.getX() * scaleX) + translateX;
+    double y = (shapeBounds.getY() * scaleY) + translateY;
+    double width = shapeBounds.getWidth() * scaleX;
+    double height = shapeBounds.getHeight() * scaleY;
+    return new Rectangle2D.Double(x, y, width, height);
   }
 
   public abstract void draw(GL2 gl);
