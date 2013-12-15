@@ -47,8 +47,6 @@ public class LayoutPickerControl extends Composite {
     setLayout(new FillLayout());
 
     layoutChoice = new Combo(this, SWT.READ_ONLY | SWT.BORDER);
-    layoutChoice.setVisibleItemCount(1);
-
     layoutChoice.select(0);
   }
 

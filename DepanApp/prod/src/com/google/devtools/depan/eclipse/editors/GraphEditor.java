@@ -125,7 +125,7 @@ public class GraphEditor
     Composite pickerRegion = setupRelationPicker(top);
 
     // recursive select options
-    final Button recursiveSelect = new Button(top, SWT.CHECK | SWT.BORDER);
+    final Button recursiveSelect = new Button(top, SWT.CHECK);
     recursiveSelect.setText("Recursive select in tree");
     recursiveSelect.setSelection(recursiveTreeSelect);
     recursiveSelect.addSelectionListener(new SelectionAdapter() {
