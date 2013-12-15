@@ -74,9 +74,7 @@ public class Tools extends ListeningViewViewPart<ViewEditor> {
     super(ViewEditor.class);
   }
 
-  /*
-   * (non-Javadoc)
-   *
+  /**
    * @see com.google.devtools.depan.eclipse.utils.ListeningViewViewPart
    *      #createGui()
    */
@@ -107,9 +105,42 @@ public class Tools extends ListeningViewViewPart<ViewEditor> {
     for (Tool tool : ToolList.tools) {
       buildToolPanel(composite, tool);
     }
+
+    // Tell the tools which editor it should listen to.
+    // Need to set the editor on creation if an editor is active.
+    setEditor(getAcceptableEditor());
   }
 
-  /**
+  @Override
+  public void disposeGui() {
+    for (Tool tool : guis.keySet()) {
+      if (null != tool) {
+        try {
+          tool.dispose();
+        } catch (Exception errGui) {
+          logger.log(SEVERE, "Unable to close " + tool.getName(), errGui);
+        }
+      }
+    }
+  }
+
+  private void setEditor(ViewEditor editor) {
+    for (Tool tool : guis.keySet()) {
+      if (null != tool) {
+        tool.setEditor(editor);
+      }
+    }
+  }
+
+  private void closeEditor(ViewEditor editor) {
+    for (Tool tool : guis.keySet()) {
+      if (null != tool) {
+        tool.editorClosed(editor);
+      }
+    }
+  }
+
+    /**
    * Create a Composite with a gridLayout using 2 columns. On the first row,
    * there are the icon and a label with the tool's name. Then, we can
    * add the tool options spanning those two columns.
@@ -145,11 +176,12 @@ public class Tools extends ListeningViewViewPart<ViewEditor> {
     control.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
 
-    // Tell the tool which editor it should listen to.
-    // Need to set the editor on creation if an editor is active.
-    tool.setEditor(getAcceptableEditor());
   }
 
+  /**
+   * Create the tool's UI.  Don't let an exception in one tool create
+   * problems for any of the other tools.
+   */
   private Control createToolControl(Composite toolPanel, Tool tool) {
     try {
       return tool.setupComposite(toolPanel);
@@ -194,22 +226,14 @@ public class Tools extends ListeningViewViewPart<ViewEditor> {
 
   @Override
   protected boolean newEditorCallback(ViewEditor e) {
-    for (Tool t : guis.keySet()) {
-      if (null != t) {
-        t.setEditor(e);
-      }
-    }
+    setEditor(e);
     return true;
   }
+
 
   @Override
   protected boolean closeEditorCallback(ViewEditor e) {
-    for (Tool t : guis.keySet()) {
-      if (null != t) {
-        t.editorClosed(e);
-      }
-    }
+    closeEditor(e);
     return true;
   }
-
 }

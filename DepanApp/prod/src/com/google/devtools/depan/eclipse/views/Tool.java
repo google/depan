@@ -34,14 +34,14 @@ public interface Tool {
    *
    * @return a name for this tool.
    */
-  public String getName();
+  String getName();
 
   /**
    * Provides an image used for the button representing this tool.
    *
    * @return an image used for the button representing this tool.
    */
-  public Image getIcon();
+  Image getIcon();
 
   /**
    * Standard way to create the GUI with options for this tool.
@@ -52,7 +52,14 @@ public interface Tool {
    * @return the composite created, or <code>null</code> if this tool has no
    *         options.
    */
-  public Control setupComposite(Composite parent);
+  Control setupComposite(Composite parent);
+
+  /**
+   * Dispose of any resources when then tool is closed.
+   * 
+   * This is independent of whether any editor is assigned to the tool.
+   */
+  public void dispose();
 
   /**
    * Set the editor that is currently selected.

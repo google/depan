@@ -204,9 +204,8 @@ public class ScaleTool extends ViewEditorTool {
   @Override
   protected void acquireResources() {
     super.acquireResources();
-    if (hasEditor()) {
-      getEditor().addDrawingListener(drawingListener);
-    }
+
+    getEditor().addDrawingListener(drawingListener);
   }
 
   @Override
@@ -214,6 +213,7 @@ public class ScaleTool extends ViewEditorTool {
     if (hasEditor()) {
       getEditor().removeDrawingListener(drawingListener);
     }
+
     super.releaseResources();
   }
 

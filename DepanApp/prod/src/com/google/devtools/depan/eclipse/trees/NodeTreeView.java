@@ -65,6 +65,10 @@ public class NodeTreeView<E> {
   }
 
   public void updateData(GraphData<E> data) {
+    // Some updates don't change the nodes.
+    if (this.data == data)
+      return;
+
     this.data = data;
     updateTree();
     updateExpandState();
@@ -73,14 +77,8 @@ public class NodeTreeView<E> {
   }
   
   private void updateTree() {
-    System.out.println("Compute roots...");
     NodeWrapperRoot<E> roots = data.getHierarchyRoots();
-    System.out.println("  DONE");
-    System.out.println("Set Input...");
-    long l = Calendar.getInstance().getTimeInMillis();
     tree.setInput(roots);
-    long l2 = Calendar.getInstance().getTimeInMillis() - l;
-    System.out.println("  DONE " + (l2 / 1000.0));
   }
 
   private void updateExpandState() {

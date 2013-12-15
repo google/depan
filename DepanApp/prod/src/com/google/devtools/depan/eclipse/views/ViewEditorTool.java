@@ -72,6 +72,11 @@ public abstract class ViewEditorTool implements Tool {
   protected void updateControls() {
   }
 
+  @Override
+  public void dispose() {
+    releaseResources();
+  }
+
   /**
    * {@inheritDoc}
    * <p>
@@ -83,8 +88,10 @@ public abstract class ViewEditorTool implements Tool {
       return;
     }
 
-    releaseResources();
+    // May need (expect?) resources to clear controls.
     clearControls();
+    releaseResources();
+
     this.editor = null;
   }
 
@@ -105,9 +112,11 @@ public abstract class ViewEditorTool implements Tool {
     }
     this.editor = viewEditor;
 
-    acquireResources();
-
-    clearControls();  // Is this necessary? Also happens in editorClosed().
-    updateControls();
+    if (null == viewEditor) {
+      clearControls();  // Is this necessary? Also happens in editorClosed().
+    } else {
+      acquireResources();
+      updateControls();
+    }
   }
 }

@@ -61,7 +61,7 @@ public class ListenerManager<L> {
   }
 
   public void removeListener(L listener) {
-    if (!listeners.contains(listener)) {
+    if (listeners.contains(listener)) {
       listeners.remove(listener);
     }
   }

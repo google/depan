@@ -47,13 +47,19 @@ public abstract class ListeningViewViewPart<E extends IWorkbenchPart>
     this.acceptedClass = e;
   }
 
-  // Suppressed for getActivePart()
   @Override
   public void createPartControl(Composite parentComposite) {
     IWorkbenchPage parentPage = getViewSite().getPage();
     this.editor = getAcceptableEditor(parentPage.getActivePart());
     parentPage.addPartListener(partListener);
     createGui(parentComposite);
+  }
+
+  @Override
+  public void dispose() {
+    disposeGui();
+    getViewSite().getPage().removePartListener(partListener);
+    super.dispose();
   }
 
   /**
@@ -63,14 +69,10 @@ public abstract class ListeningViewViewPart<E extends IWorkbenchPart>
    */
   protected abstract void createGui(Composite parent);
 
-  /* (non-Javadoc)
-   * @see org.eclipse.ui.part.WorkbenchPart#dispose()
+  /**
+   * Extending classes overload this method to dispose their resources.
    */
-  @Override
-  public void dispose() {
-    getViewSite().getPage().removePartListener(partListener);
-    super.dispose();
-  }
+  protected abstract void disposeGui();
 
   @Override
   public void setFocus() {

@@ -46,6 +46,12 @@ public class ViewEditorToolView extends ListeningViewViewPart<ViewEditor> {
     tool.setEditor(getAcceptableEditor());
   }
 
+
+  @Override
+  protected void disposeGui() {
+    tool.dispose();
+  }
+
   @Override
   public void eClosed(ViewEditor part) {
     tool.editorClosed(part);
@@ -56,5 +62,4 @@ public class ViewEditorToolView extends ListeningViewViewPart<ViewEditor> {
     tool.setEditor(part);
     return false;
   }
-
 }

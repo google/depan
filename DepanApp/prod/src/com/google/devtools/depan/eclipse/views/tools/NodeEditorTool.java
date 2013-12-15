@@ -184,11 +184,12 @@ public class NodeEditorTool extends ViewSelectionListenerTool
   // Tool life-cycle methods
 
   @Override
-  public void releaseResources() {
+  protected void acquireResources() {
+    super.acquireResources();
+
     GraphData<NodeDisplayProperty> hierarchy = getEditorHierarchy();
-    hierarchy.saveExpandState(
-        nodeTreeView.getTreeViewer().getExpandedTreePaths());
-    }
+    nodeTreeView.updateData(hierarchy);
+  }
 
   @Override
   protected void updateControls() {
@@ -198,19 +199,6 @@ public class NodeEditorTool extends ViewSelectionListenerTool
     RelationshipSet selectedRelSet = getEditor().getContainerRelSet();
     List<RelSetDescriptor> choices = getEditor().getRelSetChoices();
     relationshipSetPicker.setInput(selectedRelSet, choices );
-  }
-
-  /**
-   * after a change of editor, reset the content of the tree.
-   */
-  protected void refresh() {
-    // TODO(leeca): how can this tool be active and not have a valid editor?
-    if (!hasEditor()) {
-      return;
-    }
-
-    GraphData<NodeDisplayProperty> hierarchy = getEditorHierarchy();
-    nodeTreeView.updateData(hierarchy);
   }
 
   @Override
@@ -225,7 +213,12 @@ public class NodeEditorTool extends ViewSelectionListenerTool
 
   @Override
   public void emptySelection() {
-    refresh();
+    if (!hasEditor()) {
+      return;
+    }
+
+    GraphData<NodeDisplayProperty> hierarchy = getEditorHierarchy();
+    nodeTreeView.updateData(hierarchy);
   }
 
   private GraphData<NodeDisplayProperty> getEditorHierarchy() {
@@ -251,7 +244,7 @@ public class NodeEditorTool extends ViewSelectionListenerTool
   }
 
   @Override
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes") // NodeWrapper
   public Object getValue(Object element, String property) {
     if (element instanceof NodeWrapper) {
       NodeWrapper wrapper = (NodeWrapper) element;
@@ -417,7 +410,16 @@ public class NodeEditorTool extends ViewSelectionListenerTool
   }
 
   @Override
+  // From RelationshipSelectorListener
   public void selectedSetChanged(RelationshipSet set) {
-    refresh();
+    // Ignore RelationshipSelector changes with no active editor
+    if (!hasEditor()) {
+      return;
+    }
+
+    GraphData<NodeDisplayProperty> hierarchy = getEditorHierarchy();
+    nodeTreeView.updateData(hierarchy);
+
+    // TODO: updateSelectionTo()?
   }
 }

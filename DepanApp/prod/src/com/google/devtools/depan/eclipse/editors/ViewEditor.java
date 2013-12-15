@@ -1139,6 +1139,8 @@ public class ViewEditor extends MultiPageEditorPart
       public void dispatch(DrawingListener listener) {
         listener.updateDrawingBounds(drawing, viewport);
       }
+
+      @Override
       public void captureException(RuntimeException errAny) {
         logger.warning(errAny.toString());
       }
@@ -1150,6 +1152,8 @@ public class ViewEditor extends MultiPageEditorPart
 
   private abstract static class SimpleDispatcher
       implements ListenerManager.Dispatcher<SelectionChangeListener> {
+
+    @Override
     public void captureException(RuntimeException errAny) {
       logger.warning(errAny.toString());
     }
