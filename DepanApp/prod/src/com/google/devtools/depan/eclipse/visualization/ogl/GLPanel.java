@@ -162,6 +162,7 @@ public class GLPanel extends GLScene {
     dryRun();
 
     Refresher r = new Refresher(this);
+    r.setName("OGL " + editor.getPartName());
     r.start();
   }
 
