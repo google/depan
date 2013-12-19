@@ -415,8 +415,10 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
     viewDoc.setSelectedLayout(layoutName);
     viewDoc.setLayoutFinder(layoutChoices.getRelationSet());
 
-    boolean doLayout = false;
-    if (null != layoutName) {
+    // Preserve locations if no new layout is selected
+    if (null == layoutName) {
+      viewDoc.setNodeLocations(viewEditor.getNodeLocations());
+    } else {
       LayoutContext layoutContext = LayoutUtil.newLayoutContext(
           viewEditor.getParentGraph(), viewNodes, layoutChoices.getRelationSet());
       layoutContext.setNodeLocations(getEditor().getNodeLocations());
@@ -425,10 +427,9 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
       LayoutGenerator layout = layoutChoices.getLayoutGenerator();
       viewDoc.setNodeLocations(
           LayoutUtil.calcPositions(layout, layoutContext, viewNodes));
-      doLayout = true;
     }
 
-    ViewEditor.startViewEditor(viewDoc, doLayout);
+    ViewEditor.startViewEditor(viewDoc);
   }
 
   /**

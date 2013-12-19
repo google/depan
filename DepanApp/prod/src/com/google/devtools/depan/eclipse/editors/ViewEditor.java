@@ -146,12 +146,6 @@ public class ViewEditor extends MultiPageEditorPart
   /** Dirty state. */
   private boolean isDirty = true;
 
-  /**
-   * Skip layout on initial render if existing positions should 
-   * be preserved.
-   */
-  private boolean skipLayout;
-
   /////////////////////////////////////
   // Resources to release in the dispose() method
 
@@ -318,7 +312,8 @@ public class ViewEditor extends MultiPageEditorPart
         new GridData(SWT.FILL, SWT.FILL, true, true));
 
     // Configure the rendering pipe before listening for changes.
-    layoutKludge();
+    renderer.initializeNodeLocations(viewInfo.getNodeLocations());
+
     setPreferences();
     initSelectedNodes(getSelectedNodes());
 
@@ -331,33 +326,28 @@ public class ViewEditor extends MultiPageEditorPart
         scrollHandler.updateDrawingBounds(drawing, viewport);
       }});
 
+    if (viewInfo.getNodeLocations().size() == 0) {
+      addDrawingListener(new DrawingListener() {
+
+        @Override
+        public void updateDrawingBounds(Rectangle2D drawing, Rectangle2D viewport) {
+          // Don't layout nodes if no layout is defined
+          LayoutGenerator selectedLayout = getSelectedLayout();
+          if (null == selectedLayout ) {
+            return;
+          }
+
+          // Run the layout process on all nodes in the view.
+          applyLayout(selectedLayout,
+              viewInfo.getLayoutFinder(), viewInfo.getViewNodes());
+
+          // Only need to do this once on startup
+          removeDrawingListener(this);
+        }});
+    }
+
     int index = addPage(parent);
     setPageText(index, "Graph View");
-  }
-
-  /**
-   * If we could scale the layout to the view-port without setting up the
-   * renderer, we wouldn't need this.  But that will require viewport
-   * persistence in the ViewPrefs, and the ability for ViewEditor to scale
-   * positions to the viewport size.
-   */
-  private void layoutKludge() {
-    renderer.initializeNodeLocations(viewInfo.getNodeLocations());
-
-    // Don't layout nodes if previous location is good.
-    if (skipLayout) {
-      return;
-    }
-
-    // Don't layout nodes if no layout is defined
-    LayoutGenerator selectedLayout = getSelectedLayout();
-    if (null == selectedLayout ) {
-      return;
-    }
-
-    // Run the layout process on all nodes in the view.
-    applyLayout(selectedLayout,
-        viewInfo.getLayoutFinder(), viewInfo.getViewNodes());
   }
 
   protected String edgeToolTip(GraphEdge edge) {
@@ -412,7 +402,6 @@ public class ViewEditor extends MultiPageEditorPart
       ViewEditorInput editorInput = (ViewEditorInput) input;
       viewFile = null; // not yet saved
       viewInfo = editorInput.getViewDocument();
-      skipLayout = editorInput.skipLayout();
       String graphName = viewInfo.getGraphModelLocation().getName();
       String partName = NewEditorHelper.newEditorLabel(
           graphName + " - New View");
@@ -422,7 +411,6 @@ public class ViewEditor extends MultiPageEditorPart
       try {
         viewFile = ((IFileEditorInput) input).getFile();
         viewInfo = loadViewDocument(viewFile);
-        skipLayout = (viewInfo.getNodeLocations().size() > 0);
         setPartName(viewFile.getName());
         setDirtyState(false);
       } catch (IOException e) {
@@ -1374,16 +1362,12 @@ public class ViewEditor extends MultiPageEditorPart
 
   /**
    * Activate a new ViewEditor.
-   * This is an asynchronous active, as the new editor will execute separately
-   * from the other workbench windows.
    * 
-   * @param newInfo graph to display
-   * @param skipLayout {@code true} if layout should be skipped on initial
-   *     rendering.
+   * This is an asynchronous activate, as the new editor will execute
+   * separately from the other workbench windows.
    */
-  public static void startViewEditor(
-      ViewDocument newInfo, boolean skipLayout) {
-    final ViewEditorInput input = new ViewEditorInput(newInfo, skipLayout);
+  public static void startViewEditor(ViewDocument newInfo) {
+    final ViewEditorInput input = new ViewEditorInput(newInfo);
     getWorkbenchDisplay().asyncExec(new Runnable() {
       public void run() {
         IWorkbenchPage page = PlatformUI.getWorkbench()

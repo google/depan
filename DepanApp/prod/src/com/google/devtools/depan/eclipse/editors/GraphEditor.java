@@ -304,24 +304,15 @@ public class GraphEditor
     GraphModelReference graphRef = new GraphModelReference(file, graph);
 
     ViewPreferences userPrefs = new ViewPreferences();
+
+    // No locations, so initial layout occurs in ViewEditor once viewport
+    // is constructed.
     String layoutName = layoutChoices.getLayoutName();
     userPrefs.setSelectedLayout(layoutName);
     userPrefs.setLayoutFinder(layoutChoices.getRelationSet());
 
-    boolean doLayout = false;
-    if (null != layoutName) {
-      LayoutContext layoutContext = LayoutUtil.newLayoutContext(
-          graph.getGraph(), nodes, layoutChoices.getRelationSet());
-
-      // Do the layout for these nodes
-      LayoutGenerator layout = layoutChoices.getLayoutGenerator();
-      userPrefs.setNodeLocations(
-          LayoutUtil.calcPositions(layout, layoutContext, nodes));
-      doLayout = true;
-    }
-
     ViewDocument viewInfo = new ViewDocument(graphRef, nodes, userPrefs);
-    ViewEditor.startViewEditor(viewInfo, doLayout);
+    ViewEditor.startViewEditor(viewInfo);
   }
 
   /**
