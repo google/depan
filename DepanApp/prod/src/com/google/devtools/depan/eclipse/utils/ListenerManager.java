@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.eclipse.utils;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 import java.util.List;
@@ -67,7 +68,9 @@ public class ListenerManager<L> {
   }
 
   public void fireEvent(Dispatcher<L> dispatcher) {
-    for (L listener : listeners) {
+    // Allow listeners to remove themselves
+    ImmutableList<L> snapshot = ImmutableList.copyOf(listeners);
+    for (L listener : snapshot) {
       try {
         dispatcher.dispatch(listener);
       } catch (RuntimeException errAny) {
