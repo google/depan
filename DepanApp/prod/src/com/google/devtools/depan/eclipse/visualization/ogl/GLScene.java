@@ -54,6 +54,9 @@ public abstract class GLScene {
   private static final Logger logger =
       Logger.getLogger(GLScene.class.getName());
 
+  // For OSX, get profile early
+  private static GLProfile DEFAULT_PROFILE = GLProfile.getDefault();
+
   private SceneGrip grip;
   private GLCanvas canvas;
   private final GLContext context;
@@ -118,8 +121,8 @@ public abstract class GLScene {
 
     try {
       logger.info("Create context...");
-      GLProfile profile = GLProfile.getDefault();
-      GLContext result = GLDrawableFactory.getFactory(profile).createExternalGLContext();
+      GLDrawableFactory drawableFactory = GLDrawableFactory.getFactory(DEFAULT_PROFILE);
+	GLContext result = drawableFactory.createExternalGLContext();
       logger.info("    Done.");
 
       return result;
