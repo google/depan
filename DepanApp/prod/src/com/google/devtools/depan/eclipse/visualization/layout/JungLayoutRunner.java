@@ -119,7 +119,7 @@ public abstract class JungLayoutRunner implements LayoutRunner {
       super.layoutStep();
 
       if (stepsRemaining > 0)
-        stepsRemaining++;
+        stepsRemaining--;
     }
 
     @Override
