@@ -22,7 +22,6 @@ import com.google.common.collect.Maps;
 
 import edu.uci.ics.jung.graph.DirectedGraph;
 
-import java.awt.Dimension;
 import java.awt.geom.Point2D;
 import java.util.Collection;
 import java.util.Map;
@@ -100,11 +99,10 @@ public abstract class TreeLayoutGenerator implements LayoutGenerator {
       // TODO:  Use GraphModel more directly
       DirectedGraph<GraphNode, GraphEdge> jungGraph =
               LayoutUtil.buildJungGraph(context);
-      Dimension size = LayoutUtil.buildJungDimension(context);
 
       return new NewTreeLayout(
               jungGraph, context.getGraphModel(),
-              context.getRelations(), size);
+              context.getRelations(), context.getViewport());
     }
   };
 
@@ -116,11 +114,10 @@ public abstract class TreeLayoutGenerator implements LayoutGenerator {
       // TODO:  Use GraphModel more directly
       DirectedGraph<GraphNode, GraphEdge> jungGraph =
               LayoutUtil.buildJungGraph(context);
-      Dimension size = LayoutUtil.buildJungDimension(context);
 
       return new NewRadialLayout(
               jungGraph, context.getGraphModel(),
-              context.getRelations(), size);
+              context.getRelations(), context.getViewport());
     }
   };
 }

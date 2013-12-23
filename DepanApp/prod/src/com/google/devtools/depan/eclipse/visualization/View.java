@@ -123,6 +123,7 @@ public class View {
   public Rectangle2D getOGLViewport() {
     return glPanel.getOGLViewport();
   }
+
   /////////////////////////////////////
 
   public void updateSelectedNodes(

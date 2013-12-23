@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.eclipse.visualization.layout;
 
+import com.google.devtools.depan.eclipse.editors.Point2dUtils;
 import com.google.devtools.depan.graph.api.DirectedRelationFinder;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
@@ -25,8 +26,8 @@ import com.google.common.collect.Maps;
 
 import edu.uci.ics.jung.graph.Graph;
 
-import java.awt.Dimension;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 
 /**
@@ -53,8 +54,8 @@ public class NewRadialLayout extends NewTreeLayout {
    * @param size available rendering space (ignored)
    */
   protected NewRadialLayout(Graph<GraphNode, GraphEdge> graph,
-      GraphModel graphModel, DirectedRelationFinder relations, Dimension size) {
-    super(graph, graphModel, relations, size);
+      GraphModel graphModel, DirectedRelationFinder relations, Rectangle2D region) {
+    super(graph, graphModel, relations, region);
   }
 
   /**
@@ -73,6 +74,7 @@ public class NewRadialLayout extends NewTreeLayout {
 
     positions = Maps.newHashMapWithExpectedSize(graphModel.getNodes().size());
     layoutTool.layoutTree();
+    Point2dUtils.translatePos(region, graphModel.getNodes(), positions);
   }
 
   /**

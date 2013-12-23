@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.eclipse.visualization.layout;
 
+import com.google.devtools.depan.eclipse.editors.Point2dUtils;
 import com.google.devtools.depan.graph.api.DirectedRelationFinder;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
@@ -25,8 +26,8 @@ import com.google.common.collect.Maps;
 
 import edu.uci.ics.jung.graph.Graph;
 
-import java.awt.Dimension;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.Map;
 
 /**
@@ -39,11 +40,18 @@ import java.util.Map;
 public class NewTreeLayout {
 
   /** The source of nodes for layout. */
-  protected GraphModel graphModel;
+  protected final GraphModel graphModel;
 
   /** The set of relations that define the hierarchy. */
-  protected DirectedRelationFinder relations;
+  protected final DirectedRelationFinder relations;
 
+  /** The region to fill with the layout. */
+  protected final Rectangle2D region;
+
+  /**
+   * The computed positions for the nodes.  Allocated just before the
+   * positions are computed.
+   */
   protected Map<GraphNode, Point2D> positions;
 
   /**
@@ -55,9 +63,11 @@ public class NewTreeLayout {
    * @param size available rendering space (ignored)
    */
   protected NewTreeLayout(Graph<GraphNode, GraphEdge> graph,
-      GraphModel graphModel, DirectedRelationFinder relations, Dimension size) {
+      GraphModel graphModel, DirectedRelationFinder relations,
+      Rectangle2D region) {
     this.graphModel = graphModel;
     this.relations = relations;
+    this.region = region;
   }
 
   /**
@@ -68,6 +78,7 @@ public class NewTreeLayout {
 
     positions = Maps.newHashMapWithExpectedSize(graphModel.getNodes().size());
     layoutTool.layoutTree();
+    Point2dUtils.translatePos(region, graphModel.getNodes(), positions);
   }
 
   public Point2D getPosition(GraphNode node) {

@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.eclipse.visualization.layout;
 
+import com.google.devtools.depan.eclipse.editors.Point2dUtils;
 import com.google.devtools.depan.model.GraphNode;
 
 import java.awt.geom.Point2D;
@@ -34,11 +35,14 @@ import java.util.Map;
  * @author <a href="mailto:leeca@google.com">Lee Carver</a>
  */
 public class LayoutScaler {
-  public static final Point2D ZERO_POINT = new Point2D.Double(0.0, 0.0);
+  @SuppressWarnings("unused") // for now
+  private final int nodeCnt;
 
-  public final int nodeCnt;
-  public final int emptyCnt;
-  public final Rectangle2D graphArea;
+  @SuppressWarnings("unused") // for now
+  private final int emptyCnt;
+
+  /** Destination region for diagram, in OGL coordinates. */
+  private final Rectangle2D graphArea;
 
   /**
    * Initialize the graph area from the set of layout nodes and positions
@@ -93,22 +97,17 @@ public class LayoutScaler {
     this.nodeCnt = nodeCnt;
     this.emptyCnt = emptyCnt;
 
-    this.graphArea = new Rectangle2D.Double(minX, maxY, maxX, minY);
+    this.graphArea = new Rectangle2D.Double(
+        minX, minY, maxX - minX, maxY - minY);
   }
 
-  private static double scaleRange(double range, double view) {
-    if (view == 0) {
-      return 1.0;
-    }
-    return view / range;
-  }
-
-  public double getCenterX() {
-    return graphArea.getCenterX();
-  }
-
-  public double getCenterY() {
-    return graphArea.getCenterY();
+  /**
+   * Provide a translater that maps the graph area to the region.  Nodes in the
+   * center (and corners) go to the same location in the into regions.  Other
+   *  nodes are shifted proportionately.
+   */
+  public Point2dUtils.Translater intoRegion(Rectangle2D region) {
+    return Point2dUtils.newIntoRegion(region, graphArea);
   }
 
   /**
@@ -142,5 +141,12 @@ public class LayoutScaler {
     double scaleX = scaleRange(rangeX, viewport.getWidth());
 
     return Math.min(scaleX, scaleY);
+  }
+
+  private static double scaleRange(double range, double view) {
+    if (view == 0) {
+      return 1.0;
+    }
+    return view / range;
   }
 }

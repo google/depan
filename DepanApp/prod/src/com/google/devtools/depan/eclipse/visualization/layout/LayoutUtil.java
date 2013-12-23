@@ -23,9 +23,7 @@ import com.google.devtools.depan.model.GraphNode;
 
 import edu.uci.ics.jung.graph.DirectedGraph;
 
-import java.awt.Dimension;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 import java.util.Map;
 
@@ -91,16 +89,5 @@ public class LayoutUtil {
       layoutContext.setRelations(viewRelations);
     }
     return layoutContext;
-  }
-
-  /**
-   * @param context
-   * @return
-   */
-  public static Dimension buildJungDimension(LayoutContext context) {
-    Rectangle2D viewport = context.getViewport();
-
-    // TODO: improve scaling
-    return new Dimension((int) viewport.getWidth(), (int) viewport.getHeight());
   }
 }

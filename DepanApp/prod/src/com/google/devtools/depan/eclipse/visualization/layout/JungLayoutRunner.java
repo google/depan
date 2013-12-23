@@ -15,6 +15,7 @@
  */
 package com.google.devtools.depan.eclipse.visualization.layout;
 
+import com.google.devtools.depan.eclipse.editors.Point2dUtils;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphNode;
 
@@ -24,6 +25,7 @@ import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.algorithms.util.IterativeContext;
 
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 import java.util.Map;
 
@@ -37,25 +39,34 @@ public abstract class JungLayoutRunner implements LayoutRunner {
 
   private final Layout<GraphNode, GraphEdge> jungLayout;
 
-  protected JungLayoutRunner(Layout<GraphNode, GraphEdge> jungLayout) {
+  private final Rectangle2D region;
+
+  protected JungLayoutRunner(
+      Rectangle2D region,
+      Layout<GraphNode, GraphEdge> jungLayout) {
     this.jungLayout = jungLayout;
+    this.region = region;
   }
 
   @Override
   public Map<GraphNode, Point2D> getPositions(Collection<GraphNode> nodes) {
-    // TODO: Simply wrapper jungLayout with a Map Adapter?
-    Map<GraphNode, Point2D> result = Maps.newHashMap();
+    // Collect the positions from the Jung layout tool.
+    Map<GraphNode, Point2D> result =
+        Maps.newHashMapWithExpectedSize(nodes.size());
     for (GraphNode node : nodes) {
       Point2D position = jungLayout.transform(node);
       result.put(node, position);
     }
+
+    Point2dUtils.translatePos(region, nodes, result);
     return result;
   }
 
   public static class Direct extends JungLayoutRunner {
 
-    protected Direct(Layout<GraphNode, GraphEdge> jungLayout) {
-      super(jungLayout);
+    protected Direct(
+        Rectangle2D region, Layout<GraphNode, GraphEdge> jungLayout) {
+      super(region, jungLayout);
     }
 
     @Override
@@ -78,9 +89,10 @@ public abstract class JungLayoutRunner implements LayoutRunner {
     private final int layoutCost;
 
     protected Iterative(
-            Layout<GraphNode, GraphEdge> jungLayout,
-            int layoutCost) {
-      super(jungLayout);
+        Rectangle2D region,
+        Layout<GraphNode, GraphEdge> jungLayout,
+        int layoutCost) {
+      super(region, jungLayout);
       this.layoutCost = layoutCost; 
       this.runner = (IterativeContext) jungLayout;
     }
@@ -108,9 +120,10 @@ public abstract class JungLayoutRunner implements LayoutRunner {
     private int stepsRemaining;
 
     protected Counted(
-            Layout<GraphNode, GraphEdge> jungLayout,
-            int layoutCost) {
-      super(jungLayout, layoutCost);
+        Rectangle2D region,
+        Layout<GraphNode, GraphEdge> jungLayout,
+        int layoutCost) {
+      super(region, jungLayout, layoutCost);
       stepsRemaining = layoutCost;
     }
 

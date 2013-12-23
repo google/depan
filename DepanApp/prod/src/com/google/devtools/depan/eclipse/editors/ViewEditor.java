@@ -881,30 +881,6 @@ public class ViewEditor extends MultiPageEditorPart
     renderer.editNodeLocations(nodeLocations);
   }
 
-  /**
-   * For the listed nodes, move their provided location by the given delta
-   * values.  The location map can be the node's current location, or a newly
-   * computed location for the nodes.  If a listed node has no entry in the
-   * location map, the node's location is moved relative to the origin and will
-   * be (xDelta, yDelta).
-   * 
-   * @param moveNodes defines the nodes to move
-   * @param locations defines the initial locations of nodes
-   * @param xDelta amount of x shift for node move
-   * @param yDelta amount of y shift for node move
-   */
-  private static Map<GraphNode, Point2D> translateNodes(
-      Collection<GraphNode> moveNodes,
-      Map<GraphNode, Point2D> locations,
-      Point2dUtils.Translater translater) {
-    Map<GraphNode, Point2D> result = Maps.newHashMap();
-    for (GraphNode node : moveNodes) {
-      Point2D location = locations.get(node);
-      result.put(node, translater.translate(location));
-    }
-    return result;
-  }
-
   /////////////////////////////////////
   // Update node positions in the View Document
 
@@ -926,7 +902,7 @@ public class ViewEditor extends MultiPageEditorPart
   public void layoutScale(double scaleX, double scaleY) {
     Point2dUtils.Translater translater =
         Point2dUtils.newScaleTranslater(scaleX, scaleY);
-    Map<GraphNode, Point2D> changes = translateNodes(
+    Map<GraphNode, Point2D> changes = Point2dUtils.translateNodes(
         getExposedGraph().getNodes(), getNodeLocations(),
         translater);
 
@@ -975,7 +951,7 @@ public class ViewEditor extends MultiPageEditorPart
     double scaleView = scaleWithMargin(scaler, viewport);
     Point2dUtils.Translater translater =
             Point2dUtils.newScaleTranslater(scaleView, scaleView);
-    return translateNodes(layoutNodes, locations, translater);
+    return Point2dUtils.translateNodes(layoutNodes, locations, translater);
   }
 
   private double scaleWithMargin(
@@ -1045,7 +1021,8 @@ public class ViewEditor extends MultiPageEditorPart
     context.setRelations(relationFinder);
     context.setNodeLocations(getNodeLocations());
 
-    Rectangle2D layoutViewport = buildOriginRegion(renderer.getOGLViewport());
+    Rectangle2D layoutViewport = Point2dUtils.scaleRectangle(
+        renderer.getOGLViewport(), 0.7);
     context.setViewport(layoutViewport);
 
     Map<GraphNode, Point2D> changes = LayoutUtil.calcPositions(
@@ -1053,15 +1030,6 @@ public class ViewEditor extends MultiPageEditorPart
 
     // Change the node locations.
     viewInfo.editNodeLocations(changes, null);
-  }
-
-  private Rectangle2D buildOriginRegion(Rectangle2D base) {
-    double rangeX = base.getWidth();
-    double rangeY = base.getHeight();
-    double newLeft = -rangeX / 2;
-    double newBottom = -rangeY / 2;
-    return new Rectangle2D.Double(
-        newLeft, rangeY + newBottom, rangeX + newLeft, newBottom);
   }
 
   /////////////////////////////////////
@@ -1104,7 +1072,7 @@ public class ViewEditor extends MultiPageEditorPart
     Point2dUtils.Translater translater =
         Point2dUtils.newDeltaTranslater(deltaX, deltaY);
 
-    Map<GraphNode, Point2D> changes = translateNodes(
+    Map<GraphNode, Point2D> changes = Point2dUtils.translateNodes(
         getSelectedNodes(), getNodeLocations(), translater);
     viewInfo.editNodeLocations(changes, author);
   }

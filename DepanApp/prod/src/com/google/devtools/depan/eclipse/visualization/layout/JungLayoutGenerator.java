@@ -28,6 +28,7 @@ import edu.uci.ics.jung.algorithms.layout.SpringLayout2;
 import edu.uci.ics.jung.graph.DirectedGraph;
 
 import java.awt.Dimension;
+import java.awt.geom.Rectangle2D;
 
 /**
  * Define a group of LayoutGenerator that use the JUNG layout algorithms.
@@ -51,16 +52,20 @@ public abstract class JungLayoutGenerator implements LayoutGenerator {
    * from {@link #buildRunner(LayoutContext)}.
    */
   protected abstract LayoutRunner buildLayoutRunner(
-          Layout<GraphNode, GraphEdge> jungLayout);
+      Rectangle2D region,
+      Layout<GraphNode, GraphEdge> jungLayout);
 
   @Override
   // Template method, with hook runnerBuilder()
   public final LayoutRunner buildRunner(LayoutContext context) {
     DirectedGraph<GraphNode, GraphEdge> jungGraph =
         LayoutUtil.buildJungGraph(context);
-    Dimension size = LayoutUtil.buildJungDimension(context);
+
+    Rectangle2D region = context.getViewport();
+    Dimension size = new Dimension((int) region.getWidth(), (int) region.getHeight());
+
     Layout<GraphNode, GraphEdge> jungLayout = buildJungLayout(jungGraph, size);
-    return buildLayoutRunner(jungLayout);
+    return buildLayoutRunner(region, jungLayout);
   }
 
   /////////////////////////////////////
@@ -71,8 +76,9 @@ public abstract class JungLayoutGenerator implements LayoutGenerator {
 
     @Override
     protected final LayoutRunner buildLayoutRunner(
-            Layout<GraphNode, GraphEdge> jungLayout) {
-      return new JungLayoutRunner.Direct(jungLayout);
+        Rectangle2D region,
+        Layout<GraphNode, GraphEdge> jungLayout) {
+      return new JungLayoutRunner.Direct(region, jungLayout);
     }
   }
 
@@ -86,8 +92,9 @@ public abstract class JungLayoutGenerator implements LayoutGenerator {
 
     @Override
     protected final LayoutRunner buildLayoutRunner(
-            Layout<GraphNode, GraphEdge> jungLayout) {
-      return new JungLayoutRunner.Iterative(jungLayout, iterations);
+        Rectangle2D region,
+        Layout<GraphNode, GraphEdge> jungLayout) {
+      return new JungLayoutRunner.Iterative(region, jungLayout, iterations);
     }
   }
 
@@ -101,8 +108,9 @@ public abstract class JungLayoutGenerator implements LayoutGenerator {
 
     @Override
     protected final LayoutRunner buildLayoutRunner(
-            Layout<GraphNode, GraphEdge> jungLayout) {
-      return new JungLayoutRunner.Counted(jungLayout, iterations);
+        Rectangle2D region,
+        Layout<GraphNode, GraphEdge> jungLayout) {
+      return new JungLayoutRunner.Counted(region, jungLayout, iterations);
     }
   }
 

@@ -16,7 +16,15 @@
 
 package com.google.devtools.depan.eclipse.editors;
 
+import com.google.devtools.depan.eclipse.visualization.layout.LayoutScaler;
+import com.google.devtools.depan.model.GraphNode;
+
+import com.google.common.collect.Maps;
+
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * Computes new Point2D values based on delta terms and scaling factors
@@ -28,7 +36,7 @@ import java.awt.geom.Point2D;
 public class Point2dUtils {
   public static final Point2D ZERO_POINT = newZeroPoint();
 
-  // Prevent instantiation of this namespace class.
+  // Prevent instantiation of this utility class.
   private Point2dUtils() {
   }
 
@@ -37,13 +45,26 @@ public class Point2dUtils {
   }
 
   public static Point2D newZeroPoint() {
-    return new Point2D.Double(0.0, 0.0);
+    return newPoint2D(0.0, 0.0);
+  }
+
+  /////////////////////////////////////
+  // Rectangle tools
+
+  public static Rectangle2D scaleRectangle(Rectangle2D base, Double scale) {
+    double width = base.getWidth() * scale;
+    double height = base.getHeight() * scale;
+    double shiftX = (base.getWidth() - width ) / 2.0;
+    double shiftY = (base.getHeight() - height ) / 2.0;
+
+    return new Rectangle2D.Double(
+        base.getX() + shiftX, base.getY() + shiftY, width, height);
   }
 
   /////////////////////////////////////
   // Translaters for repetitively doing the same thing to many Point2Ds.
 
-  public interface Translater {
+  public static interface Translater {
     Point2D translate(Point2D source);
   }
 
@@ -121,4 +142,62 @@ public class Point2dUtils {
         newScaleTranslater(scaleX, scaleY));
   }
 
+  /**
+   * Provide a translater that maps nodes in the from region to the
+   * into region.  Nodes in the center (and corners) go to the same location
+   * in the into regions.  Other nodes are shifted proportionately.
+   */
+  public static Translater newIntoRegion(
+      Rectangle2D into, Rectangle2D from) {
+
+    double scaleX = into.getWidth() / from.getWidth();
+    double scaleY = into.getHeight() / from.getHeight();
+
+    double deltaX = into.getCenterX() - (scaleX * from.getCenterX());
+    double deltaY = into.getCenterY() - (scaleY * from.getCenterY());
+    return new Point2dUtils.DoubleTranslater(
+        Point2dUtils.newScaleTranslater(scaleX, scaleY),
+        Point2dUtils.newDeltaTranslater(deltaX, deltaY));
+  }
+
+  /**
+   * Update positions of moveNodes using the supplied translator.
+   * 
+   * The map of node positions is changed in place.
+   */
+  public static void translatePos(
+      Collection<GraphNode> moveNodes, Map<GraphNode, Point2D> positions,
+      Translater intoRegion) {
+
+    for (GraphNode node : moveNodes) {
+      Point2D location = positions.get(node);
+      positions.put(node, intoRegion.translate(location));
+    }
+  }
+
+  /**
+   * Compute positions of moveNodes using the supplied translator.
+   * 
+   * A new map of node positions is provided.
+   */
+  public static Map<GraphNode, Point2D> translateNodes(
+      Collection<GraphNode> moveNodes, Map<GraphNode, Point2D> positions,
+      Translater translater) {
+
+    Map<GraphNode, Point2D> result =
+        Maps.newHashMapWithExpectedSize(moveNodes.size());
+    for (GraphNode node : moveNodes) {
+      Point2D location = positions.get(node);
+      result.put(node, translater.translate(location));
+    }
+    return result;
+  }
+
+  public static void translatePos(Rectangle2D into, Collection<GraphNode> nodes, Map<GraphNode, Point2D> result) {
+    // Translate node locations to region
+    LayoutScaler scaler = new LayoutScaler(nodes, result);
+    Translater intoRegion = scaler.intoRegion(into);
+  
+    translatePos(nodes, result, intoRegion);
+  }
 }
