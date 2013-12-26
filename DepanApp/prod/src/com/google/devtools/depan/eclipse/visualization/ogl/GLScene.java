@@ -122,7 +122,7 @@ public abstract class GLScene {
     try {
       logger.info("Create context...");
       GLDrawableFactory drawableFactory = GLDrawableFactory.getFactory(DEFAULT_PROFILE);
-	GLContext result = drawableFactory.createExternalGLContext();
+      GLContext result = drawableFactory.createExternalGLContext();
       logger.info("    Done.");
 
       return result;
@@ -326,7 +326,7 @@ public abstract class GLScene {
     glu.gluUnProject(winX, winY, 0,
         modelview, 0, projection, 0, viewport, 0, wcoord0, 0);
     glu.gluUnProject(winX, winY, 1.0,
-            modelview, 0, projection, 0, viewport, 0, wcoord1, 0);
+        modelview, 0, projection, 0, viewport, 0, wcoord1, 0);
 
     // compute the vector between the two results.
     double[] vector = {wcoord1[0] - wcoord0[0], wcoord1[1] - wcoord0[1],
