@@ -25,8 +25,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 
-import java.util.Calendar;
-
 /**
  * Provide a tree view of the graph nodes.
  *
