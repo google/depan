@@ -285,26 +285,18 @@ public abstract class GLScene {
 
   public Rectangle2D getOGLViewport() {
     int[] osViewport = getViewport();
-    double[] topLeft = getOGLPos(osViewport[0], osViewport[1]);
-    double[] bottomRight = getOGLPos(osViewport[2], osViewport[3]);
+    double[] bottomLeft = getOGLPos(osViewport[0], osViewport[3] - osViewport[1]);
+    double[] topRight = getOGLPos(osViewport[0] + osViewport[2], 0);
     return new Rectangle2D.Double(
-        topLeft[0], bottomRight[1] /* left, bottom */ ,
-        bottomRight[0] - topLeft[0] /* width */,
-        topLeft[1] - bottomRight[1] /* height */ );
+        bottomLeft[0], bottomLeft[1] /* left, bottom */ ,
+        topRight[0] - bottomLeft[0] /* width */,
+        topRight[1] - bottomLeft[1] /* height */ );
   }
 
   /**
-   * Return the position in the openGL coordinates, given a window-relative
-   * position. For instance to know what are the coordinate for the point
-   * under the mouse, call this method with the mouse position relative to
-   * the window.
-   *
-   * @param gl
-   * @param glu
-   * @param grip
-   * @param x
-   * @param y
-   * @return
+   * Given graphics coordinates (origin top-left, y increases down), provide
+   * the corresponding OGL model coordinates (origin bottom-left, y increases
+   * up) for the point.
    */
   public static double[] getOGLPos(
       GL2 gl, GLU glu, SceneGrip grip, int x, int y) {

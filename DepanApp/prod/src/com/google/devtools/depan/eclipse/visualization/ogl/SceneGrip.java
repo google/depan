@@ -215,10 +215,14 @@ public class SceneGrip extends MouseAdapter
   }
 
   /**
+   * Provide the coordinates for the camera.  These are the OGL coordinates
+   * at which the camera is placed.  In rendering terms, that's the negative
+   * of the (x,y) translation transform.
+   * 
    * @return the camera (eye) position.
    */
   public float[] getCameraPosition() {
-    return new float[] {xoff, yoff, zoff};
+    return new float[] {-xoff, -yoff, zoff};
   }
 
   @Override
@@ -426,7 +430,7 @@ public class SceneGrip extends MouseAdapter
    * @param camY y coordinate
    */
   public void setCameraCenterTo(float camX, float camY) {
-    this.targetXoff = camX;
-    this.targetYoff = camY;
+    this.targetXoff = -camX;
+    this.targetYoff = -camY;
   }
 }

@@ -1021,8 +1021,8 @@ public class ViewEditor extends MultiPageEditorPart
     context.setRelations(relationFinder);
     context.setNodeLocations(getNodeLocations());
 
-    Rectangle2D layoutViewport = Point2dUtils.scaleRectangle(
-        renderer.getOGLViewport(), 0.7);
+    Rectangle2D viewport = renderer.getOGLViewport();
+    Rectangle2D layoutViewport = Point2dUtils.scaleRectangle(viewport, 0.7);
     context.setViewport(layoutViewport);
 
     Map<GraphNode, Point2D> changes = LayoutUtil.calcPositions(
