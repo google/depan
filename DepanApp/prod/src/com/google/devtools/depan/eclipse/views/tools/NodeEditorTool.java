@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.eclipse.views.tools;
 
-import com.google.common.collect.Lists;
+import com.google.devtools.depan.eclipse.editors.HierarchyCache;
 import com.google.devtools.depan.eclipse.editors.NodeWrapperTreeSorter;
 import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.trees.GraphData;
@@ -24,19 +24,20 @@ import com.google.devtools.depan.eclipse.trees.NodeTreeProvider;
 import com.google.devtools.depan.eclipse.trees.NodeTreeView;
 import com.google.devtools.depan.eclipse.trees.NodeTreeView.NodeWrapper;
 import com.google.devtools.depan.eclipse.utils.EditColTableDef;
-import com.google.devtools.depan.eclipse.utils.RelationshipSelectorListener;
-import com.google.devtools.depan.eclipse.utils.RelationshipSetPickerControl;
+import com.google.devtools.depan.eclipse.utils.HierarchyViewer;
+import com.google.devtools.depan.eclipse.utils.HierarchyViewer.HierarchyChangeListener;
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.utils.Tools;
 import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptor;
 import com.google.devtools.depan.eclipse.views.NodeEditorLabelProvider;
 import com.google.devtools.depan.eclipse.views.ViewSelectionListenerTool;
-import com.google.devtools.depan.graph.api.DirectedRelationFinder;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.RelationshipSet;
 import com.google.devtools.depan.util.StringUtils;
 import com.google.devtools.depan.view.NodeDisplayProperty;
 import com.google.devtools.depan.view.NodeDisplayProperty.Size;
+
+import com.google.common.collect.Lists;
 
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CheckboxCellEditor;
@@ -49,7 +50,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
@@ -67,7 +67,7 @@ import java.util.List;
  */
 public class NodeEditorTool extends ViewSelectionListenerTool
     implements ICellModifier, NodeTreeProvider<NodeDisplayProperty>,
-    RelationshipSelectorListener {
+    HierarchyChangeListener {
 
   /**
    * Node Tree View handling the TreeViewer, and the data inside.
@@ -77,7 +77,7 @@ public class NodeEditorTool extends ViewSelectionListenerTool
   /**
    * Selector for named relationships sets.
    */
-  private RelationshipSetPickerControl relationshipSetPicker = null;
+  private HierarchyViewer<NodeDisplayProperty> hierarchyPicker = null;
 
   protected static final String COL_NAME = "Name";
   protected static final String COL_XPOS = "X";
@@ -121,12 +121,11 @@ public class NodeEditorTool extends ViewSelectionListenerTool
     GridLayout grid = new GridLayout(1, false);
     baseComposite.setLayout(grid);
 
-    Composite pickerRegion = setupRelationPicker(baseComposite);
-    pickerRegion.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+    hierarchyPicker = createHierarchyPicker(baseComposite);
+    hierarchyPicker.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
     nodeTreeView = new NodeTreeView<NodeDisplayProperty>(baseComposite,
         SWT.VIRTUAL | SWT.FULL_SELECTION | SWT.BORDER);
-
     nodeTreeView.getTreeViewer().getControl().setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, true));
 
@@ -165,19 +164,14 @@ public class NodeEditorTool extends ViewSelectionListenerTool
     return baseComposite;
   }
 
-  private Composite setupRelationPicker(Composite parent) {
-    Composite region = new Composite(parent, SWT.NONE);
-    region.setLayout(new GridLayout(2, false));
+  private HierarchyViewer<NodeDisplayProperty> createHierarchyPicker(
+      Composite parent) {
 
-    Label pickerLabel = RelationshipSetPickerControl.createPickerLabel(region);
-    pickerLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+    HierarchyViewer<NodeDisplayProperty> result =
+        new HierarchyViewer<NodeDisplayProperty>(parent, false);
+    result.addChangeListener(this);
 
-    relationshipSetPicker = new RelationshipSetPickerControl(region);
-    relationshipSetPicker.addChangeListener(this);
-    relationshipSetPicker.setLayoutData(
-        new GridData(SWT.FILL, SWT.CENTER, true, false));
-
-    return region;
+    return result;
   }
 
   /////////////////////////////////////
@@ -187,7 +181,7 @@ public class NodeEditorTool extends ViewSelectionListenerTool
   protected void acquireResources() {
     super.acquireResources();
 
-    GraphData<NodeDisplayProperty> hierarchy = getEditorHierarchy();
+    GraphData<NodeDisplayProperty> hierarchy = getDisplayHierarchy();
     nodeTreeView.updateData(hierarchy);
   }
 
@@ -195,16 +189,17 @@ public class NodeEditorTool extends ViewSelectionListenerTool
   protected void updateControls() {
     super.updateControls();
 
-    // Update the RelSet picker for auto-collapse.
+    // Update the hierarchy picker for the new editor.
+    HierarchyCache<NodeDisplayProperty> hierarchies = getEditor().getHierarchies();
     RelationshipSet selectedRelSet = getEditor().getContainerRelSet();
     List<RelSetDescriptor> choices = getEditor().getRelSetChoices();
-    relationshipSetPicker.setInput(selectedRelSet, choices );
+    hierarchyPicker.setInput(hierarchies, selectedRelSet, choices );
   }
 
   @Override
   public void editorClosed(ViewEditor viewEditor) {
     if (hasEditor()) {
-      GraphData<NodeDisplayProperty> hierarchy = getEditorHierarchy();
+      GraphData<NodeDisplayProperty> hierarchy = getDisplayHierarchy();
       hierarchy.saveExpandState(
           nodeTreeView.getTreeViewer().getExpandedTreePaths());
     }
@@ -217,22 +212,12 @@ public class NodeEditorTool extends ViewSelectionListenerTool
       return;
     }
 
-    GraphData<NodeDisplayProperty> hierarchy = getEditorHierarchy();
+    GraphData<NodeDisplayProperty> hierarchy = getDisplayHierarchy();
     nodeTreeView.updateData(hierarchy);
   }
 
-  private GraphData<NodeDisplayProperty> getEditorHierarchy() {
-    GraphData<NodeDisplayProperty> hierarchy =
-        getEditor().getHierarchy(getHierarchyRelSet());
-    return hierarchy;
-  }
-
-  private DirectedRelationFinder getHierarchyRelSet() {
-    RelationshipSet relSet = relationshipSetPicker.getSelection();
-    if (null != relSet) {
-      return relSet;
-    }
-    return getEditor().getContainerRelSet();
+  private GraphData<NodeDisplayProperty> getDisplayHierarchy() {
+    return hierarchyPicker.getGraphData();
   }
 
   /////////////////////////////////////
@@ -278,20 +263,17 @@ public class NodeEditorTool extends ViewSelectionListenerTool
    * @param element
    * @return the property associated with the given {@link NodeWrapper}.
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   private NodeDisplayProperty getProp(NodeWrapper element) {
     return ((NodeWrapper<NodeDisplayProperty>) element).getContent();
   }
 
-  /*
-   * (non-Javadoc)
+  /**
    * Change the element property to the given value.
-   *
-   * @see org.eclipse.jface.viewers.ICellModifier#modify(java.lang.Object,
-   *      java.lang.String, java.lang.Object)
    */
   // suppressWarning: we cast an Object to NodeWrapper, the parameter type is
   // unchecked.
+  @Override
   @SuppressWarnings("unchecked")
   public void modify(Object element, String property, Object value) {
     if (!(element instanceof TreeItem)) {
@@ -395,7 +377,6 @@ public class NodeEditorTool extends ViewSelectionListenerTool
   @Override
   public void updateSelectionTo(Collection<GraphNode> selection) {
     for (GraphNode node : getEditor().getViewGraph().getNodes()) {
-      NodeDisplayProperty nodeProps = getEditor().getNodeProperty(node);
       NodeWrapper<NodeDisplayProperty> nodeWrapper =
           nodeTreeView.getNodeWrapper(node);
       if (null != nodeWrapper) {
@@ -410,16 +391,12 @@ public class NodeEditorTool extends ViewSelectionListenerTool
   }
 
   @Override
-  // From RelationshipSelectorListener
-  public void selectedSetChanged(RelationshipSet set) {
-    // Ignore RelationshipSelector changes with no active editor
+  public void hierarchyChanged() {
     if (!hasEditor()) {
       return;
     }
 
-    GraphData<NodeDisplayProperty> hierarchy = getEditorHierarchy();
+    GraphData<NodeDisplayProperty> hierarchy = getDisplayHierarchy();
     nodeTreeView.updateData(hierarchy);
-
-    // TODO: updateSelectionTo()?
   }
 }

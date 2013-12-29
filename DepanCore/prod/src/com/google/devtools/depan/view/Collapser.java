@@ -173,7 +173,8 @@ public class Collapser {
   public Collection<CollapseData> collapseTree(
       GraphModel graph, TreeModel treeData) {
 
-    List<GraphNode> inOrder = treeData.topoSort();
+    TopoSortState sorter = new TopoSortState(treeData);
+    List<GraphNode> inOrder = sorter.topoSort(graph.getNodes());
     Collection<CollapseData> collapseChanges = Lists.newArrayList();
 
     for (GraphNode top : inOrder) {
@@ -202,8 +203,8 @@ public class Collapser {
       GraphNode parent) {
 
     // Nothing to do if the node has no successors
-    Collection<GraphNode> successors = treeModel.getSuccessors(parent);
-    if (successors.isEmpty()) {
+    SuccessorEdges successors = treeModel.getSuccessors(parent);
+    if (!successors.hasSuccessors()) {
       return;
     }
 
@@ -229,8 +230,8 @@ public class Collapser {
       Set<GraphNode> exposedNodes,
       Set<GraphNode> masterNodes,
       GraphNode parent) {
-    for (GraphNode child : treeModel.getSuccessors(parent)) {
 
+    for (GraphNode child : treeModel.getSuccessorNodes(parent)) {
       // Only include exposed children
       if (exposedNodes.contains(child)) {
         result.add(child);

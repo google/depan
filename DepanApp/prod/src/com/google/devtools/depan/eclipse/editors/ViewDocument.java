@@ -26,6 +26,7 @@ import com.google.devtools.depan.model.RelationshipSet;
 import com.google.devtools.depan.model.interfaces.GraphBuilder;
 import com.google.devtools.depan.view.EdgeDisplayProperty;
 import com.google.devtools.depan.view.NodeDisplayProperty;
+import com.google.devtools.depan.view.TreeModel;
 
 import org.eclipse.core.resources.IResource;
 
@@ -223,9 +224,9 @@ public class ViewDocument {
     return userPrefs.getExposedGraph(graph);
   }
 
-  public void autoCollapse(
-      GraphModel graph, DirectedRelationFinder finder, Object author) {
-    userPrefs.autoCollapse(graph, finder, author);
+  public void collapseTree(
+      GraphModel graph, TreeModel treeData, Object author) {
+    userPrefs.collapseTree(graph, treeData, author);
   }
 
   public void collapse(

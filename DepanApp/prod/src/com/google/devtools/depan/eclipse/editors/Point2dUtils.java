@@ -36,6 +36,8 @@ import java.util.Map;
 public class Point2dUtils {
   public static final Point2D ZERO_POINT = newZeroPoint();
 
+  private static final double ZERO_THRESHOLD = 0.1;
+
   // Prevent instantiation of this utility class.
   private Point2dUtils() {
   }
@@ -77,6 +79,7 @@ public class Point2dUtils {
       this.deltaY = deltaY;
     }
 
+    @Override
     public Point2D translate(Point2D source) {
       if (null == source) {
         return newPoint2D(deltaX, deltaY);
@@ -94,6 +97,7 @@ public class Point2dUtils {
       this.scaleY = scaleY;
     }
 
+    @Override
     public Point2D translate(Point2D source) {
       if (null == source) {
         return newZeroPoint();
@@ -119,6 +123,7 @@ public class Point2dUtils {
       this.last = last;
     }
 
+    @Override
     public Point2D translate(Point2D source) {
       return last.translate(first.translate(source));
     }
@@ -140,6 +145,29 @@ public class Point2dUtils {
     return new DoubleTranslater(
         newDeltaTranslater(deltaX, deltaY),
         newScaleTranslater(scaleX, scaleY));
+  }
+
+  /**
+   * Provide a square region that is centered on the supplied from region,
+   * and is a minimal cover for the from region.  The provided region is at
+   * least (1.0, 1.0), even if the from region is empty.
+   */
+  public static Rectangle2D newOrthoRegion(Rectangle2D from) {
+    // Don't move the origin, 
+    double width = from.getWidth();
+    double height = from.getHeight();
+
+    if ((width < ZERO_THRESHOLD) && (height < ZERO_THRESHOLD)) {
+      width = 1.0;
+      height = 1.0;
+    }
+
+    width = Math.max(width, height);
+    height = Math.max(width, height);
+    
+    double x = from.getX() - (width - from.getWidth()) / 2;
+    double y = from.getY() - (height - from.getHeight()) / 2;
+    return new Rectangle2D.Double(x, y, width, height);
   }
 
   /**

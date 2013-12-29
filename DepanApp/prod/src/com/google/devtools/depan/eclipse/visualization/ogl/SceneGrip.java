@@ -27,6 +27,9 @@ import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
+import javax.media.opengl.GL2;
+import javax.media.opengl.glu.GLU;
+
 /**
  * A class handling basic mouse events, keyboard events, and camera position of
  * a {@link GLScene}.
@@ -392,7 +395,7 @@ public class SceneGrip extends MouseAdapter
    * @param zoomValue value added to the current zoom level.
    */
   public void zoomAt(int xPos, int yPos, float zoomValue) {
-    double[] target = scene.getOGLPos(xPos, yPos);
+    double[] target = getOGLPos(xPos, yPos);
     zoomAt(target[0], target[1], target[2], zoomValue);
   }
 
@@ -432,5 +435,48 @@ public class SceneGrip extends MouseAdapter
   public void setCameraCenterTo(float camX, float camY) {
     this.targetXoff = -camX;
     this.targetYoff = -camY;
+  }
+
+  /**
+   * Given graphics coordinates (origin top-left, y increases down), provide
+   * the corresponding OGL model coordinates (origin bottom-left, y increases
+   * up) for the point.
+   */
+  public double[] getOGLPos(int x, int y) {
+    int[] viewport = new int[4];
+    double[] modelview = new double[16];
+    double[] projection = new double[16];
+    double[] wcoord0 = new double[3];
+    double[] wcoord1 = new double[3];
+
+    GL2 gl = scene.gl;
+    gl.glGetDoublev(GL2.GL_MODELVIEW_MATRIX, modelview, 0);
+    gl.glGetDoublev(GL2.GL_PROJECTION_MATRIX, projection, 0);
+    gl.glGetIntegerv(GL2.GL_VIEWPORT, viewport, 0);
+
+    double winX = x;
+    double winY = (double) viewport[3] - (double) y;
+
+    // UnProject twice, once with z = 0 (zNear), and once with
+    // z = 1 (zFar).
+    GLU glu = scene.glu;
+    glu.gluUnProject(winX, winY, 0,
+        modelview, 0, projection, 0, viewport, 0, wcoord0, 0);
+    glu.gluUnProject(winX, winY, 1.0,
+        modelview, 0, projection, 0, viewport, 0, wcoord1, 0);
+
+    // compute the vector between the two results.
+    double[] vector = {wcoord1[0] - wcoord0[0], wcoord1[1] - wcoord0[1],
+        wcoord1[2] - wcoord0[2]};
+    // normalize it
+    double[] norm = {vector[0] / vector[2], vector[1] / vector[2], 1.0f};
+    // then we have 1 point (the camera), and one vector.
+    // we can therefore compute the position of the point where
+    // z = 0, for the line passing by the camera position, and
+    // directed by the vector.
+    float[] camera = getCameraPosition();
+    double[] res = {camera[0] + (-camera[2]) * norm[0],
+        camera[1] + (-camera[2]) * norm[1], 0f};
+    return res;
   }
 }

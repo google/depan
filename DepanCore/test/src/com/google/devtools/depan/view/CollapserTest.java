@@ -167,7 +167,7 @@ public class CollapserTest {
     MultipleDirectedRelationFinder finder =
       new MultipleDirectedRelationFinder();
     finder.addRelation(SampleRelation.sampleRelation, true, false);
-    TreeModel treeData = new TreeModel(
+    TreeModel treeData = new HierarchicalTreeModel(
         testGraph.computeSuccessorHierarchy(finder));
 
     Collection<CollapseData> collapseChanges =

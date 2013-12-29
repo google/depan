@@ -25,10 +25,7 @@ import com.google.devtools.depan.eclipse.utils.Sasher;
 import com.google.devtools.depan.eclipse.utils.TableContentProvider;
 import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptor;
 import com.google.devtools.depan.eclipse.views.ViewSelectionListenerTool;
-import com.google.devtools.depan.eclipse.visualization.layout.LayoutContext;
-import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerator;
 import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerators;
-import com.google.devtools.depan.eclipse.visualization.layout.LayoutUtil;
 import com.google.devtools.depan.filters.PathMatcher;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
@@ -53,6 +50,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 
+import java.awt.geom.Point2D;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -415,18 +413,10 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
     viewDoc.setSelectedLayout(layoutName);
     viewDoc.setLayoutFinder(layoutChoices.getRelationSet());
 
-    // Preserve locations if no new layout is selected
-    if (null == layoutName) {
-      viewDoc.setNodeLocations(viewEditor.getNodeLocations());
-    } else {
-      LayoutContext layoutContext = LayoutUtil.newLayoutContext(
-          viewEditor.getParentGraph(), viewNodes, layoutChoices.getRelationSet());
-      layoutContext.setNodeLocations(getEditor().getNodeLocations());
-
-      // Do the layout for these nodes
-      LayoutGenerator layout = layoutChoices.getLayoutGenerator();
-      viewDoc.setNodeLocations(
-          LayoutUtil.calcPositions(layout, layoutContext, viewNodes));
+    // Preserve locations if no new layout is selected.
+    // Otherwise, allow layout to happen on editor initialization.
+    if (null != layoutName) {
+      viewDoc.setNodeLocations(Collections.<GraphNode, Point2D>emptyMap());
     }
 
     ViewEditor.startViewEditor(viewDoc);

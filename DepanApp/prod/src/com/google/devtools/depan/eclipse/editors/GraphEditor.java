@@ -26,10 +26,7 @@ import com.google.devtools.depan.eclipse.utils.RelationshipSelectorListener;
 import com.google.devtools.depan.eclipse.utils.RelationshipSetPickerControl;
 import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptor;
 import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptors;
-import com.google.devtools.depan.eclipse.visualization.layout.LayoutContext;
-import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerator;
 import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerators;
-import com.google.devtools.depan.eclipse.visualization.layout.LayoutUtil;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.RelationshipSet;
 
@@ -48,7 +45,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
@@ -122,7 +118,7 @@ public class GraphEditor
     toplayout.type = SWT.HORIZONTAL;
     top.setLayout(toplayout);
 
-    Composite pickerRegion = setupRelationPicker(top);
+    setupRelationPicker(top);
 
     // recursive select options
     final Button recursiveSelect = new Button(top, SWT.CHECK);
@@ -165,6 +161,7 @@ public class GraphEditor
     tree.getTree().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     tree.setSorter(new NodeWrapperTreeSorter());
     tree.addCheckStateListener(new ICheckStateListener() {
+      @Override
       public void checkStateChanged(CheckStateChangedEvent event) {
         if (recursiveTreeSelect) {
           tree.setSubtreeChecked(event.getElement(), event.getChecked());
@@ -194,7 +191,7 @@ public class GraphEditor
     Composite region = new Composite(parent, SWT.NONE);
     region.setLayout(new GridLayout(2, false));
 
-    Label relSetLabel = RelationshipSetPickerControl.createPickerLabel(region);
+    RelationshipSetPickerControl.createPickerLabel(region);
 
     relSetPicker = new RelationshipSetPickerControl(region);
 
@@ -297,7 +294,7 @@ public class GraphEditor
     CheckboxTreeViewer treeView = checkNodeTreeView.getCheckboxTreeViewer();
 
     Collection<GraphNode> nodes = getSelectedNodes(treeView);
-    if (nodes.size() <= 0) {
+    if (nodes.isEmpty()) {
       return;
     }
 
@@ -377,6 +374,7 @@ public class GraphEditor
     super.dispose();
   }
 
+  @Override
   public GraphNode getObject(GraphNode node) {
     return node;
   }

@@ -16,9 +16,10 @@
 
 package com.google.devtools.depan.eclipse.utils;
 
-import com.google.common.collect.Lists;
 import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptor;
 import com.google.devtools.depan.model.RelationshipSet;
+
+import com.google.common.collect.Lists;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.BaseLabelProvider;
@@ -79,11 +80,19 @@ public class RelationshipSetPickerControl extends Composite {
   /**
    * Provide a standard label for a {@code RelationSetPickerControl}.
    */
-  public static Label createPickerLabel(Composite parent) {
+  public static void createPickerLabel(Composite parent, Object layoutData) {
     Label result = new Label(parent, SWT.NONE);
     result.setText(RELATION_SET_LABEL);
-    result.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
-    return result;
+    result.setLayoutData(layoutData);
+  }
+
+  /**
+   * Provide a standard label for a {@code RelationSetPickerControl}.
+   * 
+   * Assumed to be within a grid layout.
+   */
+  public static void createPickerLabel(Composite parent) {
+    createPickerLabel(parent, new GridData(SWT.FILL, SWT.CENTER, false, false));
   }
 
   /////////////////////////////////////
@@ -103,6 +112,8 @@ public class RelationshipSetPickerControl extends Composite {
     setsViewer.setSorter(new AlphabeticSorter());
 
     setsViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+
+      @Override
       public void selectionChanged(SelectionChangedEvent event) {
         RelationshipSet set = extractFromSelection(event.getSelection());
         if (null == set) {

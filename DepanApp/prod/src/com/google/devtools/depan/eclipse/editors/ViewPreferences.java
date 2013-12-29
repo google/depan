@@ -108,6 +108,8 @@ public class ViewPreferences {
 
   private abstract static class SimpleDispatcher
       implements ListenerManager.Dispatcher<ViewPrefsListener> {
+
+    @Override
     public void captureException(RuntimeException errAny) {
       logger.warning(errAny.toString());
     }
@@ -228,7 +230,7 @@ public class ViewPreferences {
    * @param newLocations
    */
   public void setNodeLocations(final Map<GraphNode, Point2D> newLocations) {
-    nodeLocations = newLocations;
+    nodeLocations = Maps.newHashMap(newLocations);
 
     listeners.fireEvent(new SimpleDispatcher() {
       @Override
@@ -450,22 +452,19 @@ public class ViewPreferences {
   }
 
   /**
-   * Collapse all Nodes in the exposed graph using the hierarchy implied
-   * by the given set of relations.
+   * Collapse all Nodes in the exposed graph using
+   * the supplied hierarchy TreeModel.
    * <p>
-   * The algorithm works by computing a topological sort over the imputed
-   * hierarchy, and then collapsing the nodes in order from bottom to top.
-   * This allows a user to later uncollapse individual masters,
-   * and to incrementally expose their internal details.
+   * The algorithm works by collapsing the nodes in treeData order
+   * from bottom to top. This allows a user to later uncollapse individual
+   * masters, and to incrementally expose their internal details.
    *
    * @param graph source of nodes to collapse
-   * @param finder set of relations that define the hierarchy
+   * @param treeData hierarchy data for graph
    * @param author interface component that initiated the action
    */
-  public void autoCollapse(
-      GraphModel graph, DirectedRelationFinder finder, Object author) {
-    TreeModel treeData = new TreeModel(
-        getExposedGraph(graph).computeSuccessorHierarchy(finder));
+  public void collapseTree(
+      GraphModel graph, TreeModel treeData, Object author) {
 
     Collection<CollapseData> collapseChanges =
         collapser.collapseTree(graph, treeData);

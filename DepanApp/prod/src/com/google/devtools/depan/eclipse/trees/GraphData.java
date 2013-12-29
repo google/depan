@@ -17,11 +17,13 @@
 package com.google.devtools.depan.eclipse.trees;
 
 import com.google.common.collect.Maps;
+
 import com.google.devtools.depan.eclipse.trees.NodeTreeView.NodeWrapper;
 import com.google.devtools.depan.eclipse.trees.NodeTreeView.NodeWrapperRoot;
 import com.google.devtools.depan.graph.api.DirectedRelationFinder;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
+import com.google.devtools.depan.view.HierarchicalTreeModel;
 import com.google.devtools.depan.view.TreeModel;
 
 import org.eclipse.jface.viewers.TreePath;
@@ -41,7 +43,7 @@ public class GraphData<F> {
   public static final TreePath[] EMPTY_PATHS =
     new TreePath[0];
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   private static final NodeTreeView.NodeWrapper[] LEAF_KIDS =
       new NodeTreeView.NodeWrapper[0];
 
@@ -66,7 +68,6 @@ public class GraphData<F> {
    */
   public GraphData(
       NodeTreeProvider<F> provider, TreeModel treeData) {
-    super();
     this.provider = provider;
     this.treeData = treeData;
     this.hierarchyRoots = null;
@@ -75,7 +76,8 @@ public class GraphData<F> {
   public static <F> GraphData<F> createGraphData(
       NodeTreeProvider<F> provider,
       GraphModel graph, DirectedRelationFinder relFinder) {
-    TreeModel hierarchy = new TreeModel(graph.computeSpanningHierarchy(relFinder));
+    TreeModel hierarchy =
+        new HierarchicalTreeModel(graph.computeSpanningHierarchy(relFinder));
     return new GraphData<F>(provider, hierarchy);
   }
 
@@ -86,10 +88,15 @@ public class GraphData<F> {
    * @return Array of children NodeWrappers.
    */
   public NodeWrapper<F>[] getChildren(NodeTreeView.NodeWrapper<F> parent) {
-    Collection<GraphNode> childList = treeData.getSuccessors(parent.getNode());
+    Collection<GraphNode> childList =
+        treeData.getSuccessorNodes(parent.getNode());
 
     buildChildWrapperArray(parent, childList);
     return parent.childs;
+  }
+
+  public TreeModel getTreeModel() {
+    return treeData;
   }
 
   /**

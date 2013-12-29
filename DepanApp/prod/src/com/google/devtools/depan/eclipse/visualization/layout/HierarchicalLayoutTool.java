@@ -16,12 +16,15 @@
 
 package com.google.devtools.depan.eclipse.visualization.layout;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.google.devtools.depan.graph.api.DirectedRelationFinder;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
+import com.google.devtools.depan.view.HierarchicalTreeModel;
+import com.google.devtools.depan.view.SuccessorEdges;
 import com.google.devtools.depan.view.TreeModel;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import java.awt.geom.Point2D;
 import java.util.Collection;
@@ -62,7 +65,7 @@ public abstract class HierarchicalLayoutTool {
 
   public static TreeModel createTreeModel(
       GraphModel layoutGraph, DirectedRelationFinder relations) {
-    return new TreeModel(
+    return new HierarchicalTreeModel(
       layoutGraph.computeSuccessorHierarchy(relations));
   }
 
@@ -175,21 +178,22 @@ public abstract class HierarchicalLayoutTool {
   private Collection<GraphNode> orderChildren(GraphNode root) {
     List<GraphNode> leafs = Lists.newArrayList();
     List<GraphNode> inners = Lists.newArrayList();
-    for (GraphNode node : treeData.getSuccessors(root)) {
+    for (GraphNode node : treeData.getSuccessorNodes(root)) {
 
       // Don't include nodes that are already placed.
       if (allreadyDone.contains(node)) {
         continue;
       }
 
-      Collection<GraphNode> nodeChildren = treeData.getSuccessors(node);
-      if (nodeChildren.size() < 1) {
-        leafs.add(node);
-      }
-      else {
+     SuccessorEdges successors = treeData.getSuccessors(node);
+      if (successors.hasSuccessors()) {
         inners.add(node);
       }
+      else {
+        leafs.add(node);
+      }
     }
+
     leafs.addAll(inners);
     return leafs;
   }

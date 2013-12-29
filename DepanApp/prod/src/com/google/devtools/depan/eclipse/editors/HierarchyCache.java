@@ -16,12 +16,17 @@
 
 package com.google.devtools.depan.eclipse.editors;
 
-import com.google.common.collect.Maps;
 import com.google.devtools.depan.eclipse.trees.GraphData;
 import com.google.devtools.depan.eclipse.trees.NodeTreeProvider;
 import com.google.devtools.depan.graph.api.DirectedRelationFinder;
 import com.google.devtools.depan.model.GraphModel;
+import com.google.devtools.depan.model.GraphNode;
+import com.google.devtools.depan.view.TreeModel;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -70,5 +75,20 @@ public class HierarchyCache<T> {
     }
 
     return hierarchies.get(relFinder);
+  }
+
+  public GraphData<T> allNodes() {
+    Collection<GraphNode> nodes = graph.getNodes();
+
+    TreeModel hierarchy = new TreeModel.Flat(nodes);
+    return new GraphData<T>(provider, hierarchy );
+  }
+
+  public GraphData<T> excludedNodes(Collection<GraphNode> included) {
+    Collection<GraphNode> nodes = Lists.newArrayList(graph.getNodes());
+    nodes.removeAll(included);
+
+    TreeModel hierarchy = new TreeModel.Flat(nodes);
+    return new GraphData<T>(provider, hierarchy );
   }
 }

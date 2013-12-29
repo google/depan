@@ -99,6 +99,7 @@ public abstract class GLScene {
       }
     });
     this.canvas.addDisposeListener(new DisposeListener() {
+      @Override
       public void widgetDisposed(DisposeEvent e) {
         dispose();
       }
@@ -274,7 +275,7 @@ public abstract class GLScene {
   }
 
   public double[] getOGLPos(int x, int y) {
-    return GLScene.getOGLPos(gl, glu, grip, x, y);
+    return grip.getOGLPos(x, y);
   }
 
   public int[] getViewport() {
@@ -291,48 +292,6 @@ public abstract class GLScene {
         bottomLeft[0], bottomLeft[1] /* left, bottom */ ,
         topRight[0] - bottomLeft[0] /* width */,
         topRight[1] - bottomLeft[1] /* height */ );
-  }
-
-  /**
-   * Given graphics coordinates (origin top-left, y increases down), provide
-   * the corresponding OGL model coordinates (origin bottom-left, y increases
-   * up) for the point.
-   */
-  public static double[] getOGLPos(
-      GL2 gl, GLU glu, SceneGrip grip, int x, int y) {
-    int[] viewport = new int[4];
-    double[] modelview = new double[16];
-    double[] projection = new double[16];
-    double[] wcoord0 = new double[3];
-    double[] wcoord1 = new double[3];
-
-    gl.glGetDoublev(GL2.GL_MODELVIEW_MATRIX, modelview, 0);
-    gl.glGetDoublev(GL2.GL_PROJECTION_MATRIX, projection, 0);
-    gl.glGetIntegerv(GL2.GL_VIEWPORT, viewport, 0);
-
-    double winX = x;
-    double winY = (double) viewport[3] - (double) y;
-
-    // UnProject twice, once with z = 0 (zNear), and once with
-    // z = 1 (zFar).
-    glu.gluUnProject(winX, winY, 0,
-        modelview, 0, projection, 0, viewport, 0, wcoord0, 0);
-    glu.gluUnProject(winX, winY, 1.0,
-        modelview, 0, projection, 0, viewport, 0, wcoord1, 0);
-
-    // compute the vector between the two results.
-    double[] vector = {wcoord1[0] - wcoord0[0], wcoord1[1] - wcoord0[1],
-        wcoord1[2] - wcoord0[2]};
-    // normalize it
-    double[] norm = {vector[0] / vector[2], vector[1] / vector[2], 1.0f};
-    // then we have 1 point (the camera), and one vector.
-    // we can therefore compute the position of the point where
-    // z = 0, for the line passing by the camera position, and
-    // directed by the vector.
-    float[] camera = grip.getCameraPosition();
-    double[] res = {camera[0] + (-camera[2]) * norm[0],
-        camera[1] + (-camera[2]) * norm[1], 0f};
-    return res;
   }
 
   /**

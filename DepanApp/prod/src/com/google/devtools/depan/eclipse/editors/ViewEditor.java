@@ -56,6 +56,7 @@ import com.google.devtools.depan.model.RelationshipSet;
 import com.google.devtools.depan.view.CollapseData;
 import com.google.devtools.depan.view.EdgeDisplayProperty;
 import com.google.devtools.depan.view.NodeDisplayProperty;
+import com.google.devtools.depan.view.TreeModel;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -104,6 +105,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
@@ -326,7 +328,7 @@ public class ViewEditor extends MultiPageEditorPart
         scrollHandler.updateDrawingBounds(drawing, viewport);
       }});
 
-    if (viewInfo.getNodeLocations().size() == 0) {
+    if (viewInfo.getNodeLocations().isEmpty()) {
       addDrawingListener(new DrawingListener() {
 
         @Override
@@ -380,6 +382,8 @@ public class ViewEditor extends MultiPageEditorPart
     name.setLayoutData(fillGrid);
 
     name.addModifyListener(new ModifyListener() {
+
+      @Override
       public void modifyText(ModifyEvent e) {
         if (viewInfo != null) {
           String newDescription = name.getText();
@@ -641,6 +645,7 @@ public class ViewEditor extends MultiPageEditorPart
     renderer.setColors(back, front);
   }
 
+  @Override
   public void preferenceChange(PreferenceChangeEvent event) {
     // changes in the configuration for the views, so redraw the graph.
     if (event.getKey().startsWith(LabelPreferencesIds.LABEL_PREFIX)) {
@@ -844,7 +849,13 @@ public class ViewEditor extends MultiPageEditorPart
   }
 
   public void autoCollapse(DirectedRelationFinder finder, Object author) {
-    viewInfo.autoCollapse(getViewGraph(), finder, author);
+    GraphData<NodeDisplayProperty> tree = hierarchies.getHierarchy(finder);
+    TreeModel treeData = tree.getTreeModel();
+    collapseTree(treeData, author);
+  }
+
+  public void collapseTree(TreeModel treeData, Object author) {
+    viewInfo.collapseTree(getViewGraph(), treeData, author);
   }
 
   public void collapse(
@@ -1111,7 +1122,7 @@ public class ViewEditor extends MultiPageEditorPart
 
     @Override
     public void captureException(RuntimeException errAny) {
-      logger.warning(errAny.toString());
+      logger.log(Level.WARNING, "Listener dispatch failure", errAny);
     }
   }
 
@@ -1181,6 +1192,10 @@ public class ViewEditor extends MultiPageEditorPart
   /////////////////////////////////////
   // Specialized features
 
+  public HierarchyCache<NodeDisplayProperty> getHierarchies() {
+    return hierarchies;
+  }
+
   public GraphData<NodeDisplayProperty> getHierarchy(
       DirectedRelationFinder relFinder) {
     return hierarchies.getHierarchy(relFinder);
@@ -1204,6 +1219,8 @@ public class ViewEditor extends MultiPageEditorPart
    */
   private void updateStatusLine(final String statusText) {
     getWorkbenchDisplay().asyncExec(new Runnable() {
+
+      @Override
       public void run() {
         getEditorSite().getActionBars().getStatusLineManager()
             .setMessage(statusText);
@@ -1337,6 +1354,8 @@ public class ViewEditor extends MultiPageEditorPart
   public static void startViewEditor(ViewDocument newInfo) {
     final ViewEditorInput input = new ViewEditorInput(newInfo);
     getWorkbenchDisplay().asyncExec(new Runnable() {
+
+      @Override
       public void run() {
         IWorkbenchPage page = PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow().getActivePage();

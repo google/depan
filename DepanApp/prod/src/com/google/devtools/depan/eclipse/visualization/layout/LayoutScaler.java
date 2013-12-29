@@ -107,7 +107,8 @@ public class LayoutScaler {
    *  nodes are shifted proportionately.
    */
   public Point2dUtils.Translater intoRegion(Rectangle2D region) {
-    return Point2dUtils.newIntoRegion(region, graphArea);
+    Rectangle2D graphOrtho = Point2dUtils.newOrthoRegion(graphArea);
+    return Point2dUtils.newIntoRegion(region, graphOrtho);
   }
 
   /**

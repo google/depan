@@ -91,6 +91,22 @@ public abstract class SuccessorEdges {
     
   }
 
+  public static class Empty extends SuccessorEdges {
+
+    @Override
+    public Collection<GraphEdge> getForwardEdges() {
+      return Collections.emptyList();
+    }
+
+    @Override
+    public Collection<GraphEdge> getReverseEdges() {
+      return Collections.emptyList();
+    }
+  }
+
+  // Only need one instance of the empty SucccessorEdge
+  public static final Empty EMPTY = new Empty();
+
   /**
    * A standard API for mutable variations. 
    */
