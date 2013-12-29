@@ -220,13 +220,55 @@ public class GLPanel extends GLScene {
   }
 
   @Override
-  public void uncaughtKey(int keyCode, char character, boolean keyCtrlState,
-      boolean keyAltState, boolean keyShiftState) {
+  public void uncaughtKey(int keyCode, char character,
+      boolean keyCtrlState, boolean keyAltState, boolean keyShiftState) {
     boolean caught = renderer.uncaughtKey(keyCode, character, keyCtrlState,
         keyAltState, keyShiftState);
-    if (!caught) {
-      logger.info("Lost key press: " + keyCode + " (" + character + ")");
+    if (caught) {
+      return;
     }
+
+    if (selectAll(keyCode, character, keyCtrlState, keyAltState, keyShiftState)) {
+      return;
+    }
+
+    logUncaughtKey(keyCode, character, keyCtrlState, keyAltState, keyShiftState);
+  }
+
+  private void logUncaughtKey(int keyCode, char character,
+      boolean keyCtrlState, boolean keyAltState, boolean keyShiftState) {
+    StringBuffer buf = new StringBuffer();
+    buf.append("Lost key press: ");
+    buf.append(keyCode);
+
+    buf.append(" (");
+    buf.append(character);
+
+    if (keyCtrlState) {
+      buf.append(" CTRL");
+    }
+    if (keyAltState) {
+      buf.append(" ALT");
+    }
+    if (keyShiftState) {
+      buf.append(" SHFT");
+    }
+
+    buf.append(")");
+    logger.info(buf.toString());
+  }
+
+  private boolean selectAll(int keyCode, char character,
+      boolean keyCtrlState, boolean keyAltState, boolean keyShiftState) {
+    if (keyAltState || keyShiftState || !keyCtrlState) {
+      return false;
+    }
+    if ('a' != keyCode) {
+      return false;
+    }
+
+    editor.selectAllNodes();
+    return true;
   }
 
   /////////////////////
@@ -525,12 +567,18 @@ public class GLPanel extends GLScene {
 
     // Unselect all the cleared nodes.
     for (GraphNode node : clearedNodes) {
-      node2property(node).setSelected(false);
+      NodeRenderingProperty props = node2property(node);
+      if (null != props) {
+        props.setSelected(false);
+      }
     }
 
     // Select all the chosen nodes.
     for (GraphNode node : selectedNodes) {
-      node2property(node).setSelected(true);
+      NodeRenderingProperty props = node2property(node);
+      if (null != props) {
+        props.setSelected(true);
+      }
     }
   }
 }
