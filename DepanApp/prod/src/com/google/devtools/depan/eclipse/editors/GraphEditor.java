@@ -20,10 +20,9 @@ import com.google.devtools.depan.eclipse.trees.CheckNodeTreeView;
 import com.google.devtools.depan.eclipse.trees.GraphData;
 import com.google.devtools.depan.eclipse.trees.NodeTreeProvider;
 import com.google.devtools.depan.eclipse.trees.NodeTreeView.NodeWrapper;
-import com.google.devtools.depan.eclipse.utils.DefaultRelationshipSet;
+import com.google.devtools.depan.eclipse.utils.HierarchyViewer;
+import com.google.devtools.depan.eclipse.utils.HierarchyViewer.HierarchyChangeListener;
 import com.google.devtools.depan.eclipse.utils.LayoutChoicesControl;
-import com.google.devtools.depan.eclipse.utils.RelationshipSelectorListener;
-import com.google.devtools.depan.eclipse.utils.RelationshipSetPickerControl;
 import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptor;
 import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptors;
 import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerators;
@@ -62,7 +61,7 @@ import java.util.logging.Logger;
 public class GraphEditor
     extends MultiPageEditorPart
     implements NodeTreeProvider<GraphNode>,
-        RelationshipSelectorListener {
+    HierarchyChangeListener {
 
   private static final Logger logger =
       Logger.getLogger(GraphEditor.class.getName());
@@ -79,9 +78,8 @@ public class GraphEditor
   // private Binop<GraphModel> binop = null;
 
   private LayoutChoicesControl layoutChoices;
-
-  /** Selector for named relationships sets. */
-  private RelationshipSetPickerControl relSetPicker = null;
+  
+  private HierarchyViewer<GraphNode> hierarchyView = null;
 
   private HierarchyCache<GraphNode> hierarchies;
 
@@ -103,9 +101,10 @@ public class GraphEditor
 
   private void createPage0() {
     Composite composite = new Composite(getContainer(), SWT.NONE);
+
     GridLayout layout = new GridLayout();
-    composite.setLayout(layout);
     layout.numColumns = 1;
+    composite.setLayout(layout);
 
     // top panel ---------------
     Composite top = new Composite(composite, SWT.NONE);
@@ -118,7 +117,7 @@ public class GraphEditor
     toplayout.type = SWT.HORIZONTAL;
     top.setLayout(toplayout);
 
-    setupRelationPicker(top);
+    setupHierarchyViewer(top);
 
     // recursive select options
     final Button recursiveSelect = new Button(top, SWT.CHECK);
@@ -150,12 +149,9 @@ public class GraphEditor
     });
 
     // tree --------------------
-    System.out.println("Initialize tree...");
-    RelationshipSet relSet = relSetPicker.getSelection();
     checkNodeTreeView = new CheckNodeTreeView<GraphNode>(
         composite, SWT.VIRTUAL | SWT.FULL_SELECTION | SWT.BORDER);
-    selectedSetChanged(relSet);
-    System.out.println("  DONE");
+    hierarchyChanged();
 
     tree = checkNodeTreeView.getCheckboxTreeViewer();
     tree.getTree().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -187,25 +183,16 @@ public class GraphEditor
     return result;
   }
 
-  private Composite setupRelationPicker(Composite parent) {
-    Composite region = new Composite(parent, SWT.NONE);
-    region.setLayout(new GridLayout(2, false));
-
-    RelationshipSetPickerControl.createPickerLabel(region);
-
-    relSetPicker = new RelationshipSetPickerControl(region);
+  private void setupHierarchyViewer(Composite parent) {
+    hierarchyView = new HierarchyViewer<GraphNode>(parent, false);
 
     RelationshipSet selectedRelSet =
         graph.getDefaultAnalysis().getDefaultRelationshipSet();
     java.util.List<RelSetDescriptor> choices =
         RelSetDescriptors.buildGraphChoices(graph);
-    relSetPicker.setInput(selectedRelSet, choices );
+    hierarchyView.setInput(hierarchies, selectedRelSet, choices);
 
-    relSetPicker.addChangeListener(this);
-    relSetPicker.setLayoutData(
-        new GridData(SWT.FILL, SWT.CENTER, true, false));
-
-    return region;
+    hierarchyView.addChangeListener(this);
   }
 
   private void createPage1() {
@@ -338,17 +325,11 @@ public class GraphEditor
     file = ((IFileEditorInput) input).getFile();
 
     logger.info("Reading " + file.getRawLocationURI());
-
     graph = ResourceCache.fetchGraphDocument(file);
-
     logger.info("  DONE");
 
     hierarchies = new HierarchyCache<GraphNode>(this, graph.getGraph());
-    if (null != checkNodeTreeView) {
-      logger.info("Initialize graph...");
-      selectedSetChanged(DefaultRelationshipSet.SET);
-      logger.info("  DONE");
-    }
+    hierarchyChanged();
 
     // set the title to the filename, excepted the file extension
     String title = file.getName();
@@ -380,8 +361,17 @@ public class GraphEditor
   }
 
   @Override
-  public void selectedSetChanged(RelationshipSet relSet) {
-    GraphData<GraphNode> hierarchy = hierarchies.getHierarchy(relSet);
-    checkNodeTreeView.updateData(hierarchy);
+  public void hierarchyChanged() {
+    if (null == checkNodeTreeView) {
+      return;
+    }
+    if (null == hierarchyView) {
+      return;
+    }
+
+    logger.info("Initialize graph...");
+    GraphData<GraphNode> graphData = hierarchyView.getGraphData();
+    checkNodeTreeView.updateData(graphData);
+    logger.info("  DONE");
   }
 }
