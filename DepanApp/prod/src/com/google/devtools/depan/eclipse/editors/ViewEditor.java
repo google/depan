@@ -37,7 +37,6 @@ import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptor;
 import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptors;
 import com.google.devtools.depan.eclipse.views.tools.RelationCount;
 import com.google.devtools.depan.eclipse.visualization.View;
-import com.google.devtools.depan.eclipse.visualization.layout.JungBuilder;
 import com.google.devtools.depan.eclipse.visualization.layout.LayoutContext;
 import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerator;
 import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerators;
@@ -69,6 +68,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -758,7 +758,10 @@ public class ViewEditor extends MultiPageEditorPart
       return;
     }
 
-    saveFile(viewFile, monitor);
+    saveFile(viewFile, monitor, "save");
+    if (null != monitor) {
+      monitor.done();
+    }
   }
 
   @Override
@@ -772,19 +775,12 @@ public class ViewEditor extends MultiPageEditorPart
 
     // get the file relatively to the workspace.
     IFile saveFile = calcViewFile(saveas.getResult());
+    // TODO: set up a progress monitor
+    saveFile(saveFile, null, "saveAs");
 
-    // TODO(leeca): Consolidate with doSave() flow and saveFile() below and
-    // add a progress monitor.
-    try {
-      saveViewDocument(saveFile, viewInfo);
-      viewFile = saveFile;
-      setPartName(viewFile.getName());
-      setDirtyState(false);
-    } catch (IOException errIo) {
-      throw new RuntimeException(
-          "Unable to saveAs to " + saveFile.getFullPath().toString(), errIo);
+    viewFile = saveFile;
+    setPartName(viewFile.getName());
     }
-  }
 
   private IFile getSaveAsFile() {
     if (null != viewFile) {
@@ -839,20 +835,39 @@ public class ViewEditor extends MultiPageEditorPart
   }
 
   /**
-   * Save the view document , managing the progress monitor too.
+   * Save the view document, managing the progress monitor too.
+   * Trigger a resource refresh for the supplied file if the save is successful.
+   * 
    * @param file where to save the view document
    * @param monitor progress indicator to update
+   * @param opLabel save operation being performed
+   * @throws IOException if the save is unsuccessful
    */
-  private void saveFile(IFile file, IProgressMonitor monitor) {
-    try {
+  private void saveFile(IFile file, IProgressMonitor monitor, String opLabel) {
+    if (null != monitor)
       monitor.setTaskName("Writing file " + file.getName());
-      saveViewDocument(viewFile, viewInfo);
-      setDirtyState(false);
-    } catch (IOException errIo) {
-      logger.warning(errIo.toString());
-      monitor.setCanceled(true);
+
+    try {
+      saveViewDocument(file, viewInfo);
+    } catch (IOException err) {
+      logger.log(Level.SEVERE,
+          "Unable to " + opLabel + " " + file.getName(), err);
+      if (null != monitor)
+        monitor.setCanceled(true);
     }
-    monitor.done();
+
+    try {
+      // WEIRD:  refreshLocal() directly on the resource often works,
+      // but here we sometimes get a conflict.
+      file.refreshLocal(1, monitor);
+    } catch (CoreException errCore) {
+      logger.log(Level.WARNING,
+          "Failed resource refresh after " + opLabel + " to "
+              + file.getFullPath().toString(),
+          errCore);
+    }
+
+    setDirtyState(false);
   }
 
   /**
