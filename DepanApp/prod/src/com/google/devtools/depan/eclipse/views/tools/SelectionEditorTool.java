@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.eclipse.views.tools;
 
+import com.google.devtools.depan.eclipse.editors.NewEditorHelper;
 import com.google.devtools.depan.eclipse.editors.ViewDocument;
 import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.utils.LayoutChoicesControl;
@@ -419,7 +420,8 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
       viewDoc.setNodeLocations(Collections.<GraphNode, Point2D>emptyMap());
     }
 
-    ViewEditor.startViewEditor(viewDoc);
+    String baseName = NewEditorHelper.newEditorLabel(viewEditor.getBaseName());
+    ViewEditor.startViewEditor(viewDoc, baseName);
   }
 
   /**

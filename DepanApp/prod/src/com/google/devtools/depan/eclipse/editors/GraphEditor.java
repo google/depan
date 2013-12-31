@@ -279,12 +279,19 @@ public class GraphEditor
    */
   protected void createViewEditor() {
     CheckboxTreeViewer treeView = checkNodeTreeView.getCheckboxTreeViewer();
+    GraphNode topNode = getFirstNode(treeView);
+    if (null == topNode) {
+      return;
+    }
 
     Collection<GraphNode> nodes = getSelectedNodes(treeView);
     if (nodes.isEmpty()) {
       return;
     }
 
+    String baseName = NewEditorHelper.newEditorLabel(getBaseName(topNode));
+
+    // Create ViewDocument elements
     GraphModelReference graphRef = new GraphModelReference(file, graph);
 
     ViewPreferences userPrefs = new ViewPreferences();
@@ -296,21 +303,44 @@ public class GraphEditor
     userPrefs.setLayoutFinder(layoutChoices.getRelationSet());
 
     ViewDocument viewInfo = new ViewDocument(graphRef, nodes, userPrefs);
-    ViewEditor.startViewEditor(viewInfo);
+    ViewEditor.startViewEditor(viewInfo, baseName);
   }
 
   /**
    * @param nodes
    * @param treeView
    */
+  private GraphNode getFirstNode(CheckboxTreeViewer treeView) {
+    for (Object item : treeView.getCheckedElements()) {
+      if (item instanceof NodeWrapper) {
+        return ((NodeWrapper<?>) item).getNode();
+      }
+    }
+    return null;
+  }
+
   private Collection<GraphNode> getSelectedNodes(CheckboxTreeViewer treeView) {
     Set<GraphNode> result = Sets.newHashSet();
     for (Object item : treeView.getCheckedElements()) {
       if (item instanceof NodeWrapper) {
-        result.add(((NodeWrapper<?>) item).getNode());
+        GraphNode node = ((NodeWrapper<?>) item).getNode();
+        result.add(node);
       }
     }
     return result;
+  }
+
+  private String getBaseName(GraphNode node) {
+    String baseName = node.friendlyString();
+    int period = baseName.lastIndexOf('.');
+    if (period > 0) {
+      String segment = baseName.substring(period + 1);
+      if (segment.length() > 3) {
+        return segment;
+      }
+    }
+
+    return baseName;
   }
 
   @Override

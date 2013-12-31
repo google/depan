@@ -66,6 +66,8 @@ import edu.uci.ics.jung.algorithms.importance.KStepMarkov;
 import edu.uci.ics.jung.graph.DirectedGraph;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
@@ -144,6 +146,12 @@ public class ViewEditor extends MultiPageEditorPart
 
   /** Persistent location for the viewInfo. */
   private IFile viewFile;
+
+  /**
+   * Base name to use for created files. Typically set through the
+   * ViewEditorInput supplied at editor startup.
+   */
+  private String baseName;
 
   /** Dirty state. */
   private boolean isDirty = true;
@@ -402,31 +410,7 @@ public class ViewEditor extends MultiPageEditorPart
     setSite(site);
     setInput(input);
 
-    if (input instanceof ViewEditorInput) {
-      ViewEditorInput editorInput = (ViewEditorInput) input;
-      viewFile = null; // not yet saved
-      viewInfo = editorInput.getViewDocument();
-      String graphName = viewInfo.getGraphModelLocation().getName();
-      String partName = NewEditorHelper.newEditorLabel(
-          graphName + " - New View");
-      setPartName(partName);
-      markDirty();
-    } else if (input instanceof IFileEditorInput) {
-      try {
-        viewFile = ((IFileEditorInput) input).getFile();
-        viewInfo = loadViewDocument(viewFile);
-        setPartName(viewFile.getName());
-        setDirtyState(false);
-      } catch (IOException e) {
-        viewFile = null;
-        viewInfo = null;
-        throw new PartInitException(
-            "Unable to load view from " + viewFile.getFullPath().toString());
-      }
-    } else {
-      throw new PartInitException(
-          "Input for editor is not suitable for the ViewEditor");
-    }
+    initFromInput(input);
 
     // Synthesize derived graph perspectives
     deriveDetails();
@@ -439,6 +423,33 @@ public class ViewEditor extends MultiPageEditorPart
     // listen the changes in the configuration
     new InstanceScope().getNode(Resources.PLUGIN_ID)
         .addPreferenceChangeListener(this);
+  }
+
+  private void initFromInput(IEditorInput input) throws PartInitException {
+    if (input instanceof ViewEditorInput) {
+      ViewEditorInput editorInput = (ViewEditorInput) input;
+      viewFile = null; // not yet saved
+      baseName = editorInput.getBaseName();
+      viewInfo = editorInput.getViewDocument();
+      setPartName(calcPartName());
+      markDirty();
+    } else if (input instanceof IFileEditorInput) {
+      try {
+        viewFile = ((IFileEditorInput) input).getFile();
+        baseName = viewFile.getName();
+        viewInfo = loadViewDocument(viewFile);
+        setPartName(calcPartName());
+        setDirtyState(false);
+      } catch (IOException e) {
+        viewFile = null;
+        viewInfo = null;
+        throw new PartInitException(
+            "Unable to load view from " + viewFile.getFullPath().toString());
+      }
+    } else {
+      throw new PartInitException(
+          "Input for editor is not suitable for the ViewEditor");
+    }
   }
 
   /**
@@ -500,12 +511,13 @@ public class ViewEditor extends MultiPageEditorPart
   }
 
   private DirectedGraph<GraphNode, GraphEdge> buildJungGraph( ) {
-    JungBuilder builder = new JungBuilder(getViewGraph());
-    builder.setMovableNodes(viewGraph.getNodes());
-
+    LayoutContext context = new LayoutContext();
+    context.setGraphModel(getExposedGraph());
+    context.setMovableNodes(viewGraph.getNodes());
     // TODO: Compute ranking based on selected relations
-    builder.setRelations(ForwardIdentityRelationFinder.FINDER);
-    return builder.build();
+    context.setRelations(ForwardIdentityRelationFinder.FINDER);
+
+    return LayoutUtil.buildJungGraph(context);
   }
 
   /**
@@ -752,6 +764,8 @@ public class ViewEditor extends MultiPageEditorPart
   @Override
   public void doSaveAs() {
     SaveAsDialog saveas = new SaveAsDialog(getSite().getShell());
+    saveas.setOriginalFile(getSaveAsFile());
+    saveas.setOriginalName(calcSaveAsName());
     if (saveas.open() != SaveAsDialog.OK) {
       return;
     }
@@ -770,6 +784,58 @@ public class ViewEditor extends MultiPageEditorPart
       throw new RuntimeException(
           "Unable to saveAs to " + saveFile.getFullPath().toString(), errIo);
     }
+  }
+
+  private IFile getSaveAsFile() {
+    if (null != viewFile) {
+      return viewFile;
+    }
+
+    IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+    IProject[] projs = root.getProjects();
+
+    // Propose a name only if there is exactly one project.
+    if (projs.length != 1) {
+      return null;
+    }
+
+    IProject proj = projs[0];
+    String name = calcSaveAsName();
+    return proj.getFile(name);
+  }
+
+  public String getBaseName() {
+    return baseName;
+  }
+
+  /**
+   * Provide a likely file name for this view editor's contents.
+   */
+  private String calcSaveAsName() {
+    // Basename can be null (on initialization, etc.).
+    // Rare, but cope with it.
+    if (null != baseName && !baseName.isEmpty()) {
+      return baseName;
+    }
+
+    String graphName = viewInfo.getGraphModelLocation().getName();
+    String label = NewEditorHelper.newEditorLabel(graphName);
+    baseName = label;
+    return label;
+  }
+
+  /**
+   * Provide a tab name for this editor./
+   */
+  private String calcPartName() {
+    if (null != baseName && !baseName.isEmpty()) {
+      return baseName;
+    }
+
+    // TODO: Also set baseName .. see getSaveAsName()
+    String graphName = viewInfo.getGraphModelLocation().getName();
+    return NewEditorHelper.newEditorLabel(
+        graphName + " - New View");
   }
 
   /**
@@ -1351,8 +1417,8 @@ public class ViewEditor extends MultiPageEditorPart
    * This is an asynchronous activate, as the new editor will execute
    * separately from the other workbench windows.
    */
-  public static void startViewEditor(ViewDocument newInfo) {
-    final ViewEditorInput input = new ViewEditorInput(newInfo);
+  public static void startViewEditor(ViewDocument newInfo, String baseName) {
+    final ViewEditorInput input = new ViewEditorInput(newInfo, baseName);
     getWorkbenchDisplay().asyncExec(new Runnable() {
 
       @Override

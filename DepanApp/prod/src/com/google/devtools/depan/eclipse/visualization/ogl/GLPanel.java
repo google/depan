@@ -119,6 +119,7 @@ public class GLPanel extends GLScene {
     this.renderer = new RenderingPipe(gl, glu, this, editor);
   }
 
+  @Override
   protected void allocateResources() {
     GraphModel viewGraph = editor.getViewGraph();
 
@@ -404,6 +405,7 @@ public class GLPanel extends GLScene {
       }
     };
 
+    @Override
     public abstract void setPosition(
         NodeRenderingProperty nodeProp, Point2D position);
   }

@@ -27,8 +27,15 @@ public class ViewEditorInput implements IEditorInput {
 
   private final ViewDocument viewInfo;
 
-  public ViewEditorInput(ViewDocument viewInfo) {
+  private final String baseName;
+
+  public ViewEditorInput(ViewDocument viewInfo, String baseName) {
     this.viewInfo = viewInfo;
+    this.baseName = baseName;
+  }
+
+  public String getBaseName() {
+    return baseName;
   }
 
   public ViewDocument getViewDocument() {
