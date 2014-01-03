@@ -25,6 +25,7 @@ import com.google.devtools.depan.model.GraphNode;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.widgets.Composite;
 
 import java.awt.Color;
@@ -36,7 +37,6 @@ import java.nio.IntBuffer;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 /**
  * A class extending {@link GLScene}, that specialize the {@link GLScene} to
@@ -48,9 +48,6 @@ import java.util.logging.Logger;
  * @author Yohann Coppel
  */
 public class GLPanel extends GLScene {
-
-  private static final Logger logger =
-    Logger.getLogger(GLPanel.class.getName());
 
   private static final int BYTES_PER_INT = (Integer.SIZE / Byte.SIZE);
 
@@ -221,42 +218,24 @@ public class GLPanel extends GLScene {
   }
 
   @Override
-  public void uncaughtKey(int keyCode, char character,
+  public void uncaughtKey(KeyEvent event,
       boolean keyCtrlState, boolean keyAltState, boolean keyShiftState) {
-    boolean caught = renderer.uncaughtKey(keyCode, character, keyCtrlState,
-        keyAltState, keyShiftState);
+
+    // Does any renderer handle it?
+    // Is this obsolete?
+    boolean caught = renderer.uncaughtKey(
+        event.keyCode, event.character,
+        keyCtrlState, keyAltState, keyShiftState);
     if (caught) {
       return;
     }
 
-    if (selectAll(keyCode, character, keyCtrlState, keyAltState, keyShiftState)) {
+    if (selectAll(event.keyCode, event.character,
+        keyCtrlState, keyAltState, keyShiftState)) {
       return;
     }
 
-    logUncaughtKey(keyCode, character, keyCtrlState, keyAltState, keyShiftState);
-  }
-
-  private void logUncaughtKey(int keyCode, char character,
-      boolean keyCtrlState, boolean keyAltState, boolean keyShiftState) {
-    StringBuffer buf = new StringBuffer();
-    buf.append("Lost key press: ");
-    buf.append(keyCode);
-
-    buf.append(" (");
-    buf.append(character);
-
-    if (keyCtrlState) {
-      buf.append(" CTRL");
-    }
-    if (keyAltState) {
-      buf.append(" ALT");
-    }
-    if (keyShiftState) {
-      buf.append(" SHFT");
-    }
-
-    buf.append(")");
-    logger.info(buf.toString());
+    super.uncaughtKey(event, keyCtrlState, keyAltState, keyShiftState);
   }
 
   private boolean selectAll(int keyCode, char character,

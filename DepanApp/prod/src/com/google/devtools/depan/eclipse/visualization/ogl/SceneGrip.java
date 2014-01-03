@@ -67,45 +67,8 @@ public class SceneGrip extends MouseAdapter
   }
 
   @Override
-  public void keyPressed(KeyEvent e) {
-    switch (e.keyCode) {
-      case SWT.ARROW_UP:
-        if ((e.stateMask & SWT.CTRL) != 0) {
-          scene.rotateCamera(-0.5f, 0.0f, 0.0f);
-        } else {
-          scene.pedestalCamera(-5.0f);
-        }
-        break;
-      case SWT.ARROW_DOWN:
-        if ((e.stateMask & SWT.CTRL) != 0) {
-          scene.rotateCamera(0.5f, 0.0f, 0.0f);
-        } else {
-          scene.pedestalCamera(5.0f);
-        }
-        break;
-      case SWT.ARROW_LEFT:
-        if ((e.stateMask & SWT.CTRL) != 0) {
-          scene.rotateCamera(0.0f, 0.0f, -0.5f);
-        } else {
-          scene.truckCamera(-5.0f);
-        }
-        break;
-      case SWT.ARROW_RIGHT:
-        if ((e.stateMask & SWT.CTRL) != 0) {
-          scene.rotateCamera(0.0f, 0.0f, 0.5f);
-        } else {
-          scene.truckCamera(5.0f);
-        }
-        break;
-      case SWT.PAGE_UP:
-        scene.zoomCamera(5.0f);
-        break;
-      case SWT.PAGE_DOWN:
-        scene.zoomCamera(-5.0f);
-        break;
-      case SWT.HOME:
-        scene.homeCamera();
-        break;
+  public void keyPressed(KeyEvent event) {
+    switch (event.keyCode) {
       case SWT.SHIFT:
         this.keyShiftState = true;
         break;
@@ -117,7 +80,7 @@ public class SceneGrip extends MouseAdapter
         break;
       default:
         // uncaught key, transmit it to lower level for handling.
-        scene.uncaughtKey(e.keyCode, e.character, keyCtrlState, keyAltState,
+        scene.uncaughtKey(event, keyCtrlState, keyAltState,
             keyShiftState);
     }
   }

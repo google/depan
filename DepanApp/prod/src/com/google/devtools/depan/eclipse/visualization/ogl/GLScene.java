@@ -23,6 +23,7 @@ import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.opengl.GLCanvas;
 import org.eclipse.swt.opengl.GLData;
@@ -650,15 +651,83 @@ public abstract class GLScene {
   /**
    * A key stroke was received by the OpenGL canvas but it wasn't used by the
    * previous layers.  Give someone else a chance to use it.
-   *
-   * @param keyCode
-   * @param character
-   * @param keyCtrlState true if Ctrl key is pressed
-   * @param keyAltState true if Alt key is pressed
-   * @param keyShiftState true if Shift key is pressed
+   * 
+   * This is intended to be overridden, and {@code super.uncaughtKey()}
+   * should be the final statement of such methods.  Normally, this is the
+   * "last gasp" key handler.
    */
-  public abstract void uncaughtKey(int keyCode, char character,
-      boolean keyCtrlState, boolean keyAltState, boolean keyShiftState);
+  public void uncaughtKey(KeyEvent event,
+      boolean keyCtrlState, boolean keyAltState, boolean keyShiftState) {
+
+    switch (event.keyCode) {
+      case SWT.ARROW_UP:
+        if ((event.stateMask & SWT.CTRL) != 0) {
+          rotateCamera(-0.5f, 0.0f, 0.0f);
+        } else {
+          pedestalCamera(-5.0f);
+        }
+        break;
+      case SWT.ARROW_DOWN:
+        if ((event.stateMask & SWT.CTRL) != 0) {
+          rotateCamera(0.5f, 0.0f, 0.0f);
+        } else {
+          pedestalCamera(5.0f);
+        }
+        break;
+
+      case SWT.ARROW_LEFT:
+        if ((event.stateMask & SWT.CTRL) != 0) {
+          rotateCamera(0.0f, 0.0f, -0.5f);
+        } else {
+          truckCamera(-5.0f);
+        }
+        break;
+      case SWT.ARROW_RIGHT:
+        if ((event.stateMask & SWT.CTRL) != 0) {
+          rotateCamera(0.0f, 0.0f, 0.5f);
+        } else {
+          truckCamera(5.0f);
+        }
+        break;
+
+      case SWT.PAGE_UP:
+        zoomCamera(5.0f);
+        break;
+      case SWT.PAGE_DOWN:
+        zoomCamera(-5.0f);
+        break;
+      case SWT.HOME:
+        homeCamera();
+        break;
+
+      default:
+        logUncaughtKey(event.keyCode, event.character, keyCtrlState, keyAltState, keyShiftState);
+    }
+
+  }
+
+  private void logUncaughtKey(int keyCode, char character,
+      boolean keyCtrlState, boolean keyAltState, boolean keyShiftState) {
+    StringBuffer buf = new StringBuffer();
+    buf.append("Lost key press: ");
+    buf.append(keyCode);
+
+    buf.append(" (");
+    buf.append(character);
+
+    if (keyCtrlState) {
+      buf.append(" CTRL");
+    }
+    if (keyAltState) {
+      buf.append(" ALT");
+    }
+    if (keyShiftState) {
+      buf.append(" SHFT");
+    }
+
+    buf.append(")");
+    logger.info(buf.toString());
+  }
 
   /**
    * Retrieve the openGL ids that were hited by a previous picking operation.
@@ -948,4 +1017,5 @@ public abstract class GLScene {
     //System.out.println(""+x+":"+y+":"+z);
     gl.glVertex3f(x,y,z);
   }
+
 }
