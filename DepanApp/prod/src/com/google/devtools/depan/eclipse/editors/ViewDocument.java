@@ -55,11 +55,11 @@ public class ViewDocument {
    */
   public static final String EXTENSION = "dvi";
 
-  private GraphModelReference parentGraph;
+  private final GraphModelReference parentGraph;
 
-  private Collection<GraphNode> viewNodes;
+  private final Collection<GraphNode> viewNodes;
 
-  private ViewPreferences userPrefs;
+  private final ViewPreferences userPrefs;
 
   public ViewDocument(
       GraphModelReference parentGraph,

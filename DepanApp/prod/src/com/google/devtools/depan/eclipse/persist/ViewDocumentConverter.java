@@ -19,11 +19,12 @@ package com.google.devtools.depan.eclipse.persist;
 import com.google.devtools.depan.eclipse.editors.GraphDocument;
 import com.google.devtools.depan.eclipse.editors.GraphModelReference;
 import com.google.devtools.depan.eclipse.editors.ViewDocument;
-import com.google.devtools.depan.eclipse.editors.ViewPreferences;
 import com.google.devtools.depan.eclipse.editors.ViewDocument.Components;
+import com.google.devtools.depan.eclipse.editors.ViewPreferences;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 
+import com.google.common.collect.Sets;
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
@@ -32,6 +33,8 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import com.thoughtworks.xstream.mapper.Mapper;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -46,6 +49,11 @@ public class ViewDocumentConverter implements Converter {
   @SuppressWarnings("unused")  // Sure to be used in the future.
   private static final Logger logger =
       Logger.getLogger(ViewDocumentConverter.class.getName());
+
+  private static final String VIEW_NODES = "view-nodes";
+
+  /** Legacy tag for the view-nodes section. */
+  private static final Object SET_LEGACY = "set";
 
   private final Mapper mapper;
 
@@ -91,17 +99,27 @@ public class ViewDocumentConverter implements Converter {
     marshalObject(components.getParentGraph(), writer, context);
 
     // Save all node references.
-    marshalObject(components.getViewNodes(), writer, context);
+    marshallNodes(components.getViewNodes(), VIEW_NODES, writer, context);
 
     // Save the preferences.
     marshalObject(components.getUserPrefs(), writer, context);
   }
 
-  protected void marshalObject(Object item,
+  private void marshalObject(Object item,
       HierarchicalStreamWriter writer, MarshallingContext context) {
     String nodeLabel = mapper.serializedClass(item.getClass());
     writer.startNode(nodeLabel);
     context.convertAnother(item);
+    writer.endNode();
+  }
+
+  private void marshallNodes(Collection<GraphNode> nodes, String nodeLabel,
+      HierarchicalStreamWriter writer, MarshallingContext context) {
+    // Save all nodes.
+    writer.startNode(nodeLabel);
+    for (GraphNode node : nodes) {
+      marshalObject(node, writer, context);
+    }
     writer.endNode();
   }
 
@@ -142,10 +160,41 @@ public class ViewDocumentConverter implements Converter {
   /**
    * Isolate unchecked conversion.
    */
-  @SuppressWarnings("unchecked")
   private Collection<GraphNode> loadGraphNodes(
       HierarchicalStreamReader reader, UnmarshallingContext context) {
-    return (Collection<GraphNode>) unmarshalObject(reader, context);
+
+    reader.moveDown();
+    if (!isViewNodes(reader)) {
+      reader.moveUp();
+      logger.info("Can't load nodes from section " + reader.getNodeName());
+
+      return Collections.emptySet();
+    }
+
+    Set<GraphNode> result = Sets.newHashSet();
+
+    while (reader.hasMoreChildren()) {
+      reader.moveDown();
+      String nodeName = reader.getNodeName();
+      Class<?> childClass = mapper.realClass(nodeName);
+      GraphNode node = (GraphNode) context.convertAnother(null, childClass);
+      result.add(node);
+      reader.moveUp();
+    }
+    reader.moveUp();
+
+    return result;
+  }
+
+  private boolean isViewNodes(HierarchicalStreamReader reader) {
+    String childName = reader.getNodeName();
+    if (VIEW_NODES.equals(childName)) {
+      return true;
+    }
+    if (SET_LEGACY.equals(childName)) {
+      return true;
+    }
+    return false;
   }
 
   private Object unmarshalObject(
