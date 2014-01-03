@@ -99,11 +99,7 @@ public class ScaleTool extends ViewEditorTool {
         + "The stretch value is relative to the previously applied stretch "
         + "value. Therefore, applying a stretch value of 100% will never do "
         + "anything, and a stretch value of 200% always makes the graph two "
-        + "times larger even if applied multiple times consecutivelly.\n"
-        + "\n"
-        + "A too small zoom value (<35%) can put the drawings out of the "
-        + "range of the openGL world, and you will not see anything. "
-        + "Change to a higher value to get the drawings back.");
+        + "times larger even if applied multiple times consecutivelly.\n");
 
     Composite metrics = setupMetrics(baseComposite);
 
@@ -236,7 +232,7 @@ public class ScaleTool extends ViewEditorTool {
     if (!hasEditor()) {
       return;
     }
-    getEditor().getRenderer().getGrip().setZoom(scale);
+    getEditor().getRenderer().getScene().setZoom(scale);
   }
 
   /**

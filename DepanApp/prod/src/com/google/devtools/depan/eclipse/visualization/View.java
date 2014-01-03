@@ -20,7 +20,7 @@ import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds;
 import com.google.devtools.depan.eclipse.visualization.ogl.ArrowHead;
 import com.google.devtools.depan.eclipse.visualization.ogl.GLPanel;
-import com.google.devtools.depan.eclipse.visualization.ogl.SceneGrip;
+import com.google.devtools.depan.eclipse.visualization.ogl.GLScene;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.CollapsePlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.EdgeIncludePlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.FactorPlugin;
@@ -116,8 +116,8 @@ public class View {
     return glPanel.getRenderingPipe().getFactor();
   }
 
-  public SceneGrip getGrip() {
-    return glPanel.getGrip();
+  public GLScene getScene() {
+    return glPanel;
   }
 
   public Rectangle2D getOGLViewport() {

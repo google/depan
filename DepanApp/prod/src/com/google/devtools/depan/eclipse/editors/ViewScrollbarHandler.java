@@ -15,7 +15,7 @@
  */
 package com.google.devtools.depan.eclipse.editors;
 
-import com.google.devtools.depan.eclipse.visualization.ogl.SceneGrip;
+import com.google.devtools.depan.eclipse.visualization.ogl.GLScene;
 
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -36,7 +36,7 @@ public class ViewScrollbarHandler {
   private static final int SCROLL_MINIMUM = 0;
 
   private final Scrollable view;
-  private final SceneGrip grip;
+  private final GLScene scene;
 
   private SelectionListener selectListener;
 
@@ -48,9 +48,9 @@ public class ViewScrollbarHandler {
   private double horizSelBase;
   private double horizRange;
 
-  public ViewScrollbarHandler(Scrollable view, SceneGrip grip) {
+  public ViewScrollbarHandler(Scrollable view, GLScene scene) {
     this.view = view;
-    this.grip = grip;
+    this.scene = scene;
     this.vertBar = view.getVerticalBar();
     this.horizBar = view.getHorizontalBar();
   }
@@ -64,7 +64,7 @@ public class ViewScrollbarHandler {
             ((double) vertBar.getSelection() / (double) vertBar.getMaximum()));
         double xPos = horizSelBase + (horizRange *
             ((double) horizBar.getSelection() / (double) horizBar.getMaximum()));
-        grip.setCameraCenterTo((float) xPos, (float) yPos);
+        scene.moveToCamera((float) xPos, (float) yPos);
       }
 
       @Override

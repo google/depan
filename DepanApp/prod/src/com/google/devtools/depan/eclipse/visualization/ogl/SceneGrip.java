@@ -27,12 +27,9 @@ import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
-import javax.media.opengl.GL2;
-import javax.media.opengl.glu.GLU;
-
 /**
- * A class handling basic mouse events, keyboard events, and camera position of
- * a {@link GLScene}.
+ * Convert user input events - mouse, keyboard, etc. - into changes of the
+ * {@link GLScene}.
  *
  * @author Yohann Coppel
  */
@@ -40,28 +37,8 @@ public class SceneGrip extends MouseAdapter
     implements KeyListener, Listener,
     MouseListener, MouseMoveListener, MouseWheelListener {
 
-  /** eye position */
-  private float xrot;
-  private float zrot;
-  private float zoff;
-  public float xoff;
-  public float yoff;
-
-  /** Target for eye position, for smooth moves */
-  private float targetXrot;
-  private float targetZrot;
-  private float targetZoff;
-  private float targetXoff;
-  private float targetYoff;
-
-  /** speed for moves */
-  private static final int SPEED = 5;
-
-  /** Camera z position, if zoom value is set to "100%". */
-  private static final float HUNDRED_PERCENT_ZOOM = 300f;
-
   /** GL scene to control */
-  private GLScene scene;
+  private final GLScene scene;
 
   /** Modifier keys states. */
   private boolean keyCtrlState = false;
@@ -87,26 +64,6 @@ public class SceneGrip extends MouseAdapter
 
   public SceneGrip(GLScene scene) {
     this.scene = scene;
-    // Start with the drawing properly zoomed.
-    this.zoff = HUNDRED_PERCENT_ZOOM;
-    targetHome();
-  }
-
-  protected void targetHome() {
-    this.targetXrot = 0.0f;
-    this.targetXoff = 0.0f;
-    this.targetZrot = 0.0f;
-    this.targetYoff = 0.0f;
-
-    this.targetZoff = HUNDRED_PERCENT_ZOOM;
-  }
-
-  /**
-   * Set the zoom to the given value. 1.0 is 100%.
-   * @param scale
-   */
-  public void setZoom(float scale) {
-    this.targetZoff = HUNDRED_PERCENT_ZOOM / scale;
   }
 
   @Override
@@ -114,44 +71,40 @@ public class SceneGrip extends MouseAdapter
     switch (e.keyCode) {
       case SWT.ARROW_UP:
         if ((e.stateMask & SWT.CTRL) != 0) {
-          this.targetXrot -= 0.5f;
+          scene.rotateCamera(-0.5f, 0.0f, 0.0f);
         } else {
-          this.targetYoff -= 5f * Math.cos(Math.toRadians(zrot));
-          this.targetXoff -= 5f * Math.sin(Math.toRadians(zrot));
+          scene.pedestalCamera(-5.0f);
         }
         break;
       case SWT.ARROW_DOWN:
         if ((e.stateMask & SWT.CTRL) != 0) {
-          this.targetXrot += 0.5f;
+          scene.rotateCamera(0.5f, 0.0f, 0.0f);
         } else {
-          this.targetYoff += 5f * Math.cos(Math.toRadians(zrot));
-          this.targetXoff += 5f * Math.sin(Math.toRadians(zrot));
+          scene.pedestalCamera(5.0f);
         }
         break;
       case SWT.ARROW_LEFT:
         if ((e.stateMask & SWT.CTRL) != 0) {
-          this.targetZrot -= 0.5f;
+          scene.rotateCamera(0.0f, 0.0f, -0.5f);
         } else {
-          this.targetXoff -= 5f * Math.sin(Math.toRadians(zrot-90));
-          this.targetYoff -= 5f * Math.cos(Math.toRadians(zrot-90));
+          scene.truckCamera(-5.0f);
         }
         break;
       case SWT.ARROW_RIGHT:
         if ((e.stateMask & SWT.CTRL) != 0) {
-          this.targetZrot += 0.5f;
+          scene.rotateCamera(0.0f, 0.0f, 0.5f);
         } else {
-          this.targetXoff += 5f * Math.sin(Math.toRadians(zrot-90));
-          this.targetYoff += 5f * Math.cos(Math.toRadians(zrot-90));
+          scene.truckCamera(5.0f);
         }
         break;
       case SWT.PAGE_UP:
-        this.targetZoff += 5f;
+        scene.zoomCamera(5.0f);
         break;
       case SWT.PAGE_DOWN:
-        this.targetZoff -= 5f;
+        scene.zoomCamera(-5.0f);
         break;
       case SWT.HOME:
-        targetHome();
+        scene.homeCamera();
         break;
       case SWT.SHIFT:
         this.keyShiftState = true;
@@ -169,88 +122,18 @@ public class SceneGrip extends MouseAdapter
     }
   }
 
-  /**
-   * Perform a step: move the camera if necessary
-   */
-  private void step() {
-    if (zoff < targetZoff) {
-      zoff += (targetZoff - zoff) / SPEED;
-    } else if (zoff > targetZoff) {
-      zoff -= (zoff - targetZoff) / SPEED;
-    }
-    if (yoff < targetYoff) {
-      yoff += (targetYoff - yoff) / SPEED;
-    } else if (yoff > targetYoff) {
-      yoff -= (yoff - targetYoff) / SPEED;
-    }
-    if (xoff < targetXoff) {
-      xoff += (targetXoff - xoff) / SPEED;
-    } else if (xoff > targetXoff) {
-      xoff -= (xoff - targetXoff) / SPEED;
-    }
-    if (zrot < targetZrot) {
-      zrot += (targetZrot - zrot) / SPEED;
-    } else if (zrot > targetZrot) {
-      zrot -= (zrot - targetZrot) / SPEED;
-    }
-    if (xrot < targetXrot) {
-      xrot += (targetXrot - xrot) / SPEED;
-    } else if (xrot > targetXrot) {
-      xrot -= (xrot - targetXrot) / SPEED;
-    }
-  }
-
-  /**
-   * Adjust the position of the camera.
-   */
-  public void adjust() {
-    step();
-
-    if (!GLScene.hyperbolic) {
-      scene.gl.glRotatef(xrot, 1.0f, 0.0f, 0.0f);
-      scene.gl.glRotatef(zrot, 0.0f, 0.0f, 1.0f);
-      scene.gl.glTranslatef(this.xoff, this.yoff, -this.zoff);
-    } else {
-      scene.glu.gluLookAt(0, 0, zoff, 0, 0, zoff - 1, 0, 1, 0);
-    }
-    //gl.glRotatef(this.xrot, 1.0f, 0.0f, 0.0f);
-    //gl.glRotatef(this.yrot, 0.0f, 1.0f, 0.0f);
-  }
-
-  /**
-   * Provide the coordinates for the camera.  These are the OGL coordinates
-   * at which the camera is placed.  In rendering terms, that's the negative
-   * of the (x,y) translation transform.
-   * 
-   * @return the camera (eye) position.
-   */
-  public float[] getCameraPosition() {
-    return new float[] {-xoff, -yoff, zoff};
-  }
-
   @Override
   public void mouseMove(MouseEvent e) {
     if (mouseButtonState[0]) { // button1 pressed
       switch (state) {
       case Moving:
-        // translate
-        int dx = e.x - mouseX;
-        int dy = e.y - mouseY;
-
-        xoff -= dx * Math.sin(Math.toRadians(zrot-90));
-        yoff -= dx * Math.cos(Math.toRadians(zrot-90));
-
-        yoff -= dy * Math.cos(Math.toRadians(zrot));
-        xoff -= dy * Math.sin(Math.toRadians(zrot));
-
-        targetXoff = xoff;
-        targetYoff = yoff;
+        scene.truckCamera(mouseX - e.x);
+        scene.pedestalCamera(mouseY - e.y);
         break;
       case MovingObject:
         scene.moveSelectedObjectsTo(mouseX - e.x, mouseY - e.y);
         break;
       case RectangleSelection:
-        // draw selection rectangle
         scene.activateSelectionRectangle(mouseDownX, mouseDownY, e.x, e.y);
         break;
       default:
@@ -260,10 +143,9 @@ public class SceneGrip extends MouseAdapter
       case Moving:
         int dx = mouseX - e.x;
         int dy = e.y - mouseY;
-        xrot += dy / 10f;
-        targetXrot = xrot;
-        zrot += -dx / 10f;
-        targetZrot = zrot;
+        scene.rotateCamera(dy / 10f, 0.0f, dx / 10f);
+        // prevent animation
+        scene.cutCamera();
         break;
       default:
         // Explicitly ignore other state
@@ -394,89 +276,8 @@ public class SceneGrip extends MouseAdapter
    * @param yPos Y cursor coordinate
    * @param zoomValue value added to the current zoom level.
    */
-  public void zoomAt(int xPos, int yPos, float zoomValue) {
-    double[] target = getOGLPos(xPos, yPos);
-    zoomAt(target[0], target[1], target[2], zoomValue);
-  }
-
-  /**
-   * Move the eye in straight line toward the given word position, reducing
-   * (or augmenting) the distance between eye and point of zoomValue.
-   *
-   * @param x
-   * @param y
-   * @param z
-   * @param zoomValue
-   */
-  public void zoomAt(double x, double y, double z, double zoomValue) {
-    double[] diff = {targetXoff - x, targetYoff - y, z - targetZoff};
-    double length = Math.sqrt(diff[0] * diff[0] + diff[1] * diff[1]
-        + diff[2] * diff[2]);
-    if (length == 0) {
-      length = 1;
-    }
-    double[] normalized = {diff[0] / length, diff[1] / length,
-        diff[2] / length};
-    // calculate zoom such that the difference on the Z axis is equal to
-    // zoomValue
-    double percent = zoomValue / normalized[2];
-    this.targetXoff += normalized[0] * percent;
-    this.targetYoff += normalized[1] * percent;
-    this.targetZoff += zoomValue;
-    this.targetZoff = Math.max(targetZoff, 1.1f);
-  }
-
-  /**
-   * Center the camera to the given point (in openGL coordinates)
-   *
-   * @param camX x coordinate
-   * @param camY y coordinate
-   */
-  public void setCameraCenterTo(float camX, float camY) {
-    this.targetXoff = -camX;
-    this.targetYoff = -camY;
-  }
-
-  /**
-   * Given graphics coordinates (origin top-left, y increases down), provide
-   * the corresponding OGL model coordinates (origin bottom-left, y increases
-   * up) for the point.
-   */
-  public double[] getOGLPos(int x, int y) {
-    int[] viewport = new int[4];
-    double[] modelview = new double[16];
-    double[] projection = new double[16];
-    double[] wcoord0 = new double[3];
-    double[] wcoord1 = new double[3];
-
-    GL2 gl = scene.gl;
-    gl.glGetDoublev(GL2.GL_MODELVIEW_MATRIX, modelview, 0);
-    gl.glGetDoublev(GL2.GL_PROJECTION_MATRIX, projection, 0);
-    gl.glGetIntegerv(GL2.GL_VIEWPORT, viewport, 0);
-
-    double winX = x;
-    double winY = (double) viewport[3] - (double) y;
-
-    // UnProject twice, once with z = 0 (zNear), and once with
-    // z = 1 (zFar).
-    GLU glu = scene.glu;
-    glu.gluUnProject(winX, winY, 0,
-        modelview, 0, projection, 0, viewport, 0, wcoord0, 0);
-    glu.gluUnProject(winX, winY, 1.0,
-        modelview, 0, projection, 0, viewport, 0, wcoord1, 0);
-
-    // compute the vector between the two results.
-    double[] vector = {wcoord1[0] - wcoord0[0], wcoord1[1] - wcoord0[1],
-        wcoord1[2] - wcoord0[2]};
-    // normalize it
-    double[] norm = {vector[0] / vector[2], vector[1] / vector[2], 1.0f};
-    // then we have 1 point (the camera), and one vector.
-    // we can therefore compute the position of the point where
-    // z = 0, for the line passing by the camera position, and
-    // directed by the vector.
-    float[] camera = getCameraPosition();
-    double[] res = {camera[0] + (-camera[2]) * norm[0],
-        camera[1] + (-camera[2]) * norm[1], 0f};
-    return res;
+  private void zoomAt(int xPos, int yPos, float zoomValue) {
+    double[] target = scene.getOGLPos(xPos, yPos);
+    scene.zoomAt(target[0], target[1], target[2], zoomValue);
   }
 }

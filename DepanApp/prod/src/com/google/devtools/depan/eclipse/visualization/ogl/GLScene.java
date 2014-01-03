@@ -63,6 +63,44 @@ public abstract class GLScene {
   public final GL2 gl;
   public final GLU glu;
 
+  /** eye position */
+  private float xoff;
+  private float yoff;
+  private float zoff;
+
+  private float targetXoff;
+  private float targetYoff;
+  private float targetZoff;
+
+  /** eye direction */
+  private float xrot;
+  private float yrot;
+  private float zrot;
+
+  private float targetXrot;
+  private float targetYrot;
+  private float targetZrot;
+
+  /** speed for moves */
+  public static final int SPEED = 5;
+
+  /** Camera z position, if zoom value is set to "100%". */
+  public static final float HUNDRED_PERCENT_ZOOM = 300f;
+
+  private static final float FOV = 90.0f;
+
+  public static final float Z_NEAR = 0.4f;
+
+  public static final float Z_FAR = 1000.0f;
+
+  public static final float PIXEL_QUANTA = 0.1f;
+
+  public static final float ZOOM_QUANTA = 1.0f;
+
+  public static final float ZOOM_MAX = 1.1f;
+
+  public static final float ROTATE_QUANTA = 0.001f;
+  
   public static boolean hyperbolic = false;
 
   /** Latest received mouse positions. */
@@ -112,6 +150,10 @@ public abstract class GLScene {
     canvas.addKeyListener(grip);
     canvas.addMouseWheelListener(grip);
 
+    // Start with the drawing properly zoomed.
+    homeCamera();
+    cutCamera();
+
     this.init();
   }
 
@@ -145,7 +187,7 @@ public abstract class GLScene {
     gl.glViewport(0, 0, width, height);
     gl.glMatrixMode(GL2.GL_PROJECTION);
     gl.glLoadIdentity();
-    glu.gluPerspective(90.0f, aspect, 0.4f, 1000.0f);
+    glu.gluPerspective(FOV, aspect, Z_NEAR, 1000.0f);
     gl.glMatrixMode(GL2.GL_MODELVIEW);
     gl.glLoadIdentity();
     context.release();
@@ -255,6 +297,221 @@ public abstract class GLScene {
     return processHits(hits, selectBuffer);
   }
 
+  /////////////////////////////////////
+  // Camera (and drawing) management
+
+  /**
+   * Center the camera over the given point (in openGL coordinates)
+   *
+   * @param camX x coordinate
+   * @param camY y coordinate
+   */
+  public void moveToCamera(float camX, float camY) {
+    targetXoff = -camX;
+    targetYoff = -camY;
+  }
+
+  /**
+   * Provide the coordinates for the camera.  These are the OGL coordinates
+   * at which the camera is placed.  In rendering terms, that's the negative
+   * of the (x,y) translation transform.
+   * 
+   * @return the camera (eye) position.
+   */
+  public float[] getCameraPosition() {
+    return new float[] {-xoff, -yoff, zoff};
+  }
+
+  /**
+   * Set the zoom to the given value. 1.0 is 100%.
+   * @param scale
+   */
+  public void setZoom(float scale) {
+    setZoomTarget(HUNDRED_PERCENT_ZOOM / scale);
+  }
+
+  /**
+   * Set the zoom to the given value. 1.0 is 100%.
+   * @param scale
+   */
+  public void zoomCamera(float size) {
+    setZoomTarget(targetZoff += size);
+  }
+
+  /**
+   * Avoid moving the camera too far or too close. so the scene
+   * stays within the frustum for the perspective transform.
+   * 
+   * No direct assignments to targetZoff.
+   */
+  private void setZoomTarget(float zOffset) {
+    if (zOffset > (GLScene.Z_FAR - 1.0)) {
+      zOffset = GLScene.Z_FAR - 1.0f;
+      logger.info("clamped zoom at " + zOffset);
+    }
+    if (zOffset < (ZOOM_MAX)) {
+      zOffset = ZOOM_MAX;
+      logger.info("clamped zoom at " + zOffset);
+    }
+
+    targetZoff = zOffset;
+  }
+
+  /**
+   * Move the eye in straight line toward the given word position, reducing
+   * (or augmenting) the distance between eye and point of zoomValue.
+   *
+   * @param x
+   * @param y
+   * @param z
+   * @param zoomValue
+   */
+  public void zoomAt(double x, double y, double z, double zoomValue) {
+    double[] diff = {targetXoff - x, targetYoff - y, z - targetZoff};
+    double length = Math.sqrt(diff[0] * diff[0] + diff[1] * diff[1]
+        + diff[2] * diff[2]);
+    if (length == 0) {
+      length = 1;
+    }
+    double[] normalized = {diff[0] / length, diff[1] / length,
+        diff[2] / length};
+    // calculate zoom such that the difference on the Z axis is equal to
+    // zoomValue
+    double percent = zoomValue / normalized[2];
+
+    moveToCamera((float) (targetXoff + normalized[0] * percent),
+        (float) (targetYoff + normalized[1] * percent));
+    setZoomTarget((float) (targetYoff + normalized[1] * percent));
+  }
+
+  /**
+   * Change direction of camera (pan -u/d, scan - l/r, or turn - c/cc).
+   * 
+   * TODO: Make sure these match their behaviors
+   * @param xRot - amount to tilt up or down
+   * @param yRot - amount to pan left or right
+   * @param zRot - amount to turn/twist clockwise or counterclockwise.
+   */
+  public void rotateCamera(float xRot, float yRot, float zRot) {
+    targetXrot += xRot;
+    targetYrot += yRot;
+    targetZrot += zRot;
+  }
+
+  /**
+   * Change camera position vertically (up or down)
+   */
+  public void pedestalCamera(float size) {
+    this.targetXoff += size * Math.sin(Math.toRadians(zrot));
+    this.targetYoff += size * Math.cos(Math.toRadians(zrot));
+  }
+
+  /**
+   * Change camera position horizontally (left or right).
+   */
+  public void truckCamera(float size) {
+    // TODO:  Isn't the -90 just swapping sin/cos?
+    this.targetXoff += size * Math.sin(Math.toRadians(zrot - 90));
+    this.targetYoff += size * Math.cos(Math.toRadians(zrot - 90));
+  }
+
+  public void homeCamera() {
+    targetXrot = 0.0f;
+    targetYoff = 0.0f;
+    targetZrot = 0.0f;
+
+    targetXoff = 0.0f;
+    targetYoff = 0.0f;
+    targetZoff = HUNDRED_PERCENT_ZOOM;
+  }
+
+  /**
+   * Cut the camera immediately to the target location.  No animation.
+   */
+  public void cutCamera() {
+    xrot = targetXrot;
+    yoff = targetYoff;
+    zrot = targetZrot;
+
+    xoff = targetXoff;
+    yoff = targetYoff;
+    zoff = targetZoff;
+  }
+
+  /**
+   * Perform a step: move the camera if necessary
+   */
+  private void step() {
+    if (isPixelEpsilon(xoff, targetXoff)) {
+      xoff = targetXoff;
+    } else {
+      xoff += (targetXoff - xoff) / SPEED;
+    }
+    if (isPixelEpsilon(yoff, targetYoff)) {
+      yoff = targetYoff;
+    } else {
+      yoff += (targetYoff - yoff) / SPEED;
+    }
+
+    if (isZoomEpsilon(zoff, targetZoff)) {
+      zoff = targetZoff;
+    } else {
+      zoff += (targetZoff - zoff) / SPEED;
+    }
+
+    if (isRotateEpsilon(xrot, targetXrot)) {
+      xrot = targetXrot;
+    } else {
+      xrot += (targetXrot - xrot) / SPEED;
+    }
+    if (isRotateEpsilon(yrot, targetYrot)) {
+      yrot = targetYrot;
+    } else {
+      yrot += (targetYrot - yrot) / SPEED;
+    }
+    if (isRotateEpsilon(zrot, targetZrot)) {
+      zrot = targetZrot;
+    } else {
+      zrot += (targetZrot - zrot) / SPEED;
+    }
+  }
+
+  private boolean isPixelEpsilon(float left, float right) {
+    return isEpsilon(left, right, PIXEL_QUANTA);
+  }
+
+  private boolean isZoomEpsilon(float left, float right) {
+    return isEpsilon(left, right, ZOOM_QUANTA);
+  }
+
+  private boolean isRotateEpsilon(float left, float right) {
+    return isEpsilon(left, right, ROTATE_QUANTA);
+  }
+  
+  private boolean isEpsilon(float left, float right, float epsilon) {
+    return Math.abs(left - right) < epsilon;
+  }
+
+  /**
+   * Establish the position and direction of the camera.
+   */
+  private void prepareCamera() {
+    step();
+
+    if (!GLScene.hyperbolic) {
+      gl.glRotatef(xrot, 1.0f, 0.0f, 0.0f);
+      gl.glRotatef(zrot, 0.0f, 0.0f, 1.0f);
+      gl.glTranslatef(this.xoff, this.yoff, -this.zoff);
+    } else {
+      glu.gluLookAt(0, 0, zoff, 0, 0, zoff - 1, 0, 1, 0);
+    }
+    //gl.glRotatef(this.xrot, 1.0f, 0.0f, 0.0f);
+    //gl.glRotatef(this.yrot, 0.0f, 1.0f, 0.0f);
+  }
+
+  /////////////////////////////////////
+  // Draw the scene
+
   /**
    * Clear the scene and adjust the camera position.
    * 
@@ -266,7 +523,7 @@ public abstract class GLScene {
    */
   protected void drawScene(float elapsedTime) {
     gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
-    grip.adjust();
+    prepareCamera();
   }
 
   public void printMousePos(int x, int y) {
@@ -274,8 +531,50 @@ public abstract class GLScene {
     logger.info("Mouse " + m[0] + " : " + m[1] + " - " + m[2]);
   }
 
+  /**
+   * Convert screen coordinates (x, y) to OGL coordinates.
+   * 
+   * In screen coordinates, y increases from top to bottom.
+   * Screen coordinates are often pixels from a boundary.
+   * In OGL coordinates, y increases from bottom to top.
+   * 
+   * @param x screen x coordinate
+   * @param y screen x coordinate
+   * @return corresponding OGL coordinate for current view
+   */
   public double[] getOGLPos(int x, int y) {
-    return grip.getOGLPos(x, y);
+    int[] viewport = new int[4];
+    double[] modelview = new double[16];
+    double[] projection = new double[16];
+    double[] wcoord0 = new double[3];
+    double[] wcoord1 = new double[3];
+
+    gl.glGetDoublev(GL2.GL_MODELVIEW_MATRIX, modelview, 0);
+    gl.glGetDoublev(GL2.GL_PROJECTION_MATRIX, projection, 0);
+    gl.glGetIntegerv(GL2.GL_VIEWPORT, viewport, 0);
+
+    double winX = x;
+    double winY = (double) viewport[3] - (double) y;
+
+    // UnProject twice, once with z = 0 (zNear), and once with
+    // z = 1 (zFar).
+    glu.gluUnProject(winX, winY, 0,
+        modelview, 0, projection, 0, viewport, 0, wcoord0, 0);
+    glu.gluUnProject(winX, winY, 1.0,
+        modelview, 0, projection, 0, viewport, 0, wcoord1, 0);
+
+    // compute the vector between the two results.
+    double[] vector = {wcoord1[0] - wcoord0[0], wcoord1[1] - wcoord0[1],
+        wcoord1[2] - wcoord0[2]};
+    // normalize it
+    double[] norm = {vector[0] / vector[2], vector[1] / vector[2], 1.0f};
+    // then we have 1 point (the camera), and one vector.
+    // we can therefore compute the position of the point where
+    // z = 0, for the line passing by the camera position, and
+    // directed by the vector.
+    double[] res = {-xoff + (-zoff) * norm[0],
+        -yoff + (-zoff) * norm[1], 0f};
+    return res;
   }
 
   public int[] getViewport() {
@@ -456,8 +755,6 @@ public abstract class GLScene {
     this.startSelectX = fromX;
     this.startSelectY = fromY;
   }
-
-
 
   /**
    * Start 2D rendering mode.

@@ -327,12 +327,13 @@ public class ViewEditor extends MultiPageEditorPart
     setPreferences();
     initSelectedNodes(getSelectedNodes());
 
-    scrollHandler = new ViewScrollbarHandler(parent, renderer.getGrip());
+    scrollHandler = new ViewScrollbarHandler(parent, renderer.getScene());
     scrollHandler.acquireResources();
     addDrawingListener(new DrawingListener() {
 
       @Override
-      public void updateDrawingBounds(Rectangle2D drawing, Rectangle2D viewport) {
+      public void updateDrawingBounds(
+          Rectangle2D drawing, Rectangle2D viewport) {
         scrollHandler.updateDrawingBounds(drawing, viewport);
       }});
 
@@ -340,7 +341,8 @@ public class ViewEditor extends MultiPageEditorPart
       addDrawingListener(new DrawingListener() {
 
         @Override
-        public void updateDrawingBounds(Rectangle2D drawing, Rectangle2D viewport) {
+        public void updateDrawingBounds(
+            Rectangle2D drawing, Rectangle2D viewport) {
           // Don't layout nodes if no layout is defined
           LayoutGenerator selectedLayout = getSelectedLayout();
           if (null == selectedLayout ) {
