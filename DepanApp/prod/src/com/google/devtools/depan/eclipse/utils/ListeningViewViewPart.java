@@ -20,6 +20,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IPartService;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
 /**
@@ -89,6 +92,16 @@ public abstract class ListeningViewViewPart<E extends IWorkbenchPart>
     return null;
   }
 
+  protected E getActiveEditor() {
+    IWorkbenchWindow wndo = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+    if (null == wndo) {
+      return null;
+    }
+
+    IPartService srvc = wndo.getPartService();
+    return getAcceptableEditor(srvc.getActivePart());
+  }
+
   protected E getAcceptableEditor() {
     return getAcceptableEditor(editor);
   }
@@ -99,30 +112,35 @@ public abstract class ListeningViewViewPart<E extends IWorkbenchPart>
    * associated tree with the currently selected {@link ViewPart}.
    */
   private IPartListener partListener = new IPartListener() {
+    @Override
     public void partOpened(IWorkbenchPart part) {
       if (acceptedClass.isAssignableFrom(part.getClass()) && editor != part) {
           eOpened(acceptedClass.cast(part));
       }
     }
 
+    @Override
     public void partActivated(IWorkbenchPart part) {
       if (acceptedClass.isAssignableFrom(part.getClass()) && editor != part) {
           eActivated(acceptedClass.cast(part));
       }
     }
 
+    @Override
     public void partBroughtToTop(IWorkbenchPart part) {
       if (acceptedClass.isAssignableFrom(part.getClass()) && editor != part) {
           eBroughtToTop(acceptedClass.cast(part));
       }
     }
 
+    @Override
     public void partClosed(IWorkbenchPart part) {
       if (acceptedClass.isAssignableFrom(part.getClass())) {
         eClosed(acceptedClass.cast(part));
       }
     }
 
+    @Override
     public void partDeactivated(IWorkbenchPart part) {
       if (acceptedClass.isAssignableFrom(part.getClass())) {
         eDeactivated(acceptedClass.cast(part));

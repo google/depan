@@ -43,7 +43,7 @@ public class ViewEditorToolView extends ListeningViewViewPart<ViewEditor> {
     tool.setupComposite(parent);
 
     // After GUI creation, tell the tool which editor it should listen to
-    tool.setEditor(getAcceptableEditor());
+    tool.setEditor(getActiveEditor());
   }
 
 

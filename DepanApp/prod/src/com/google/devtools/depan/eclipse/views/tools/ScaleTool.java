@@ -114,7 +114,7 @@ public class ScaleTool extends ViewEditorTool {
     zoomPercents.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, false));
     metrics.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false));
+        new GridData(SWT.FILL, SWT.FILL, true, false, 4, 1));
 
     // actions
     apply.addSelectionListener(new SelectionAdapter() {
@@ -159,21 +159,36 @@ public class ScaleTool extends ViewEditorTool {
     Composite baseComposite = new Composite(parent, SWT.NONE);
     baseComposite.setLayout(new GridLayout(3, false));
 
-    new Label(baseComposite, SWT.NONE).setText("Top ");
-    topDrawing = new Label(baseComposite, SWT.NONE);
-    topViewport = new Label(baseComposite, SWT.NONE);
+    Label headerLabel = new Label(baseComposite, SWT.NONE);
+    Label headerDrawing = new Label(baseComposite, SWT.RIGHT);
+    headerDrawing.setText("Drawing");
+    Label headerViewPort = new Label(baseComposite, SWT.RIGHT);
+    headerViewPort.setText("Viewport");
+    layoutRow(headerLabel, headerDrawing, headerViewPort);
 
-    new Label(baseComposite, SWT.NONE).setText("Left ");
-    leftDrawing = new Label(baseComposite, SWT.NONE);
-    leftViewport = new Label(baseComposite, SWT.NONE);
+    Label topLabel = new Label(baseComposite, SWT.NONE);
+    topLabel.setText("Top");
+    topDrawing = new Label(baseComposite, SWT.RIGHT);
+    topViewport = new Label(baseComposite, SWT.RIGHT);
+    layoutRow(topLabel, topDrawing, topViewport);
 
-    new Label(baseComposite, SWT.NONE).setText("Right ");
-    rightDrawing = new Label(baseComposite, SWT.NONE);
-    rightViewport = new Label(baseComposite, SWT.NONE);
+    Label leftLabel = new Label(baseComposite, SWT.NONE);
+    leftLabel.setText("Left");
+    leftDrawing = new Label(baseComposite, SWT.RIGHT);
+    leftViewport = new Label(baseComposite, SWT.RIGHT);
+    layoutRow(leftLabel, leftDrawing, leftViewport);
 
-    new Label(baseComposite, SWT.NONE).setText("Bottom ");
-    bottomDrawing = new Label(baseComposite, SWT.NONE);
-    bottomViewport = new Label(baseComposite, SWT.NONE);
+    Label rightLabel = new Label(baseComposite, SWT.NONE);
+    rightLabel.setText("Right");
+    rightDrawing = new Label(baseComposite, SWT.RIGHT);
+    rightViewport = new Label(baseComposite, SWT.RIGHT);
+    layoutRow(rightLabel, rightDrawing, rightViewport);
+
+    Label bottomLabel = new Label(baseComposite, SWT.NONE);
+    bottomLabel.setText("Bottom");
+    bottomDrawing = new Label(baseComposite, SWT.RIGHT);
+    bottomViewport = new Label(baseComposite, SWT.RIGHT);
+    layoutRow(bottomLabel, bottomDrawing, bottomViewport);
 
     drawingListener = new DrawingListener() {
       @Override
@@ -183,6 +198,12 @@ public class ScaleTool extends ViewEditorTool {
     };
 
     return baseComposite;
+  }
+
+  private void layoutRow(Label label, Label forDrawing, Label forViewPort) {
+    label.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
+    forDrawing.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+    forViewPort.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
   }
 
   public void updateMetrics(Rectangle2D drawing, Rectangle2D viewport) {

@@ -108,7 +108,7 @@ public class Tools extends ListeningViewViewPart<ViewEditor> {
 
     // Tell the tools which editor it should listen to.
     // Need to set the editor on creation if an editor is active.
-    setEditor(getAcceptableEditor());
+    setEditor(getActiveEditor());
   }
 
   @Override
