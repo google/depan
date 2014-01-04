@@ -240,6 +240,18 @@ public class ViewDocument {
     userPrefs.uncollapse(master, deleteGroup, author);
   }
 
+
+  /////////////////////////////////////
+  // Manage scene preference
+
+  public ScenePreferences getScenePrefs() {
+    return userPrefs.getScenePrefs();
+  }
+
+  public void setScenePrefs(ScenePreferences prefs) {
+    userPrefs.setScenePrefs(prefs);
+  }
+
   /////////////////////////////////////
   // Manage change listeners
 

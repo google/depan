@@ -81,6 +81,8 @@ public class ViewPreferences {
 
   private String description;
 
+  private ScenePreferences scenePrefs;
+
   /**
    * Relation finder used by layout algorithms by default if it wasn't
    * specified.
@@ -131,6 +133,7 @@ public class ViewPreferences {
    */
   public ViewPreferences() {
     this(
+        ScenePreferences.getDefaultScenePrefs(),
         Maps.<GraphNode, Point2D>newHashMap(),
         Maps.<GraphNode, NodeDisplayProperty>newHashMap(),
         Maps.<GraphEdge, EdgeDisplayProperty>newHashMap(),
@@ -139,6 +142,7 @@ public class ViewPreferences {
   }
 
   public ViewPreferences(
+      ScenePreferences gripPrefs,
       Map<GraphNode, Point2D> newNodeLocations,
       Map<GraphNode, NodeDisplayProperty> newNodeProperties,
       Map<GraphEdge, EdgeDisplayProperty> newEdgeProperties,
@@ -147,6 +151,7 @@ public class ViewPreferences {
     initTransients();
     collapser = new Collapser();
 
+    this.scenePrefs = gripPrefs;
     this.nodeLocations = newNodeLocations;
     this.nodeProperties = newNodeProperties;
     this.edgeProperties = newEdgeProperties;
@@ -201,7 +206,9 @@ public class ViewPreferences {
     String newDescription = (source.description.isEmpty())
         ? "" : "Derived from " + source.description;
 
-    return new ViewPreferences(newNodeLocations, newNodeProperties,
+    return new ViewPreferences(
+        ScenePreferences.getDefaultScenePrefs(),
+        newNodeLocations, newNodeProperties,
         newEdgeProperties, newSelectedNodes, newDescription);
   }
 
@@ -218,6 +225,14 @@ public class ViewPreferences {
 
   /////////////////////////////////////
   // Simple accessors (event-less)
+
+  public ScenePreferences getScenePrefs() {
+    return scenePrefs;
+  }
+
+  public void setScenePrefs(ScenePreferences prefs) {
+    scenePrefs = prefs;
+  }
 
   public Map<GraphNode, Point2D> getNodeLocations() {
     return nodeLocations;

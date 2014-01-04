@@ -215,6 +215,9 @@ public class GLPanel extends GLScene {
     Rectangle2D drawing = renderer.getDrawing().getDrawingBounds();
     Rectangle2D viewport = getOGLViewport();
     getRendererCallback().updateDrawingBounds(drawing, viewport);
+    if (isNowStable()) {
+      getRendererCallback().sceneChanged();
+    }
   }
 
   @Override

@@ -16,6 +16,8 @@
 
 package com.google.devtools.depan.eclipse.visualization;
 
+import com.google.devtools.depan.eclipse.editors.CameraPosPreference;
+import com.google.devtools.depan.eclipse.editors.ScenePreferences;
 import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds;
 import com.google.devtools.depan.eclipse.visualization.ogl.ArrowHead;
@@ -52,6 +54,8 @@ import java.util.Map;
  */
 public class View {
 
+  // TODO: Convert to a listener style of interaction?
+  @SuppressWarnings("unused")  // Someday, this will be essential
   private final ViewEditor editor;
 
   /**
@@ -252,5 +256,38 @@ public class View {
    */
   public void updateNodeLocations(Map<GraphNode, Point2D> newLocations) {
     glPanel.updateNodeLocations(newLocations);
+  }
+
+  public void saveCameraPosition(ScenePreferences prefs) {
+    CameraPosPreference prefsPos = prefs.getCameraPos();
+    if (null == prefsPos) {
+      prefsPos = CameraPosPreference.getDefaultCameraPos();
+      prefs.setCameraPos(prefsPos);
+    }
+
+    float[] scenePos = getScene().getCameraPosition();
+    prefsPos.setX(scenePos[0]);
+    prefsPos.setY(scenePos[1]);
+    prefsPos.setZ(scenePos[2]);
+  }
+
+  public void setCameraPosition(ScenePreferences prefs) {
+    if (null == prefs) {
+      return;
+    }
+    CameraPosPreference prefsPos = prefs.getCameraPos();
+    if (null == prefsPos) {
+      return;
+    }
+
+    GLScene scene = getScene();
+    scene.moveToCamera(prefsPos.getX(), prefsPos.getY());
+    scene.zoomToCamera(prefsPos.getZ());
+    scene.cutCamera();
+  }
+
+  public void initCameraPosition(ScenePreferences prefs) {
+    setCameraPosition(prefs);
+    getScene().clearChanges();
   }
 }

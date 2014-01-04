@@ -322,6 +322,7 @@ public class ViewEditor extends MultiPageEditorPart
         new GridData(SWT.FILL, SWT.FILL, true, true));
 
     // Configure the rendering pipe before listening for changes.
+    renderer.initCameraPosition(viewInfo.getScenePrefs());
     renderer.initializeNodeLocations(viewInfo.getNodeLocations());
 
     setPreferences();
@@ -1351,6 +1352,17 @@ public class ViewEditor extends MultiPageEditorPart
     @Override
     public void updateDrawingBounds(Rectangle2D drawing, Rectangle2D viewport) {
       fireUpdateDrawingBounds(drawing, viewport);
+    }
+
+    @Override
+    public void sceneChanged() {
+      setDirtyState(true);
+      ScenePreferences prefs = viewInfo.getScenePrefs();
+      if (null == prefs) {
+        prefs = ScenePreferences.getDefaultScenePrefs();
+        viewInfo.setScenePrefs(prefs);
+      }
+      renderer.saveCameraPosition(prefs);
     }
   }
 

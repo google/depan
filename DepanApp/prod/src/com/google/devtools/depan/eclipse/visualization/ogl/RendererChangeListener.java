@@ -77,4 +77,10 @@ public interface RendererChangeListener {
    * Notify the receiver of the total size for the drawing.
    */
   public void updateDrawingBounds(Rectangle2D drawing, Rectangle2D viewport);
+
+  /**
+   * Notify the receiver that the scene (viewpoint, camera, etc.) has changed.
+   * The receiver should query the renderer for the current state.
+   */
+  public void sceneChanged();
 }

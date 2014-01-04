@@ -45,6 +45,8 @@ public class GraphElements {
   }
 
   public static final Config GRAPH_XML_PERSIST = new Config() {
+
+    @Override
     public void config(XStream xstream) {
 
       xstream.alias(GRAPH_INFO_TAG, GraphDocument.class);
@@ -61,6 +63,8 @@ public class GraphElements {
   };
 
   public static final Config REF_XML_PERSIST = new Config() {
+
+    @Override
     public void  config(XStream xstream) {
 
       xstream.alias(
@@ -87,6 +91,8 @@ public class GraphElements {
 
       xstream.aliasType(Point2DConverter.POS_TAG, Point2D.class);
       xstream.registerConverter(new Point2DConverter(xstream.getMapper()));
+
+      CameraPosConverter.configXStream(xstream);
     }
   };
 }

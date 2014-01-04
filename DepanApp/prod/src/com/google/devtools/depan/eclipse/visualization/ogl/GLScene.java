@@ -49,7 +49,7 @@ import javax.media.opengl.glu.GLU;
  */
 public abstract class GLScene {
   public static final float FACTOR = 1f;
-  
+
   private static final int[] EMPTY_HIT_LIST = new int[0];
 
   private static final Logger logger =
@@ -58,11 +58,11 @@ public abstract class GLScene {
   // For OSX, get profile early
   private static GLProfile DEFAULT_PROFILE = GLProfile.getDefault();
 
-  private SceneGrip grip;
   private GLCanvas canvas;
   private final GLContext context;
   public final GL2 gl;
   public final GLU glu;
+  private final SceneGrip grip;
 
   /** eye position */
   private float xoff;
@@ -82,16 +82,26 @@ public abstract class GLScene {
   private float targetYrot;
   private float targetZrot;
 
+  private boolean isSceneChanged = false;
+
   /** speed for moves */
   public static final int SPEED = 5;
 
   /** Camera z position, if zoom value is set to "100%". */
   public static final float HUNDRED_PERCENT_ZOOM = 300f;
 
+  public static final float[] DEFAULT_CAMERA_POSITION = {
+    0.0f, 0.0f, HUNDRED_PERCENT_ZOOM
+  };
+
+  // Full laptop screen vertical space:
+  // 7" vertical from 22" is ~ 20 degrees.
+  // public static final float FOV = 20.0f;
   private static final float FOV = 90.0f;
 
   public static final float Z_NEAR = 0.4f;
 
+  //public static final float Z_FAR = 20000.0f;
   public static final float Z_FAR = 1000.0f;
 
   public static final float PIXEL_QUANTA = 0.1f;
@@ -188,7 +198,7 @@ public abstract class GLScene {
     gl.glViewport(0, 0, width, height);
     gl.glMatrixMode(GL2.GL_PROJECTION);
     gl.glLoadIdentity();
-    glu.gluPerspective(FOV, aspect, Z_NEAR, 1000.0f);
+    glu.gluPerspective(FOV, aspect, Z_NEAR, Z_FAR);
     gl.glMatrixMode(GL2.GL_MODELVIEW);
     gl.glLoadIdentity();
     context.release();
@@ -302,17 +312,6 @@ public abstract class GLScene {
   // Camera (and drawing) management
 
   /**
-   * Center the camera over the given point (in openGL coordinates)
-   *
-   * @param camX x coordinate
-   * @param camY y coordinate
-   */
-  public void moveToCamera(float camX, float camY) {
-    targetXoff = -camX;
-    targetYoff = -camY;
-  }
-
-  /**
    * Provide the coordinates for the camera.  These are the OGL coordinates
    * at which the camera is placed.  In rendering terms, that's the negative
    * of the (x,y) translation transform.
@@ -323,20 +322,25 @@ public abstract class GLScene {
     return new float[] {-xoff, -yoff, zoff};
   }
 
-  /**
-   * Set the zoom to the given value. 1.0 is 100%.
-   * @param scale
-   */
-  public void setZoom(float scale) {
-    setZoomTarget(HUNDRED_PERCENT_ZOOM / scale);
+  public void homeCamera() {
+    targetXrot = 0.0f;
+    targetYoff = 0.0f;
+    targetZrot = 0.0f;
+
+    moveToCamera(0.0f, 0.0f);
+    zoomToCamera(HUNDRED_PERCENT_ZOOM);
   }
 
   /**
-   * Set the zoom to the given value. 1.0 is 100%.
-   * @param scale
+   * Center the camera over the given point (in openGL coordinates)
+   *
+   * @param camX x coordinate
+   * @param camY y coordinate
    */
-  public void zoomCamera(float size) {
-    setZoomTarget(targetZoff += size);
+  public void moveToCamera(float camX, float camY) {
+    targetXoff = -camX;
+    targetYoff = -camY;
+    isSceneChanged = true;
   }
 
   /**
@@ -345,7 +349,7 @@ public abstract class GLScene {
    * 
    * No direct assignments to targetZoff.
    */
-  private void setZoomTarget(float zOffset) {
+  public void zoomToCamera(float zOffset) {
     if (zOffset > (GLScene.Z_FAR - 1.0)) {
       zOffset = GLScene.Z_FAR - 1.0f;
       logger.info("clamped zoom at " + zOffset);
@@ -356,6 +360,43 @@ public abstract class GLScene {
     }
 
     targetZoff = zOffset;
+    isSceneChanged = true;
+  }
+
+  public boolean isNowStable() {
+    // With no changes, 
+    if (!isSceneChanged)
+      return false;
+
+    if (xoff != targetXoff)
+      return false;
+    if (yoff != targetYoff)
+      return false;
+    if (zoff != targetZoff)
+      return false;
+
+    clearChanges();
+    return true;
+  }
+
+  public void clearChanges() {
+    isSceneChanged = false;
+  }
+
+  /**
+   * Set the zoom to the given value. 1.0 is 100%.
+   * @param scale
+   */
+  public void setZoom(float scale) {
+    zoomToCamera(HUNDRED_PERCENT_ZOOM / scale);
+  }
+
+  /**
+   * Set the zoom to the given value. 1.0 is 100%.
+   * @param scale
+   */
+  public void zoomCamera(float size) {
+    zoomToCamera(targetZoff += size);
   }
 
   /**
@@ -382,7 +423,7 @@ public abstract class GLScene {
 
     moveToCamera((float) (targetXoff + normalized[0] * percent),
         (float) (targetYoff + normalized[1] * percent));
-    setZoomTarget((float) (targetYoff + normalized[1] * percent));
+    zoomToCamera((float) (targetYoff + normalized[1] * percent));
   }
 
   /**
@@ -403,8 +444,9 @@ public abstract class GLScene {
    * Change camera position vertically (up or down)
    */
   public void pedestalCamera(float size) {
-    this.targetXoff += size * Math.sin(Math.toRadians(zrot));
-    this.targetYoff += size * Math.cos(Math.toRadians(zrot));
+    moveToCamera(
+        - (float) (targetXoff + (size * Math.sin(Math.toRadians(zrot)))),
+        - (float) (targetYoff + (size * Math.cos(Math.toRadians(zrot)))));
   }
 
   /**
@@ -412,18 +454,9 @@ public abstract class GLScene {
    */
   public void truckCamera(float size) {
     // TODO:  Isn't the -90 just swapping sin/cos?
-    this.targetXoff += size * Math.sin(Math.toRadians(zrot - 90));
-    this.targetYoff += size * Math.cos(Math.toRadians(zrot - 90));
-  }
-
-  public void homeCamera() {
-    targetXrot = 0.0f;
-    targetYoff = 0.0f;
-    targetZrot = 0.0f;
-
-    targetXoff = 0.0f;
-    targetYoff = 0.0f;
-    targetZoff = HUNDRED_PERCENT_ZOOM;
+    moveToCamera(
+        - (float) (targetXoff + (size * Math.sin(Math.toRadians(zrot - 90)))),
+        - (float) (targetYoff + (size * Math.cos(Math.toRadians(zrot - 90)))));
   }
 
   /**
@@ -898,10 +931,6 @@ public abstract class GLScene {
     gl.glEnd();
 
     end2D();
-  }
-
-  public SceneGrip getGrip() {
-    return grip;
   }
 
   /**
