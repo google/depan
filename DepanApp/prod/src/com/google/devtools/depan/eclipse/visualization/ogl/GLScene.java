@@ -28,6 +28,9 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.opengl.GLCanvas;
 import org.eclipse.swt.opengl.GLData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 
 import java.awt.Color;
 import java.awt.geom.Rectangle2D;
@@ -124,6 +127,21 @@ public abstract class GLScene {
 
   private Color foregroundColor = Color.WHITE;
 
+  /**
+   * Turn off SWT-display wheel listening for the canvas.
+   * OGL rendering uses a separate mouse listening mechanism, and SWT
+   * generates conflicting scroll-bar move events.
+   */
+  private final Listener wheelListener = new Listener() {
+    @Override
+    public void handleEvent(Event event) {
+      if (event.widget != canvas) {
+        return;
+      }
+      event.doit = false;
+    }
+  };
+
   public GLScene(Composite parent) {
     GLData data = new GLData();
     data.doubleBuffer = true;
@@ -161,6 +179,11 @@ public abstract class GLScene {
     canvas.addKeyListener(grip);
     canvas.addMouseWheelListener(grip);
 
+    // Disable display support for mouse-wheel.
+    Display display = canvas.getDisplay();
+    display.addFilter(SWT.MouseVerticalWheel, wheelListener);
+    display.addFilter(SWT.MouseHorizontalWheel, wheelListener);
+
     // Start with the drawing properly zoomed.
     homeCamera();
     cutCamera();
@@ -168,9 +191,6 @@ public abstract class GLScene {
     this.init();
   }
 
-  /**
-   * @return
-   */
   private GLContext createGLContext() {
 
     try {
@@ -206,6 +226,11 @@ public abstract class GLScene {
 
   protected void dispose() {
     if (this.canvas != null) {
+
+      Display display = canvas.getDisplay();
+      display.removeFilter(SWT.MouseVerticalWheel, wheelListener);
+      display.removeFilter(SWT.MouseHorizontalWheel, wheelListener);
+
       this.canvas.dispose();
       this.canvas = null;
     }
@@ -400,7 +425,7 @@ public abstract class GLScene {
   }
 
   /**
-   * Move the eye in straight line toward the given word position, reducing
+   * Move the eye in straight line toward the given world position, reducing
    * (or augmenting) the distance between eye and point of zoomValue.
    *
    * @param x
@@ -421,9 +446,10 @@ public abstract class GLScene {
     // zoomValue
     double percent = zoomValue / normalized[2];
 
-    moveToCamera((float) (targetXoff + normalized[0] * percent),
-        (float) (targetYoff + normalized[1] * percent));
-    zoomToCamera((float) (targetYoff + normalized[1] * percent));
+    moveToCamera(
+        - (float) (targetXoff + normalized[0] * percent),
+        - (float) (targetYoff + normalized[1] * percent));
+    zoomToCamera((float) (targetZoff + normalized[2] * percent));
   }
 
   /**
