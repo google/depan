@@ -31,7 +31,6 @@ public abstract class GraphModelBuilder implements GraphBuilder {
   protected abstract void addGraphNode(GraphNode node);
 
   @Override
-  @SuppressWarnings("unchecked")
   public GraphModel getGraph() {
     return getGraphModel();
   }

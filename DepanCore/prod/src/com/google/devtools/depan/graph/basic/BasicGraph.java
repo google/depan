@@ -18,6 +18,7 @@ package com.google.devtools.depan.graph.basic;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
 import com.google.devtools.depan.graph.api.Edge;
 import com.google.devtools.depan.graph.api.Graph;
 import com.google.devtools.depan.graph.api.Node;
@@ -39,6 +40,7 @@ public class BasicGraph<T> implements Graph<T> {
 
   private final Set<BasicEdge<? extends T>> edges = Sets.newHashSet();
 
+  @SuppressWarnings("serial")
   public static class DuplicateNodeException
       extends IllegalArgumentException {
 
@@ -50,6 +52,7 @@ public class BasicGraph<T> implements Graph<T> {
     }
   }
 
+  @SuppressWarnings("serial")
   public static class DuplicateEdgeException
       extends IllegalArgumentException {
 
@@ -71,9 +74,7 @@ public class BasicGraph<T> implements Graph<T> {
   /////////////////////////////////////
   // Basic Graph<> methods for Nodes
 
-  /**
-   * @inheritDoc
-   */
+  @Override
   public void addNode(Node<? extends T> node) {
     if (nodes.containsKey(node.getId())) {
       throw new DuplicateNodeException(node.getId().toString());
@@ -82,9 +83,7 @@ public class BasicGraph<T> implements Graph<T> {
     nodes.put(node.getId(), (BasicNode<? extends T>) node);
   }
 
-  /**
-   * @inheritDoc
-   */
+  @Override
   public BasicNode<? extends T> findNode(T id) {
     final BasicNode<? extends T> result = nodes.get(id);
     return result;
@@ -93,16 +92,12 @@ public class BasicGraph<T> implements Graph<T> {
   /////////////////////////////////////
   // Basic Graph<> methods for Edges
 
-  /**
-   * @inheritDoc
-   */
+  @Override
   public void addEdge(Edge<? extends T> edge) {
     edges.add((BasicEdge<? extends T>) edge);
   }
 
-  /**
-   * @inheritDoc
-   */
+  @Override
   public BasicEdge<? extends T> findEdge(final Relation relation,
       final Node<? extends T> head, final Node<? extends T> tail) {
     for (BasicEdge<? extends T> edge : edges) {

@@ -23,6 +23,7 @@ import java.util.Collection;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
+
 import com.google.devtools.depan.graph.basic.MultipleDirectedRelationFinder;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
@@ -33,7 +34,6 @@ import com.google.devtools.depan.model.testing.TestUtils;
  *
  * @author <a href='mailto:leeca@google.com'>Lee Carver</a>
  */
-// TODO(leeca): Rewrite without
 public class CollapserTest {
 
   /**
@@ -57,6 +57,7 @@ public class CollapserTest {
   @Test
   public void testBasic() {
     GraphModel testGraph = new GraphModel();
+    @SuppressWarnings("unused")
     GraphNode srcNodes[] =
         TestUtils.buildComplete(testGraph, 5, SampleRelation.sampleRelation);
   }
@@ -81,7 +82,7 @@ public class CollapserTest {
     collapsed.add(srcNodes[4]);
     collapser.collapse(master, collapsed, true);
 
-    assertGraphNodesEdges(collapser.buildExposedGraph(testGraph), 4, 9);
+    assertGraphNodesEdges(collapser.buildExposedGraph(testGraph), 4, 6);
   }
 
   /**
@@ -105,7 +106,7 @@ public class CollapserTest {
     collapseOne.add(masterOne);
     collapseOne.add(srcNodes[4]);
     collapser.collapse(masterOne, collapseOne, true);
-    assertGraphNodesEdges(collapser.buildExposedGraph(testGraph), 4, 9);
+    assertGraphNodesEdges(collapser.buildExposedGraph(testGraph), 4, 6);
 
     // Collapse this master into a new master
     GraphNode masterTwo = srcNodes[2];
@@ -113,7 +114,7 @@ public class CollapserTest {
     collapseTwo.add(masterOne);
     collapseTwo.add(masterTwo);
     collapser.collapse(masterTwo, collapseTwo, false);
-    assertGraphNodesEdges(collapser.buildExposedGraph(testGraph), 3, 7);
+    assertGraphNodesEdges(collapser.buildExposedGraph(testGraph), 3, 3);
   }
 
 
@@ -144,7 +145,7 @@ public class CollapserTest {
     picked.add(master);
     picked.add(srcNodes[4]);
     collapser.collapse(master, picked, false);
-    assertGraphNodesEdges(collapser.buildExposedGraph(testGraph), 4, 9);
+    assertGraphNodesEdges(collapser.buildExposedGraph(testGraph), 4, 6);
 
     // Reuse the collapse variables for a new operation
     master = srcNodes[1];
@@ -152,7 +153,7 @@ public class CollapserTest {
     picked.add(master);
     picked.add(srcNodes[2]);
     collapser.collapse(master, picked, false);
-    assertGraphNodesEdges(collapser.buildExposedGraph(testGraph), 3, 8);
+    assertGraphNodesEdges(collapser.buildExposedGraph(testGraph), 3, 3);
   }
 
   @Test
@@ -170,6 +171,7 @@ public class CollapserTest {
     TreeModel treeData = new HierarchicalTreeModel(
         testGraph.computeSuccessorHierarchy(finder));
 
+    @SuppressWarnings("unused")
     Collection<CollapseData> collapseChanges =
         collapser.collapseTree(testGraph, treeData);
 
@@ -177,13 +179,13 @@ public class CollapserTest {
 
     // Uncollapse each, and check nodes and edges
     collapser.uncollapse(srcNodes[0], false);
-    assertGraphNodesEdges(collapser.buildExposedGraph(testGraph), 2, 4);
+    assertGraphNodesEdges(collapser.buildExposedGraph(testGraph), 2, 1);
 
     collapser.uncollapse(srcNodes[1], false);
-    assertGraphNodesEdges(collapser.buildExposedGraph(testGraph), 3, 7);
+    assertGraphNodesEdges(collapser.buildExposedGraph(testGraph), 3, 3);
 
     collapser.uncollapse(srcNodes[2], false);
-    assertGraphNodesEdges(collapser.buildExposedGraph(testGraph), 4, 9);
+    assertGraphNodesEdges(collapser.buildExposedGraph(testGraph), 4, 6);
 
     collapser.uncollapse(srcNodes[3], false);
     assertGraphNodesEdges(collapser.buildExposedGraph(testGraph), 5, 10);
