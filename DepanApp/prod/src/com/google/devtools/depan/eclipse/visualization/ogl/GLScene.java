@@ -91,7 +91,7 @@ public abstract class GLScene {
   public static final int SPEED = 5;
 
   /** Camera z position, if zoom value is set to "100%". */
-  public static final float HUNDRED_PERCENT_ZOOM = 300f;
+  public static final float HUNDRED_PERCENT_ZOOM = 2000.0f;
 
   public static final float[] DEFAULT_CAMERA_POSITION = {
     0.0f, 0.0f, HUNDRED_PERCENT_ZOOM
@@ -99,13 +99,11 @@ public abstract class GLScene {
 
   // Full laptop screen vertical space:
   // 7" vertical from 22" is ~ 20 degrees.
-  // public static final float FOV = 20.0f;
-  private static final float FOV = 90.0f;
+  public static final float FOV = 20.0f;
 
   public static final float Z_NEAR = 0.4f;
 
-  //public static final float Z_FAR = 20000.0f;
-  public static final float Z_FAR = 1000.0f;
+  public static final float Z_FAR = 30000.0f;
 
   public static final float PIXEL_QUANTA = 0.1f;
 
@@ -207,21 +205,28 @@ public abstract class GLScene {
   }
 
   protected void resizeScene() {
+    canvas.setCurrent();
+    context.makeCurrent();
+
     Rectangle rect = canvas.getClientArea();
+    gl.glViewport(0, 0, rect.width, rect.height);
+
+    gl.glMatrixMode(GL2.GL_PROJECTION);
+    gl.glLoadIdentity();
+    updateViewpoint(rect);
+
+    gl.glMatrixMode(GL2.GL_MODELVIEW);
+    gl.glLoadIdentity();
+
+    context.release();
+  }
+
+  private void updateViewpoint(Rectangle rect) {
     int width = rect.width;
     int height = Math.max(rect.height, 1);
     float aspect = (float) width / (float) height;
 
-    canvas.setCurrent();
-
-    context.makeCurrent();
-    gl.glViewport(0, 0, width, height);
-    gl.glMatrixMode(GL2.GL_PROJECTION);
-    gl.glLoadIdentity();
     glu.gluPerspective(FOV, aspect, Z_NEAR, Z_FAR);
-    gl.glMatrixMode(GL2.GL_MODELVIEW);
-    gl.glLoadIdentity();
-    context.release();
   }
 
   protected void dispose() {
@@ -310,18 +315,15 @@ public abstract class GLScene {
     // setup the view
     gl.glRenderMode(GL2.GL_SELECT);
     gl.glInitNames();
+
     gl.glMatrixMode(GL2.GL_PROJECTION);
     gl.glPushMatrix();
     gl.glLoadIdentity();
 
     glu.gluPickMatrix(mouseX, viewPort[3] - mouseY, selectionWidth,
         selectionHeight, viewPort, 0);
+    updateViewpoint(canvas.getClientArea());
 
-    Rectangle rect = canvas.getClientArea();
-    int width = rect.width;
-    int height = Math.max(rect.height, 1);
-    float aspect = (float) width / (float) height;
-    glu.gluPerspective(90.0f, aspect, 1.0f, 1000.0f);
     drawScene(0f);
 
     gl.glPopMatrix();
@@ -561,7 +563,7 @@ public abstract class GLScene {
     if (!GLScene.hyperbolic) {
       gl.glRotatef(xrot, 1.0f, 0.0f, 0.0f);
       gl.glRotatef(zrot, 0.0f, 0.0f, 1.0f);
-      gl.glTranslatef(this.xoff, this.yoff, -this.zoff);
+      gl.glTranslatef(xoff, yoff, -zoff);
     } else {
       glu.gluLookAt(0, 0, zoff, 0, 0, zoff - 1, 0, 1, 0);
     }
