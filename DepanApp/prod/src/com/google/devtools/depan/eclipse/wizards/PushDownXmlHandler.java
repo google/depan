@@ -250,7 +250,7 @@ public class PushDownXmlHandler extends DefaultHandler {
     super.startElement(uri, localName, qName, attributes);
   }
 
-  @Override
+  @Override // from sax..DefaultHandler
   public void characters(char[] ch, int start, int length)
       throws SAXException {
     top().processText(new String(ch, start, length));
