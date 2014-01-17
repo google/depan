@@ -18,6 +18,8 @@ package com.google.devtools.depan.eclipse.visualization.ogl;
 
 import com.google.common.base.Preconditions;
 
+import org.eclipse.swt.opengl.GLCanvas;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -61,28 +63,22 @@ public class Refresher extends Thread {
     }
 
     public boolean isDrawable() {
-      if (scene.getContext() == null) {
+      GLCanvas canvas = scene.getContext();
+      if (canvas == null) {
         return false;
       }
-      return !scene.getContext().isDisposed();
+      return !canvas.isDisposed();
     }
 
     public void run() {
-      if (isDrawable()) {
-        scene.render(DELAY);
-
-        // computations for FPS
-        long t = System.currentTimeMillis();
-        time += t - lastTime;
-        lastTime = t;
-        frames++;
-        // printing the FPS number every 10 seconds.
-        if (time > 10000) {
-          logger.fine(((float) frames / (float) time * 1000f) + " FPS");
-          time = 0;
-          frames = 0;
-        }
+      if (!isDrawable()) {
+        return;
       }
+      if (!scene.getContext().isVisible()) {
+        return;
+      }
+
+      scene.render(DELAY);
     }
   }
 
