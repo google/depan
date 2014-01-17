@@ -33,6 +33,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
 import java.awt.geom.Rectangle2D;
+import java.text.DecimalFormat;
 
 /**
  * @author ycoppel@google.com (Yohann Coppel)
@@ -49,7 +50,15 @@ public class ScaleTool extends ViewEditorTool {
   private Label rightViewport;
   private Label bottomViewport;
 
+  private Label frameRate;
+  private int frameUpdate;
+  private int framePrev;
+  private long timePrev;
+  private int frameCount;
+
   private DrawingListener drawingListener;
+
+  private DecimalFormat fpsFormat = new DecimalFormat("###.00");
 
   @Override
   public Image getIcon() {
@@ -102,6 +111,7 @@ public class ScaleTool extends ViewEditorTool {
         + "times larger even if applied multiple times consecutivelly.\n");
 
     Composite metrics = setupMetrics(baseComposite);
+    Composite rate = setupFrameRate(baseComposite);
 
     // layout
     baseComposite.setLayout(new GridLayout(4, false));
@@ -114,6 +124,8 @@ public class ScaleTool extends ViewEditorTool {
     zoomPercents.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, false));
     metrics.setLayoutData(
+        new GridData(SWT.FILL, SWT.FILL, true, false, 4, 1));
+    rate.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, false, 4, 1));
 
     // actions
@@ -200,6 +212,25 @@ public class ScaleTool extends ViewEditorTool {
     return baseComposite;
   }
 
+  private Composite setupFrameRate(Composite parent) {
+    Composite baseComposite = new Composite(parent, SWT.NONE);
+    baseComposite.setLayout(new GridLayout(2, false));
+
+    Label rateLabel = new Label(baseComposite, SWT.NONE);
+    rateLabel.setText("Frames per second");
+    frameRate = new Label(baseComposite, SWT.RIGHT);
+
+    rateLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
+    frameRate.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+
+    frameCount = 0;
+    frameUpdate = frameCount + 20;
+    framePrev = frameCount;
+    timePrev = System.currentTimeMillis();
+
+    return baseComposite;
+  }
+
   private void layoutRow(Label label, Label forDrawing, Label forViewPort) {
     label.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
     forDrawing.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
@@ -216,7 +247,27 @@ public class ScaleTool extends ViewEditorTool {
     leftViewport.setText(Double.toString(viewport.getMinX()));
     rightViewport.setText(Double.toString(viewport.getMaxX()));
     bottomViewport.setText(Double.toString(viewport.getMinY()));
-}
+
+    frameCount++;
+    if (frameCount > frameUpdate) {
+      long timeFrame = System.currentTimeMillis();
+      frameRate.setText(calcFpsDisplay(timeFrame));
+
+      frameUpdate = frameCount + 30;
+      framePrev = frameCount;
+      timePrev = timeFrame;
+    }
+  }
+
+  private String calcFpsDisplay(long timeFrame) {
+    double interval = (double) (timeFrame - timePrev);
+    if (0.0 == interval) {
+      return "Bad fps";
+    }
+
+    double fpsCalc = 1000.0 * ((double) (frameCount - framePrev)) / interval;
+    return fpsFormat.format(fpsCalc);
+  }
 
   @Override
   protected void acquireResources() {
