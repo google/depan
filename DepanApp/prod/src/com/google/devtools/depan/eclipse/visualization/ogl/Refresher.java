@@ -51,8 +51,6 @@ public class Refresher extends Thread {
     private final GLScene scene;
 
     // values to compute the number of FPS.
-    private long frames = 0;
-    private long time = 0;
     private long lastTime = System.currentTimeMillis();
 
     /**
@@ -78,7 +76,11 @@ public class Refresher extends Thread {
         return;
       }
 
-      scene.render(DELAY);
+      long currTime = System.currentTimeMillis();
+      long interval = currTime - lastTime;
+      lastTime = currTime;
+
+      scene.render(interval);
     }
   }
 

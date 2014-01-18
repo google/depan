@@ -285,6 +285,9 @@ public abstract class GLScene {
   protected void allocateResources() {
   }
 
+  /**
+   * @param elapsedTime time since previous frame.
+   */
   public void render(float elapsedTime) {
     if (!this.canvas.isCurrent()) {
       this.canvas.setCurrent();
