@@ -228,7 +228,7 @@
       <editor id="com.google.devtools.depan.eclipse.editors.ViewEditor"
             name="View Editor"
             extensions="dvi"
-            icon="icons/sample.gif"
+            icon="icons/view-editor.gif"
             class="com.google.devtools.depan.eclipse.editors.ViewEditor"/>
       <editor id="com.google.devtools.depan.eclipse.editors.GraphEditor"
             name="Graph Editor"
