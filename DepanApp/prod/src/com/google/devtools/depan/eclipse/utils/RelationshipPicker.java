@@ -583,6 +583,10 @@ public class RelationshipPicker
   public void modify(DirectedRelation element, String property, Boolean value) {
     notifyListeners(element, property, value);
 
+    if (selectedSet != instanceSet) {
+      copyToAndSelectInstanceSet();
+    }
+
     // after the change, if we are currently editing the instance set,
     // we modify it to get the changes back if we leave/come back to the
     // temporary set.
@@ -592,8 +596,6 @@ public class RelationshipPicker
       } else if (property.equals(RelationshipPickerHelper.COL_BACKWARD)) {
         instanceSet.setMatchBackward(element.getRelation(), value);
       }
-    } else {
-      copyToAndSelectInstanceSet();
     }
   }
 
