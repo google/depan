@@ -16,7 +16,6 @@
 
 package com.google.devtools.depan.eclipse.utils;
 
-import com.google.common.collect.Lists;
 import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
 import com.google.devtools.depan.eclipse.plugins.SourcePluginRegistry;
 import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptor;
@@ -30,9 +29,11 @@ import com.google.devtools.depan.graph.api.DirectedRelationFinder;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.basic.BasicDirectedRelation;
 import com.google.devtools.depan.graph.basic.MultipleDirectedRelationFinder;
-import com.google.devtools.depan.graph.basic.ReversedDirectedRelationFinder;
 import com.google.devtools.depan.model.RelationshipSet;
 import com.google.devtools.depan.model.RelationshipSetAdapter;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CheckboxCellEditor;
@@ -52,8 +53,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -142,15 +141,14 @@ public class RelationshipPicker
     Composite pickerRegion = setupRelationPicker(panel);
     pickerRegion.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
-    Button reverseAll = new Button(panel, SWT.PUSH);
-    reverseAll.setText("Reverse all lines");
-    reverseAll.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, false, false));
-    
+    Composite allRels = setupAllRelsButtons(panel);
+    allRels.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+
     relationPicker = new TableViewer(
         panel, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
 
-    setupRelationToggles(panel);
+    Composite toggles = setupRelationToggles(panel);
+    toggles.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
     // initialize the table
     Table relationTable = relationPicker.getTable();
@@ -172,22 +170,43 @@ public class RelationshipPicker
         new SelectionEditorTableEditor(relationPicker, this);
     relationPicker.setLabelProvider(tableLabelProvider);
     relationPicker.setCellModifier(tableLabelProvider);
+    relationPicker.setSorter(new AlphabeticSorter(this));
 
     // content provider
     relationPickerContent =
         new TableContentProvider<DirectedRelation>();
     relationPickerContent.initViewer(relationPicker);
-    relationPicker.setSorter(new AlphabeticSorter(this));
 
-    // options actions
+    return panel;
+  }
+
+  private Composite setupAllRelsButtons(Composite parent) {
+    Composite result = new Composite(parent, SWT.NONE);
+    result.setLayout(new GridLayout(2, false));
+
+    Button reverseAll = new Button(result, SWT.PUSH);
+    reverseAll.setText("Reverse all lines");
+    reverseAll.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+
+    Button invertAll = new Button(result, SWT.PUSH);
+    invertAll.setText("Invert all lines");
+    invertAll.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+
     reverseAll.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
-        reverseSelection();
+        reverseRels(contentMap.values());
       }
     });
 
-    return panel;
+    invertAll.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        invertRels(contentMap.values());
+      }
+    });
+
+    return result;
   }
 
   private Composite setupRelationPicker(Composite parent) {
@@ -216,13 +235,47 @@ public class RelationshipPicker
     return region;
   }
 
-  private void setupRelationToggles(Composite parent) {
-    Label optionsLabel = new Label(parent, SWT.NONE);
+  private Composite setupRelationToggles(Composite parent) {
+    Composite result = new Composite(parent, SWT.NONE);
+    GridLayout togglesLayout = new GridLayout(1, false);
+    togglesLayout.verticalSpacing = 0;
+    result.setLayout(togglesLayout);
+
+    Label optionsLabel = new Label(result, SWT.NONE);
     optionsLabel.setText("For selected lines:");
     optionsLabel.setLayoutData(
         new GridData(SWT.LEFT, SWT.FILL, false, false));
 
-    Composite toggles = new Composite(parent, SWT.NONE);
+    // Relation operations
+    Composite group = new Composite(result, SWT.NONE);
+    group.setLayout(new GridLayout(2, false));
+    group.setLayoutData(
+        new GridData(SWT.FILL, SWT.FILL, true, false));
+
+    Button groupReverse = new Button(group, SWT.PUSH);
+    groupReverse.setText("Reverse");
+    groupReverse.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+
+    Button groupInvert = new Button(group, SWT.PUSH);
+    groupInvert.setText("Invert");
+    groupInvert.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+
+    groupReverse.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        reverseRels(getSelectedRels());
+      }
+    });
+
+    groupInvert.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        invertRels(getSelectedRels());
+      }
+    });
+
+    // Toggle operations
+    Composite toggles = new Composite(result, SWT.NONE);
     toggles.setLayout(new GridLayout(8, false));
     toggles.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, false));
@@ -239,9 +292,9 @@ public class RelationshipPicker
     forwardNone.setImage(Resources.IMAGE_OFF);
     forwardNone.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
-    Button forwardReverse = new Button(toggles, SWT.PUSH);
-    forwardReverse.setText("Reverse");
-    forwardReverse.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+    Button forwardInvert = new Button(toggles, SWT.PUSH);
+    forwardInvert.setText("Invert");
+    forwardInvert.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
     Label backward = new Label(toggles, SWT.NONE);
     backward.setText("Backward");
@@ -255,9 +308,9 @@ public class RelationshipPicker
     backwardNone.setImage(Resources.IMAGE_OFF);
     backwardNone.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
-    Button backwardReverse = new Button(toggles, SWT.PUSH);
-    backwardReverse.setText("Reverse");
-    backwardReverse.setLayoutData(
+    Button backwardInvert = new Button(toggles, SWT.PUSH);
+    backwardInvert.setText("Invert");
+    backwardInvert.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, false));
 
     // actions
@@ -275,10 +328,10 @@ public class RelationshipPicker
       }
     });
 
-    forwardReverse.addSelectionListener(new SelectionAdapter() {
+    forwardInvert.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
-        forwardReverseSelection();
+        forwardInvertSelection();
       }
     });
 
@@ -296,56 +349,97 @@ public class RelationshipPicker
       }
     });
 
-    backwardReverse.addSelectionListener(new SelectionAdapter() {
+    backwardInvert.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
-        backwardReverseSelection();
+        backwardInvertSelection();
       }
     });
+
+    return result;
   }
 
   /**
-   * Reverse the forward setting for all selected lines.
+   * (un)Select the forward direction for each selected relations types.
+   *
+   * @param select true to select, false to unselect.
    */
-  // suppressWarnings: .iterator in IStructuredSelection is not parameterized
-  @SuppressWarnings("unchecked")
-  protected void forwardReverseSelection() {
-    Iterator selectedLines =
-      ((IStructuredSelection) relationPicker.getSelection()).iterator();
-    while (selectedLines.hasNext()) {
-      Object line = selectedLines.next();
-      if (line instanceof DirectedRelation) {
-        DirectedRelation rel = (DirectedRelation) line;
-        setForward(rel.getRelation(), !rel.matchForward(), true);
-      }
+  protected void forwardSelectAll(boolean select) {
+    for (DirectedRelation rel : getSelectedRels()) {
+      setForward(rel.getRelation(), select, true);
     }
     copyToAndSelectInstanceSet();
   }
 
   /**
-   * Reverse the backward setting for all selected lines.
+   * (un)Select the backward direction for each selected relations types.
+   *
+   * @param select true to select, false to unselect.
    */
-  // suppressWarnings: .iterator in IStructuredSelection is not parameterized
-  @SuppressWarnings("unchecked")
-  protected void backwardReverseSelection() {
-    Iterator selectedLines =
-      ((IStructuredSelection) relationPicker.getSelection()).iterator();
-    while (selectedLines.hasNext()) {
-      Object line = selectedLines.next();
-      if (line instanceof DirectedRelation) {
-        DirectedRelation rel = (DirectedRelation) line;
-        setBackward(rel.getRelation(), !rel.matchBackward(), true);
-      }
+  protected void backwardSelectAll(boolean select) {
+    for (DirectedRelation rel : getSelectedRels()) {
+      setBackward(rel.getRelation(), select, true);
+    }
+    copyToAndSelectInstanceSet();
+  }
+
+
+  /**
+   * Invert the forward setting for all selected lines.
+   */
+  protected void forwardInvertSelection() {
+    for (DirectedRelation rel : getSelectedRels()) {
+      setForward(rel.getRelation(), !rel.matchForward(), true);
     }
     copyToAndSelectInstanceSet();
   }
 
   /**
-   * Reverse the selection: select all directions that are not enabled, while
-   * deselecting each direction that were initially selected.
+   * Invert the backward setting for all selected lines.
    */
-  protected void reverseSelection() {
-    selectFinder(new ReversedDirectedRelationFinder(getSelectedRelations()));
+  protected void backwardInvertSelection() {
+    for (DirectedRelation rel : getSelectedRels()) {
+      setBackward(rel.getRelation(), !rel.matchBackward(), true);
+    }
+    copyToAndSelectInstanceSet();
+  }
+
+  private List<DirectedRelation> getSelectedRels() {
+     List<?> selection = ((IStructuredSelection) relationPicker.getSelection()).toList();
+     List<DirectedRelation> result =
+         Lists.newArrayListWithExpectedSize(selection.size());
+     for (Object item : selection) {
+       if (item instanceof DirectedRelation) {
+         result.add((DirectedRelation) item);
+       }
+     }
+     return result;
+  }
+
+  /**
+   * Invert the direction choices for all supplied directions.
+   */
+  protected void invertRels(Collection<DirectedRelation> rels) {
+    for (DirectedRelation direct :  rels) {
+      boolean forward = direct.matchForward();
+      boolean backward = direct.matchBackward();
+      setForward(direct.getRelation(), !forward, true);
+      setBackward(direct.getRelation(), !backward, true);
+    }
+    copyToAndSelectInstanceSet();
+  }
+
+  /**
+   * Reverse direction for all supplied relations.
+   */
+  protected void reverseRels(Collection<DirectedRelation> rels) {
+    for (DirectedRelation direct : rels) {
+      boolean forward = direct.matchForward();
+      boolean backward = direct.matchBackward();
+      setForward(direct.getRelation(), backward, true);
+      setBackward(direct.getRelation(), forward, true);
+    }
+    copyToAndSelectInstanceSet();
   }
 
   /**
@@ -353,7 +447,7 @@ public class RelationshipPicker
    */
   public void updateTable(List<SourcePlugin> plugins) {
     relationPickerContent.clear();
-    contentMap = new HashMap<Relation, DirectedRelation>();
+    contentMap = Maps.newHashMap();
     for (SourcePlugin p : plugins) {
       for (Relation r : p.getRelations()) {
         DirectedRelation directedRelation = new BasicDirectedRelation(r);
@@ -373,46 +467,6 @@ public class RelationshipPicker
       RelationshipSet selectedRelSet, List<RelSetDescriptor> choices) {
     baseChoices = choices;
     relSetPicker.setInput(selectedRelSet, choices);
-  }
-
-  /**
-   * (un)Select the forward direction for each selected relations types.
-   *
-   * @param select true to select, false to unselect.
-   */
-  // supressWarning because Iterator should be parameterized, but the .iterator
-  // in IStructuredSelection is not.
-  @SuppressWarnings("unchecked")
-  protected void forwardSelectAll(boolean select) {
-    Iterator selectedLines =
-      ((IStructuredSelection) relationPicker.getSelection()).iterator();
-    while (selectedLines.hasNext()) {
-      Object line = selectedLines.next();
-      if (line instanceof DirectedRelation) {
-        setForward(((DirectedRelation) line).getRelation(), select, true);
-      }
-    }
-    copyToAndSelectInstanceSet();
-  }
-
-  /**
-   * (un)Select the backward direction for each selected relations types.
-   *
-   * @param select true to select, false to unselect.
-   */
-  // supressWarning because Iterator should be parameterized, but the .iterator
-  // in IStructuredSelection is not.
-  @SuppressWarnings("unchecked")
-  protected void backwardSelectAll(boolean select) {
-    Iterator selectedLines =
-      ((IStructuredSelection) relationPicker.getSelection()).iterator();
-    while (selectedLines.hasNext()) {
-      Object line = selectedLines.next();
-      if (line instanceof DirectedRelation) {
-        setBackward(((DirectedRelation) line).getRelation(), select, true);
-      }
-    }
-    copyToAndSelectInstanceSet();
   }
 
   /**
