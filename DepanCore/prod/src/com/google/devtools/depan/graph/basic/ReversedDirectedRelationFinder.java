@@ -33,25 +33,15 @@ public class ReversedDirectedRelationFinder implements DirectedRelationFinder {
   public ReversedDirectedRelationFinder(DirectedRelationFinder parent) {
     this.parent = parent;
   }
-  
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.google.devtools.depan.graph.api.DirectedRelationFinder
-   *      #matchBackward(com.google.devtools.depan.graph.api.Relation)
-   */
+
+  @Override
   public boolean matchBackward(Relation find) {
     return !parent.matchBackward(find);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.google.devtools.depan.graph.api.DirectedRelationFinder
-   *      #matchForward(com.google.devtools.depan.graph.api.Relation)
-   */
+  @Override
   public boolean matchForward(Relation find) {
-    return !parent.matchBackward(find);
+    return !parent.matchForward(find);
   }
 
 }
