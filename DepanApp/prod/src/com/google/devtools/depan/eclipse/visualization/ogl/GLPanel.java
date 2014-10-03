@@ -146,7 +146,6 @@ public class GLPanel extends GLScene {
 
     selectBuffer = allocSelectBuffer();
     renderer = new RenderingPipe(this, jungGraph, nodeRanking);
-    dryRun();
   }
 
   /**
@@ -188,6 +187,7 @@ public class GLPanel extends GLScene {
   }
 
   public void start() {
+    dryRun();
     refresher.start();
   }
 
@@ -207,10 +207,10 @@ public class GLPanel extends GLScene {
   // Rendering methods.
 
   /**
-   * Perform a dry run in the rendering pipe, so that every plugin knows about
+   * Perform a dry run in the rendering pipe, so that every plug-in knows about
    * all nodes and edges.
    */
-  protected void dryRun() {
+  private void dryRun() {
     for (NodeRenderingProperty p : nodesProperties) {
       renderer.dryRun(p);
     }

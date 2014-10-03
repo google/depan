@@ -19,18 +19,9 @@ package com.google.devtools.depan.eclipse.editors;
 import com.google.devtools.depan.eclipse.persist.ObjectXmlPersist;
 import com.google.devtools.depan.eclipse.persist.XStreamFactory;
 import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
-import com.google.devtools.depan.eclipse.preferences.ColorPreferencesIds;
-import com.google.devtools.depan.eclipse.preferences.LabelPreferencesIds;
-import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds;
-import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.LabelPosition;
-import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeColors;
-import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeShape;
-import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeSize;
 import com.google.devtools.depan.eclipse.stats.ElementKindStats;
 import com.google.devtools.depan.eclipse.trees.GraphData;
 import com.google.devtools.depan.eclipse.utils.ListenerManager;
-import com.google.devtools.depan.eclipse.utils.Resources;
-import com.google.devtools.depan.eclipse.utils.Tools;
 import com.google.devtools.depan.eclipse.utils.elementkinds.ElementKindDescriptor;
 import com.google.devtools.depan.eclipse.utils.elementkinds.ElementKindDescriptors;
 import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptor;
@@ -43,9 +34,6 @@ import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerators;
 import com.google.devtools.depan.eclipse.visualization.layout.LayoutScaler;
 import com.google.devtools.depan.eclipse.visualization.layout.LayoutUtil;
 import com.google.devtools.depan.eclipse.visualization.ogl.RendererChangeListener;
-import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeColorPlugin;
-import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeShapePlugin;
-import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeSizePlugin;
 import com.google.devtools.depan.graph.api.DirectedRelationFinder;
 import com.google.devtools.depan.graph.basic.ForwardIdentityRelationFinder;
 import com.google.devtools.depan.model.GraphEdge;
@@ -72,10 +60,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -97,7 +81,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.SaveAsDialog;
 import org.eclipse.ui.part.MultiPageEditorPart;
 
-import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -117,8 +100,7 @@ import javax.imageio.ImageIO;
  * 
  * @author ycoppel@google.com (Yohann Coppel)
  */
-public class ViewEditor extends MultiPageEditorPart
-    implements IPreferenceChangeListener {
+public class ViewEditor extends MultiPageEditorPart {
 
   public static final String ID =
       "com.google.devtools.depan.eclipse.editors.ViewEditor";
@@ -325,7 +307,6 @@ public class ViewEditor extends MultiPageEditorPart
     renderer.initCameraPosition(viewInfo.getScenePrefs());
     renderer.initializeNodeLocations(viewInfo.getNodeLocations());
 
-    setPreferences();
     initSelectedNodes(getSelectedNodes());
 
     scrollHandler = new ViewScrollbarHandler(parent, renderer.getScene());
@@ -421,11 +402,6 @@ public class ViewEditor extends MultiPageEditorPart
     // Listen to changes in the underlying ViewModel
     viewPrefsListener = new Listener();
     viewInfo.addPrefsListener(viewPrefsListener);
-
-    // TODO(leeca): What does this do?
-    // listen the changes in the configuration
-    IEclipsePreferences prefs = getPreferences();
-    prefs.addPreferenceChangeListener(this);
   }
 
   private void initFromInput(IEditorInput input) throws PartInitException {
@@ -554,127 +530,6 @@ public class ViewEditor extends MultiPageEditorPart
 
   @Override
   public void setFocus() {
-  }
-
-  private void setPreferences() {
-    // setup label preferences
-    setLabelPreferences();
-    // setup size and shape for nodes with preferences.
-    setNodePreferences();
-    // setup color preferences.
-    setColorsPreferences();
-  }
-
-  /////////////////////////////////////
-  // Write preferences to renderer
-
-  /**
-   * Read and setup label preferences.
-   */
-  private void setLabelPreferences() {
-    IEclipsePreferences node = getPreferences();
-
-    // set label position
-    try {
-      String val = node.get(LabelPreferencesIds.LABEL_POSITION,
-          LabelPreferencesIds.LABEL_POSITION_DEFAULT);
-      renderer.getNodeLabel().setLabelPosition(LabelPosition.valueOf(val));
-    } catch (IllegalArgumentException ex) {
-      // bad label position in the preferences. ignore the change.
-      System.err.println("Bad label position in preferences");
-    }
-  }
-
-  /**
-   * Read and setup node rendering preferences (Colors, size, shape, ratio).
-   */
-  private void setNodePreferences() {
-    IEclipsePreferences node = getPreferences();
-
-    NodeSizePlugin<GraphEdge> nodeSize = renderer.getNodeSize();
-    NodeColorPlugin<GraphEdge> nodeColor = renderer.getNodeColor();
-    NodeShapePlugin<GraphEdge> nodeShape = renderer.getNodeShape();
-
-    // read enable/disable preferences
-    boolean colorEnabled = node.getBoolean(
-        NodePreferencesIds.NODE_COLOR_ON, true);
-    boolean shapeEnabled = node.getBoolean(
-        NodePreferencesIds.NODE_SHAPE_ON, true);
-    boolean resizeEnabled = node.getBoolean(
-        NodePreferencesIds.NODE_SIZE_ON, false);
-    boolean ratioEnabled = node.getBoolean(
-        NodePreferencesIds.NODE_RATIO_ON, false);
-
-    // set enable/disable preferences
-    nodeColor.setColor(colorEnabled);
-    nodeShape.setShapes(shapeEnabled);
-    nodeSize.setRatio(ratioEnabled);
-    nodeSize.setResize(resizeEnabled);
-
-    // set color mode color
-    try {
-      NodeColors color = NodeColors.valueOf(node.get(
-          NodePreferencesIds.NODE_COLOR,
-          NodeColors.getDefault().toString()));
-      nodeColor.setColorMode(color);
-    } catch (IllegalArgumentException ex) {
-      // bad node rendering option. ignore.
-      System.err.println("Bad node rendering option (color) in preferences.");
-    }
-
-    // set shape mode
-    try {
-      NodeShape shape = NodeShape.valueOf(node.get(
-          NodePreferencesIds.NODE_SHAPE,
-          NodeShape.getDefault().toString()));
-      nodeShape.setShapeMode(shape);
-    } catch (IllegalArgumentException ex) {
-      // bad node rendering option. ignore.
-      System.err.println("Bad node rendering option (shape) in preferences.");
-    }
-
-    // set size mode
-    try {
-      NodeSize size = NodeSize.valueOf(node.get(
-          NodePreferencesIds.NODE_SIZE,
-          NodeSize.getDefault().toString()));
-      nodeSize.setSizeMode(size);
-    } catch (IllegalArgumentException ex) {
-      // bad node rendering option. ignore.
-      System.err.println("Bad node rendering option (size) in preferences.");
-    }
-  }
-
-  /**
-   * read and setup color preferences.
-   */
-  private void setColorsPreferences() {
-    IEclipsePreferences node = getPreferences();
-
-    Color back = Tools.getRgb(node.get(
-        ColorPreferencesIds.COLOR_BACKGROUND, "255,255,255"));
-    Color front = Tools.getRgb(node.get(
-        ColorPreferencesIds.COLOR_FOREGROUND, "0,0,0"));
-    renderer.setColors(back, front);
-  }
-  
-  @SuppressWarnings("deprecation")
-  private IEclipsePreferences getPreferences() {
-    return new InstanceScope().getNode(Resources.PLUGIN_ID);
-  }
-
-  @Override
-  public void preferenceChange(PreferenceChangeEvent event) {
-    // changes in the configuration for the views, so redraw the graph.
-    if (event.getKey().startsWith(LabelPreferencesIds.LABEL_PREFIX)) {
-      setLabelPreferences();
-    }
-    if (event.getKey().startsWith(ColorPreferencesIds.COLORS_PREFIX)) {
-      setColorsPreferences();
-    }
-    if (event.getKey().startsWith(NodePreferencesIds.NODE_PREFIX)) {
-      setNodePreferences();
-    }
   }
 
   /////////////////////////////////////

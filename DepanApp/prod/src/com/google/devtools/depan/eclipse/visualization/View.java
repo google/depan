@@ -25,9 +25,7 @@ import com.google.devtools.depan.eclipse.visualization.ogl.GLPanel;
 import com.google.devtools.depan.eclipse.visualization.ogl.GLScene;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.CollapsePlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.EdgeIncludePlugin;
-import com.google.devtools.depan.eclipse.visualization.plugins.impl.FactorPlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeColorPlugin;
-import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeLabelPlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeShapePlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeSizePlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeStrokePlugin;
@@ -42,7 +40,6 @@ import com.google.devtools.depan.view.NodeDisplayProperty.Size;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
-import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -63,6 +60,8 @@ public class View {
    */
   private GLPanel glPanel;
 
+  private RendererPreferences prefUpdater;
+
   /**
    * Create a new View, with the given model and initialize the layout.
    *
@@ -76,14 +75,22 @@ public class View {
 
     glPanel = new GLPanel(parent,
         editor.getRendererCallback(), editor.getPartName());
+
     glPanel.setGraphModel(
         editor.getViewGraph(),
         editor.getJungGraph(),
         editor.getNodeRanking());
+
+    prefUpdater = RendererPreferences.preparePreferences(glPanel);
+
     glPanel.start();
   }
 
   public void dispose() {
+    if (null != prefUpdater) {
+      prefUpdater.dispose();
+      prefUpdater = null;
+    }
     if (null != glPanel) {
       glPanel.dispose();
       glPanel = null;
@@ -92,10 +99,6 @@ public class View {
 
   /////////////////////////////////////
   // Configurable instances
-
-  public void setColors(Color background, Color foreground) {
-    glPanel.setColors(background, foreground);
-  }
 
   public NodeSizePlugin<GraphEdge> getNodeSize() {
     return glPanel.getRenderingPipe().getNodeSize();
@@ -109,20 +112,12 @@ public class View {
     return glPanel.getRenderingPipe().getNodeShape();
   }
 
-  public NodeLabelPlugin getNodeLabel() {
-    return glPanel.getRenderingPipe().getNodeLabel();
-  }
-
   public NodeStrokePlugin<GraphEdge> getNodeStroke() {
     return glPanel.getRenderingPipe().getNodeStroke();
   }
 
   public EdgeIncludePlugin getEdgeInclude() {
     return glPanel.getRenderingPipe().getEdgeInclude();
-  }
-
-  public FactorPlugin getFactor() {
-    return glPanel.getRenderingPipe().getFactor();
   }
 
   public GLScene getScene() {
