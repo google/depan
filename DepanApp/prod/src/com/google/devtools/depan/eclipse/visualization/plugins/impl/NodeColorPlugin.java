@@ -52,7 +52,6 @@ public class NodeColorPlugin<E> implements NodeRenderingPlugin {
   private ColorMap cm = new ColorMap(ColorMapDefJet.CM, 256);
   private NodeColors nodeColors = NodeColors.getDefault();
 
-
   public NodeColorPlugin(Graph<GraphNode, E> graph,
       Map<GraphNode, Double> importances) {
     this.graph = graph;
@@ -114,6 +113,7 @@ public class NodeColorPlugin<E> implements NodeRenderingPlugin {
     if (p.overriddenColor != null) {
       return p.overriddenColor;
     } else {
+      @SuppressWarnings("unchecked")
       NodeColorData vals = (NodeColorData) p.pluginStore.get(this);
       float voltagePercent = (float) (vals.importance / maxImportance);
       float degreePercent = ((float) vals.degree) / maxDegree;
@@ -125,9 +125,11 @@ public class NodeColorPlugin<E> implements NodeRenderingPlugin {
   public void preFrame(float elapsedTime) {
   }
 
+  @Override
   public void postFrame() {
   }
 
+  @Override
   public boolean keyPressed(int keycode, char character, boolean ctrl,
       boolean alt, boolean shift) {
     return false;

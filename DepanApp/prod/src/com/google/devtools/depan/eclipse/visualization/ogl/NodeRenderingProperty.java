@@ -225,5 +225,19 @@ public class NodeRenderingProperty extends RenderingProperty {
   public void setSelected(boolean selected) {
     this.isSelected = selected;
   }
-}
 
+  /**
+   * Indicate if the node is apparent on the screen.  A node is apparent on
+   * the display if it is directly visible, or if it one of it collapse parents
+   * if directly visible
+   */
+  public boolean isApparent() {
+    if (isVisible) {
+      return true;
+    }
+    if (collapsedUnder != null) {
+      return collapsedUnder.isApparent();
+    }
+    return false;
+  }
+}

@@ -53,7 +53,7 @@ public class NodeStrokePlugin<E> implements NodeRenderingPlugin {
 
   @Override
   public void dryRun(NodeRenderingProperty p) {
-    // during the dry run, store a list of neibourgh in the node properties.
+    // during the dry run, store a list of neighbors in the node properties.
     List<NodeRenderingProperty> props = Lists.newArrayList();
     for (GraphNode node : graph.getNeighbors(p.node)) {
       props.add(view.node2property(node));
@@ -121,5 +121,4 @@ public class NodeStrokePlugin<E> implements NodeRenderingPlugin {
     highlight = !highlight;
     return highlight;
   }
-
 }

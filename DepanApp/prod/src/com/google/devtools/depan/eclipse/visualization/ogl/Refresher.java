@@ -68,6 +68,7 @@ public class Refresher extends Thread {
       return !canvas.isDisposed();
     }
 
+    @Override
     public void run() {
       if (!isDrawable()) {
         return;

@@ -16,7 +16,6 @@
 
 package com.google.devtools.depan.eclipse.visualization.plugins.impl;
 
-import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.visualization.ogl.GLPanel;
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeRenderingProperty;
 import com.google.devtools.depan.eclipse.visualization.plugins.core.NodeRenderingPlugin;
@@ -44,19 +43,13 @@ import com.google.devtools.depan.eclipse.visualization.plugins.core.NodeRenderin
 public class FactorPlugin implements NodeRenderingPlugin {
 
   private final GLPanel panel;
-  
-  // TODO(leca): later on, OpenGL shortcuts should fire Eclipse Actions rather
-  // then directly interacting with the ViewEditor.  But for now, it helps
-  // achieve the next step in this cleanup.
-  private final ViewEditor editor;
 
   public double ZOOM_IN_FACTOR = 1.1;
 
   public double ZOOM_OUT_FACTOR = 0.9;
 
-  public FactorPlugin(GLPanel panel, ViewEditor editor) {
+  public FactorPlugin(GLPanel panel) {
     this.panel = panel;
-    this.editor = editor;
   }
 
   @Override
@@ -68,15 +61,15 @@ public class FactorPlugin implements NodeRenderingPlugin {
   public boolean keyPressed(int keycode, char character, boolean ctrl,
       boolean alt, boolean shift) {
     if (character == '+') {
-      editor.layoutScale(ZOOM_IN_FACTOR, ZOOM_IN_FACTOR);
+      panel.scaleLayout(ZOOM_IN_FACTOR, ZOOM_IN_FACTOR);
       return true;
     }
     if (character == '-') {
-      editor.layoutScale(ZOOM_OUT_FACTOR, ZOOM_OUT_FACTOR);
+      panel.scaleLayout(ZOOM_OUT_FACTOR, ZOOM_OUT_FACTOR);
       return true;
     }
     if (character == 'a' || character == 'A') {
-      editor.layoutBestFit();
+      panel.scaleToViewport();
       return true;
     }
     return false;

@@ -16,9 +16,6 @@
 
 package com.google.devtools.depan.eclipse.visualization.ogl;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.visualization.plugins.core.EdgeRenderingPlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.core.NodeRenderingPlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.core.Plugin;
@@ -38,14 +35,14 @@ import com.google.devtools.depan.eclipse.visualization.plugins.impl.SteperPlugin
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphNode;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+
 import edu.uci.ics.jung.graph.Graph;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.media.opengl.GL2;
-import javax.media.opengl.glu.GLU;
 
 /**
  * A class that takes care of every rendering plugins.
@@ -86,20 +83,20 @@ public class RenderingPipe {
   private EdgeLabelPlugin edgeLabel;
   private EdgeIncludePlugin edgeInclude;
 
-  public RenderingPipe(GL2 gl, GLU glu, GLPanel panel, ViewEditor editor) {
-    Graph<GraphNode, GraphEdge> graph = editor.getJungGraph();
-    Map<GraphNode, Double> nodeRanking = editor.getNodeRanking();
+  public RenderingPipe(GLPanel panel,
+      Graph<GraphNode, GraphEdge> jungGraph, 
+      Map<GraphNode, Double> nodeRanking) {
 
-    shortcuts = new LayoutShortcutsPlugin(editor);
+    shortcuts = new LayoutShortcutsPlugin(panel);
     layout = new LayoutPlugin();
-    nodeColors = new NodeColorPlugin<GraphEdge>(graph, nodeRanking);
+    nodeColors = new NodeColorPlugin<GraphEdge>(jungGraph, nodeRanking);
     edgeColors = new EdgeColorPlugin();
     stepper = new SteperPlugin();
-    drawing = new DrawingPlugin(gl, panel);
-    factor = new FactorPlugin(panel, editor);
-    nodeSize = new NodeSizePlugin<GraphEdge>(graph, nodeRanking);
-    nodeStroke = new NodeStrokePlugin<GraphEdge>(panel, graph);
-    nodeShape = new NodeShapePlugin<GraphEdge>(graph);
+    drawing = new DrawingPlugin(panel);
+    factor = new FactorPlugin(panel);
+    nodeSize = new NodeSizePlugin<GraphEdge>(jungGraph, nodeRanking);
+    nodeStroke = new NodeStrokePlugin<GraphEdge>(panel, jungGraph);
+    nodeShape = new NodeShapePlugin<GraphEdge>(jungGraph);
     nodeLabel = new NodeLabelPlugin();
     edgeLabel = new EdgeLabelPlugin();
     edgeInclude = new EdgeIncludePlugin();

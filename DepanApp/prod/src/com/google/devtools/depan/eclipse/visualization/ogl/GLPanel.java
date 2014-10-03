@@ -16,14 +16,16 @@
 
 package com.google.devtools.depan.eclipse.visualization.ogl;
 
-import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds;
+import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerator;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+
+import edu.uci.ics.jung.graph.Graph;
 
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.widgets.Composite;
@@ -68,26 +70,42 @@ public class GLPanel extends GLScene {
   public static final int NODE_MASK   = 0xC0000000;
 
   /**
-   * Source of information about the graph.
+   * Callback instance for OGL gestures.
    */
-  private final ViewEditor editor;
+  private final RendererChangeListener changeListener;
+
+  /**
+   * Thread responsible for redrawing the OGL scene.
+   */
+  private final Refresher refresher;
+
+  /////////////////////////////////////
+  // What to draw, and the resources to render it.
+  // These must be re-allocated whenever the view graph and its properties
+  // are ever changed, including initial construction.
+
+  /**
+   * The graph that should be rendered.  This must be configured before
+   * rendering is started via {@link #setGraphModel(GraphModel, Graph, Map)}.  
+   */
+  private GraphModel viewGraph;
 
   /**
    * Rendering pipe.
    */
-  private final RenderingPipe renderer;
+  private RenderingPipe renderer;
 
   /**
    * Set of {@link NodeRenderingProperty}, one for each {@link GraphNode} to
    * render.
    */
-  NodeRenderingProperty[] nodesProperties;
+  private NodeRenderingProperty[] nodesProperties;
 
   /**
    * Set of {@link EdgeRenderingProperty}, one for each {@link GraphEdge} to
    * render.
    */
-  EdgeRenderingProperty[] edgesProperties;
+  private EdgeRenderingProperty[] edgesProperties;
 
   /**
    * Sufficient space to select every element in this panel.
@@ -98,28 +116,45 @@ public class GLPanel extends GLScene {
    * Map to retrieve a {@link NodeRenderingProperty} given its
    * {@link GraphNode}.
    */
-  Map<GraphNode, NodeRenderingProperty> nodePropMap = Maps.newHashMap();
+  private Map<GraphNode, NodeRenderingProperty> nodePropMap = Maps.newHashMap();
 
   /**
    * Map to retrieve an {@link EdgeRenderingProperty} given its
    * {@link GraphEdge}.
    */
-  Map<GraphEdge, EdgeRenderingProperty> edgePropMap = Maps.newHashMap();
-
+  private Map<GraphEdge, EdgeRenderingProperty> edgePropMap = Maps.newHashMap();
 
   /////////////////////////////////////
   // Lifecycle management
 
-  public GLPanel(Composite parent, ViewEditor editor) {
+  public GLPanel(Composite parent,
+      RendererChangeListener changeListener, String threadLabel) {
     super(parent);
-    this.editor = editor;
-    this.renderer = new RenderingPipe(gl, glu, this, editor);
+    this.changeListener = changeListener;
+
+    refresher = new Refresher(this);
+    refresher.setName("OGL " + threadLabel);
   }
 
+  public void setGraphModel(
+      GraphModel viewGraph,
+      Graph<GraphNode, GraphEdge> jungGraph,
+      Map<GraphNode, Double> nodeRanking) {
+
+    this.viewGraph = viewGraph;
+    prepareResources();
+
+    selectBuffer = allocSelectBuffer();
+    renderer = new RenderingPipe(this, jungGraph, nodeRanking);
+    dryRun();
+  }
+
+  /**
+   * Labels for nodes and edges need to be created within the
+   * OGL context.
+   */
   @Override
   protected void allocateResources() {
-    GraphModel viewGraph = editor.getViewGraph();
-
     // nodes
     GraphNode[] nodes = new GraphNode[0];
     nodes = viewGraph.getNodes().toArray(nodes);
@@ -150,18 +185,10 @@ public class GLPanel extends GLScene {
       edgesProperties[i] = edgesProp;
       edgePropMap.put(edge, edgesProp);
     }
-
-    // Allocate the select buffer needed for these graphic elements.
-    selectBuffer = allocSelectBuffer();
   }
 
   public void start() {
-    prepareResources();
-    dryRun();
-
-    Refresher r = new Refresher(this);
-    r.setName("OGL " + editor.getPartName());
-    r.start();
+    refresher.start();
   }
 
   @Override
@@ -250,7 +277,17 @@ public class GLPanel extends GLScene {
       return false;
     }
 
-    editor.selectAllNodes();
+    // Select all directly or indirectly visible nodes.
+    // Assume this is all of the known nodes.
+    List<GraphNode> selection =
+        Lists.newArrayListWithExpectedSize(nodesProperties.length);
+    for (NodeRenderingProperty nodeProp : nodesProperties) {
+      if (nodeProp.isApparent()) {
+        selection.add(nodeProp.node);
+      }
+    }
+
+    getRendererCallback().selectionChanged(selection);
     return true;
   }
 
@@ -307,16 +344,8 @@ public class GLPanel extends GLScene {
     return nodesProperties[n];
   }
 
-  private GraphNode getGraphNode(int id) {
-    NodeRenderingProperty prop = getNodeRenderer(id);
-    if (null != prop) {
-      return prop.node;
-    }
-    return null;
-  }
-
   private Collection<GraphNode> getGraphNodes(int[] ids) {
-    List<GraphNode> result = Lists.newArrayListWithCapacity(ids.length);
+    List<GraphNode> result = Lists.newArrayListWithExpectedSize(ids.length);
     for (int id : ids) {
       NodeRenderingProperty prop = getNodeRenderer(id);
       if (null != prop) {
@@ -514,15 +543,15 @@ public class GLPanel extends GLScene {
 
   @Override
   protected boolean isSelected(int id) {
-    GraphNode node = getGraphNode(id);
-    if (null == node) {
+    NodeRenderingProperty prop = getNodeRenderer(id);
+    if (null == prop) {
       return false;
     }
-    return editor.isSelected(node);
+    return prop.isSelected();
   }
 
   private RendererChangeListener getRendererCallback() {
-    return editor.getRendererCallback();
+    return changeListener;
   }
 
   @Override
@@ -564,5 +593,17 @@ public class GLPanel extends GLScene {
         props.setSelected(true);
       }
     }
+  }
+
+  public void applyLayout(LayoutGenerator layout) {
+    getRendererCallback().applyLayout(layout);
+  }
+
+  public void scaleLayout(double zoomX, double zoomY) {
+    getRendererCallback().scaleLayout(zoomX, zoomY);
+  }
+
+  public void scaleToViewport() {
+    getRendererCallback().scaleToViewport();
   }
 }

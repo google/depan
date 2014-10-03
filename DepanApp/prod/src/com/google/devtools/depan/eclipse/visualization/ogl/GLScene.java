@@ -16,14 +16,13 @@
 
 package com.google.devtools.depan.eclipse.visualization.ogl;
 
-import com.jogamp.opengl.util.awt.Screenshot;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.opengl.GLCanvas;
 import org.eclipse.swt.opengl.GLData;
@@ -157,13 +156,13 @@ public abstract class GLScene {
     }
     glu = new GLU();
 
-    this.canvas.addControlListener(new ControlAdapter() {
+    canvas.addControlListener(new ControlAdapter() {
       @Override
       public void controlResized(ControlEvent e) {
         resizeScene();
       }
     });
-    this.canvas.addDisposeListener(new DisposeListener() {
+    canvas.addDisposeListener(new DisposeListener() {
       @Override
       public void widgetDisposed(DisposeEvent e) {
         dispose();
@@ -230,24 +229,24 @@ public abstract class GLScene {
   }
 
   protected void dispose() {
-    if (this.canvas != null) {
+    if (canvas != null) {
 
       Display display = canvas.getDisplay();
       display.removeFilter(SWT.MouseVerticalWheel, wheelListener);
       display.removeFilter(SWT.MouseHorizontalWheel, wheelListener);
 
-      this.canvas.dispose();
-      this.canvas = null;
+      canvas.dispose();
+      canvas = null;
     }
   }
 
   protected void init() {
-    this.initGLContext();
-    this.initGL();
+    initGLContext();
+    initGL();
   }
 
   protected void initGLContext() {
-    this.canvas.setCurrent();
+    canvas.setCurrent();
   }
 
   protected void initGL() {
@@ -289,8 +288,8 @@ public abstract class GLScene {
    * @param elapsedTime time since previous frame.
    */
   public void render(float elapsedTime) {
-    if (!this.canvas.isCurrent()) {
-      this.canvas.setCurrent();
+    if (!canvas.isCurrent()) {
+      canvas.setCurrent();
     }
     context.makeCurrent();
     gl.glPushMatrix();
@@ -304,8 +303,8 @@ public abstract class GLScene {
   }
 
   private int[] renderWithPicking() {
-    if (!this.canvas.isCurrent()) {
-      this.canvas.setCurrent();
+    if (!canvas.isCurrent()) {
+      canvas.setCurrent();
     }
     context.makeCurrent();
 
@@ -991,7 +990,8 @@ public abstract class GLScene {
       this.canvas.setCurrent();
     }
     context.makeCurrent();
-    BufferedImage image = Screenshot.readToBufferedImage(canvas.getSize().x, canvas.getSize().y);
+    Point size = canvas.getSize();
+    BufferedImage image = Screenshots.grab(size.x, size.y);
     context.release();
     return image;
   }

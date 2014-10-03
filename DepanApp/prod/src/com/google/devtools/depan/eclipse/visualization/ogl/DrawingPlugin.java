@@ -35,24 +35,24 @@ import javax.media.opengl.GL2;
  */
 public class DrawingPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
 
-  private GL2 gl;
   private GLScene scene;
 
   // Set to null for each rendering in preframe
   private Rectangle2D drawingBounds;
 
-  public DrawingPlugin(GL2 gl, GLScene scene) {
-    this.gl = gl;
+  public DrawingPlugin(GLScene scene) {
     this.scene = scene;
   }
 
   /**
    * Draw a node.
    */
+  @Override
   public boolean apply(NodeRenderingProperty property) {
     if (!property.isVisible) {
       return false;
     }
+    GL2 gl = scene.gl;
     gl.glPushMatrix();
     gl.glPushName(property.shapeId);
 
@@ -139,10 +139,12 @@ public class DrawingPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
   /**
    * Draw an edge.
    */
+  @Override
   public boolean apply(EdgeRenderingProperty property) {
     if (!property.node1.isVisible || !property.node2.isVisible) {
       return false;
     }
+    GL2 gl = scene.gl;
     gl.glPushName(property.shapeId);
     if (property.strokeWidth > 0.0f) {
       gl.glLineWidth(property.strokeWidth);
@@ -182,6 +184,7 @@ public class DrawingPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
   private void paintLabel(EdgeRenderingProperty property, Point2D p) {
     // Use the GL_MODULATE texture function to effectively multiply
     // each pixel in the texture by the current alpha value
+    GL2 gl = scene.gl;
     gl.glTexEnvi(GL2.GL_TEXTURE_ENV, GL2.GL_TEXTURE_ENV_MODE, GL2.GL_MODULATE);
 
     if (property.textIsDirty) {
@@ -200,6 +203,7 @@ public class DrawingPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
   private void paintLabel(NodeRenderingProperty property) {
     // Use the GL_MODULATE texture function to effectively multiply
     // each pixel in the texture by the current alpha value
+    GL2 gl = scene.gl;
     gl.glTexEnvi(GL2.GL_TEXTURE_ENV, GL2.GL_TEXTURE_ENV_MODE, GL2.GL_MODULATE);
 
     if (property.textIsDirty) {
@@ -235,6 +239,8 @@ public class DrawingPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
     float ty2 = tc.bottom();
     float halfWidth = quarterValue(texture.getWidth());
     float halfHeight = quarterValue(texture.getHeight());
+
+    GL2 gl = scene.gl;
     texture.bind(gl);
     texture.enable(gl);
 
@@ -293,6 +299,7 @@ public class DrawingPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
   public void dryRun(NodeRenderingProperty p) {
   }
 
+  @Override
   public boolean keyPressed(int keycode, char character, boolean ctrl,
       boolean alt, boolean shift) {
     return false;

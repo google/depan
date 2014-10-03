@@ -74,7 +74,12 @@ public class View {
       Composite parent, int style, ViewEditor editor) {
     this.editor = editor;
 
-    glPanel = new GLPanel(parent, editor);
+    glPanel = new GLPanel(parent,
+        editor.getRendererCallback(), editor.getPartName());
+    glPanel.setGraphModel(
+        editor.getViewGraph(),
+        editor.getJungGraph(),
+        editor.getNodeRanking());
     glPanel.start();
   }
 

@@ -16,9 +16,9 @@
 
 package com.google.devtools.depan.eclipse.visualization.plugins.impl;
 
-import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerator;
 import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerators;
+import com.google.devtools.depan.eclipse.visualization.ogl.GLPanel;
 import com.google.devtools.depan.eclipse.visualization.plugins.core.Plugin;
 
 import java.util.List;
@@ -36,7 +36,7 @@ import java.util.List;
  */
 public class LayoutShortcutsPlugin implements Plugin {
 
-  private final ViewEditor editor;
+  private final GLPanel panel;
 
   private enum KeyState {
     /**
@@ -57,8 +57,8 @@ public class LayoutShortcutsPlugin implements Plugin {
    * 0.5.
    * @param view
    */
-  public LayoutShortcutsPlugin(ViewEditor editor) {
-    this.editor = editor;
+  public LayoutShortcutsPlugin(GLPanel panel) {
+    this.panel = panel;
   }
 
   @Override
@@ -91,7 +91,7 @@ public class LayoutShortcutsPlugin implements Plugin {
 
       System.out.println("Apply layout " + layoutName);
       LayoutGenerator layout = LayoutGenerators.getByName(layoutName);
-      editor.applyLayout(layout);
+      panel.applyLayout(layout);
       return true;
 
     default:

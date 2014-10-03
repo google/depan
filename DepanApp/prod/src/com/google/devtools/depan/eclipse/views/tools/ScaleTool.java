@@ -135,7 +135,7 @@ public class ScaleTool extends ViewEditorTool {
         try {
           float size = Float.parseFloat(percents.getText());
           size /= 100.0f; // we have percents, we need a /1 scale.
-          applyScale(size);
+          scaleLayout(size);
         } catch (NumberFormatException ex) {
           // error in the user input. ignore the zoom level.
           System.out.println("Error in the number format. Must be float.");
@@ -160,7 +160,7 @@ public class ScaleTool extends ViewEditorTool {
     autoStretch.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
-        automaticScaling();
+        scaleToViewport();
       }
     });
 
@@ -289,11 +289,11 @@ public class ScaleTool extends ViewEditorTool {
    * Apply a scaling factor to the current view.
    * @param scale
    */
-  private void applyScale(float scale) {
+  private void scaleLayout(float scale) {
     if (!hasEditor()) {
       return;
     }
-    getEditor().layoutScale(scale, scale);
+    getEditor().scaleLayout(scale, scale);
   }
 
   /**
@@ -311,10 +311,10 @@ public class ScaleTool extends ViewEditorTool {
    * Run the algorithm trying to find the best scaling value for everything
    * to fit into the current view, with the current zoom level.
    */
-  private void automaticScaling() {
+  private void scaleToViewport() {
     if (!hasEditor()) {
       return;
     }
-    getEditor().layoutBestFit();
+    getEditor().scaleToViewport();
   }
 }

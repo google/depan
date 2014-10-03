@@ -424,8 +424,8 @@ public class ViewEditor extends MultiPageEditorPart
 
     // TODO(leeca): What does this do?
     // listen the changes in the configuration
-    new InstanceScope().getNode(Resources.PLUGIN_ID)
-        .addPreferenceChangeListener(this);
+    IEclipsePreferences prefs = getPreferences();
+    prefs.addPreferenceChangeListener(this);
   }
 
   private void initFromInput(IEditorInput input) throws PartInitException {
@@ -485,6 +485,7 @@ public class ViewEditor extends MultiPageEditorPart
    *
    * The result is stored in the map {@link #ranking}.
    */
+  @SuppressWarnings("unused") // Retained legacy code
   private Map<GraphNode, Double> rankGraphX(
           DirectedGraph<GraphNode, GraphEdge> graph) {
 
@@ -565,14 +566,13 @@ public class ViewEditor extends MultiPageEditorPart
   }
 
   /////////////////////////////////////
-  // Preference handling
+  // Write preferences to renderer
 
   /**
    * Read and setup label preferences.
    */
   private void setLabelPreferences() {
-    IEclipsePreferences node =
-        new InstanceScope().getNode(Resources.PLUGIN_ID);
+    IEclipsePreferences node = getPreferences();
 
     // set label position
     try {
@@ -589,8 +589,8 @@ public class ViewEditor extends MultiPageEditorPart
    * Read and setup node rendering preferences (Colors, size, shape, ratio).
    */
   private void setNodePreferences() {
-    IEclipsePreferences node =
-        new InstanceScope().getNode(Resources.PLUGIN_ID);
+    IEclipsePreferences node = getPreferences();
+
     NodeSizePlugin<GraphEdge> nodeSize = renderer.getNodeSize();
     NodeColorPlugin<GraphEdge> nodeColor = renderer.getNodeColor();
     NodeShapePlugin<GraphEdge> nodeShape = renderer.getNodeShape();
@@ -643,21 +643,24 @@ public class ViewEditor extends MultiPageEditorPart
       // bad node rendering option. ignore.
       System.err.println("Bad node rendering option (size) in preferences.");
     }
-
   }
 
   /**
    * read and setup color preferences.
    */
   private void setColorsPreferences() {
-    IEclipsePreferences node =
-      new InstanceScope().getNode(Resources.PLUGIN_ID);
+    IEclipsePreferences node = getPreferences();
 
     Color back = Tools.getRgb(node.get(
         ColorPreferencesIds.COLOR_BACKGROUND, "255,255,255"));
     Color front = Tools.getRgb(node.get(
         ColorPreferencesIds.COLOR_FOREGROUND, "0,0,0"));
     renderer.setColors(back, front);
+  }
+  
+  @SuppressWarnings("deprecation")
+  private IEclipsePreferences getPreferences() {
+    return new InstanceScope().getNode(Resources.PLUGIN_ID);
   }
 
   @Override
@@ -984,7 +987,7 @@ public class ViewEditor extends MultiPageEditorPart
    * was centered over the nodes.  This has been the historical behavior of the
    * {@code FactorPlugin}.
    */
-  public void layoutBestFit() {
+  public void scaleToViewport() {
     layoutBestFit(getExposedGraph().getNodes(), getNodeLocations());
   }
 
@@ -994,7 +997,7 @@ public class ViewEditor extends MultiPageEditorPart
    * @param scaleX scale factor for X coordinates
    * @param scaleY scale factor for Y coordinates
    */
-  public void layoutScale(double scaleX, double scaleY) {
+  public void scaleLayout(double scaleX, double scaleY) {
     Point2dUtils.Translater translater =
         Point2dUtils.newScaleTranslater(scaleX, scaleY);
     Map<GraphNode, Point2D> changes = Point2dUtils.translateNodes(
@@ -1363,6 +1366,21 @@ public class ViewEditor extends MultiPageEditorPart
         viewInfo.setScenePrefs(prefs);
       }
       renderer.saveCameraPosition(prefs);
+    }
+
+    @Override
+    public void applyLayout(LayoutGenerator layout) {
+      ViewEditor.this.applyLayout(layout);
+    }
+
+    @Override
+    public void scaleLayout(double scaleX, double scaleY) {
+      ViewEditor.this.scaleLayout(scaleX, scaleY);
+    }
+
+    @Override
+    public void scaleToViewport() {
+      ViewEditor.this.scaleToViewport();
     }
   }
 

@@ -17,6 +17,7 @@
 package com.google.devtools.depan.eclipse.visualization.ogl;
 
 import com.google.devtools.depan.eclipse.editors.ViewEditor;
+import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerator;
 import com.google.devtools.depan.model.GraphNode;
 
 import java.awt.geom.Point2D;
@@ -83,4 +84,21 @@ public interface RendererChangeListener {
    * The receiver should query the renderer for the current state.
    */
   public void sceneChanged();
+
+  /**
+   * Notify the receiver that the supplied layout should be used.
+   */
+  public void applyLayout(LayoutGenerator layout);
+
+  /**
+   * Notify the receiver that node positions should be scaled with the
+   * provided factors.
+   */
+  public void scaleLayout(double scaleX, double scaley);
+
+  /**
+   * Notify the receiver that nodes positions should be scaled to fit
+   * entirely within the current viewport.
+   */
+  public void scaleToViewport();
 }
