@@ -76,11 +76,18 @@ public interface RendererChangeListener {
 
   /**
    * Notify the receiver of the total size for the drawing.
+   * 
+   * Drawing bounds are updated for each rendering cycle. Listeners should
+   * wait for the {@link #sceneChanged()} event to detect stable points in
+   * the graph drawing.
    */
   public void updateDrawingBounds(Rectangle2D drawing, Rectangle2D viewport);
 
   /**
-   * Notify the receiver that the scene (viewpoint, camera, etc.) has changed.
+   * Notify the receiver that the scene (viewpoint, camera, etc.) has changed,
+   * and this it is currently stable (unlikely to further change without an
+   * explicit action).
+   * 
    * The receiver should query the renderer for the current state.
    */
   public void sceneChanged();

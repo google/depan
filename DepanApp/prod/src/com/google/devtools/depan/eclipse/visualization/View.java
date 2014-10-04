@@ -20,9 +20,11 @@ import com.google.devtools.depan.eclipse.editors.CameraPosPreference;
 import com.google.devtools.depan.eclipse.editors.ScenePreferences;
 import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds;
+import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerator;
 import com.google.devtools.depan.eclipse.visualization.ogl.ArrowHead;
 import com.google.devtools.depan.eclipse.visualization.ogl.GLPanel;
 import com.google.devtools.depan.eclipse.visualization.ogl.GLScene;
+import com.google.devtools.depan.eclipse.visualization.ogl.RendererChangeListener;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.CollapsePlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.EdgeIncludePlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeColorPlugin;
@@ -38,7 +40,6 @@ import com.google.devtools.depan.view.NodeDisplayProperty;
 import com.google.devtools.depan.view.NodeDisplayProperty.Size;
 
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -47,19 +48,30 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
+ * Widget-like object that encapsulates the OGL rendering on behalf of the
+ * ViewEditor.
+ * 
+ * Hides the {@link GLPanel} and other OGL artifacts from the
+ * {@link ViewEditor}.
+ * 
  * @author ycoppel@google.com (Yohann Coppel)
  */
 public class View {
 
-  // TODO: Convert to a listener style of interaction?
-  @SuppressWarnings("unused")  // Someday, this will be essential
+  // TODO: Turn this into an event dispatcher, and have editor
+  // register a listener.
   private final ViewEditor editor;
 
-  /**
-   * Rendering object.
-   */
+  /** Callbacks from {@link GLPanel}. */
+  private final RendererChangeReceiver changeReceiver =
+      new RendererChangeReceiver();
+
+  // Not final, so they can be released when this view instance is dispose()ed.
+  
+  /** Rendering object. */
   private GLPanel glPanel;
 
+  /** Update drawing options from Eclipse preferences. */
   private RendererPreferences prefUpdater;
 
   /**
@@ -73,8 +85,7 @@ public class View {
       Composite parent, int style, ViewEditor editor) {
     this.editor = editor;
 
-    glPanel = new GLPanel(parent,
-        editor.getRendererCallback(), editor.getPartName());
+    glPanel = new GLPanel(parent, changeReceiver, editor.getPartName());
 
     glPanel.setGraphModel(
         editor.getViewGraph(),
@@ -86,6 +97,10 @@ public class View {
     glPanel.start();
   }
 
+  public void setLayoutData(Object layoutData) {
+    glPanel.getContext().setLayoutData(layoutData);
+  }
+
   public void dispose() {
     if (null != prefUpdater) {
       prefUpdater.dispose();
@@ -95,6 +110,13 @@ public class View {
       glPanel.dispose();
       glPanel = null;
     }
+  }
+
+  /////////////////////////////////////
+  // High-level actions
+
+  public BufferedImage takeScreenshot() {
+    return glPanel.takeScreenshot();
   }
 
   /////////////////////////////////////
@@ -184,17 +206,6 @@ public class View {
   }
 
   /////////////////////////////////////
-  // Basic Getters and Setters
-
-  public Control getControl() {
-    return glPanel.getContext();
-  }
-
-  public BufferedImage takeScreenshot() {
-    return glPanel.takeScreenshot();
-  }
-
-  /////////////////////////////////////
   // Rendering support
 
   public void updateCollapseChanges(
@@ -258,6 +269,10 @@ public class View {
     glPanel.updateNodeLocations(newLocations);
   }
 
+  /**
+   * Save the current camera position into the supplied ScenePreferences
+   * instance.
+   */
   public void saveCameraPosition(ScenePreferences prefs) {
     CameraPosPreference prefsPos = prefs.getCameraPos();
     if (null == prefsPos) {
@@ -271,6 +286,13 @@ public class View {
     prefsPos.setZ(scenePos[2]);
   }
 
+  /**
+   * Move the camera position to the supplied ScenePreferences as a "cut",
+   * without animation.
+   * 
+   * A scene changed event to indicate the newly stable diagram rendering
+   * can occur despite the lack of animation.
+   */
   public void setCameraPosition(ScenePreferences prefs) {
     if (null == prefs) {
       return;
@@ -286,8 +308,69 @@ public class View {
     scene.cutCamera();
   }
 
+  /**
+   * Initialize the camera position to the supplied ScenePreferences,
+   * without animation.  No scene changed event is genereated.
+   */
   public void initCameraPosition(ScenePreferences prefs) {
     setCameraPosition(prefs);
     getScene().clearChanges();
+  }
+
+  /////////////////////////////////////
+  // Callbacks from the rendering engine.
+
+  private class RendererChangeReceiver
+      implements RendererChangeListener {
+
+    @Override
+    public void locationsChanged(Map<GraphNode, Point2D> changes) {
+      editor.editNodeLocations(changes, this);
+    }
+
+    @Override
+    public void selectionMoved(double x, double y) {
+      editor.moveSelectionDelta(x, y, this);
+    }
+
+    @Override
+    public void selectionChanged(Collection<GraphNode> pickedNodes) {
+      editor.selectNodes(pickedNodes);
+    }
+
+    @Override
+    public void selectionExtended(Collection<GraphNode> extendNodes) {
+      editor.extendSelection(extendNodes, null);
+    }
+
+    @Override
+    public void selectionReduced(Collection<GraphNode> reduceNodes) {
+      editor.reduceSelection(reduceNodes, null);
+    }
+
+    @Override
+    public void updateDrawingBounds(Rectangle2D drawing, Rectangle2D viewport) {
+      editor.updateDrawingBounds(drawing, viewport);
+    }
+
+    @Override
+    public void sceneChanged() {
+      editor.sceneChanged();
+    }
+
+    @Override
+    public void applyLayout(LayoutGenerator layout) {
+      editor.applyLayout(layout);
+    }
+
+    @Override
+    public void scaleLayout(double scaleX, double scaleY) {
+      editor.scaleLayout(scaleX, scaleY);
+    }
+
+    @Override
+    public void scaleToViewport() {
+      editor.scaleToViewport();
+    }
   }
 }

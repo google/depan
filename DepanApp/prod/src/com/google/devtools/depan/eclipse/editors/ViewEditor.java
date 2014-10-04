@@ -33,7 +33,6 @@ import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerator;
 import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerators;
 import com.google.devtools.depan.eclipse.visualization.layout.LayoutScaler;
 import com.google.devtools.depan.eclipse.visualization.layout.LayoutUtil;
-import com.google.devtools.depan.eclipse.visualization.ogl.RendererChangeListener;
 import com.google.devtools.depan.graph.api.DirectedRelationFinder;
 import com.google.devtools.depan.graph.basic.ForwardIdentityRelationFinder;
 import com.google.devtools.depan.model.GraphEdge;
@@ -150,9 +149,6 @@ public class ViewEditor extends MultiPageEditorPart {
   /** The visualization View that handles rendering. */
   private View renderer;
 
-  /** Callback for changes from the renderer. */
-  private RendererChangeListener rendererCallback;
-
   /**
    * Forward only selection change events to interested parties.
    */
@@ -205,10 +201,6 @@ public class ViewEditor extends MultiPageEditorPart {
    */
   public View getRenderer() {
     return renderer;
-  }
-
-  public RendererChangeListener getRendererCallback() {
-    return rendererCallback;
   }
 
   public List<SourcePlugin> getBuiltinAnalysisPlugins() {
@@ -296,11 +288,10 @@ public class ViewEditor extends MultiPageEditorPart {
     GridLayout pageLayout = new GridLayout();
     pageLayout.numColumns = 1;
     parent.setLayout(pageLayout);
-    // bottom composite containing main diagram
-    rendererCallback = new RendererChangeReceiver();
-    renderer = new View(parent, SWT.NONE, this);
 
-    renderer.getControl().setLayoutData(
+    // bottom composite containing main diagram
+    renderer = new View(parent, SWT.NONE, this);
+    renderer.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, true));
 
     // Configure the rendering pipe before listening for changes.
@@ -519,10 +510,6 @@ public class ViewEditor extends MultiPageEditorPart {
     if (null != renderer) {
       renderer.dispose();
       renderer = null;
-    }
-
-    if (null != rendererCallback) {
-      rendererCallback = null;
     }
 
     super.dispose();
@@ -829,13 +816,20 @@ public class ViewEditor extends MultiPageEditorPart {
   public Map<GraphNode, Point2D> getNodeLocations() {
     return viewInfo.getNodeLocations();
   }
-
-  private void editNodeLocations(Map<GraphNode, Point2D> nodeLocations) {
-    renderer.editNodeLocations(nodeLocations);
-  }
-
   /////////////////////////////////////
   // Update node positions in the View Document
+
+  public void editNodeLocations(
+      Map<GraphNode, Point2D> nodeLocations, Object author) {
+    viewInfo.editNodeLocations(nodeLocations, author);
+  }
+
+  /**
+   * For internal use to avoid the null author.
+   */
+  private void editNodeLocations(Map<GraphNode, Point2D> nodeLocations) {
+    editNodeLocations(nodeLocations, null);
+  }
 
   /**
    * Scale the exposed nodes so they would fit in the viewport, if the viewport
@@ -843,7 +837,7 @@ public class ViewEditor extends MultiPageEditorPart {
    * {@code FactorPlugin}.
    */
   public void scaleToViewport() {
-    layoutBestFit(getExposedGraph().getNodes(), getNodeLocations());
+    scaleToViewport(getExposedGraph().getNodes(), getNodeLocations());
   }
 
   /**
@@ -859,15 +853,15 @@ public class ViewEditor extends MultiPageEditorPart {
         getExposedGraph().getNodes(), getNodeLocations(),
         translater);
 
-    viewInfo.editNodeLocations(changes, null);
+    editNodeLocations(changes);
   }
 
-  private void layoutBestFit(
+  private void scaleToViewport(
       Collection<GraphNode> layoutNodes, Map<GraphNode, Point2D> locations) {
     Rectangle2D viewport = renderer.getOGLViewport();
     Map<GraphNode, Point2D> changes = 
             computeFullViewScale(layoutNodes, locations, viewport);
-    viewInfo.editNodeLocations(changes, null);
+    editNodeLocations(changes);
   }
 
   /**
@@ -982,7 +976,7 @@ public class ViewEditor extends MultiPageEditorPart {
             layout, context, layoutNodes);
 
     // Change the node locations.
-    viewInfo.editNodeLocations(changes, null);
+    editNodeLocations(changes);
   }
 
   /////////////////////////////////////
@@ -1027,7 +1021,7 @@ public class ViewEditor extends MultiPageEditorPart {
 
     Map<GraphNode, Point2D> changes = Point2dUtils.translateNodes(
         getSelectedNodes(), getNodeLocations(), translater);
-    viewInfo.editNodeLocations(changes, author);
+    editNodeLocations(changes, author);
   }
 
   /////////////////////////////////////
@@ -1041,7 +1035,7 @@ public class ViewEditor extends MultiPageEditorPart {
     drawingListeners.removeListener(listener);
   }
 
-  private void fireUpdateDrawingBounds(
+  public void updateDrawingBounds(
       final Rectangle2D drawing, final Rectangle2D viewport) {
     drawingListeners.fireEvent(new ListenerManager.Dispatcher<DrawingListener>() {
       @Override
@@ -1054,6 +1048,21 @@ public class ViewEditor extends MultiPageEditorPart {
         logger.warning(errAny.toString());
       }
     });
+  }
+
+  /**
+   * Capture stable points in the diagram rendering.
+   */
+  public void sceneChanged() {
+    markDirty();
+    ScenePreferences prefs = viewInfo.getScenePrefs();
+    if (null == prefs) {
+      prefs = ScenePreferences.getDefaultScenePrefs();
+      viewInfo.setScenePrefs(prefs);
+    }
+
+    // Capture the newly stable current camera position in the prefs object.
+    renderer.saveCameraPosition(prefs);
   }
 
   /////////////////////////////////////
@@ -1175,71 +1184,6 @@ public class ViewEditor extends MultiPageEditorPart {
   }
 
   /////////////////////////////////////
-  // Callbacks from the rendering engine
-  // Most events are converted to ViewDocument method calls, and those
-  // changes lead to change events for the tools and the renderer.
-
-  private class RendererChangeReceiver
-      implements RendererChangeListener {
-
-    @Override
-    public void locationsChanged(Map<GraphNode, Point2D> changes) {
-      viewInfo.editNodeLocations(changes, renderer);
-    }
-
-    @Override
-    public void selectionMoved(double x, double y) {
-      moveSelectionDelta(x, y, renderer);
-    }
-
-    @Override
-    public void selectionChanged(Collection<GraphNode> pickedNodes) {
-      selectNodes(pickedNodes);
-    }
-
-    @Override
-    public void selectionExtended(Collection<GraphNode> extendNodes) {
-      extendSelection(extendNodes, null);
-    }
-
-    @Override
-    public void selectionReduced(Collection<GraphNode> reduceNodes) {
-      reduceSelection(reduceNodes, null);
-    }
-
-    @Override
-    public void updateDrawingBounds(Rectangle2D drawing, Rectangle2D viewport) {
-      fireUpdateDrawingBounds(drawing, viewport);
-    }
-
-    @Override
-    public void sceneChanged() {
-      setDirtyState(true);
-      ScenePreferences prefs = viewInfo.getScenePrefs();
-      if (null == prefs) {
-        prefs = ScenePreferences.getDefaultScenePrefs();
-        viewInfo.setScenePrefs(prefs);
-      }
-      renderer.saveCameraPosition(prefs);
-    }
-
-    @Override
-    public void applyLayout(LayoutGenerator layout) {
-      ViewEditor.this.applyLayout(layout);
-    }
-
-    @Override
-    public void scaleLayout(double scaleX, double scaleY) {
-      ViewEditor.this.scaleLayout(scaleX, scaleY);
-    }
-
-    @Override
-    public void scaleToViewport() {
-      ViewEditor.this.scaleToViewport();
-    }
-  }
-
-  /////////////////////////////////////
   // Receiver for notifications from the ViewDocument
   // Most events are mapped to standard re-dispatch methods.
 
@@ -1278,7 +1222,7 @@ public class ViewEditor extends MultiPageEditorPart {
 
     @Override
     public void nodeLocationsSet(Map<GraphNode, Point2D> newLocations) {
-      editNodeLocations(newLocations);
+      renderer.editNodeLocations(newLocations);
       markDirty();
     }
 
