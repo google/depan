@@ -180,8 +180,6 @@ public class ViewEditor extends MultiPageEditorPart {
 
   private Collection<ElementKindStats.Info> elementKindStats;
 
-  private ViewScrollbarHandler scrollHandler;
-
   /////////////////////////////////////
   // Basic Getters and Setters
 
@@ -295,21 +293,13 @@ public class ViewEditor extends MultiPageEditorPart {
         new GridData(SWT.FILL, SWT.FILL, true, true));
 
     // Configure the rendering pipe before listening for changes.
+    renderer.setGraphModel(getViewGraph(), getJungGraph(), getNodeRanking());
     renderer.initCameraPosition(viewInfo.getScenePrefs());
     renderer.initializeNodeLocations(viewInfo.getNodeLocations());
-
     initSelectedNodes(getSelectedNodes());
+    renderer.start();
 
-    scrollHandler = new ViewScrollbarHandler(parent, renderer.getScene());
-    scrollHandler.acquireResources();
-    addDrawingListener(new DrawingListener() {
-
-      @Override
-      public void updateDrawingBounds(
-          Rectangle2D drawing, Rectangle2D viewport) {
-        scrollHandler.updateDrawingBounds(drawing, viewport);
-      }});
-
+    // Force a layout if there are no locations.
     if (viewInfo.getNodeLocations().isEmpty()) {
       addDrawingListener(new DrawingListener() {
 

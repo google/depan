@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.google.devtools.depan.eclipse.editors;
+package com.google.devtools.depan.eclipse.visualization;
 
 import com.google.devtools.depan.eclipse.visualization.ogl.GLScene;
 
@@ -30,7 +30,7 @@ import java.awt.geom.Rectangle2D;
  * 
  * @author <a href="mailto:leeca@pnambic.com">Lee Carver</a>
  */
-public class ViewScrollbarHandler {
+public class ScrollbarHandler {
   private static final int INCR_SCALE = 16;
 
   private static final int SCROLL_MINIMUM = 0;
@@ -48,7 +48,7 @@ public class ViewScrollbarHandler {
   private double horizSelBase;
   private double horizRange;
 
-  public ViewScrollbarHandler(Scrollable view, GLScene scene) {
+  public ScrollbarHandler(Scrollable view, GLScene scene) {
     this.view = view;
     this.scene = scene;
     this.vertBar = view.getVerticalBar();

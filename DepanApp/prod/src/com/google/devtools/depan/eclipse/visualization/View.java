@@ -32,12 +32,15 @@ import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeShapePlu
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeSizePlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeStrokePlugin;
 import com.google.devtools.depan.model.GraphEdge;
+import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.view.CollapseData;
 import com.google.devtools.depan.view.EdgeDisplayProperty;
 import com.google.devtools.depan.view.EdgeDisplayProperty.LineStyle;
 import com.google.devtools.depan.view.NodeDisplayProperty;
 import com.google.devtools.depan.view.NodeDisplayProperty.Size;
+
+import edu.uci.ics.jung.graph.Graph;
 
 import org.eclipse.swt.widgets.Composite;
 
@@ -66,6 +69,9 @@ public class View {
   private final RendererChangeReceiver changeReceiver =
       new RendererChangeReceiver();
 
+  /** Run the scroll bar for the OGL canvas. */
+  private final ScrollbarHandler scrollHandler;
+
   // Not final, so they can be released when this view instance is dispose()ed.
   
   /** Rendering object. */
@@ -87,14 +93,8 @@ public class View {
 
     glPanel = new GLPanel(parent, changeReceiver, editor.getPartName());
 
-    glPanel.setGraphModel(
-        editor.getViewGraph(),
-        editor.getJungGraph(),
-        editor.getNodeRanking());
-
-    prefUpdater = RendererPreferences.preparePreferences(glPanel);
-
-    glPanel.start();
+    scrollHandler = new ScrollbarHandler(parent, glPanel);
+    scrollHandler.acquireResources();
   }
 
   public void setLayoutData(Object layoutData) {
@@ -110,6 +110,21 @@ public class View {
       glPanel.dispose();
       glPanel = null;
     }
+  }
+
+  public void setGraphModel(
+      GraphModel viewGraph,
+      Graph<GraphNode, GraphEdge> jungGraph,
+      Map<GraphNode, Double> nodeRanking) {
+
+    // Creates the rendering pipe
+    glPanel.setGraphModel(viewGraph, jungGraph, nodeRanking);
+
+    prefUpdater = RendererPreferences.preparePreferences(glPanel);
+  }
+
+  public void start() {
+    glPanel.start();
   }
 
   /////////////////////////////////////
@@ -140,10 +155,6 @@ public class View {
 
   public EdgeIncludePlugin getEdgeInclude() {
     return glPanel.getRenderingPipe().getEdgeInclude();
-  }
-
-  public GLScene getScene() {
-    return glPanel;
   }
 
   public Rectangle2D getOGLViewport() {
@@ -289,7 +300,7 @@ public class View {
       prefs.setCameraPos(prefsPos);
     }
 
-    float[] scenePos = getScene().getCameraPosition();
+    float[] scenePos = glPanel.getCameraPosition();
     prefsPos.setX(scenePos[0]);
     prefsPos.setY(scenePos[1]);
     prefsPos.setZ(scenePos[2]);
@@ -311,7 +322,7 @@ public class View {
       return;
     }
 
-    GLScene scene = getScene();
+    GLScene scene = glPanel;
     scene.moveToCamera(prefsPos.getX(), prefsPos.getY());
     scene.zoomToCamera(prefsPos.getZ());
     scene.cutCamera();
@@ -323,7 +334,7 @@ public class View {
    */
   public void initCameraPosition(ScenePreferences prefs) {
     setCameraPosition(prefs);
-    getScene().clearChanges();
+    glPanel.clearChanges();
   }
 
   /////////////////////////////////////
@@ -359,6 +370,7 @@ public class View {
 
     @Override
     public void updateDrawingBounds(Rectangle2D drawing, Rectangle2D viewport) {
+      scrollHandler.updateDrawingBounds(drawing, viewport);
       editor.updateDrawingBounds(drawing, viewport);
     }
 
