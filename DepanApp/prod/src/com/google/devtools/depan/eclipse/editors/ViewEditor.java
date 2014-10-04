@@ -819,6 +819,14 @@ public class ViewEditor extends MultiPageEditorPart {
   /////////////////////////////////////
   // Update node positions in the View Document
 
+  /**
+   * Zoom to supplied scale.
+   * A value of 1.0 places the camera at the default location.
+   */
+  public void setZoom(float scale) {
+    renderer.setZoom(scale);
+  }
+
   public void editNodeLocations(
       Map<GraphNode, Point2D> nodeLocations, Object author) {
     viewInfo.editNodeLocations(nodeLocations, author);

@@ -304,7 +304,8 @@ public class ScaleTool extends ViewEditorTool {
     if (!hasEditor()) {
       return;
     }
-    getEditor().getRenderer().getScene().setZoom(scale);
+
+    getEditor().setZoom(scale);
   }
 
   /**

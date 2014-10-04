@@ -269,6 +269,15 @@ public class View {
     glPanel.updateNodeLocations(newLocations);
   }
 
+
+  /**
+   * Zoom to supplied scale.
+   * A value of 1.0 places the camera at the default location.
+   */
+  public void setZoom(float scale) {
+    glPanel.setZoom(scale);
+  }
+
   /**
    * Save the current camera position into the supplied ScenePreferences
    * instance.
