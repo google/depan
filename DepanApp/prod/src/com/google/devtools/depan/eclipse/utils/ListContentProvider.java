@@ -68,34 +68,18 @@ public class ListContentProvider<E> implements IStructuredContentProvider {
     return objects.get(index);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.jface.viewers.IStructuredContentProvider
-   *      #getElements(java.lang.Object)
-   */
+  @Override
   public Object[] getElements(Object inputElement) {
     return new Object[] { inputElement };
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.jface.viewers.IContentProvider#dispose()
-   */
+  @Override
   public void dispose() {
     objects = null;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.jface.viewers.IContentProvider
-   *      #inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object,
-   *      java.lang.Object)
-   */
+  @Override
   public void inputChanged(
       Viewer structuredViewer, Object oldInput, Object newInput) {
   }
-
 }
