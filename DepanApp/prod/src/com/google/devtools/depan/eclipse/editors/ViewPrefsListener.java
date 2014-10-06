@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.eclipse.editors;
 
+import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.view.CollapseData;
@@ -41,6 +42,11 @@ public interface ViewPrefsListener {
     @Override
     public void edgePropertyChanged(
         GraphEdge node, EdgeDisplayProperty newProperty) {
+    }
+
+    @Override
+    public void relationPropertyChanged(
+        Relation relation, EdgeDisplayProperty newProperty) {
     }
 
     @Override
@@ -72,11 +78,20 @@ public interface ViewPrefsListener {
     }
   }
 
-  public void nodePropertyChanged(
-      GraphNode node, NodeDisplayProperty newProperty);
+  /////////////////////////////////////
+  // Edge related callbacks
 
   public void edgePropertyChanged(
       GraphEdge node, EdgeDisplayProperty newProperty);
+
+  public void relationPropertyChanged(
+      Relation relation, EdgeDisplayProperty newProperty);
+
+  /////////////////////////////////////
+  // Node related callbacks
+
+  public void nodePropertyChanged(
+      GraphNode node, NodeDisplayProperty newProperty);
 
   /**
    * Callback when nodes locations are set.  Any nodes omitted from the map

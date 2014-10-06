@@ -72,7 +72,6 @@ public class NodeRenderingProperty extends RenderingProperty {
   public boolean isFilled;
   public boolean isVisible;
   private boolean isSelected;
-  public boolean isTextVisible;
 
   /**
    * Used when the color value of this node is overridden.
@@ -95,9 +94,14 @@ public class NodeRenderingProperty extends RenderingProperty {
    */
   public boolean hasCollapsedNodeUnder = false;
 
+  /////////////////////////////////////
+  // Text rendering properties
+
+  public boolean isTextVisible;
+
   /**
    * TextureRenderer used as a temporary object, before creating the Texture
-   * object, when an OpngGL context is active (during rendering).
+   * object, when an OpenGL context is active (during rendering).
    */
   public TextureRenderer textRenderer;
 
@@ -128,6 +132,8 @@ public class NodeRenderingProperty extends RenderingProperty {
   }
 
   public void init() {
+    isVisible = true;
+
     ratio = 1f;
     size = 10.0f;
     positionX = 0f;
@@ -139,7 +145,6 @@ public class NodeRenderingProperty extends RenderingProperty {
 
     shape = NodeShape.getDefaultShape();
     isFilled = true;
-    isVisible = true;
     isTextVisible = true;
 
     textRenderer = FontManager.makeText(node.friendlyString());

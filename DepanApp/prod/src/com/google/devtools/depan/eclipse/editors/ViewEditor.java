@@ -34,6 +34,7 @@ import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerators;
 import com.google.devtools.depan.eclipse.visualization.layout.LayoutScaler;
 import com.google.devtools.depan.eclipse.visualization.layout.LayoutUtil;
 import com.google.devtools.depan.graph.api.DirectedRelationFinder;
+import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.basic.ForwardIdentityRelationFinder;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
@@ -759,6 +760,50 @@ public class ViewEditor extends MultiPageEditorPart {
       GraphEdge edge, EdgeDisplayProperty newProperty) {
     viewInfo.setEdgeProperty(edge, newProperty);
   }
+ 
+  public void setRelationVisible(Relation relation, boolean isVisible) {
+    EdgeDisplayProperty edgeProp = getRelationProperty(relation);
+    if (null == edgeProp) {
+      edgeProp = new EdgeDisplayProperty();
+      edgeProp.setVisible(isVisible);
+      viewInfo.setRelationProperty(relation, edgeProp);
+      return;
+    }
+
+    // Don't change a relation that is already visible
+    if (edgeProp.isVisible() == isVisible) {
+      return;
+    }
+    edgeProp.setVisible(isVisible);
+    viewInfo.setRelationProperty(relation, edgeProp);
+  }
+
+  public Collection<Relation> getDisplayRelations() {
+    return viewInfo.getDisplayRelations();
+  }
+
+  public EdgeDisplayProperty getRelationProperty(Relation relation) {
+    return viewInfo.getRelationProperty(relation);
+  }
+
+  public void updateEdgesToRelations() {
+    for (GraphEdge edge : viewGraph.getEdges()) {
+      // If the edge has explicit display properties, leave those.
+      EdgeDisplayProperty edgeProp = viewInfo.getEdgeProperty(edge);
+      if (null != edgeProp) {
+        continue;
+      }
+
+      EdgeDisplayProperty relationProp =
+          getRelationProperty(edge.getRelation());
+      if (null == relationProp) {
+        renderer.setEdgeVisible(edge, false);
+        continue;
+      }
+
+      renderer.updateEdgeProperty(edge, relationProp);
+    }
+  }
 
   /////////////////////////////////////
   // Collapsed presentations
@@ -1193,18 +1238,27 @@ public class ViewEditor extends MultiPageEditorPart {
     @Override
     public void edgePropertyChanged(
         GraphEdge edge, EdgeDisplayProperty newProperty) {
-      if (null != renderer) {
-        renderer.updateEdgeProperty(edge, newProperty);
+      if (null == renderer) {
+        return;
       }
+      renderer.updateEdgeProperty(edge, newProperty);
+      markDirty();
+    }
+
+    @Override
+    public void relationPropertyChanged(
+        Relation relation,  EdgeDisplayProperty newProperty) {
+      updateEdgesToRelations();
       markDirty();
     }
 
     @Override
     public void nodePropertyChanged(
         GraphNode node, NodeDisplayProperty newProperty) {
-      if (null != renderer) {
-        renderer.updateNodeProperty(node, newProperty);
+      if (null == renderer) {
+        return;
       }
+      renderer.updateNodeProperty(node, newProperty);
       markDirty();
     }
 

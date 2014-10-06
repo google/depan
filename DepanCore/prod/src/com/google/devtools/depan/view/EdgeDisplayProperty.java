@@ -27,20 +27,22 @@ import java.awt.Color;
  */
 public class EdgeDisplayProperty {
 
+  private boolean isVisible;
+
   /**
    * The <code>Color</code> of this edge.
    */
-  private Color color = null;
+  private Color color;
 
   /**
    * Shows the {@link LineStyle} of this edge.
    */
-  private LineStyle lineStyle = LineStyle.getDefault();
+  private LineStyle lineStyle;
 
   /**
    * Shows the {@link ArrowheadStyle} of this edge.
    */
-  private ArrowheadStyle arrowhead = ArrowheadStyle.getDefault();
+  private ArrowheadStyle arrowhead;
 
   /**
    * Handles different line styles for edges.
@@ -127,7 +129,7 @@ public class EdgeDisplayProperty {
    * style, default arrow head style and default color.
    */
   public EdgeDisplayProperty() {
-    this(LineStyle.getDefault(), ArrowheadStyle.getDefault(), null);
+    this(true, null, LineStyle.getDefault(), ArrowheadStyle.getDefault());
   }
 
   /**
@@ -138,10 +140,12 @@ public class EdgeDisplayProperty {
    * @param lineColor <code>Color</code> of the object.
    */
   public EdgeDisplayProperty(
-      LineStyle lineStyle, ArrowheadStyle arrowhead, Color lineColor) {
+      boolean isVisible, Color lineColor,
+      LineStyle lineStyle, ArrowheadStyle arrowhead) {
+    this.isVisible = isVisible;
+    this.color = lineColor;
     this.lineStyle = lineStyle;
     this.arrowhead = arrowhead;
-    this.color = lineColor;
   }
 
   /**
@@ -149,7 +153,16 @@ public class EdgeDisplayProperty {
    * @param current
    */
   public EdgeDisplayProperty(EdgeDisplayProperty current) {
-    this(current.getLineStyle(), current.getArrowhead(), current.getColor());
+    this(current.isVisible(), current.getColor(),
+        current.getLineStyle(), current.getArrowhead());
+  }
+
+  public boolean isVisible() {
+    return isVisible;
+  }
+
+  public void setVisible(boolean isVisible) {
+    this.isVisible = isVisible;
   }
 
   /**

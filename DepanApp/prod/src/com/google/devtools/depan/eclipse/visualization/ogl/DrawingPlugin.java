@@ -141,6 +141,9 @@ public class DrawingPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
    */
   @Override
   public boolean apply(EdgeRenderingProperty property) {
+    if (!property.isVisible) {
+      return false;
+    }
     if (!property.node1.isVisible || !property.node2.isVisible) {
       return false;
     }

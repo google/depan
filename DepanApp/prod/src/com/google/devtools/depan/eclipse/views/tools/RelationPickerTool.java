@@ -16,7 +16,6 @@
 
 package com.google.devtools.depan.eclipse.views.tools;
 
-import com.google.common.collect.Lists;
 import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
 import com.google.devtools.depan.eclipse.plugins.SourcePluginRegistry;
 import com.google.devtools.depan.eclipse.utils.ListContentProvider;
@@ -25,7 +24,6 @@ import com.google.devtools.depan.eclipse.utils.RelationshipSetPickerControl;
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptor;
 import com.google.devtools.depan.eclipse.views.ViewEditorTool;
-import com.google.devtools.depan.eclipse.visualization.plugins.impl.EdgeIncludePlugin;
 import com.google.devtools.depan.eclipse.wizards.NewRelationshipSetWizard;
 import com.google.devtools.depan.graph.api.DirectedRelationFinder;
 import com.google.devtools.depan.graph.api.Relation;
@@ -33,6 +31,9 @@ import com.google.devtools.depan.graph.api.RelationFinder;
 import com.google.devtools.depan.graph.basic.MultipleRelationFinder;
 import com.google.devtools.depan.graph.basic.ReversedDirectedRelationFinder;
 import com.google.devtools.depan.model.RelationshipSet;
+import com.google.devtools.depan.view.EdgeDisplayProperty;
+
+import com.google.common.collect.Lists;
 
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -127,7 +128,7 @@ public class RelationPickerTool extends ViewEditorTool
     reverse.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 3, 1));
 
     Label listLabel = new Label(topLevel, SWT.NONE);
-    listLabel.setText("Select relationships to hide :");
+    listLabel.setText("Select relationships to show:");
     listLabel.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, false, 3, 1));
 
@@ -198,27 +199,27 @@ public class RelationPickerTool extends ViewEditorTool
   /**
    * Update the ViewModel to hide selected relations.
    */
-  // suppressWarning because selection.iterator is not parameterized in
-  // IStructuredSelection, so we need to infer it.
-  @SuppressWarnings("unchecked")
   private void updateModel() {
     if (!hasEditor()) {
       return;
     }
-    EdgeIncludePlugin edgeInclude =
-        getEditor().getRenderer().getEdgeInclude();
 
-    // show all relations
-    for (Relation r : contentProvider.getObjects()) {
-      edgeInclude.includeRelation(r);
-    }
+    List<Relation> unselected =
+        Lists.newArrayList(contentProvider.getObjects());
 
-    // hide selected ones
+    // show selected ones
     IStructuredSelection selection = (IStructuredSelection) list.getSelection();
-    //selection.iterator();
+
+    @SuppressWarnings("unchecked")
     Iterator<Relation> iterator = selection.iterator();
     while (iterator.hasNext()) {
-      edgeInclude.rejectRelation(iterator.next());
+      Relation relation = iterator.next();
+      getEditor().setRelationVisible(relation, true);
+      unselected.remove(relation);
+    }
+
+    for (Relation relation : unselected) {
+      getEditor().setRelationVisible(relation, false);
     }
   }
 
@@ -229,18 +230,18 @@ public class RelationPickerTool extends ViewEditorTool
     if (!hasEditor()) {
       return;
     }
-    EdgeIncludePlugin edgeInclude =
-        getEditor().getRenderer().getEdgeInclude();
 
-    // clear the list.
-    List<Relation> selected = Lists.newArrayList(contentProvider.getObjects());
-
-    // add relations to the list, and saved which one should be selected.
-    for (Relation relation : edgeInclude.getVisibleRelations()) {
-      selected.remove(relation);
+    // Build selection from list of visible relations.
+    Collection<Relation> relations = getEditor().getDisplayRelations();
+    List<Relation> selected =
+        Lists.newArrayListWithExpectedSize(relations.size());
+    for (Relation relation : relations) {
+      EdgeDisplayProperty edgeProp = getEditor().getRelationProperty(relation);
+      if (edgeProp.isVisible()) {
+        selected.add(relation);
+      }
     }
 
-    // select hidden values
     list.setSelection(new StructuredSelection(selected));
   }
 
@@ -254,7 +255,7 @@ public class RelationPickerTool extends ViewEditorTool
    *
    * @param finder finder describing a set of relations.
    */
-  public void selectFinder(DirectedRelationFinder finder) {
+  private void selectFinder(DirectedRelationFinder finder) {
     List<Relation> relations = Lists.newArrayList();
     for (SourcePlugin plugin : SourcePluginRegistry.getInstances()) {
       for (Relation relation : plugin.getRelations()) {

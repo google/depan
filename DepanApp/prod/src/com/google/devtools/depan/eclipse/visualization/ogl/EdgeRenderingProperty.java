@@ -37,9 +37,12 @@ public class EdgeRenderingProperty extends RenderingProperty {
   public NodeRenderingProperty node1;
   public NodeRenderingProperty node2;
 
+  public boolean isVisible;
+
   /** Center coordinates for the first node */
   public float p1X;
   public float p1Y;
+
   /** Center coordinates for the second node */
   public float p2X;
   public float p2Y;
@@ -90,7 +93,9 @@ public class EdgeRenderingProperty extends RenderingProperty {
     strokeWidth += (targetStrokeWidth - strokeWidth) / SPEED;
   }
 
-  public void init() {
+  private void init() {
+    isVisible = true;
+
     deviation = 0.25f;
     p1X = 0.0f;
     p1Y = 0.0f;
@@ -100,10 +105,9 @@ public class EdgeRenderingProperty extends RenderingProperty {
     textColor = Color.WHITE;
     strokeWidth = 1.0f;
 
-    isTextVisible = true;
-
     shape = new Arrow();
 
+    isTextVisible = true;
     textRenderer = FontManager.makeText(edge.getRelation().toString());
     textIsDirty = true;
 

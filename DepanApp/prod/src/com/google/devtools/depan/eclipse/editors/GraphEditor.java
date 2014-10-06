@@ -16,6 +16,8 @@
 
 package com.google.devtools.depan.eclipse.editors;
 
+import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
+import com.google.devtools.depan.eclipse.plugins.SourcePluginRegistry;
 import com.google.devtools.depan.eclipse.trees.CheckNodeTreeView;
 import com.google.devtools.depan.eclipse.trees.GraphData;
 import com.google.devtools.depan.eclipse.trees.NodeTreeProvider;
@@ -26,8 +28,10 @@ import com.google.devtools.depan.eclipse.utils.LayoutChoicesControl;
 import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptor;
 import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptors;
 import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerators;
+import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.RelationshipSet;
+import com.google.devtools.depan.view.EdgeDisplayProperty;
 
 import com.google.common.collect.Sets;
 
@@ -301,9 +305,19 @@ public class GraphEditor
     String layoutName = layoutChoices.getLayoutName();
     userPrefs.setSelectedLayout(layoutName);
     userPrefs.setLayoutFinder(layoutChoices.getRelationSet());
+    prepareRelations(userPrefs);
 
     ViewDocument viewInfo = new ViewDocument(graphRef, nodes, userPrefs);
     ViewEditor.startViewEditor(viewInfo, baseName);
+  }
+
+  private void prepareRelations(ViewPreferences userPrefs) {
+    for (SourcePlugin plugin : SourcePluginRegistry.getInstances()) {
+      for (Relation relation : plugin.getRelations()) {
+        EdgeDisplayProperty edgeProp = new EdgeDisplayProperty();
+        userPrefs.setRelationProperty(relation, edgeProp);
+      }
+    }
   }
 
   /**

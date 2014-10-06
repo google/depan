@@ -449,6 +449,11 @@ public class GLPanel extends GLScene {
   /////////////////////////////////////
   // Node and edge property methods
 
+  public void setEdgeVisible(GraphEdge edge, boolean isVisible) {
+    EdgeRenderingProperty edgeProperty = edge2property(edge);
+    edgeProperty.isVisible = isVisible;
+  }
+
   /**
    * Sets the <code>Color</code> of the given edge.
    *
@@ -513,7 +518,7 @@ public class GLPanel extends GLScene {
    * @param node Node whose visibility is modified.
    * @param isVisible New value for the visibility of this node.
    */
-  public void setVisible(GraphNode node, boolean isVisible) {
+  public void setNodeVisible(GraphNode node, boolean isVisible) {
     node2property(node).isVisible = isVisible;
   }
 

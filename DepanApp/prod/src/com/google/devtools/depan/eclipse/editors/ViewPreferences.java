@@ -19,6 +19,7 @@ package com.google.devtools.depan.eclipse.editors;
 import com.google.devtools.depan.eclipse.trees.NodeTreeProvider;
 import com.google.devtools.depan.eclipse.utils.ListenerManager;
 import com.google.devtools.depan.graph.api.DirectedRelationFinder;
+import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
@@ -31,12 +32,14 @@ import com.google.devtools.depan.view.TreeModel;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import java.awt.geom.Point2D;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -51,6 +54,8 @@ public class ViewPreferences {
   private static final Logger logger =
       Logger.getLogger(ViewPreferences.class.getName());
 
+  public static final String EMPTY_DESCRIPTION = "";
+
   /////////////////////////////////////
   // Persisted instance members
 
@@ -62,13 +67,19 @@ public class ViewPreferences {
   /**
    * Rendering properties for nodes.
    */
-  public Map<GraphNode, NodeDisplayProperty> nodeProperties;
+  private Map<GraphNode, NodeDisplayProperty> nodeProperties;
 
   /**
    * Hash map that contains a list of edge display property objects for each
    * edge in graph.
    */
   private Map<GraphEdge, EdgeDisplayProperty> edgeProperties;
+
+  /**
+   * Hash map that contains a list of edge display property objects
+   * for known relations.
+   */
+  private Map<Relation, EdgeDisplayProperty> relationProperties;
 
   /**
    * Manager object for handling all collapsed nodes.
@@ -137,8 +148,9 @@ public class ViewPreferences {
         Maps.<GraphNode, Point2D>newHashMap(),
         Maps.<GraphNode, NodeDisplayProperty>newHashMap(),
         Maps.<GraphEdge, EdgeDisplayProperty>newHashMap(),
+        Maps.<Relation, EdgeDisplayProperty>newHashMap(),
         ImmutableList.<GraphNode>of(),
-        "");
+        EMPTY_DESCRIPTION);
   }
 
   public ViewPreferences(
@@ -146,6 +158,7 @@ public class ViewPreferences {
       Map<GraphNode, Point2D> newNodeLocations,
       Map<GraphNode, NodeDisplayProperty> newNodeProperties,
       Map<GraphEdge, EdgeDisplayProperty> newEdgeProperties,
+      Map<Relation, EdgeDisplayProperty> newRelationProperties,
       Collection<GraphNode> newSelectedNodes,
       String newDescription) {
     initTransients();
@@ -155,6 +168,7 @@ public class ViewPreferences {
     this.nodeLocations = newNodeLocations;
     this.nodeProperties = newNodeProperties;
     this.edgeProperties = newEdgeProperties;
+    this.relationProperties = newRelationProperties;
     this.selectedNodes = newSelectedNodes;
     this.description = newDescription;
   }
@@ -166,6 +180,34 @@ public class ViewPreferences {
    */
   public void initTransients() {
     listeners = new ListenerManager<ViewPrefsListener>();
+  }
+
+  /**
+   * Populate any required fields after an unmarshall(), since that process
+   * by-passes the constructors.
+   */
+  public void afterUnmarshall() {
+    if (null == scenePrefs) {
+      scenePrefs = ScenePreferences.getDefaultScenePrefs();
+    }
+    if (null == nodeLocations) {
+      nodeLocations = Maps.newHashMap();
+    }
+    if (null == nodeProperties) {
+      nodeProperties = Maps.newHashMap();
+    }
+    if (null == edgeProperties) {
+      edgeProperties = Maps.newHashMap();
+    }
+    if (null == relationProperties) {
+      relationProperties = Maps.newHashMap();
+    }
+    if (null == selectedNodes) {
+      selectedNodes = ImmutableList.of();
+    }
+    if (null == description) {
+      description = EMPTY_DESCRIPTION;
+    }
   }
 
   /**
@@ -188,11 +230,21 @@ public class ViewPreferences {
 
     Map<GraphEdge, EdgeDisplayProperty> newEdgeProperties =
         Maps.newHashMap();
+    Set<Relation> newRelations = Sets.newHashSet();
     for (Entry<GraphEdge, EdgeDisplayProperty> entry : 
         source.edgeProperties.entrySet()) {
       GraphEdge edge = entry.getKey();
       if (nodes.contains(edge.getHead()) && nodes.contains(edge.getTail())) {
-        newEdgeProperties.put(entry.getKey(), entry.getValue());
+        newEdgeProperties.put(edge, entry.getValue());
+        newRelations.add(edge.getRelation());
+      }
+    }
+
+    Map<Relation, EdgeDisplayProperty> newRelationProps = Maps.newHashMap();
+    for (Relation relation : newRelations) {
+      EdgeDisplayProperty edgeProp = source.getRelationProperty(relation);
+      if (null != edgeProp) {
+        newRelationProps.put(relation, new EdgeDisplayProperty(edgeProp));
       }
     }
 
@@ -206,10 +258,13 @@ public class ViewPreferences {
     String newDescription = (source.description.isEmpty())
         ? "" : "Derived from " + source.description;
 
-    return new ViewPreferences(
+    ViewPreferences result = new ViewPreferences(
         ScenePreferences.getDefaultScenePrefs(),
         newNodeLocations, newNodeProperties,
-        newEdgeProperties, newSelectedNodes, newDescription);
+        newEdgeProperties, newRelationProps,
+        newSelectedNodes, newDescription);
+
+    return result;
   }
 
   private static <K, V> Map<K, V> filterMap(
@@ -384,6 +439,26 @@ public class ViewPreferences {
       @Override
       public void dispatch(ViewPrefsListener listener) {
         listener.edgePropertyChanged(edge, newProperty);
+      }
+    });
+  }
+
+  public Collection<Relation> getDisplayRelations() {
+    return Lists.newArrayList(relationProperties.keySet());
+  }
+
+  public EdgeDisplayProperty getRelationProperty(Relation relation) {
+    return relationProperties.get(relation);
+  }
+
+  public void setRelationProperty(
+      final Relation relation, final EdgeDisplayProperty newProperty) {
+    relationProperties.put(relation, newProperty);
+
+    listeners.fireEvent(new SimpleDispatcher() {
+      @Override
+      public void dispatch(ViewPrefsListener listener) {
+        listener.relationPropertyChanged(relation, newProperty);
       }
     });
   }

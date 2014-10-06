@@ -26,7 +26,6 @@ import com.google.devtools.depan.eclipse.visualization.ogl.GLPanel;
 import com.google.devtools.depan.eclipse.visualization.ogl.GLScene;
 import com.google.devtools.depan.eclipse.visualization.ogl.RendererChangeListener;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.CollapsePlugin;
-import com.google.devtools.depan.eclipse.visualization.plugins.impl.EdgeIncludePlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeColorPlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeShapePlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeSizePlugin;
@@ -153,20 +152,14 @@ public class View {
     return glPanel.getRenderingPipe().getNodeStroke();
   }
 
-  public EdgeIncludePlugin getEdgeInclude() {
-    return glPanel.getRenderingPipe().getEdgeInclude();
-  }
-
   public Rectangle2D getOGLViewport() {
     return glPanel.getOGLViewport();
   }
 
   /////////////////////////////////////
 
-  public void updateSelectedNodes(
-      Collection<GraphNode> removeNodes,
-      Collection<GraphNode> extendNodes) {
-    glPanel.updateSelection(removeNodes, extendNodes);
+  public void setEdgeVisible(GraphEdge edge, boolean isVisible) {
+    glPanel.setEdgeVisible(edge, isVisible);
   }
 
   /**
@@ -187,6 +180,15 @@ public class View {
 
     glPanel.setArrowhead(edge,
         ArrowHead.createNewArrowhead(property.getArrowhead()));
+    glPanel.setEdgeVisible(edge, property.isVisible());
+  }
+
+  /////////////////////////////////////
+
+  public void updateSelectedNodes(
+      Collection<GraphNode> removeNodes,
+      Collection<GraphNode> extendNodes) {
+    glPanel.updateSelection(removeNodes, extendNodes);
   }
 
   /**
@@ -205,7 +207,7 @@ public class View {
     glPanel.setNodeColor(node, property.getColor());
 
     // set if this node is visible
-    glPanel.setVisible(node, property.isVisible());
+    glPanel.setNodeVisible(node, property.isVisible());
 
     // Set the size of this node
     Size nodeSize = property.getSize();

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.google.devtools.depan.eclipse.visualization.ogl;
 
 import com.google.devtools.depan.eclipse.visualization.plugins.core.EdgeRenderingPlugin;
@@ -21,7 +20,6 @@ import com.google.devtools.depan.eclipse.visualization.plugins.core.NodeRenderin
 import com.google.devtools.depan.eclipse.visualization.plugins.core.Plugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.CollapsePlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.EdgeColorPlugin;
-import com.google.devtools.depan.eclipse.visualization.plugins.impl.EdgeIncludePlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.EdgeLabelPlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.FactorPlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.LayoutPlugin;
@@ -81,7 +79,6 @@ public class RenderingPipe {
   private NodeShapePlugin<GraphEdge> nodeShape;
   private NodeLabelPlugin nodeLabel;
   private EdgeLabelPlugin edgeLabel;
-  private EdgeIncludePlugin edgeInclude;
 
   public RenderingPipe(GLPanel panel,
       Graph<GraphNode, GraphEdge> jungGraph, 
@@ -99,7 +96,6 @@ public class RenderingPipe {
     nodeShape = new NodeShapePlugin<GraphEdge>(jungGraph);
     nodeLabel = new NodeLabelPlugin();
     edgeLabel = new EdgeLabelPlugin();
-    edgeInclude = new EdgeIncludePlugin();
     collapse = new CollapsePlugin();
 
     List<NodeRenderingPlugin> nodesP = Lists.newArrayList();
@@ -123,7 +119,6 @@ public class RenderingPipe {
 
     ////////// Edge plugins
     // --- logical plugins
-    edgesP.add(edgeInclude);
     edgesP.add(layout);
     edgesP.add(collapse);
     edgesP.add(edgeColors);
@@ -238,10 +233,6 @@ public class RenderingPipe {
 
   public NodeLabelPlugin getNodeLabel() {
     return nodeLabel;
-  }
-
-  public EdgeIncludePlugin getEdgeInclude() {
-    return edgeInclude;
   }
 
   public CollapsePlugin getCollapsePlugin() {
