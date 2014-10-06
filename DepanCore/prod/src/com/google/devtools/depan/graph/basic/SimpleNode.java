@@ -37,11 +37,8 @@ public class SimpleNode<T> extends BasicNode<T> {
     this.id = id;
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
   public T getId() {
     return id;
   }
-
 }

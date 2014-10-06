@@ -69,6 +69,7 @@ public class PathExpression implements PathMatcher {
    * @return A collection of <code>GraphNode</code> objects that is the result
    * of applying this filter to the input.
    */
+  @Override
   public Collection<GraphNode> nextMatch(GraphModel graph,
       Collection<GraphNode> input) {
     /*

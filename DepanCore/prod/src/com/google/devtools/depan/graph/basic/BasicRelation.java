@@ -32,18 +32,13 @@ public class BasicRelation implements Relation {
     this.reverseName = reverseName;
   }
 
-  /**
-   * @{inheritdoc}
-   */
+  @Override
   public String getForwardName() {
     return forwardName;
   }
 
-  /**
-   * @{inheritdoc}
-   */
+  @Override
   public String getReverseName() {
     return reverseName;
   }
-
 }

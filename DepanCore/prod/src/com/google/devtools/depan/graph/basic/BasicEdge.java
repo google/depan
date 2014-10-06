@@ -37,25 +37,18 @@ public class BasicEdge<T> implements Edge<T> {
     this.tail = tail;
   }
 
-  /**
-   * @inheritDoc
-   */
+  @Override
   public Relation getRelation() {
     return relation;
   }
 
-  /**
-   * @inheritDoc
-   */
+  @Override
   public Node<? extends T> getHead() {
     return head;
   }
 
-  /**
-   * @inheritDoc
-   */
+  @Override
   public Node<? extends T> getTail() {
     return tail;
   }
-
 }

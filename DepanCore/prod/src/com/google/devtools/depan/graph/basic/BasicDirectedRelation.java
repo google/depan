@@ -40,51 +40,28 @@ public class BasicDirectedRelation implements DirectedRelation {
     this.backward = backward;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.google.devtools.depan.graph.api.DirectedRelation#getRelation()
-   */
+  @Override
   public Relation getRelation() {
     return relation;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.google.devtools.depan.graph.api.DirectedRelation#isBackward()
-   */
+  @Override
   public boolean matchBackward() {
     return backward;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.google.devtools.depan.graph.api.DirectedRelation#isForward()
-   */
+  @Override
   public boolean matchForward() {
     return forward;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.google.devtools.depan.graph.api.DirectedRelation
-   *      #setMatchBackward()
-   */
+  @Override
   public void setMatchBackward(boolean matches) {
     this.backward = matches;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.google.devtools.depan.graph.api.DirectedRelation
-   *      #setMatchForward()
-   */
+  @Override
   public void setMatchForward(boolean matches) {
     this.forward = matches;
   }
-
 }
