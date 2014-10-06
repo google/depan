@@ -373,8 +373,7 @@ public class ViewEditor extends MultiPageEditorPart {
   @Override
   public void init(IEditorSite site, IEditorInput input)
       throws PartInitException  {
-    setSite(site);
-    setInput(input);
+    super.init(site, input);
 
     initFromInput(input);
 
