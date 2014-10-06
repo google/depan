@@ -29,6 +29,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 
 import java.util.Collection;
 import java.util.List;
@@ -75,8 +76,9 @@ public class HierarchyViewer<T> extends Composite
     viewerLayout.marginHeight = 0;
     this.setLayout(viewerLayout);
 
-    RelationshipSetPickerControl.createPickerLabel(
-        this, new GridData(SWT.LEFT, SWT.CENTER, false, false));
+    Label pickerLabel = RelationshipSetPickerControl.createPickerLabel(this);
+    pickerLabel.setLayoutData(
+        new GridData(SWT.LEFT, SWT.CENTER, false, false));
 
     relSetPicker = new RelationshipSetPickerControl(this);
     relSetPicker.addChangeListener(this);

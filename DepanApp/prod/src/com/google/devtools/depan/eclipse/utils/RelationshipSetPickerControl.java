@@ -33,7 +33,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
@@ -80,19 +79,10 @@ public class RelationshipSetPickerControl extends Composite {
   /**
    * Provide a standard label for a {@code RelationSetPickerControl}.
    */
-  public static void createPickerLabel(Composite parent, Object layoutData) {
+  public static Label createPickerLabel(Composite parent) {
     Label result = new Label(parent, SWT.NONE);
     result.setText(RELATION_SET_LABEL);
-    result.setLayoutData(layoutData);
-  }
-
-  /**
-   * Provide a standard label for a {@code RelationSetPickerControl}.
-   * 
-   * Assumed to be within a grid layout.
-   */
-  public static void createPickerLabel(Composite parent) {
-    createPickerLabel(parent, new GridData(SWT.FILL, SWT.CENTER, false, false));
+    return result;
   }
 
   /////////////////////////////////////

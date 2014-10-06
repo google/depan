@@ -213,7 +213,9 @@ public class RelationshipPicker
     Composite region = new Composite(parent, SWT.NONE);
     region.setLayout(new GridLayout(3, false));
 
-    RelationshipSetPickerControl.createPickerLabel(region);
+    Label pickerLabel = RelationshipSetPickerControl.createPickerLabel(region);
+    pickerLabel.setLayoutData(
+        new GridData(SWT.FILL, SWT.CENTER, false, false));
 
     relSetPicker = new RelationshipSetPickerControl(region);
     relSetPicker.addChangeListener(this);
@@ -223,7 +225,7 @@ public class RelationshipPicker
     Button save = new Button(region, SWT.PUSH);
     save.setText("Save selection as");
     save.setLayoutData(
-      new GridData(SWT.FILL, SWT.CENTER, false, false));
+        new GridData(SWT.FILL, SWT.CENTER, false, false));
 
     save.addSelectionListener(new SelectionAdapter() {
       @Override

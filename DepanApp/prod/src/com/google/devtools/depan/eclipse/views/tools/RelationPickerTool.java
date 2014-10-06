@@ -165,8 +165,9 @@ public class RelationPickerTool extends ViewEditorTool
     region.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
     region.setLayout(new GridLayout(3, false));
 
-    RelationshipSetPickerControl.createPickerLabel(
-        region, new GridData(SWT.FILL, SWT.FILL, true, false));
+    Label pickerLabel = RelationshipSetPickerControl.createPickerLabel(region);
+    pickerLabel.setLayoutData(
+        new GridData(SWT.FILL, SWT.FILL, true, false));
 
     relSetPicker = new RelationshipSetPickerControl(region);
     relSetPicker.addChangeListener(this);
