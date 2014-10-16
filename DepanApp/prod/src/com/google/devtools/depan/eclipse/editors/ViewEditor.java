@@ -218,15 +218,12 @@ public class ViewEditor extends MultiPageEditorPart {
     return viewInfo.getDefaultContainerRelSet();
   }
 
-  /**
-   * Provide the relationship set to use for excluding edges in the diagram.
-   * This should be a preference setting, and it should play well with the
-   * notion of relationship set roles, but both of those efforts are pending.
-   * 
-   * @return the EMPTY relationship set.
-   */
-  public RelationshipSet getEdgeDisplayRelSet() {
-    return RelationshipSet.EMTPY;
+  public RelationshipSet getDisplayRelationSet() {
+    return viewInfo.getDisplayRelationSet();
+  }
+
+  public void setDisplayRelationSet(RelationshipSet newDisplay) {
+    viewInfo.setDisplayRelationSet(newDisplay);
   }
 
   /**
@@ -298,6 +295,7 @@ public class ViewEditor extends MultiPageEditorPart {
     renderer.initCameraPosition(viewInfo.getScenePrefs());
     renderer.initializeNodeLocations(viewInfo.getNodeLocations());
     initSelectedNodes(getSelectedNodes());
+    initEdgeRendering();
     renderer.start();
 
     // Force a layout if there are no locations.
@@ -785,7 +783,28 @@ public class ViewEditor extends MultiPageEditorPart {
     return viewInfo.getRelationProperty(relation);
   }
 
-  public void updateEdgesToRelations() {
+  private void initEdgeRendering() {
+    for (GraphEdge edge : viewGraph.getEdges()) {
+
+      // If the edge has explicit display properties, use those.
+      EdgeDisplayProperty edgeProp = viewInfo.getEdgeProperty(edge);
+      if (null != edgeProp) {
+        renderer.updateEdgeProperty(edge, edgeProp);
+        continue;
+      }
+
+      EdgeDisplayProperty relationProp =
+          getRelationProperty(edge.getRelation());
+      if (null == relationProp) {
+        renderer.setEdgeVisible(edge, false);
+        continue;
+      }
+
+      renderer.updateEdgeProperty(edge, relationProp);
+    }
+  }
+
+  private void updateEdgesToRelations() {
     for (GraphEdge edge : viewGraph.getEdges()) {
       // If the edge has explicit display properties, leave those.
       EdgeDisplayProperty edgeProp = viewInfo.getEdgeProperty(edge);

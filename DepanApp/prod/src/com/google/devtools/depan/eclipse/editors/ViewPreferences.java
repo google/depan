@@ -23,6 +23,7 @@ import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
+import com.google.devtools.depan.model.RelationshipSet;
 import com.google.devtools.depan.view.CollapseData;
 import com.google.devtools.depan.view.Collapser;
 import com.google.devtools.depan.view.EdgeDisplayProperty;
@@ -80,6 +81,13 @@ public class ViewPreferences {
    * for known relations.
    */
   private Map<Relation, EdgeDisplayProperty> relationProperties;
+
+  /**
+   * Preferred relation set of displaying edges.
+   * A value of {@code null} indicates that the {@link #relationProperties}
+   * should be used as an anonymous relation set.
+   */
+  private RelationshipSet edgeDisplayRelSet;
 
   /**
    * Manager object for handling all collapsed nodes.
@@ -461,6 +469,14 @@ public class ViewPreferences {
         listener.relationPropertyChanged(relation, newProperty);
       }
     });
+  }
+
+  public RelationshipSet getDisplayRelationSet() {
+    return edgeDisplayRelSet;
+  }
+
+  public void setDisplayRelationSet(RelationshipSet newDisplay) {
+    edgeDisplayRelSet = newDisplay;
   }
 
   /////////////////////////////////////

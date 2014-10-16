@@ -88,10 +88,6 @@ public class RelationshipSetPickerControl extends Composite {
   /////////////////////////////////////
   // Relationship Set Selector itself
 
-  /**
-   * @param top
-   * @param string
-   */
   public RelationshipSetPickerControl(Composite parent) {
     super(parent, SWT.NONE);
     setLayout(new FillLayout());
@@ -152,8 +148,13 @@ public class RelationshipSetPickerControl extends Composite {
     }
   }
 
+  public void clearSelection() {
+    setsViewer.setSelection(StructuredSelection.EMPTY);
+    fireSelectionChange(null);
+  }
+
   /**
-   * @return the currently selected RelationshipSet, or <code>null</code> if
+   * @return the currently selected RelationshipSet, or {@code null} if
    *         nothing is selected.
    */
   public RelationshipSet getSelection() {
@@ -162,10 +163,10 @@ public class RelationshipSetPickerControl extends Composite {
 
   /**
    * return the {@link RelationshipSet} for the given selection, or
-   * <code>null</code> if an error happens.
+   * {@code null} if an error happens.
    * 
    * @param selection the selection to extract the {@link RelationshipSet} from.
-   * @return the extracted {@link RelationshipSet} or <code>null</code> in
+   * @return the extracted {@link RelationshipSet} or {@code null} in
    *         case of error.
    */
   private RelationshipSet extractFromSelection(ISelection selection) {

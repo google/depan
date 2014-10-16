@@ -17,7 +17,6 @@
 package com.google.devtools.depan.eclipse.editors;
 
 import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
-import com.google.devtools.depan.eclipse.plugins.SourcePluginRegistry;
 import com.google.devtools.depan.eclipse.trees.CheckNodeTreeView;
 import com.google.devtools.depan.eclipse.trees.GraphData;
 import com.google.devtools.depan.eclipse.trees.NodeTreeProvider;
@@ -297,27 +296,28 @@ public class GraphEditor
 
     // Create ViewDocument elements
     GraphModelReference graphRef = new GraphModelReference(file, graph);
-
-    ViewPreferences userPrefs = new ViewPreferences();
-
-    // No locations, so initial layout occurs in ViewEditor once viewport
-    // is constructed.
-    String layoutName = layoutChoices.getLayoutName();
-    userPrefs.setSelectedLayout(layoutName);
-    userPrefs.setLayoutFinder(layoutChoices.getRelationSet());
-    prepareRelations(userPrefs);
+    ViewPreferences userPrefs = buildViewPreferences();
 
     ViewDocument viewInfo = new ViewDocument(graphRef, nodes, userPrefs);
     ViewEditor.startViewEditor(viewInfo, baseName);
   }
 
-  private void prepareRelations(ViewPreferences userPrefs) {
-    for (SourcePlugin plugin : SourcePluginRegistry.getInstances()) {
-      for (Relation relation : plugin.getRelations()) {
-        EdgeDisplayProperty edgeProp = new EdgeDisplayProperty();
-        userPrefs.setRelationProperty(relation, edgeProp);
-      }
+  private ViewPreferences buildViewPreferences() {
+    ViewPreferences result = new ViewPreferences();
+
+    // No locations, so initial layout occurs in ViewEditor once viewport
+    // is constructed.
+    String layoutName = layoutChoices.getLayoutName();
+    result.setSelectedLayout(layoutName);
+    result.setLayoutFinder(layoutChoices.getRelationSet());
+
+    SourcePlugin toolkit = graph.getDefaultAnalysis();
+    result.setDisplayRelationSet(toolkit.getDefaultRelationshipSet());
+    for (Relation relation : toolkit.getRelations()) {
+      EdgeDisplayProperty edgeProp = new EdgeDisplayProperty();
+      result.setRelationProperty(relation, edgeProp);
     }
+    return result;
   }
 
   /**

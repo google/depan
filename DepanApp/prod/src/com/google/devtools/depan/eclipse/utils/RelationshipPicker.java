@@ -594,16 +594,13 @@ public class RelationshipPicker
     this.selectedSet = set;
   }
 
-  /*
-   * This method doesn't notify of the changes, unless if the selected set is
-   * set to instanceSet.
-   *
-   * (non-Javadoc)
-   *
-   * @see com.google.devtools.depan.eclipse.utils.RelationshipSelectorListener
-   *      #copySelectionFromSet(
-   *          com.google.devtools.depan.relationship.RelationshipSet)
+  /**
+   * {@inheritDoc}
+   * 
+   * If the selected set is the instanceSet, this method doesn't notify
+   * of the changes.
    */
+  @Override
   public void selectedSetChanged(RelationshipSet set) {
     this.selectedSet = set;
     unselectAll(set != instanceSet);
@@ -630,12 +627,7 @@ public class RelationshipPicker
     copyToAndSelectInstanceSet();
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see com.google.devtools.depan.eclipse.utils.ModificationListener
-   *      #modify(java.lang.Object, java.lang.String, java.lang.Object)
-   */
+  @Override
   public void modify(DirectedRelation element, String property, Boolean value) {
     notifyListeners(element, property, value);
 
@@ -688,12 +680,7 @@ public class RelationshipPicker
     relSetPicker.setInput(instanceSet, tempRelSets);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see com.google.devtools.depan.eclipse.utils.ViewerObjectToString
-   *      #getString(java.lang.Object)
-   */
+  @Override
   public String getString(Object object) {
     if (!(object instanceof DirectedRelation)) {
       return object.toString();

@@ -163,6 +163,14 @@ public class ViewDocument {
     userPrefs.setRelationProperty(relation, edgeProp);
   }
 
+  public RelationshipSet getDisplayRelationSet() {
+    return userPrefs.getDisplayRelationSet();
+  }
+
+  public void setDisplayRelationSet(RelationshipSet newDisplay) {
+    userPrefs.setDisplayRelationSet(newDisplay);
+  }
+
   public void setSelectedLayout(String layoutName) {
     userPrefs.setSelectedLayout(layoutName);
   }

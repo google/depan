@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.eclipse.views.tools;
 
+import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
 import com.google.devtools.depan.eclipse.plugins.SourcePluginRegistry;
 import com.google.devtools.depan.eclipse.utils.ListContentProvider;
@@ -53,6 +54,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -62,8 +64,7 @@ import java.util.List;
  * @author ycoppel@google.com (Yohann Coppel)
  *
  */
-public class RelationPickerTool extends ViewEditorTool
-    implements RelationshipSelectorListener {
+public class RelationPickerTool extends ViewEditorTool {
 
   /**
    * The {@link RelationshipSetSelector} to choose a named set.
@@ -103,12 +104,13 @@ public class RelationPickerTool extends ViewEditorTool
   @Override
   protected void updateControls() {
     super.updateControls();
-    updateView();
 
-    // Update the RelSet picker for auto-collapse.
-    RelationshipSet selectedRelSet = getEditor().getEdgeDisplayRelSet();
+    // RelationSet picker first
+    RelationshipSet selectedRelSet = getEditor().getDisplayRelationSet();
     List<RelSetDescriptor> choices = getEditor().getRelSetChoices();
-    relSetPicker.setInput(selectedRelSet, choices );
+    relSetPicker.setInput(selectedRelSet, choices);
+
+    updateView();
   }
 
   @Override
@@ -126,36 +128,24 @@ public class RelationPickerTool extends ViewEditorTool
     Button reverse = new Button(topLevel, SWT.PUSH);
     reverse.setText("Reverse selection");
     reverse.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 3, 1));
+    reverse.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        reverseSelection();
+
+        // Invalidate relation set on manual relation selection
+        relSetPicker.clearSelection();
+      }
+    });
 
     Label listLabel = new Label(topLevel, SWT.NONE);
     listLabel.setText("Select relationships to show:");
     listLabel.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, false, 3, 1));
 
-    list = new ListViewer(topLevel, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
-    // layout
+    list = setupRelationList(topLevel);
     list.getList().setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1));
-
-    // content
-    contentProvider = new ListContentProvider<Relation>(list);
-
-    // actions
-    list.getList().addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        updateModel();
-      }
-    });
-    reverse.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        reverseSelection();
-      }
-    });
-
-    fill();
-    updateView();
 
     return topLevel;
   }
@@ -170,14 +160,20 @@ public class RelationPickerTool extends ViewEditorTool
         new GridData(SWT.FILL, SWT.FILL, true, false));
 
     relSetPicker = new RelationshipSetPickerControl(region);
-    relSetPicker.addChangeListener(this);
     relSetPicker.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, false));
+
+    relSetPicker.addChangeListener(new RelationshipSelectorListener() {
+      @Override
+      public void selectedSetChanged(RelationshipSet set) {
+        handleRelSetPickerChange(set);
+      }
+    });
 
     Button save = new Button(region, SWT.PUSH);
     save.setText("Save selection as");
     save.setLayoutData(
-      new GridData(SWT.FILL, SWT.FILL, true, false));
+        new GridData(SWT.FILL, SWT.FILL, true, false));
 
     save.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -185,26 +181,48 @@ public class RelationPickerTool extends ViewEditorTool
         saveSelection();
       }
     });
-    
+
     return region;
   }
 
-  private void fill() {
+  private ListViewer setupRelationList(Composite parent) {
+    ListViewer result = new ListViewer(parent, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
+
+    // content
+    contentProvider = new ListContentProvider<Relation>(result);
+
+    // actions
+    result.getList().addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        updateModel();
+
+        // Invalidate relation set on manual relation selection
+        relSetPicker.clearSelection();
+      }
+    });
+
+    // Populate the list viewer with all known relations.
     for (SourcePlugin plugin : SourcePluginRegistry.getInstances()) {
       for (Relation r : plugin.getRelations()) {
         contentProvider.add(r);
       }
     }
+
+    updateView();
+
+    return result;
   }
 
   /**
-   * Update the ViewModel to hide selected relations.
+   * Inform editor of changes to visible relations.
    */
   private void updateModel() {
     if (!hasEditor()) {
       return;
     }
 
+    ViewEditor editor = getEditor();
     List<Relation> unselected =
         Lists.newArrayList(contentProvider.getObjects());
 
@@ -215,12 +233,13 @@ public class RelationPickerTool extends ViewEditorTool
     Iterator<Relation> iterator = selection.iterator();
     while (iterator.hasNext()) {
       Relation relation = iterator.next();
-      getEditor().setRelationVisible(relation, true);
+      editor.setRelationVisible(relation, true);
       unselected.remove(relation);
     }
 
+    // Hide anything left in the unselected list.
     for (Relation relation : unselected) {
-      getEditor().setRelationVisible(relation, false);
+      editor.setRelationVisible(relation, false);
     }
   }
 
@@ -232,23 +251,47 @@ public class RelationPickerTool extends ViewEditorTool
       return;
     }
 
+    list.setSelection(new StructuredSelection(buildSelected()));
+  }
+
+  private List<Relation> buildSelected() {
+    RelationshipSet pickerSet = relSetPicker.getSelection();
+    if (null != pickerSet) {
+      return buildRelations(pickerSet);
+    }
+
+    if (!hasEditor()) {
+      return Collections.emptyList();
+    }
+
     // Build selection from list of visible relations.
     Collection<Relation> relations = getEditor().getDisplayRelations();
-    List<Relation> selected =
+    List<Relation> result =
         Lists.newArrayListWithExpectedSize(relations.size());
     for (Relation relation : relations) {
       EdgeDisplayProperty edgeProp = getEditor().getRelationProperty(relation);
       if (edgeProp.isVisible()) {
-        selected.add(relation);
+        result.add(relation);
       }
     }
-
-    list.setSelection(new StructuredSelection(selected));
+    return result;
   }
 
-  @Override
-  public void selectedSetChanged(RelationshipSet set) {
-    selectFinder(set);
+  /**
+   * Change listener for RelationSetPickerControl.
+   */
+  private void handleRelSetPickerChange(RelationshipSet set) {
+    if (null != set) {
+      selectFinder(set);
+    }
+    getEditor().setDisplayRelationSet(set);
+  }
+
+  /**
+   * Reverse the selection.
+   */
+  protected void reverseSelection() {
+    selectFinder(new ReversedDirectedRelationFinder(getFinder()));
   }
 
   /**
@@ -257,18 +300,22 @@ public class RelationPickerTool extends ViewEditorTool
    * @param finder finder describing a set of relations.
    */
   private void selectFinder(DirectedRelationFinder finder) {
-    List<Relation> relations = Lists.newArrayList();
-    for (SourcePlugin plugin : SourcePluginRegistry.getInstances()) {
-      for (Relation relation : plugin.getRelations()) {
-        if (finder.matchForward(relation) || finder.matchBackward(relation)) {
-          relations.add(relation);
-        }
-      }
-    }
-
+    List<Relation> relations = buildRelations(finder);
     ISelection selection = new StructuredSelection(relations);
     list.setSelection(selection);
     updateModel();
+  }
+
+  private List<Relation> buildRelations(DirectedRelationFinder finder) {
+    List<Relation> result = Lists.newArrayList();
+    for (SourcePlugin plugin : SourcePluginRegistry.getInstances()) {
+      for (Relation relation : plugin.getRelations()) {
+        if (finder.matchForward(relation) || finder.matchBackward(relation)) {
+          result.add(relation);
+        }
+      }
+    }
+    return result;
   }
 
   /**
@@ -304,12 +351,5 @@ public class RelationPickerTool extends ViewEditorTool
     NewRelationshipSetWizard wizard = new NewRelationshipSetWizard(getFinder());
     WizardDialog dialog = new WizardDialog(shell, wizard);
     dialog.open();
-  }
-
-  /**
-   * Reverse the selection.
-   */
-  protected void reverseSelection() {
-    selectFinder(new ReversedDirectedRelationFinder(getFinder()));
   }
 }

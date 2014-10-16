@@ -40,6 +40,7 @@ public abstract class ViewEditorTool implements Tool {
     return (null != getEditor());
   }
 
+  @Override
   public void selected(boolean isSelected) {
     // nothing to do here.
   }
@@ -83,6 +84,7 @@ public abstract class ViewEditorTool implements Tool {
    * In this implementation, all resources (e.g. Listeners) are released
    * when the editor is closed and any selection is emptied.
    */
+  @Override
   public void editorClosed(ViewEditor viewEditor) {
     if (getEditor() != viewEditor) {
       return;
@@ -103,6 +105,7 @@ public abstract class ViewEditorTool implements Tool {
    * The new editor then acquires it own resources and updates its
    * controls as necessary.
    */
+  @Override
   public void setEditor(ViewEditor viewEditor) {
     if (getEditor() == viewEditor) {
       return;
