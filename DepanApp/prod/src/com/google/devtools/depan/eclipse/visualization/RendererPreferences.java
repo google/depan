@@ -75,7 +75,7 @@ public class RendererPreferences implements IPreferenceChangeListener {
   }
 
   private NodeSizePlugin<GraphEdge> getNodeSize() {
-    return glPanel.getRenderingPipe().getNodeSize();
+    return getRenderingPipe().getNodeSize();
   }
 
   /////////////////////////////////////
