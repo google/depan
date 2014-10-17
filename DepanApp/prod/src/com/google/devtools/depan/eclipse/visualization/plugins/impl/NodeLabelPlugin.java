@@ -80,10 +80,13 @@ public class NodeLabelPlugin implements NodeRenderingPlugin {
   public void preFrame(float elapsedTime) {
   }
 
-  public LabelPosition getLabelPosition() {
-    return labelPosition;
-  }
+  //////////////////////////////////////
+  // Rendering attributes
 
+  /**
+   * Normally set from Eclipse workspace preference
+   * {@code LabelPreferencesIds.LABEL_POSITION}
+   */
   public void setLabelPosition(LabelPosition labelPosition) {
     this.labelPosition = labelPosition;
   }

@@ -16,9 +16,6 @@
 
 package com.google.devtools.depan.eclipse.visualization.plugins.impl;
 
-import java.awt.Color;
-import java.util.Map;
-
 import com.google.devtools.depan.eclipse.cm.ColorMapDefJet;
 import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeColors;
 import com.google.devtools.depan.eclipse.visualization.ogl.ColorMap;
@@ -27,6 +24,9 @@ import com.google.devtools.depan.eclipse.visualization.plugins.core.NodeRenderin
 import com.google.devtools.depan.model.GraphNode;
 
 import edu.uci.ics.jung.graph.Graph;
+
+import java.awt.Color;
+import java.util.Map;
 
 
 /**
@@ -97,7 +97,6 @@ public class NodeColorPlugin<E> implements NodeRenderingPlugin {
       p.targetFillColor = Color.green; //c.brighter().brighter();
       return true;
     }
-
     p.targetFillColor = color;
     p.targetStrokeColor = Color.blue;
     return true;
@@ -149,34 +148,28 @@ public class NodeColorPlugin<E> implements NodeRenderingPlugin {
   }
 
   //////////////////////////////////////
-  // Basic getters / setters / toggle
+  // Rendering attributes
 
+  /**
+   * Normally set from Eclipse workspace preference
+   * {@code NodePreferencesIds.NODE_COLOR_ON}
+   */
   public void setColor(boolean on) {
     this.isColorEnabled = on;
   }
 
-  public boolean getColor() {
-    return isColorEnabled;
-  }
-
-  public boolean toggleColor() {
-    isColorEnabled = !isColorEnabled;
-    return isColorEnabled;
-  }
-
+  /**
+   * Normally set from Eclipse workspace preference
+   * {@code NodePreferencesIds.NODE_ROOT_HIGHLIGHT_ON}
+   */
   public void setSeedColoring(boolean on) {
     this.seedColoring = on;
   }
 
-  public boolean getSeedColoring() {
-    return seedColoring;
-  }
-
-  public boolean toggleSeedColoring() {
-    seedColoring = !seedColoring;
-    return seedColoring;
-  }
-
+  /**
+   * Normally set from Eclipse workspace preference
+   * {@code NodePreferencesIds.NODE_COLOR}
+   */
   public void setColorMode(NodeColors color) {
     this.nodeColors = color;
   }
