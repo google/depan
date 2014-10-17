@@ -13,22 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.google.devtools.depan.java.eclipse;
 
-import com.google.devtools.depan.eclipse.preferences.NodeOptions;
 import com.google.devtools.depan.eclipse.preferences.PreferencesIds;
 
 /**
  * An namespace class for color preferences IDs.
  *
  * @author ycoppel@google.com (Yohann Coppel)
- *
  */
-public final class ColorPreferencesIds extends NodeOptions {
+public final class ColorPreferencesIds {
 
-  // private constructor to prevent instantiation of namespace class.
   private ColorPreferencesIds() {
+    // Prevent instantiation.
   }
 
   public static final String COLORS_PREFIX =

@@ -32,12 +32,12 @@ import org.eclipse.ui.preferences.ScopedPreferenceStore;
  *
  * @author ycoppel@google.com (Yohann Coppel)
  */
-public class NodeOptions extends FieldEditorPreferencePage
+public class NodePreferencesPage extends FieldEditorPreferencePage
     implements IWorkbenchPreferencePage {
 
   private ScopedPreferenceStore preferences;
 
-  public NodeOptions() {
+  public NodePreferencesPage() {
     super(GRID);
     preferences = PreferencesIds.getInstanceStore();
     setPreferenceStore(preferences);

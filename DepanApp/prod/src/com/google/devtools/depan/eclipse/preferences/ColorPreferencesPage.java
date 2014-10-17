@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.google.devtools.depan.eclipse.preferences;
 
 import org.eclipse.jface.preference.ColorFieldEditor;
@@ -28,12 +27,12 @@ import org.eclipse.ui.preferences.ScopedPreferenceStore;
  *
  * @author ycoppel@google.com (Yohann Coppel)
  */
-public class ColorSelection extends FieldEditorPreferencePage
+public class ColorPreferencesPage extends FieldEditorPreferencePage
     implements IWorkbenchPreferencePage {
 
   private ScopedPreferenceStore preferences;
 
-  public ColorSelection() {
+  public ColorPreferencesPage() {
     super(GRID);
     preferences = PreferencesIds.getInstanceStore();
     setPreferenceStore(preferences);

@@ -13,7 +13,6 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-
 package com.google.devtools.depan.eclipse.preferences;
 
 import com.google.devtools.depan.eclipse.utils.Tools;
@@ -28,7 +27,7 @@ import java.awt.Color;
  *
  * @author ycoppel@google.com (Yohann Coppel)
  */
-public class ColorSelectionInitializer extends AbstractPreferenceInitializer {
+public class ColorPreferencesInitializer extends AbstractPreferenceInitializer {
 
   @Override
   public void initializeDefaultPreferences() {

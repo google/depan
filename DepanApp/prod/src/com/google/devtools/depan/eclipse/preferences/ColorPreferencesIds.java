@@ -13,18 +13,14 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-
 package com.google.devtools.depan.eclipse.preferences;
-
-import com.google.devtools.depan.eclipse.preferences.NodeOptions;
-import com.google.devtools.depan.eclipse.preferences.PreferencesIds;
 
 /**
  * An namespace class for color preferences IDs.
  *
  * @author ycoppel@google.com (Yohann Coppel)
  */
-public final class ColorPreferencesIds extends NodeOptions {
+public final class ColorPreferencesIds {
 
   private ColorPreferencesIds() {
     // Prevent instantiation.

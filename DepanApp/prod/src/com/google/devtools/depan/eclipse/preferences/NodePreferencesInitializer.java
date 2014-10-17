@@ -13,7 +13,6 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-
 package com.google.devtools.depan.eclipse.preferences;
 
 import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeColors;
@@ -28,7 +27,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
  *
  * @author ycoppel@google.com (Yohann Coppel)
  */
-public class NodeOptionsInitializer extends AbstractPreferenceInitializer {
+public class NodePreferencesInitializer extends AbstractPreferenceInitializer {
 
   @Override
   public void initializeDefaultPreferences() {

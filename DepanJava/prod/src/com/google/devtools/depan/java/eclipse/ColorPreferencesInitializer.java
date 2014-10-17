@@ -13,30 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.google.devtools.depan.java.eclipse;
 
-import java.awt.Color;
+import com.google.devtools.depan.eclipse.preferences.PreferencesIds;
+import com.google.devtools.depan.eclipse.utils.Tools;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
-import com.google.devtools.depan.eclipse.utils.Tools;
-import com.google.devtools.depan.java.JavaResources;
+import java.awt.Color;
 
 /**
  * Preferences default values for editor colors.
  *
  * @author ycoppel@google.com (Yohann Coppel)
- *
  */
-public class ColorSelectionInitializer extends AbstractPreferenceInitializer {
+public class ColorPreferencesInitializer extends AbstractPreferenceInitializer {
 
   @Override
   public void initializeDefaultPreferences() {
-    IEclipsePreferences defaults =
-        new DefaultScope().getNode(JavaResources.PLUGIN_ID);
+    IEclipsePreferences defaults = PreferencesIds.getDefaultNode();
 
     setDefaultRGB(defaults, ColorPreferencesIds.COLOR_FIELD, Color.YELLOW);
     setDefaultRGB(defaults, ColorPreferencesIds.COLOR_INTERFACE, Color.GREEN);
@@ -50,5 +46,4 @@ public class ColorSelectionInitializer extends AbstractPreferenceInitializer {
   private void setDefaultRGB(IEclipsePreferences p, String key, Color color) {
     p.put(key, Tools.getRgb(color));
   }
-
 }

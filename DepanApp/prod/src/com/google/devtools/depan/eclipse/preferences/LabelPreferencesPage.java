@@ -13,7 +13,6 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-
 package com.google.devtools.depan.eclipse.preferences;
 
 import com.google.devtools.depan.eclipse.preferences.LabelPreferencesIds.LabelPosition;
@@ -30,12 +29,12 @@ import org.eclipse.ui.preferences.ScopedPreferenceStore;
  *
  * @author ycoppel@google.com (Yohann Coppel)
  */
-public class LabelPreferences extends FieldEditorPreferencePage
+public class LabelPreferencesPage extends FieldEditorPreferencePage
     implements IWorkbenchPreferencePage {
 
   private ScopedPreferenceStore preferences;
 
-  public LabelPreferences() {
+  public LabelPreferencesPage() {
     super(GRID);
     preferences = PreferencesIds.getInstanceStore();
     setPreferenceStore(preferences);
