@@ -26,10 +26,6 @@ import com.google.devtools.depan.eclipse.visualization.ogl.GLPanel;
 import com.google.devtools.depan.eclipse.visualization.ogl.GLScene;
 import com.google.devtools.depan.eclipse.visualization.ogl.RendererChangeListener;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.CollapsePlugin;
-import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeColorPlugin;
-import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeShapePlugin;
-import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeSizePlugin;
-import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeStrokePlugin;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
@@ -136,27 +132,9 @@ public class View {
   /////////////////////////////////////
   // Configurable instances
 
-  public NodeSizePlugin<GraphEdge> getNodeSize() {
-    return glPanel.getRenderingPipe().getNodeSize();
-  }
-
-  public NodeColorPlugin<GraphEdge> getNodeColor() {
-    return glPanel.getRenderingPipe().getNodeColors();
-  }
-
-  public NodeShapePlugin<GraphEdge> getNodeShape() {
-    return glPanel.getRenderingPipe().getNodeShape();
-  }
-
-  public NodeStrokePlugin<GraphEdge> getNodeStroke() {
-    return glPanel.getRenderingPipe().getNodeStroke();
-  }
-
   public Rectangle2D getOGLViewport() {
     return glPanel.getOGLViewport();
   }
-
-  /////////////////////////////////////
 
   public void setEdgeVisible(GraphEdge edge, boolean isVisible) {
     glPanel.setEdgeVisible(edge, isVisible);

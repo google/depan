@@ -16,13 +16,19 @@
 
 package com.google.devtools.depan.eclipse.preferences;
 
+import com.google.devtools.depan.eclipse.utils.Resources;
+
+import org.eclipse.core.runtime.preferences.DefaultScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.ui.preferences.ScopedPreferenceStore;
+
 
 
 /**
  * An namespace class for preferences IDs.
  *
  * @author ycoppel@google.com (Yohann Coppel)
- *
  */
 public final class PreferencesIds {
 
@@ -33,4 +39,16 @@ public final class PreferencesIds {
   public static final String PREFIX = "prefs_";
   public static final String VIEW_PREFIX = PREFIX + "view_";
 
+  public static final IEclipsePreferences getDefaultNode() {
+    return DefaultScope.INSTANCE.getNode(Resources.PLUGIN_ID);
+  }
+
+  public static final IEclipsePreferences getInstanceNode() {
+    return InstanceScope.INSTANCE.getNode(Resources.PLUGIN_ID);
+  }
+
+  public static final ScopedPreferenceStore getInstanceStore() {
+    return new ScopedPreferenceStore(
+        InstanceScope.INSTANCE, Resources.PLUGIN_ID);
+  }
 }

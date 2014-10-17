@@ -13,15 +13,12 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-
 package com.google.devtools.depan.eclipse.preferences;
 
 import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeColors;
 import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeShape;
 import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeSize;
-import com.google.devtools.depan.eclipse.utils.Resources;
 
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.RadioGroupFieldEditor;
@@ -30,12 +27,10 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
-
 /**
  * Preference page for node rendering options.
  *
  * @author ycoppel@google.com (Yohann Coppel)
- *
  */
 public class NodeOptions extends FieldEditorPreferencePage
     implements IWorkbenchPreferencePage {
@@ -44,17 +39,10 @@ public class NodeOptions extends FieldEditorPreferencePage
 
   public NodeOptions() {
     super(GRID);
-    preferences = new ScopedPreferenceStore(
-        new InstanceScope(), Resources.PLUGIN_ID);
+    preferences = PreferencesIds.getInstanceStore();
     setPreferenceStore(preferences);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.jface.preference.FieldEditorPreferencePage
-   *      #createFieldEditors()
-   */
   @Override
   protected void createFieldEditors() {
     Composite parent = getFieldEditorParent();
@@ -94,6 +82,14 @@ public class NodeOptions extends FieldEditorPreferencePage
     BooleanFieldEditor nodeRatio = new BooleanFieldEditor(
         NodePreferencesIds.NODE_RATIO_ON, "Enable node ratio", parent);
 
+    // highlight root nodes: on/off
+    BooleanFieldEditor rootHighlight = new BooleanFieldEditor(
+        NodePreferencesIds.NODE_ROOT_HIGHLIGHT_ON, "Enable root highlight", parent);
+
+    // highlight selected nodes: on/off
+    BooleanFieldEditor strokeHighlight = new BooleanFieldEditor(
+        NodePreferencesIds.NODE_STROKE_HIGHLIGHT_ON, "Enable stroke highlight", parent);
+
     // add fields to the page
     addField(nodeColors);
     addField(colorSelect);
@@ -102,16 +98,11 @@ public class NodeOptions extends FieldEditorPreferencePage
     addField(nodeSizes);
     addField(sizeSelect);
     addField(nodeRatio);
+    addField(rootHighlight);
+    addField(strokeHighlight);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.ui.IWorkbenchPreferencePage
-   *      #init(org.eclipse.ui.IWorkbench)
-   */
+  @Override
   public void init(IWorkbench workbench) {
-
   }
-
 }

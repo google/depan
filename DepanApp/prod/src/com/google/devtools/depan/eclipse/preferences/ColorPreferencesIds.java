@@ -23,16 +23,15 @@ import com.google.devtools.depan.eclipse.preferences.PreferencesIds;
  * An namespace class for color preferences IDs.
  *
  * @author ycoppel@google.com (Yohann Coppel)
- *
  */
 public final class ColorPreferencesIds extends NodeOptions {
 
-  // private constructor to prevent instantiation of namespace class.
   private ColorPreferencesIds() {
+    // Prevent instantiation.
   }
 
   public static final String COLORS_PREFIX =
-    PreferencesIds.VIEW_PREFIX + "color_";
+      PreferencesIds.VIEW_PREFIX + "color_";
 
   public static final String COLOR_BACKGROUND = COLORS_PREFIX + "background";
   public static final String COLOR_FOREGROUND = COLORS_PREFIX + "foreground";

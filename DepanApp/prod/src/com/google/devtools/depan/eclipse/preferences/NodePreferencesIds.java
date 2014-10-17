@@ -29,9 +29,12 @@ import java.awt.Color;
  * Preferences for node rendering.
  *
  * @author ycoppel@google.com (Yohann Coppel)
- *
  */
-public class NodePreferencesIds extends NodeOptions {
+public class NodePreferencesIds {
+
+  private NodePreferencesIds() {
+    // Prevent instantiation.
+  }
 
   public static final String NODE_PREFIX =
       PreferencesIds.VIEW_PREFIX + "node_";
@@ -60,6 +63,8 @@ public class NodePreferencesIds extends NodeOptions {
   public static final String NODE_SHAPE_ON = NODE_PREFIX + "shapeenabled";
   public static final String NODE_SIZE_ON = NODE_PREFIX + "sizeenabled";
   public static final String NODE_RATIO_ON = NODE_PREFIX + "ratioenabled";
+  public static final String NODE_ROOT_HIGHLIGHT_ON = NODE_PREFIX + "roothighlightenabled";
+  public static final String NODE_STROKE_HIGHLIGHT_ON = NODE_PREFIX + "strokehighlightenabled";
 
   /**
    * Different modes for rendering node colors.
@@ -266,86 +271,4 @@ public class NodePreferencesIds extends NodeOptions {
       return null;
     }
   }
-
-  public enum LabelPosition {
-    INSIDE {
-      @Override
-      public double[] getDxDy() {
-        return new double[]{0, 0};
-      }
-    },
-    NOLABEL {
-      @Override
-      public double[] getDxDy() {
-        return new double[]{0, 0};
-      }
-    },
-    N {
-      @Override
-      public double[] getDxDy() {
-        return new double[]{0, 1};
-      }
-    },
-    IFSELECTED {
-      @Override
-      public double[] getDxDy() {
-        return getDefault().getDxDy();
-      }
-    },
-    NE {
-      @Override
-      public double[] getDxDy() {
-        return new double[]{1, 1};
-      }
-    },
-    E {
-      @Override
-      public double[] getDxDy() {
-        return new double[]{1, 0};
-      }
-    },
-    SE {
-      @Override
-      public double[] getDxDy() {
-        return new double[]{1, -1};
-      }
-    },
-    S {
-      @Override
-      public double[] getDxDy() {
-        return new double[]{0, -1};
-      }
-    },
-    SW {
-      @Override
-      public double[] getDxDy() {
-        return new double[]{-1, -1};
-      }
-    },
-    W {
-      @Override
-      public double[] getDxDy() {
-        return new double[]{-1, 0};
-      }
-    },
-    NW {
-      @Override
-      public double[] getDxDy() {
-        return new double[]{-1, 1};
-      }
-    },
-    CENTER {
-      @Override
-      public double[] getDxDy() {
-        return new double[]{0, 0};
-      }
-    };
-
-    public abstract double[] getDxDy();
-
-    public static LabelPosition getDefault() {
-      return S;
-    }
-  }
-
 }

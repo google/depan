@@ -16,9 +16,6 @@
 
 package com.google.devtools.depan.eclipse.preferences;
 
-import com.google.devtools.depan.eclipse.utils.Resources;
-
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.ColorFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.swt.widgets.Composite;
@@ -30,17 +27,15 @@ import org.eclipse.ui.preferences.ScopedPreferenceStore;
  * Preference page for color selections.
  *
  * @author ycoppel@google.com (Yohann Coppel)
- *
  */
-public class ColorSelection extends FieldEditorPreferencePage implements
-    IWorkbenchPreferencePage {
+public class ColorSelection extends FieldEditorPreferencePage
+    implements IWorkbenchPreferencePage {
 
   private ScopedPreferenceStore preferences;
 
   public ColorSelection() {
     super(GRID);
-    preferences = new ScopedPreferenceStore(
-        new InstanceScope(), Resources.PLUGIN_ID);
+    preferences = PreferencesIds.getInstanceStore();
     setPreferenceStore(preferences);
   }
 
@@ -57,6 +52,7 @@ public class ColorSelection extends FieldEditorPreferencePage implements
     addField(foreground);
   }
 
+  @Override
   public void init(IWorkbench workbench) {
   }
 }

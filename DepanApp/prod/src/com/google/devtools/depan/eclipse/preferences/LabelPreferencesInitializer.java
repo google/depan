@@ -16,30 +16,19 @@
 
 package com.google.devtools.depan.eclipse.preferences;
 
-import com.google.devtools.depan.eclipse.utils.Resources;
-
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
 /**
  * Default values for label preferences.
  *
  * @author ycoppel@google.com (Yohann Coppel)
- *
  */
 public class LabelPreferencesInitializer extends AbstractPreferenceInitializer {
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer
-   *      #initializeDefaultPreferences()
-   */
   @Override
   public void initializeDefaultPreferences() {
-    IEclipsePreferences defaults =
-        new DefaultScope().getNode(Resources.PLUGIN_ID);
+    IEclipsePreferences defaults = PreferencesIds.getDefaultNode();
 
     defaults.put(LabelPreferencesIds.LABEL_POSITION,
         LabelPreferencesIds.LABEL_POSITION_DEFAULT);

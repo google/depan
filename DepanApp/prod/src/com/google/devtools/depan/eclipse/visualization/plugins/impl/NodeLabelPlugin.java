@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.eclipse.visualization.plugins.impl;
 
-import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.LabelPosition;
+import com.google.devtools.depan.eclipse.preferences.LabelPreferencesIds.LabelPosition;
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeRenderingProperty;
 import com.google.devtools.depan.eclipse.visualization.plugins.core.NodeRenderingPlugin;
 
@@ -87,5 +87,4 @@ public class NodeLabelPlugin implements NodeRenderingPlugin {
   public void setLabelPosition(LabelPosition labelPosition) {
     this.labelPosition = labelPosition;
   }
-
 }

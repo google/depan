@@ -16,11 +16,9 @@
 
 package com.google.devtools.depan.eclipse.preferences;
 
-import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.utils.Tools;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
 import java.awt.Color;
@@ -29,14 +27,12 @@ import java.awt.Color;
  * Preferences default values for editor colors.
  *
  * @author ycoppel@google.com (Yohann Coppel)
- *
  */
 public class ColorSelectionInitializer extends AbstractPreferenceInitializer {
 
   @Override
   public void initializeDefaultPreferences() {
-    IEclipsePreferences defaults =
-        new DefaultScope().getNode(Resources.PLUGIN_ID);
+    IEclipsePreferences defaults = PreferencesIds.getDefaultNode();
 
     setDefaultRGB(defaults, ColorPreferencesIds.COLOR_BACKGROUND, Color.WHITE);
     setDefaultRGB(defaults, ColorPreferencesIds.COLOR_FOREGROUND, Color.BLACK);

@@ -21,27 +21,18 @@ import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeShap
 import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeSize;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
 /**
  * Default values for node rendering preferences.
  *
  * @author ycoppel@google.com (Yohann Coppel)
- *
  */
 public class NodeOptionsInitializer extends AbstractPreferenceInitializer {
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer
-   *      #initializeDefaultPreferences()
-   */
   @Override
   public void initializeDefaultPreferences() {
-    IEclipsePreferences defaults =
-      new DefaultScope().getNode(com.google.devtools.depan.eclipse.utils.Resources.PLUGIN_ID);
+    IEclipsePreferences defaults = PreferencesIds.getDefaultNode();
 
     defaults.putBoolean(NodePreferencesIds.NODE_COLOR_ON, true);
     defaults.put(NodePreferencesIds.NODE_COLOR,
@@ -56,6 +47,7 @@ public class NodeOptionsInitializer extends AbstractPreferenceInitializer {
         NodeSize.getDefault().toString());
 
     defaults.putBoolean(NodePreferencesIds.NODE_RATIO_ON, false);
+    defaults.putBoolean(NodePreferencesIds.NODE_ROOT_HIGHLIGHT_ON, false);
+    defaults.putBoolean(NodePreferencesIds.NODE_STROKE_HIGHLIGHT_ON, false);
   }
-
 }

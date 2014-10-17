@@ -16,12 +16,11 @@
 
 package com.google.devtools.depan.eclipse.preferences;
 
-import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.LabelPosition;
-import com.google.devtools.depan.eclipse.utils.Resources;
+import com.google.devtools.depan.eclipse.preferences.LabelPreferencesIds.LabelPosition;
 
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.RadioGroupFieldEditor;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
@@ -30,28 +29,22 @@ import org.eclipse.ui.preferences.ScopedPreferenceStore;
  * Preferences pages for label options.
  *
  * @author ycoppel@google.com (Yohann Coppel)
- *
  */
-public class LabelPreferences extends FieldEditorPreferencePage implements
-    IWorkbenchPreferencePage {
+public class LabelPreferences extends FieldEditorPreferencePage
+    implements IWorkbenchPreferencePage {
 
   private ScopedPreferenceStore preferences;
 
   public LabelPreferences() {
     super(GRID);
-    preferences = new ScopedPreferenceStore(
-        new InstanceScope(), Resources.PLUGIN_ID);
+    preferences = PreferencesIds.getInstanceStore();
     setPreferenceStore(preferences);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.jface.preference.FieldEditorPreferencePage
-   *      #createFieldEditors()
-   */
   @Override
   protected void createFieldEditors() {
+    Composite parent = getFieldEditorParent();
+
     // label positions.
     RadioGroupFieldEditor position = new RadioGroupFieldEditor(
         LabelPreferencesIds.LABEL_POSITION,
@@ -73,19 +66,12 @@ public class LabelPreferences extends FieldEditorPreferencePage implements
             {"No labels", LabelPosition.NOLABEL.toString()},
             {"Only if selected", LabelPosition.IFSELECTED.toString()}
         },
-        getFieldEditorParent(), true);
+        parent, true);
 
     addField(position);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.ui.IWorkbenchPreferencePage
-   *      #init(org.eclipse.ui.IWorkbench)
-   */
+  @Override
   public void init(IWorkbench workbench) {
-
   }
-
 }

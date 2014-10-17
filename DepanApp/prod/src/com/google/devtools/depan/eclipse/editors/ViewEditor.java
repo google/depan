@@ -192,16 +192,6 @@ public class ViewEditor extends MultiPageEditorPart {
     return viewInfo.getParentGraph();
   }
 
-  /**
-   * Provide access to the underlying OpenGL renderer.  This is available
-   * primarily to assist with configuration and preference settings.
-   * 
-   * @return reference to configurable renderer
-   */
-  public View getRenderer() {
-    return renderer;
-  }
-
   public List<SourcePlugin> getBuiltinAnalysisPlugins() {
     return viewInfo.getBuiltinAnalysisPlugins();
   }
@@ -757,7 +747,7 @@ public class ViewEditor extends MultiPageEditorPart {
       GraphEdge edge, EdgeDisplayProperty newProperty) {
     viewInfo.setEdgeProperty(edge, newProperty);
   }
- 
+
   public void setRelationVisible(Relation relation, boolean isVisible) {
     EdgeDisplayProperty edgeProp = getRelationProperty(relation);
     if (null == edgeProp) {

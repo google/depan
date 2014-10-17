@@ -17,12 +17,12 @@ package com.google.devtools.depan.eclipse.visualization;
 
 import com.google.devtools.depan.eclipse.preferences.ColorPreferencesIds;
 import com.google.devtools.depan.eclipse.preferences.LabelPreferencesIds;
+import com.google.devtools.depan.eclipse.preferences.LabelPreferencesIds.LabelPosition;
 import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds;
-import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.LabelPosition;
 import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeColors;
 import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeShape;
 import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeSize;
-import com.google.devtools.depan.eclipse.utils.Resources;
+import com.google.devtools.depan.eclipse.preferences.PreferencesIds;
 import com.google.devtools.depan.eclipse.utils.Tools;
 import com.google.devtools.depan.eclipse.visualization.ogl.GLPanel;
 import com.google.devtools.depan.eclipse.visualization.ogl.RenderingPipe;
@@ -30,10 +30,10 @@ import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeColorPlu
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeLabelPlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeShapePlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeSizePlugin;
+import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeStrokePlugin;
 import com.google.devtools.depan.model.GraphEdge;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 
@@ -70,6 +70,14 @@ public class RendererPreferences implements IPreferenceChangeListener {
     return getRenderingPipe().getNodeShape();
   }
 
+  private NodeStrokePlugin<GraphEdge> getNodeStroke() {
+    return getRenderingPipe().getNodeStroke();
+  }
+
+  private NodeSizePlugin<GraphEdge> getNodeSize() {
+    return glPanel.getRenderingPipe().getNodeSize();
+  }
+
   /////////////////////////////////////
   // Write preferences to renderer
 
@@ -77,7 +85,7 @@ public class RendererPreferences implements IPreferenceChangeListener {
    * Read and setup label preferences.
    */
   private void setLabelPreferences() {
-    IEclipsePreferences node = getPreferences();
+    IEclipsePreferences node = PreferencesIds.getInstanceNode();
 
     // set label position
     try {
@@ -94,7 +102,7 @@ public class RendererPreferences implements IPreferenceChangeListener {
    * Read and setup node rendering preferences (Colors, size, shape, ratio).
    */
   private void setNodePreferences() {
-    IEclipsePreferences node = getPreferences();
+    IEclipsePreferences node = PreferencesIds.getInstanceNode();
 
     // read enable/disable preferences
     boolean colorEnabled = node.getBoolean(
@@ -105,16 +113,23 @@ public class RendererPreferences implements IPreferenceChangeListener {
         NodePreferencesIds.NODE_SIZE_ON, false);
     boolean ratioEnabled = node.getBoolean(
         NodePreferencesIds.NODE_RATIO_ON, false);
+    boolean strokeHighlight = node.getBoolean(
+        NodePreferencesIds.NODE_STROKE_HIGHLIGHT_ON, true);
+    boolean rootHighlight = node.getBoolean(
+        NodePreferencesIds.NODE_ROOT_HIGHLIGHT_ON, false);
 
-    NodeSizePlugin<GraphEdge> nodeSize = glPanel.getRenderingPipe().getNodeSize();
+    NodeSizePlugin<GraphEdge> nodeSize = getNodeSize();
     NodeColorPlugin<GraphEdge> nodeColor = getNodeColor();
     NodeShapePlugin<GraphEdge> nodeShape = getNodeShape();
+    NodeStrokePlugin<GraphEdge> nodeStroke = getNodeStroke();
 
     // set enable/disable preferences
     nodeColor.setColor(colorEnabled);
+    nodeColor.setSeedColoring(rootHighlight);
     nodeShape.setShapes(shapeEnabled);
     nodeSize.setRatio(ratioEnabled);
     nodeSize.setResize(resizeEnabled);
+    nodeStroke.activate(strokeHighlight);
 
     // set color mode color
     try {
@@ -154,18 +169,13 @@ public class RendererPreferences implements IPreferenceChangeListener {
    * read and setup color preferences.
    */
   private void setColorsPreferences() {
-    IEclipsePreferences node = getPreferences();
+    IEclipsePreferences node = PreferencesIds.getInstanceNode();
 
     Color back = Tools.getRgb(node.get(
         ColorPreferencesIds.COLOR_BACKGROUND, "255,255,255"));
     Color front = Tools.getRgb(node.get(
         ColorPreferencesIds.COLOR_FOREGROUND, "0,0,0"));
     glPanel.setColors(back, front);
-  }
-
-  @SuppressWarnings("deprecation")
-  private IEclipsePreferences getPreferences() {
-    return new InstanceScope().getNode(Resources.PLUGIN_ID);
   }
 
   /**
@@ -183,7 +193,7 @@ public class RendererPreferences implements IPreferenceChangeListener {
   public void dispose() {
     // TODO(leeca): What does this do?
     // listen the changes in the configuration
-    IEclipsePreferences prefs = getPreferences();
+    IEclipsePreferences prefs = PreferencesIds.getInstanceNode();
     prefs.removePreferenceChangeListener(this);
   }
 
@@ -210,7 +220,7 @@ public class RendererPreferences implements IPreferenceChangeListener {
     result.setPreferences();
 
     // Register the new instance for preference changes
-    IEclipsePreferences prefs = result.getPreferences();
+    IEclipsePreferences prefs = PreferencesIds.getInstanceNode();
     prefs.addPreferenceChangeListener(result);
     return result;
   }

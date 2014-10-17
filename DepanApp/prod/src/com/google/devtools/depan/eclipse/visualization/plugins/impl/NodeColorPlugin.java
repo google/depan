@@ -91,7 +91,8 @@ public class NodeColorPlugin<E> implements NodeRenderingPlugin {
       p.targetStrokeColor = Color.red;
       p.targetFillColor = color.darker().darker();
       return true;
-    } else if (seedColoring && vals.degree == 0) {
+    }
+    if (seedColoring && vals.degree == 0) {
       p.targetStrokeColor = Color.green;
       p.targetFillColor = Color.green; //c.brighter().brighter();
       return true;
@@ -180,4 +181,3 @@ public class NodeColorPlugin<E> implements NodeRenderingPlugin {
     this.nodeColors = color;
   }
 }
-

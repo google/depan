@@ -17,11 +17,13 @@
 package com.google.devtools.depan.eclipse.actions;
 
 import com.google.devtools.depan.eclipse.editors.ViewEditor;
-import com.google.devtools.depan.eclipse.visualization.View;
+import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds;
+import com.google.devtools.depan.eclipse.preferences.PreferencesIds;
 import com.google.devtools.depan.eclipse.visualization.layout.JungLayoutGenerator;
 import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerator;
 import com.google.devtools.depan.eclipse.visualization.layout.TreeLayoutGenerator;
 
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IEditorActionDelegate;
@@ -81,18 +83,17 @@ public class ViewEditorActionDelegate implements IEditorActionDelegate {
 
   private void updateState(IAction action) {
     String id = action.getId();
-    View renderer = targetEditor.getRenderer();
     boolean checked = false;
     if (id.equals(ROOTHIGHLIGHT_ID)) {
-      checked = renderer.getNodeColor().getSeedColoring();
+      checked = isChecked(NodePreferencesIds.NODE_ROOT_HIGHLIGHT_ON, false);
     } else if (id.equals(STRETCHRATIO_ID)) {
-      checked = renderer.getNodeSize().getRatio();
+      checked = isChecked(NodePreferencesIds.NODE_RATIO_ON, false);
     } else if (id.equals(SIZE_ID)) {
-      checked = renderer.getNodeSize().getResize();
+      checked = isChecked(NodePreferencesIds.NODE_SIZE_ON, false);
     } else if (id.equals(STROKEHIGHLIGHT_ID)) {
-      checked = renderer.getNodeStroke().isActivated();
+      checked = isChecked(NodePreferencesIds.NODE_STROKE_HIGHLIGHT_ON, true);
     } else if (id.equals(SHAPE_ID)) {
-      checked = renderer.getNodeShape().getShapes();
+      checked = isChecked(NodePreferencesIds.NODE_SHAPE_ON, true);
     }
     action.setChecked(checked);
   }
@@ -103,7 +104,6 @@ public class ViewEditorActionDelegate implements IEditorActionDelegate {
       return;
     }
     String id = action.getId();
-    View view = targetEditor.getRenderer();
 
     // layouts
     if (id.equals(FRLAYOUT_ID)) {
@@ -117,15 +117,15 @@ public class ViewEditorActionDelegate implements IEditorActionDelegate {
 
     // visualization options
     } else if (id.equals(ROOTHIGHLIGHT_ID)) {
-      action.setChecked(view.getNodeColor().toggleSeedColoring());
+      action.setChecked(togglePref(NodePreferencesIds.NODE_ROOT_HIGHLIGHT_ON, false));
     } else if (id.equals(STRETCHRATIO_ID)) {
-      action.setChecked(view.getNodeSize().toggleRatio());
+      action.setChecked(togglePref(NodePreferencesIds.NODE_RATIO_ON, false));
     } else if (id.equals(SIZE_ID)) {
-      action.setChecked(view.getNodeSize().toggleResize());
+      action.setChecked(togglePref(NodePreferencesIds.NODE_SIZE_ON, false));
     } else if (id.equals(STROKEHIGHLIGHT_ID)) {
-      action.setChecked(view.getNodeStroke().toggle());
+      action.setChecked(togglePref(NodePreferencesIds.NODE_STROKE_HIGHLIGHT_ON, true));
     } else if (id.equals(SHAPE_ID)) {
-      action.setChecked(view.getNodeShape().toggleShapes());
+      action.setChecked(togglePref(NodePreferencesIds.NODE_SHAPE_ON, true));
 
     // others
     } else if (id.equals(SCREENSHOT_ID)) {
@@ -137,6 +137,19 @@ public class ViewEditorActionDelegate implements IEditorActionDelegate {
 
   private void applyLayout(LayoutGenerator layout) {
     targetEditor.applyLayout(layout);
+  }
+
+  private boolean isChecked(String prefId, boolean defaultValue) {
+    IEclipsePreferences node = PreferencesIds.getInstanceNode();
+    boolean result = node.getBoolean(prefId, defaultValue);
+    return result;
+  }
+
+  private boolean togglePref(String prefId, boolean defaultValue) {
+    IEclipsePreferences node = PreferencesIds.getInstanceNode();
+    boolean result = !node.getBoolean(prefId, defaultValue);
+    node.putBoolean(prefId, result);
+    return result;
   }
 
   @Override()
