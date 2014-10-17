@@ -13,7 +13,6 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-
 package com.google.devtools.depan.eclipse.actions;
 
 import com.google.devtools.depan.eclipse.editors.ViewEditor;
@@ -31,71 +30,59 @@ import org.eclipse.ui.IEditorPart;
 
 /**
  * @author ycoppel@google.com (Yohann Coppel)
- *
  */
 public class ViewEditorActionDelegate implements IEditorActionDelegate {
 
-  private ViewEditor targetEditor = null;
-
   // layouts
   public static final String FRLAYOUT_ID =
-    "com.google.devtools.depan.eclipse.actions.view.SetFRLayout";
+      "com.google.devtools.depan.eclipse.actions.view.SetFRLayout";
   public static final String SPRINGLAYOUT_ID =
-    "com.google.devtools.depan.eclipse.actions.view.SetSpringLayout";
+      "com.google.devtools.depan.eclipse.actions.view.SetSpringLayout";
   public static final String TREELAYOUT_ID =
-    "com.google.devtools.depan.eclipse.actions.view.SetTreeLayout";
+      "com.google.devtools.depan.eclipse.actions.view.SetTreeLayout";
   public static final String RADIALLAYOUT_ID =
-    "com.google.devtools.depan.eclipse.actions.view.SetRadialLayout";
+      "com.google.devtools.depan.eclipse.actions.view.SetRadialLayout";
 
-  // renderers
+  // rendering options
   public static final String ROOTHIGHLIGHT_ID =
-    "com.google.devtools.depan.eclipse.actions.view.RootHighlight";
+      "com.google.devtools.depan.eclipse.actions.view.RootHighlight";
   public static final String SHAPE_ID =
-    "com.google.devtools.depan.eclipse.actions.view.Shape";
+      "com.google.devtools.depan.eclipse.actions.view.Shape";
   public static final String STRETCHRATIO_ID =
-    "com.google.devtools.depan.eclipse.actions.view.StretchRatio";
+      "com.google.devtools.depan.eclipse.actions.view.StretchRatio";
   public static final String SIZE_ID =
-    "com.google.devtools.depan.eclipse.actions.view.Size";
+      "com.google.devtools.depan.eclipse.actions.view.Size";
   public static final String STROKEHIGHLIGHT_ID =
-    "com.google.devtools.depan.eclipse.actions.view.StrokeHighlight";
+      "com.google.devtools.depan.eclipse.actions.view.StrokeHighlight";
 
   // selections
   public static final String SUBLAYOUT_ID =
-    "com.google.devtools.depan.eclipse.actions.view.SubLayout";
+      "com.google.devtools.depan.eclipse.actions.view.SubLayout";
   public static final String COLLAPSE_ID =
-    "com.google.devtools.depan.eclipse.actions.view.Collapse";
+      "com.google.devtools.depan.eclipse.actions.view.Collapse";
   public static final String SELECT_ALL =
-    "com.google.devtools.depan.eclipse.actions.view.SelectAll";
+      "com.google.devtools.depan.eclipse.actions.view.SelectAll";
 
   // other
   public static final String SCREENSHOT_ID =
-    "com.google.devtools.depan.eclipse.actions.view.Screenshot";
+      "com.google.devtools.depan.eclipse.actions.view.Screenshot";
+
+  /////////////////////////////////////
+  // Member fields
+
+  private ViewEditor targetEditor = null;
+
+  /////////////////////////////////////
+  // IEditorActionDelegate (& IActionDelegate) implementation
 
   @Override()
   public void setActiveEditor(IAction action, IEditorPart editor) {
     if (editor instanceof ViewEditor) {
-      this.targetEditor = (ViewEditor) editor;
+      targetEditor = (ViewEditor) editor;
       updateState(action);
     } else {
       editor = null;
     }
-  }
-
-  private void updateState(IAction action) {
-    String id = action.getId();
-    boolean checked = false;
-    if (id.equals(ROOTHIGHLIGHT_ID)) {
-      checked = isChecked(NodePreferencesIds.NODE_ROOT_HIGHLIGHT_ON, false);
-    } else if (id.equals(STRETCHRATIO_ID)) {
-      checked = isChecked(NodePreferencesIds.NODE_RATIO_ON, false);
-    } else if (id.equals(SIZE_ID)) {
-      checked = isChecked(NodePreferencesIds.NODE_SIZE_ON, false);
-    } else if (id.equals(STROKEHIGHLIGHT_ID)) {
-      checked = isChecked(NodePreferencesIds.NODE_STROKE_HIGHLIGHT_ON, true);
-    } else if (id.equals(SHAPE_ID)) {
-      checked = isChecked(NodePreferencesIds.NODE_SHAPE_ON, true);
-    }
-    action.setChecked(checked);
   }
 
   @Override()
@@ -135,6 +122,29 @@ public class ViewEditorActionDelegate implements IEditorActionDelegate {
     }
   }
 
+  @Override()
+  public void selectionChanged(IAction action, ISelection selection) {
+  }
+
+  /////////////////////////////////////
+
+  private void updateState(IAction action) {
+    String id = action.getId();
+    boolean checked = false;
+    if (id.equals(ROOTHIGHLIGHT_ID)) {
+      checked = isChecked(NodePreferencesIds.NODE_ROOT_HIGHLIGHT_ON, false);
+    } else if (id.equals(STRETCHRATIO_ID)) {
+      checked = isChecked(NodePreferencesIds.NODE_RATIO_ON, false);
+    } else if (id.equals(SIZE_ID)) {
+      checked = isChecked(NodePreferencesIds.NODE_SIZE_ON, false);
+    } else if (id.equals(STROKEHIGHLIGHT_ID)) {
+      checked = isChecked(NodePreferencesIds.NODE_STROKE_HIGHLIGHT_ON, true);
+    } else if (id.equals(SHAPE_ID)) {
+      checked = isChecked(NodePreferencesIds.NODE_SHAPE_ON, true);
+    }
+    action.setChecked(checked);
+  }
+
   private void applyLayout(LayoutGenerator layout) {
     targetEditor.applyLayout(layout);
   }
@@ -150,9 +160,5 @@ public class ViewEditorActionDelegate implements IEditorActionDelegate {
     boolean result = !node.getBoolean(prefId, defaultValue);
     node.putBoolean(prefId, result);
     return result;
-  }
-
-  @Override()
-  public void selectionChanged(IAction action, ISelection selection) {
   }
 }

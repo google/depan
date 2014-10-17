@@ -298,7 +298,7 @@
                tooltip="Enable node ratio"
                class="com.google.devtools.depan.eclipse.actions.ViewEditorActionDelegate"
                icon="icons/shape_handles.png"/>
-	 <action id="com.google.devtools.depan.eclipse.actions.view.Size"
+         <action id="com.google.devtools.depan.eclipse.actions.view.Size"
                label="Enable node sizes"
                menubarPath="com.google.devtools.depan.eclipse.actions.view/basic"
                toolbarPath="additions"
