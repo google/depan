@@ -1,0 +1,9 @@
+DepanApp/prod/build/
+DepanBytecode/prod/build/
+DepanBytecode/test/bin/
+DepanCore/prod/build/
+DepanCore/test/bin/
+DepanFileSystem/prod/bin/
+DepanFileSystem/test/bin/
+DepanJava/prod/build/
+DepanJavaScript/prod/bin/
