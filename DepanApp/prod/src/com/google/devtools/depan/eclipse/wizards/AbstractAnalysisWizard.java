@@ -52,6 +52,7 @@ public abstract class AbstractAnalysisWizard extends Wizard
 
   /**
    * Constructor for NewGraphWizard.
+   * Create the wizard (with a progress monitor)
    */
   public AbstractAnalysisWizard() {
     super();

@@ -16,13 +16,8 @@
 
 package com.google.devtools.depan.eclipse.wizards;
 
-import com.google.common.collect.Lists;
 import com.google.devtools.depan.eclipse.editors.GraphDocument;
 import com.google.devtools.depan.eclipse.editors.ResourceCache;
-import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
-import com.google.devtools.depan.model.GraphEdge;
-import com.google.devtools.depan.model.GraphModel;
-import com.google.devtools.depan.model.GraphNode;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -61,14 +56,6 @@ public class NewMergedGraphWizard extends AbstractAnalysisWizard {
   private NewMergedGraphPage page;
 
   /**
-   * Create the wizard (with a progress monitor)
-   */
-  public NewMergedGraphWizard() {
-    super();
-    setNeedsProgressMonitor(true);
-  }
-
-  /**
    * Adding the user options page to the wizard.
    */
   @Override
@@ -81,7 +68,7 @@ public class NewMergedGraphWizard extends AbstractAnalysisWizard {
    * {@inheritDoc}
    * 
    * Count 1 step for creating the graph model, plus a load and a merge step
-   * for each depenency graph (1 +2n). 
+   * for each dependency graph (1 +2n). 
    * @see com.google.devtools.depan.eclipse.wizards.AbstractAnalysisWizard#countAnalysisWork()
    */
   @Override
@@ -102,8 +89,7 @@ public class NewMergedGraphWizard extends AbstractAnalysisWizard {
     }
 
     monitor.setTaskName("Creating result graph...");
-    GraphModel resultModel = new GraphModel();
-    List<SourcePlugin> analyzers = Lists.newArrayList();
+    MergeGraphBuilder resultBuilder = new MergeGraphBuilder();
     monitor.worked(1);
 
     for (IResource graphResource : mergeGraphs) {
@@ -113,33 +99,14 @@ public class NewMergedGraphWizard extends AbstractAnalysisWizard {
           ResourceCache.importGraphDocument((IFile) graphResource);
       monitor.worked(1);
 
-      monitor.setTaskName("Merging dependency graph " + graphName + "...");
-      mergeGraph(resultModel, nextGraph.getGraph());
-      analyzers.addAll(nextGraph.getAnalyzers());
+      String taskName = "Merging dependency graph " + graphName + "...";
+      monitor.setTaskName(taskName);
+      resultBuilder.merge(nextGraph);
       monitor.worked(1);
     }
 
-    GraphDocument resultDoc = new GraphDocument(resultModel, analyzers);
-    return resultDoc;
-  }
-
-  // TODO(leeca): move this to DepanCore once the dependency graph
-  // build process gets cleaned up.
-  private void mergeGraph(GraphModel receiver, GraphModel merge) {
-
-    // Add any new nodes
-    for (GraphNode node : merge.getNodes()) {
-      if (null == receiver.findNode(node.getId())) {
-        receiver.addNode(node);
-      }
-    }
-
-    // Add any new edges
-    for (GraphEdge edge : merge.getEdges()) {
-      if (null == receiver.findEdge(edge.getRelation(), edge.getHead(), edge.getTail())) {
-        receiver.addEdge(edge.getRelation(), edge.getHead(), edge.getTail());
-      }
-    }
+    GraphDocument result = resultBuilder.getGraphDocument();
+    return result;
   }
 
   @Override
