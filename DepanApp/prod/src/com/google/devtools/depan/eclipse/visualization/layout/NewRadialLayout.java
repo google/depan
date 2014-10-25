@@ -23,12 +23,14 @@ import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import edu.uci.ics.jung.graph.Graph;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
+import java.util.Set;
 
 /**
  * Assign locations to the graph nodes so they are rendered in a 
@@ -83,6 +85,9 @@ public class NewRadialLayout extends NewTreeLayout {
    */
   private class DryRunTool extends HierarchicalLayoutTool.Planar {
 
+    protected Set<GraphNode> orphans = Sets.newHashSet();
+    protected Set<GraphNode> seeds = Sets.newHashSet();
+
     /**
      * Create a DryRun tool for radial layouts.
      * 
@@ -94,6 +99,14 @@ public class NewRadialLayout extends NewTreeLayout {
       super(layoutGraph, relations);
     }
 
+    public int getLeafCount() {
+      int layoutLeafs = super.getLeafCount();
+      if (orphans.size() > layoutLeafs) {
+        return orphans.size();
+      }
+      return layoutLeafs;
+    }
+
     /**
      * {@inheritDoc}
      * <p>
@@ -102,8 +115,25 @@ public class NewRadialLayout extends NewTreeLayout {
      */
     @Override
     protected int getRootLevel(Collection<GraphNode> roots) {
+      for (GraphNode root : roots) {
+        if (getNodeSuccessors(root).isEmpty()) {
+          orphans.add(root);
+        } else {
+          seeds.add(root);
+        }
+      }
       // Don't occupy the center unless there is only one root
-      return (roots.size() > 1) ? 1 : 0;
+      int seedCount = seeds.size();
+      if (seedCount <= 1) {
+        return 0;
+      }
+      if (seedCount <= 3) {
+        return 1;
+      }
+      if (seedCount <= 9) {
+        return 2;
+      }
+      return 3;
     }
 
     /**
@@ -116,6 +146,7 @@ public class NewRadialLayout extends NewTreeLayout {
       // logAssignNode(node, level, offset);
       // No node assignments in dry run.
     }
+
   }
 
   /**
@@ -126,6 +157,8 @@ public class NewRadialLayout extends NewTreeLayout {
    * the basic of each node's radial offset.
    */
   private class RadialLayoutTool extends DryRunTool {
+
+    protected int maxLevel;
 
     /** Number of leaf positions required by this layout. */
     private final int circumference;
@@ -147,6 +180,28 @@ public class NewRadialLayout extends NewTreeLayout {
       super(layoutGraph, relations);
       this.circumference = circumference;
       this.radiansPerLeaf = 2.0 * Math.PI / this.circumference;
+    }
+
+    public void layoutTree() {
+      super.layoutTree();
+      assignOrphans(maxLevel);
+    }
+
+    private void assignOrphans(int level) {
+      int nextLevel = level + 1;
+      int orphanSeq = 0;
+      for (GraphNode node : orphans) {
+        assignNode(node, nextLevel, orphanSeq++);
+      }
+    }
+
+    protected int getCurrOffset(int level) {
+      int result = super.getCurrOffset(level);
+      if (result > maxLevel) {
+        maxLevel = result;
+      }
+      return result;
+      
     }
 
     /**

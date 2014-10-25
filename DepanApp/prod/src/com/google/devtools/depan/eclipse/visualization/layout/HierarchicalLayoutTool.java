@@ -160,6 +160,10 @@ public abstract class HierarchicalLayoutTool {
     System.err.println("[" + level + ", " + offset + "]: " + node);
   }
 
+  protected Collection<GraphNode> getNodeSuccessors(GraphNode node) {
+    return treeData.getSuccessorNodes(node);
+  }
+
   /**
    * Provide the current nodes set of children in a principled order.
    * <p>
