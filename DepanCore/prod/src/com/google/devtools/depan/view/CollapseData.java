@@ -17,14 +17,19 @@
 package com.google.devtools.depan.view;
 
 import com.google.common.collect.Lists;
+
 import com.google.devtools.depan.model.GraphNode;
 
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * @author ycoppel@google.com (Yohann Coppel)
  */
 public class CollapseData {
+
+  public static Collection<CollapseData> EMPTY_LIST =
+      Collections.<CollapseData>emptyList();
 
   /**
    * The defined master for this collapsed set of nodes.
