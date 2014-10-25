@@ -213,12 +213,9 @@ public class Collapser {
     HiddenNodesGizmo gizmo = new HiddenNodesGizmo(hiddenNodeMap);
     Set<GraphNode> exposedNodes = getExposedNodeSet(graph, gizmo);
 
-    // Don't include the ancestors of already collapsed nodes
-    Set<GraphNode> masterNodes = getMasterNodeSet();
-
     Collection<GraphNode> result = Lists.newArrayList();
     result.add(parent);
-    addExposedAncestors(result, treeModel, exposedNodes, masterNodes, parent);
+    addExposedAncestors(result, treeModel, exposedNodes, parent);
 
     CollapseData collapseData = collapse(parent, result, false);
     collapseChanges.add(collapseData);
@@ -228,7 +225,6 @@ public class Collapser {
       Collection<GraphNode> result,
       TreeModel treeModel,
       Set<GraphNode> exposedNodes,
-      Set<GraphNode> masterNodes,
       GraphNode parent) {
 
     for (GraphNode child : treeModel.getSuccessorNodes(parent)) {
@@ -238,7 +234,7 @@ public class Collapser {
 
         // Recursively add any exposed ancestors
         addExposedAncestors(
-            result, treeModel, exposedNodes, masterNodes, child);
+            result, treeModel, exposedNodes, child);
       }
     }
   }
