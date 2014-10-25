@@ -511,6 +511,16 @@ public class ViewPreferences {
     return collapser.buildExposedGraph(graph);
   }
 
+  public Collection<CollapseData> getCollapseState() {
+    Set<GraphNode> masters = collapser.getMasterNodeSet();
+    Collection<CollapseData> result = Lists.newArrayListWithExpectedSize(masters.size());
+    for (GraphNode node : masters) {
+      result.add(collapser.getCollapseData(node));
+    };
+    return result;
+    
+  }
+
   /**
    * Collapse a set of nodes under a specific master node.
    *
@@ -528,7 +538,7 @@ public class ViewPreferences {
 
     fireCollapseChanged(
         Collections.singleton(collapser.getCollapseData(master)),
-        Collections.<CollapseData>emptyList(),
+        CollapseData.EMPTY_LIST,
         author);
   }
 
@@ -552,7 +562,7 @@ public class ViewPreferences {
     collapser.uncollapse(master, deleteGroup);
 
     fireCollapseChanged(
-        Collections.<CollapseData>emptyList(),
+        CollapseData.EMPTY_LIST,
         Collections.singleton(removedGroup),
         author);
   }
@@ -577,7 +587,7 @@ public class ViewPreferences {
 
     fireCollapseChanged(
       collapseChanges,
-      Collections.<CollapseData>emptyList(),
+      CollapseData.EMPTY_LIST,
       author);
   }
 

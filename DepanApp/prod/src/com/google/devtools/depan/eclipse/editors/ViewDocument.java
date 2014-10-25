@@ -25,6 +25,7 @@ import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.RelationshipSet;
 import com.google.devtools.depan.model.interfaces.GraphBuilder;
+import com.google.devtools.depan.view.CollapseData;
 import com.google.devtools.depan.view.EdgeDisplayProperty;
 import com.google.devtools.depan.view.NodeDisplayProperty;
 import com.google.devtools.depan.view.TreeModel;
@@ -244,6 +245,10 @@ public class ViewDocument {
 
   public GraphModel buildExposedGraph(GraphModel graph) {
     return userPrefs.getExposedGraph(graph);
+  }
+
+  public Collection<CollapseData> getCollapseState() {
+    return userPrefs.getCollapseState();
   }
 
   public void collapseTree(

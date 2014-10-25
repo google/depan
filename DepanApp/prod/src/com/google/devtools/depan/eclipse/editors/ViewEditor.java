@@ -284,6 +284,7 @@ public class ViewEditor extends MultiPageEditorPart {
     renderer.setGraphModel(getViewGraph(), getJungGraph(), getNodeRanking());
     renderer.initCameraPosition(viewInfo.getScenePrefs());
     renderer.initializeNodeLocations(viewInfo.getNodeLocations());
+    initCollapseRendering(viewInfo.getCollapseState());
     initSelectedNodes(getSelectedNodes());
     initEdgeRendering();
     renderer.start();
@@ -845,6 +846,10 @@ public class ViewEditor extends MultiPageEditorPart {
     exposedGraph = viewInfo.buildExposedGraph(viewGraph);
   }
 
+  private void initCollapseRendering(Collection<CollapseData> state) {
+    renderer.updateCollapseChanges(state, CollapseData.EMPTY_LIST);
+  }
+
   /////////////////////////////////////
   // Update Graph Layouts
 
@@ -993,7 +998,7 @@ public class ViewEditor extends MultiPageEditorPart {
 
   private Collection<GraphNode> getLayoutNodes() {
     Collection<GraphNode> picked = getSelectedNodes();
-    if (0 == picked.size()) {
+    if (picked.isEmpty()) {
       return getExposedGraph().getNodes();
     }
 
