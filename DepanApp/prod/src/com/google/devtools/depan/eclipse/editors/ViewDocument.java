@@ -247,6 +247,10 @@ public class ViewDocument {
     return userPrefs.getExposedGraph(graph);
   }
 
+  public TreeModel getCollapseTreeModel() {
+    return userPrefs.getCollapseTreeModel();
+  }
+
   public Collection<CollapseData> getCollapseState() {
     return userPrefs.getCollapseState();
   }

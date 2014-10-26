@@ -17,7 +17,10 @@
 package com.google.devtools.depan.eclipse.views.tools;
 
 import com.google.devtools.depan.eclipse.editors.HierarchyCache;
+import com.google.devtools.depan.eclipse.editors.ViewPrefsListener;
 import com.google.devtools.depan.eclipse.trees.GraphData;
+import com.google.devtools.depan.eclipse.trees.NodeTreeView;
+import com.google.devtools.depan.eclipse.trees.NodeTreeViews;
 import com.google.devtools.depan.eclipse.utils.HierarchyViewer;
 import com.google.devtools.depan.eclipse.utils.RelationshipSelectorListener;
 import com.google.devtools.depan.eclipse.utils.Resources;
@@ -26,9 +29,11 @@ import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptor;
 import com.google.devtools.depan.eclipse.views.ViewSelectionListenerTool;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.RelationshipSet;
+import com.google.devtools.depan.view.CollapseData;
 import com.google.devtools.depan.view.NodeDisplayProperty;
 
 import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -63,6 +68,10 @@ public class CollapseTool extends ViewSelectionListenerTool
   /** Provides hierarchy to use for autoCollapse operations */
   private HierarchyViewer<NodeDisplayProperty> autoHierarchyPicker;
 
+  private NodeTreeView<NodeDisplayProperty> collapseView = null;
+
+  private ViewPrefsListener prefsListener;
+
   /**
    * TODO: use those options for uncollapsing.
    */
@@ -83,6 +92,7 @@ public class CollapseTool extends ViewSelectionListenerTool
     // Setup the manual collapse controls
     setupManualCollapseGroup(topComposite);
     setupAutoCollapseGroup(topComposite);
+    setupCollapseHierarchy(topComposite);
 
     // content
     collapseMaster = new TableContentProvider<GraphNode>();
@@ -92,6 +102,26 @@ public class CollapseTool extends ViewSelectionListenerTool
     //namedSet.selectSet(BuiltinRelationshipSets.CONTAINER);
 
     return topComposite;
+  }
+
+  private Composite setupCollapseHierarchy(Composite parent) {
+    Composite baseComposite = new Composite(parent, SWT.NONE);
+    baseComposite.setLayoutData(
+        new GridData(SWT.FILL, SWT.FILL, true, true));
+
+    baseComposite.setLayout(new GridLayout(1, false));
+
+    collapseView = new NodeTreeView<NodeDisplayProperty>(baseComposite,
+        SWT.VIRTUAL | SWT.FULL_SELECTION | SWT.BORDER
+        | SWT.H_SCROLL | SWT.V_SCROLL);
+
+    TreeViewer viewer = collapseView.getTreeViewer();
+    viewer.getControl().setLayoutData(
+        new GridData(SWT.FILL, SWT.FILL, true, true));
+
+    NodeTreeViews.configure(viewer);
+
+    return baseComposite;
   }
 
   private void setupManualCollapseGroup(Composite parent) {
@@ -105,18 +135,21 @@ public class CollapseTool extends ViewSelectionListenerTool
     manualGrid.marginHeight = 10;
     manualCollapse.setLayout(manualGrid);
 
-    @SuppressWarnings("unused")
-    Label labelCollapse = createLabel(manualCollapse, "Collapse under");
+    Label collapseLabel = setupLabel(manualCollapse, "Collapse under");
+    collapseLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
 
     masterViewer = new ComboViewer(manualCollapse, SWT.READ_ONLY | SWT.FLAT);
     masterViewer.getCombo().setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
 
-    Button eraseCollapse = createPushButton(manualCollapse, "collapse / erase");
-    Button collapseButton = createPushButton(manualCollapse, "collapse / add");
+    Button eraseCollapse = setupPushButton(manualCollapse, "collapse / erase");
+    eraseCollapse.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 
-    @SuppressWarnings("unused")
-    Label labelUncollapse = createLabel(manualCollapse, "Uncollapse");
+    Button collapseButton = setupPushButton(manualCollapse, "collapse / add");
+    collapseButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+
+    Label uncollapseLabel = setupLabel(manualCollapse, "Uncollapse");
+    uncollapseLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
 
     final Combo uncollapseOpts =
         new Combo(manualCollapse, SWT.READ_ONLY | SWT.FLAT);
@@ -126,9 +159,14 @@ public class CollapseTool extends ViewSelectionListenerTool
     uncollapseOpts.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
 
-    Button deleteCollapse = createPushButton(manualCollapse, "uncollapse / Delete");
-    Button uncollapseButton = createPushButton(manualCollapse, "uncollapse");
-    Button uncollapseAll = createPushButton(manualCollapse, "Uncollapse All Selected");
+    Button deleteCollapse = setupPushButton(manualCollapse, "uncollapse / Delete");
+    deleteCollapse.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+
+    Button uncollapseButton = setupPushButton(manualCollapse, "uncollapse");
+    uncollapseButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+
+    Button uncollapseAll = setupPushButton(manualCollapse, "Uncollapse All Selected");
+    uncollapseAll.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 
     // actions
     eraseCollapse.addSelectionListener(new SelectionAdapter() {
@@ -179,8 +217,8 @@ public class CollapseTool extends ViewSelectionListenerTool
         new HierarchyViewer<NodeDisplayProperty>(autoCollapse, false);
     autoHierarchyPicker.setLayoutData(
         new GridData(SWT.FILL, SWT.CENTER, true, false));
-
-    Button doAutoGrouping = createPushButton(autoCollapse, "Collapse");
+    Button doAutoGrouping = setupPushButton(autoCollapse, "Collapse");
+    doAutoGrouping.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 
     // actions
     doAutoGrouping.addSelectionListener(new SelectionAdapter() {
@@ -191,20 +229,49 @@ public class CollapseTool extends ViewSelectionListenerTool
     });
   }
 
-  private Button createPushButton(Composite parent, String text) {
+  private Label setupLabel(Group manualCollapse, String text) {
+    Label result = new Label(manualCollapse, SWT.NONE);
+    result.setText(text);
+    return result;
+  }
+
+  private Button setupPushButton(Composite parent, String text) {
     Button result = new Button(parent, SWT.PUSH);
     result.setText(text);
-    result.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
     return result;
   }
 
-  private Label createLabel(Composite parent, String text) {
-    Label result = new Label(parent, SWT.NONE);
-    result.setText(text);
-    result.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
-    return result;
+  /////////////////////////////////////
+  // Tool life-cycle methods
+
+  @Override
+  protected void acquireResources() {
+    super.acquireResources();
+
+    updateCollapseView();
+
+    prefsListener = new ViewPrefsListener.Simple()  {
+
+      @Override
+      public void collapseChanged(
+          Collection<CollapseData> created,
+          Collection<CollapseData> removed, Object author) {
+        updateCollapseView();
+      }
+    };
+    getEditor().addViewPrefsListener(prefsListener);
   }
 
+  @Override
+  protected void releaseResources() {
+    if (hasEditor()) {
+      getEditor().removeSelectionChangeListener(this);
+      if (null != prefsListener) {
+        getEditor().removeViewPrefsListener(prefsListener);
+      }
+    }
+    super.releaseResources();
+  }
   @Override
   protected void updateControls() {
     super.updateControls();
@@ -214,6 +281,8 @@ public class CollapseTool extends ViewSelectionListenerTool
     RelationshipSet selectedRelSet = getEditor().getContainerRelSet();
     List<RelSetDescriptor> choices = getEditor().getRelSetChoices();
     autoHierarchyPicker.setInput(hierarchies, selectedRelSet, choices);
+
+    updateCollapseView();
   }
 
   /**
@@ -326,5 +395,17 @@ public class CollapseTool extends ViewSelectionListenerTool
   public void updateSelectionTo(Collection<GraphNode> selection) {
     emptySelection();
     updateSelectedExtend(selection);
+  }
+
+  private void updateCollapseView() {
+    if (!hasEditor()) {
+      return;
+    }
+
+    GraphData<NodeDisplayProperty> hierarchy =
+        new GraphData<NodeDisplayProperty>(
+            getEditor().getNodeDisplayPropertyProvider(),
+            getEditor().getCollapseTreeModel());
+    collapseView.updateData(hierarchy);
   }
 }

@@ -511,6 +511,11 @@ public class ViewPreferences {
     return collapser.buildExposedGraph(graph);
   }
 
+
+  public TreeModel getCollapseTreeModel() {
+    return collapser.getTreeModel();
+  }
+
   public Collection<CollapseData> getCollapseState() {
     Set<GraphNode> masters = collapser.getMasterNodeSet();
     Collection<CollapseData> result = Lists.newArrayListWithExpectedSize(masters.size());

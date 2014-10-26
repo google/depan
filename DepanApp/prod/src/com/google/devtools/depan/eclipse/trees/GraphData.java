@@ -91,7 +91,7 @@ public class GraphData<F> {
     Collection<GraphNode> childList =
         treeData.getSuccessorNodes(parent.getNode());
 
-    buildChildWrapperArray(parent, childList);
+    parent.childs = buildNodeWrapperArray(childList);
     return parent.childs;
   }
 
@@ -123,21 +123,6 @@ public class GraphData<F> {
     return wrapper;
   }
 
-  /**
-   * @param nodes
-   * @return
-   */
-  private void buildChildWrapperArray(
-      NodeWrapper<F> parent,
-      Collection<GraphNode> nodes) {
-
-    parent.childs = buildNodeWrapperArray(nodes);
-  }
-
-  /**
-   * @param nodes
-   * @return
-   */
   @SuppressWarnings("unchecked")
   private NodeWrapper<F>[] buildNodeWrapperArray(Collection<GraphNode> nodes) {
 

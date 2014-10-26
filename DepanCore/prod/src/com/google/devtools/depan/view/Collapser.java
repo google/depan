@@ -49,6 +49,10 @@ public class Collapser {
   public Collapser() {
   }
 
+  public CollapseTreeModel getTreeModel() {
+    return new CollapseTreeModel(this);
+  }
+
   /**
    * Provide the CollapseData for a master node.
    * 

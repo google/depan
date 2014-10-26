@@ -21,6 +21,7 @@ import com.google.devtools.depan.eclipse.persist.XStreamFactory;
 import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
 import com.google.devtools.depan.eclipse.stats.ElementKindStats;
 import com.google.devtools.depan.eclipse.trees.GraphData;
+import com.google.devtools.depan.eclipse.trees.NodeTreeProvider;
 import com.google.devtools.depan.eclipse.utils.ListenerManager;
 import com.google.devtools.depan.eclipse.utils.elementkinds.ElementKindDescriptor;
 import com.google.devtools.depan.eclipse.utils.elementkinds.ElementKindDescriptors;
@@ -186,6 +187,14 @@ public class ViewEditor extends MultiPageEditorPart {
 
   public GraphModel getViewGraph() {
     return viewGraph;
+  }
+
+  public void addViewPrefsListener(ViewPrefsListener listener) {
+    viewInfo.addPrefsListener(listener);
+  }
+
+  public void removeViewPrefsListener(ViewPrefsListener listener) {
+    viewInfo.removePrefsListener(listener);
   }
 
   public GraphModel getParentGraph() {
@@ -411,7 +420,7 @@ public class ViewEditor extends MultiPageEditorPart {
     updateExposedGraph();
 
     hierarchies = new HierarchyCache<NodeDisplayProperty>(
-        viewInfo.getNodeDisplayPropertyProvider(),
+        getNodeDisplayPropertyProvider(),
         getViewGraph());
 
     relSetChoices = RelSetDescriptors.buildViewChoices(viewInfo);
@@ -713,6 +722,10 @@ public class ViewEditor extends MultiPageEditorPart {
   /////////////////////////////////////
   // Graph elements
 
+  public NodeTreeProvider<NodeDisplayProperty> getNodeDisplayPropertyProvider() {
+    return viewInfo.getNodeDisplayPropertyProvider();
+  }
+
   /**
    * Provide a {@code NodeDisplayProperty} for any {@code GraphNode}.
    * If there is no persistent value, synthesize one, but it won't be saved
@@ -819,6 +832,10 @@ public class ViewEditor extends MultiPageEditorPart {
 
   public GraphModel getExposedGraph() {
     return exposedGraph;
+  }
+
+  public TreeModel getCollapseTreeModel() {
+    return viewInfo.getCollapseTreeModel();
   }
 
   public void autoCollapse(DirectedRelationFinder finder, Object author) {
