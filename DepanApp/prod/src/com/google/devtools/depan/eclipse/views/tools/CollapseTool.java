@@ -53,7 +53,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
@@ -94,20 +93,15 @@ public class CollapseTool extends ViewSelectionListenerTool
    */
   private TableContentProvider<GraphNode> collapseMaster = null;
 
-  /** Provides hierarchy to use for autoCollapse operations */
+  private ComboViewer masterViewer;
+
+  /** Provides hierarchy to use for autoCollapse operations. */
   private HierarchyViewer<NodeDisplayProperty> autoHierarchyPicker;
 
+  /** Provides a tree view of the collapseData. */
   private CollapseTreeView<NodeDisplayProperty> collapseView = null;
 
   private ViewPrefsListener prefsListener;
-
-  /**
-   * TODO: use those options for uncollapsing.
-   */
-  private static final String[] uncollapseOptions =
-      new String[] {"normal", "in a new view"};
-
-  private ComboViewer masterViewer;
 
   @Override
   public Control setupComposite(Composite parent) {
@@ -239,17 +233,6 @@ public class CollapseTool extends ViewSelectionListenerTool
     Button collapseButton = setupPushButton(manualCollapse, "collapse / add");
     collapseButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 
-    Label uncollapseLabel = setupLabel(manualCollapse, "Uncollapse");
-    uncollapseLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
-
-    final Combo uncollapseOpts =
-        new Combo(manualCollapse, SWT.READ_ONLY | SWT.FLAT);
-    for (String s : uncollapseOptions) {
-      uncollapseOpts.add(s);
-    }
-    uncollapseOpts.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
-
     Button uncollapseAll = setupPushButton(manualCollapse, "Uncollapse All Selected");
     uncollapseAll.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 
@@ -345,6 +328,7 @@ public class CollapseTool extends ViewSelectionListenerTool
     }
     super.releaseResources();
   }
+
   @Override
   protected void updateControls() {
     super.updateControls();
@@ -364,7 +348,7 @@ public class CollapseTool extends ViewSelectionListenerTool
    *
    * @param finder
    */
-  protected void autoCollapse() {
+  private void autoCollapse() {
     // TODO(leeca): How can this be active if there is no ViewModel
     if (!hasEditor()) {
       return;
@@ -376,21 +360,9 @@ public class CollapseTool extends ViewSelectionListenerTool
   }
 
   /**
-   * uncollapse operation.
-   *
-   * @param selectionIndex index selected in the uncollapse option list.
-   * @param deleteGroup if true, delete the group after uncollapsing.
-   */
-  protected void uncollapseButton(int selectionIndex) {
-    GraphNode master = collapseMaster.getElementAtIndex(
-        masterViewer.getCombo().getSelectionIndex());
-    getEditor().uncollapse(master, null);
-  }
-  
-  /**
    * Uncollapses <b>all</b> selected nodes.
    */
-  protected void uncollapseAllSelected() {
+  private void uncollapseAllSelected() {
     int selectionNumber = masterViewer.getCombo().getItemCount();
     for (int i = 0; i < selectionNumber; i++) {
       GraphNode master = collapseMaster.getElementAtIndex(i);
@@ -405,7 +377,7 @@ public class CollapseTool extends ViewSelectionListenerTool
    *        it will be erased. if not, the selected nodes will be added to the
    *        existing group.
    */
-  protected void collapse(boolean erase) {
+  private void collapse(boolean erase) {
     GraphNode master = collapseMaster.getElementAtIndex(
         masterViewer.getCombo().getSelectionIndex());
     Collection<GraphNode> objects = collapseMaster.getObjects();
