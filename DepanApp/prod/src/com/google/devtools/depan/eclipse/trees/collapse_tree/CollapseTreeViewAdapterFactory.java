@@ -26,7 +26,7 @@ import org.eclipse.ui.model.IWorkbenchAdapter;
 /**
  * @author ycoppel@google.com (Yohann Coppel)
  * 
- * Cloned from NovdeViewAdapterFactory
+ * Cloned from NodeViewAdapterFactory
  * @author leeca@pnambic.com
  *
  * @param <E> Type of data associated to each Node<Element>.
@@ -42,8 +42,9 @@ public class CollapseTreeViewAdapterFactory<E> implements IAdapterFactory {
 
   // suppressWarning, because getAdapter have a Class as parameter, but
   // Class should be parameterized. To update if the IAdapterFactory is updated.
-  @SuppressWarnings("unchecked")
-  public Object getAdapter(Object adaptableObject, Class adapterType) {
+  public Object getAdapter(
+      Object adaptableObject,
+      @SuppressWarnings("rawtypes") Class adapterType) {
     if (adapterType != IWorkbenchAdapter.class) {
       return null;
     }

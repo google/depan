@@ -19,9 +19,9 @@ package com.google.devtools.depan.eclipse.views.tools;
 import com.google.devtools.depan.eclipse.editors.HierarchyCache;
 import com.google.devtools.depan.eclipse.editors.ViewPrefsListener;
 import com.google.devtools.depan.eclipse.trees.GraphData;
-import com.google.devtools.depan.eclipse.trees.NodeTreeViews;
 import com.google.devtools.depan.eclipse.trees.collapse_tree.CollapseTreeProvider;
 import com.google.devtools.depan.eclipse.trees.collapse_tree.CollapseTreeView;
+import com.google.devtools.depan.eclipse.trees.collapse_tree.CollapseTreeWrapperSorter;
 import com.google.devtools.depan.eclipse.utils.HierarchyViewer;
 import com.google.devtools.depan.eclipse.utils.RelationshipSelectorListener;
 import com.google.devtools.depan.eclipse.utils.Resources;
@@ -63,6 +63,9 @@ import java.util.List;
 public class CollapseTool extends ViewSelectionListenerTool
     implements RelationshipSelectorListener {
   
+  private static final CollapseTreeWrapperSorter<NodeDisplayProperty> SORTER =
+      new CollapseTreeWrapperSorter<NodeDisplayProperty>();
+
   private CollapseTreeProvider<NodeDisplayProperty> provider =
       new CollapseTreeProvider<NodeDisplayProperty>() {
 
@@ -160,7 +163,7 @@ public class CollapseTool extends ViewSelectionListenerTool
     viewer.getControl().setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, true));
 
-    NodeTreeViews.configure(viewer);
+    viewer.setSorter(SORTER);
 
     return baseComposite;
   }
