@@ -190,6 +190,13 @@ public class CollapseTreeView<E> {
     }
   }
 
+  /**
+   * Create an array of wrapper objects for a collection of data instances.
+   * 
+   * Called from two places: within {@link #getRoots()} when constructing the
+   * roots, and within {@link CollapseDataWrapper#getChildren()} when building
+   * the children.
+   */
   private static <F> CollapseDataWrapper<F>[] buildCollapseDataWrapperArray(
       Collection<CollapseData> collapseData,
       CollapseTreeProvider<F> provider,
