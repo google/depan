@@ -33,7 +33,8 @@ import org.eclipse.ui.model.IWorkbenchAdapter;
  */
 public class CollapseTreeViewAdapterFactory<E> implements IAdapterFactory {
 
-  private final CollapseTreeViewAdapter<E> treeAdapter = new CollapseTreeViewAdapter<E>();
+  private final CollapseTreeDataAdapter<E> dataAdapter = new CollapseTreeDataAdapter<E>();
+  private final CollapseTreeRootAdapter<E> rootAdapter = new CollapseTreeRootAdapter<E>();
 
   // NodeViewAdapterFactory should be parameterized, but cannot make static
   // reference to the non-static type E
@@ -46,9 +47,11 @@ public class CollapseTreeViewAdapterFactory<E> implements IAdapterFactory {
     if (adapterType != IWorkbenchAdapter.class) {
       return null;
     }
-    if (adaptableObject instanceof CollapseDataWrapper
-        || adaptableObject instanceof CollapseDataWrapperRoot) {
-      return treeAdapter;
+    if (adaptableObject instanceof CollapseDataWrapper) {
+      return dataAdapter;
+    }
+    if (adaptableObject instanceof CollapseDataWrapperRoot) {
+      return rootAdapter;
     }
     return null;
   }

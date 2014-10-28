@@ -13,27 +13,25 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-
 package com.google.devtools.depan.eclipse.trees.collapse_tree;
 
 import com.google.devtools.depan.eclipse.plugins.SourcePluginRegistry;
 import com.google.devtools.depan.eclipse.trees.collapse_tree.CollapseTreeView.CollapseDataWrapper;
-import com.google.devtools.depan.eclipse.trees.collapse_tree.CollapseTreeView.CollapseDataWrapperRoot;
 import com.google.devtools.depan.view.CollapseData;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 
-class CollapseTreeViewAdapter<E> implements IWorkbenchAdapter {
+/**
+ * Adapt {@link CollapseDataWrapper}s for tree display.
+ */
+class CollapseTreeDataAdapter<E> implements IWorkbenchAdapter {
 
   @SuppressWarnings("unchecked")
   @Override
   public Object[] getChildren(Object o) {
     if (o instanceof CollapseDataWrapper) {
       return ((CollapseDataWrapper<E>) o).getChildren();
-    }
-    if (o instanceof CollapseDataWrapperRoot) {
-      return (((CollapseDataWrapperRoot<E>) o).getRoots());
     }
     return new Object[] {};
   }
@@ -45,9 +43,8 @@ class CollapseTreeViewAdapter<E> implements IWorkbenchAdapter {
       CollapseData collapseData = ((CollapseDataWrapper<E>) o).getCollapseData();
       return SourcePluginRegistry.getImageDescriptor(
           collapseData.getMasterNode());
-    } else {
-      return null;
     }
+    return null;
   }
 
   @SuppressWarnings("unchecked")
@@ -55,9 +52,6 @@ class CollapseTreeViewAdapter<E> implements IWorkbenchAdapter {
   public String getLabel(Object o) {
     if (o instanceof CollapseDataWrapper) {
       return getLabel((CollapseDataWrapper<E>) o);
-    }
-    if (o instanceof CollapseDataWrapperRoot) {
-      return "";
     }
     return o.toString();
   }
