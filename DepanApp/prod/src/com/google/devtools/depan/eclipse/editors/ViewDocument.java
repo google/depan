@@ -267,9 +267,8 @@ public class ViewDocument {
     userPrefs.collapse(master, picked, erase, author);
   }
 
-  public void uncollapse(
-      GraphNode master, boolean deleteGroup, Object author) {
-    userPrefs.uncollapse(master, deleteGroup, author);
+  public void uncollapse(GraphNode master, Object author) {
+    userPrefs.uncollapse(master, author);
   }
 
 

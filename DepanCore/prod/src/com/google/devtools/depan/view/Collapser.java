@@ -105,7 +105,7 @@ public class Collapser {
    * @param deleteGroup if true, the collapsed group will be deleted, otherwise
    *        it will be kept, allowing to call collapse() on the root node only.
    */
-  public void uncollapse(GraphNode master, boolean deleteGroup) {
+  public void uncollapse(GraphNode master) {
     CollapseData data = getCollapseData(master);
     if (null == data) {
       return;

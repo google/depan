@@ -549,23 +549,19 @@ public class ViewPreferences {
   }
 
   /**
-   * Collapse a set of nodes under a specific master node.
+   * Uncollapse a specific master node.
    *
    * @param master node to represent collapsed nodes.  Should be in picked.
-   * @param picked collection of nodes to collapse
-   * @param erase erase (and merge) any collapsed nodes in picked as part of
-   * the new collapsed node
    * @param author the initiator for this process
    */
-  public void uncollapse(
-      GraphNode master, boolean deleteGroup, Object author) {
+  public void uncollapse(GraphNode master, Object author) {
     CollapseData removedGroup = collapser.getCollapseData(master);
     if (null == removedGroup) {
       return;
     }
 
     // Perform the collapsing
-    collapser.uncollapse(master, deleteGroup);
+    collapser.uncollapse(master);
 
     fireCollapseChanged(
         CollapseData.EMPTY_LIST,

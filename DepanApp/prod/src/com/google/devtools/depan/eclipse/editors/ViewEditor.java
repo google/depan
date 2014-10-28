@@ -856,8 +856,8 @@ public class ViewEditor extends MultiPageEditorPart {
   }
 
   public void uncollapse(
-      GraphNode master, boolean deleteGroup, Object author) {
-    viewInfo.uncollapse(master, deleteGroup, author);
+      GraphNode master, Object author) {
+    viewInfo.uncollapse(master, author);
   }
 
   private void updateExposedGraph() {

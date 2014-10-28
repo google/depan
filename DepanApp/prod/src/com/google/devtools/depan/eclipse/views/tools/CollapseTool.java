@@ -21,6 +21,7 @@ import com.google.devtools.depan.eclipse.editors.ViewPrefsListener;
 import com.google.devtools.depan.eclipse.trees.GraphData;
 import com.google.devtools.depan.eclipse.trees.collapse_tree.CollapseTreeProvider;
 import com.google.devtools.depan.eclipse.trees.collapse_tree.CollapseTreeView;
+import com.google.devtools.depan.eclipse.trees.collapse_tree.CollapseTreeView.CollapseDataWrapper;
 import com.google.devtools.depan.eclipse.trees.collapse_tree.CollapseTreeWrapperSorter;
 import com.google.devtools.depan.eclipse.utils.HierarchyViewer;
 import com.google.devtools.depan.eclipse.utils.RelationshipSelectorListener;
@@ -34,7 +35,14 @@ import com.google.devtools.depan.view.CollapseData;
 import com.google.devtools.depan.view.CollapseTreeModel;
 import com.google.devtools.depan.view.NodeDisplayProperty;
 
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -50,6 +58,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Menu;
 
 import java.util.Collection;
 import java.util.List;
@@ -160,12 +169,50 @@ public class CollapseTool extends ViewSelectionListenerTool
         provider);
 
     TreeViewer viewer = collapseView.getTreeViewer();
+    setupHierarchyMenu(viewer);
+    viewer.setSorter(SORTER);
     viewer.getControl().setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, true));
 
-    viewer.setSorter(SORTER);
-
     return baseComposite;
+  }
+
+  private void setupHierarchyMenu(final TreeViewer viewer) {
+    MenuManager menuMgr = new MenuManager();
+
+    Menu menu = menuMgr.createContextMenu(viewer.getControl());
+
+    menuMgr.addMenuListener(new IMenuListener() {
+
+      @Override
+      public void menuAboutToShow(IMenuManager manager) {
+        ISelection selection = viewer.getSelection();
+        if (selection.isEmpty()) {
+          return;
+        }
+
+        if (selection instanceof IStructuredSelection) {
+          IStructuredSelection items = (IStructuredSelection) selection;
+          @SuppressWarnings("unchecked")
+          final CollapseDataWrapper<NodeDisplayProperty> data =
+              (CollapseDataWrapper<NodeDisplayProperty>) items.getFirstElement();
+
+          if (null != data.getParent()) {
+            return;
+          }
+
+          manager.add(new Action("uncollapse", IAction.AS_PUSH_BUTTON) {
+            @Override
+            public void run() {
+              getEditor().uncollapse(
+                  data.getCollapseData().getMasterNode(), null);
+            }
+          });
+        }
+      }
+    });
+    menuMgr.setRemoveAllWhenShown(true);
+    viewer.getControl().setMenu(menu);
   }
 
   private void setupManualCollapseGroup(Composite parent) {
@@ -203,12 +250,6 @@ public class CollapseTool extends ViewSelectionListenerTool
     uncollapseOpts.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
 
-    Button deleteCollapse = setupPushButton(manualCollapse, "uncollapse / Delete");
-    deleteCollapse.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
-
-    Button uncollapseButton = setupPushButton(manualCollapse, "uncollapse");
-    uncollapseButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
-
     Button uncollapseAll = setupPushButton(manualCollapse, "Uncollapse All Selected");
     uncollapseAll.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 
@@ -223,18 +264,6 @@ public class CollapseTool extends ViewSelectionListenerTool
       @Override
       public void widgetSelected(SelectionEvent e) {
         collapse(false);
-      }
-    });
-    deleteCollapse.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        uncollapseButton(uncollapseOpts.getSelectionIndex(), true);
-      }
-    });
-    uncollapseButton.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        uncollapseButton(uncollapseOpts.getSelectionIndex(), false);
       }
     });
     uncollapseAll.addSelectionListener(new SelectionAdapter() {
@@ -352,10 +381,10 @@ public class CollapseTool extends ViewSelectionListenerTool
    * @param selectionIndex index selected in the uncollapse option list.
    * @param deleteGroup if true, delete the group after uncollapsing.
    */
-  protected void uncollapseButton(int selectionIndex, boolean deleteGroup) {
+  protected void uncollapseButton(int selectionIndex) {
     GraphNode master = collapseMaster.getElementAtIndex(
         masterViewer.getCombo().getSelectionIndex());
-    getEditor().uncollapse(master, deleteGroup, null);
+    getEditor().uncollapse(master, null);
   }
   
   /**
@@ -365,7 +394,7 @@ public class CollapseTool extends ViewSelectionListenerTool
     int selectionNumber = masterViewer.getCombo().getItemCount();
     for (int i = 0; i < selectionNumber; i++) {
       GraphNode master = collapseMaster.getElementAtIndex(i);
-      getEditor().uncollapse(master, false, null);
+      getEditor().uncollapse(master, null);
     }
   }
 
