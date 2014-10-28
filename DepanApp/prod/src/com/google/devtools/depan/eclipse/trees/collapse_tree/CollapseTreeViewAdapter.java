@@ -26,27 +26,16 @@ import org.eclipse.ui.model.IWorkbenchAdapter;
 
 class CollapseTreeViewAdapter<E> implements IWorkbenchAdapter {
 
-  private final CollapseTreeData<E> treeData;
-
-  public CollapseTreeViewAdapter(CollapseTreeData<E> treeData) {
-    this.treeData = treeData;
-  }
-
   @SuppressWarnings("unchecked")
   @Override
   public Object[] getChildren(Object o) {
     if (o instanceof CollapseDataWrapper) {
-      return getChildren((CollapseDataWrapper<E>) o);
+      return ((CollapseDataWrapper<E>) o).getChildren();
     }
     if (o instanceof CollapseDataWrapperRoot) {
       return (((CollapseDataWrapperRoot<E>) o).getRoots());
     }
     return new Object[] {};
-  }
-
-  private Object[] getChildren(CollapseDataWrapper<E> parent) {
-
-    return treeData.getChildren(parent);
   }
 
   @SuppressWarnings("unchecked")

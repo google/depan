@@ -17,6 +17,7 @@
 package com.google.devtools.depan.eclipse.trees.collapse_tree;
 
 import com.google.devtools.depan.view.CollapseData;
+import com.google.devtools.depan.view.CollapseTreeModel;
 
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.jface.viewers.TreePath;
@@ -24,6 +25,8 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
+
+import java.util.Collection;
 
 /**
  * Provide a tree view of the graph nodes.
@@ -34,96 +37,108 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
  */
 public class CollapseTreeView<E> {
 
+  public static final TreePath[] EMPTY_PATHS = new TreePath[0];
+
+  private final CollapseTreeProvider<E> provider;
+
+  private final TreeViewer treeViewer;
+
+  private CollapseTreeModel treeModel;
+
+  private TreePath[] expandState = EMPTY_PATHS;
+
+  static {
+    CollapseTreeViewAdapterFactory.register();
+  }
+
   /**
-   * Define a generous limit for the number of tree elements to automatically
-   * open for display.  A more refined implementation might offer a user
-   * configured choice, but this prevents the most egregious problems from
-   * over-zealous expansion of tree elements.
-   * 
-   * Approx 8000 nodes takes ~8sec to expand and display.  So a limit of 1000
-   * should keep the initial open time down to ~1sec.
+   * Acquire {@code CollapseTreeView} instances via the factory methods
+   * {@link #buildCollapseTreeView(Composite, int, CollapseTreeProvider)}.
    */
-  public static final int AUTO_EXPAND_LIMIT = 1000;
-
-  private TreeViewer tree;
-  private CollapseTreeData<E> data;
-
-  public CollapseTreeView(Composite parent, int style) {
-    initWidget(parent, style);
+  private CollapseTreeView(
+      TreeViewer treeViewer, CollapseTreeProvider<E> provider) {
+    this.treeViewer = treeViewer;
+    this.provider = provider;
   }
 
-  protected void initWidget(Composite parent, int style) {
-    tree = new TreeViewer(parent, style);
-    tree.setLabelProvider(new WorkbenchLabelProvider());
-    tree.setContentProvider(new BaseWorkbenchContentProvider());
+  public static <F> CollapseTreeView<F> buildCollapseTreeView(
+      Composite parent, int style, CollapseTreeProvider<F> provider) {
+    TreeViewer result = new TreeViewer(parent, style);
+    result.setLabelProvider(new WorkbenchLabelProvider());
+    result.setContentProvider(new BaseWorkbenchContentProvider());
+    return new CollapseTreeView<F>(result, provider);
   }
 
-  public void updateData(CollapseTreeData<E> fresh) {
-    data = fresh;
+  public TreeViewer getTreeViewer() {
+    return treeViewer;
+  }
+
+  public void updateData(CollapseTreeModel collapseTreeModel) {
+    treeModel = collapseTreeModel;
 
     updateTree();
     updateExpandState();
     //$ NEEDED??
-    tree.refresh();
+    treeViewer.refresh();
   }
 
   private void updateTree() {
-    CollapseDataWrapperRoot<E> roots = data.computeRoots();
-    tree.setInput(roots);
+    Collection<CollapseData> roots = treeModel.computeRoots();
+    CollapseDataWrapper<E>[] rootArray =
+        buildCollapseDataWrapperArray(roots, provider, null);
+    CollapseDataWrapperRoot<E> wrapper =
+        new CollapseDataWrapperRoot<E>(rootArray);
+    treeViewer.setInput(wrapper);
   }
 
+  /////////////////////////////////////
+  // Expansion state
+
   public void collapseAll() {
-    tree.collapseAll();
+    treeViewer.collapseAll();
   }
 
   public void expandAll() {
-    tree.expandAll();
+    treeViewer.expandAll();
   }
 
   private void updateExpandState() {
-    TreePath[] expandState = data.getExpandState();
     if (expandState.length > 0) {
       getTreeViewer().setExpandedTreePaths(expandState);
       return;
-    } else {
-      getTreeViewer().expandToLevel(1);
-    }
-    data.saveExpandState(getTreeViewer().getExpandedTreePaths());
+    } 
+
+    getTreeViewer().expandToLevel(1);
+    saveExpandState(getTreeViewer().getExpandedTreePaths());
   }
 
-  public TreeViewer getTreeViewer() {
-    return tree;
+  public TreePath[] getExpandState() {
+    return expandState;
   }
 
-  /**
-   * Gives the NodeWrapper containing the given node. Useful for update
-   * methods when we just have a node, but need the object actually contained in
-   * a tree for example.
-   *
-   * @param node the node
-   * @return the NodeWrapper<F> containing the given node.
-   */
-  public CollapseDataWrapper<E> getCollapseDataWrapper(
-      CollapseData collapseData) {
-    return data.getCollapseDataWrapper(collapseData);
+  public void saveExpandState(TreePath[] expandState) {
+    this.expandState = expandState;
   }
+
+  /////////////////////////////////////
+  // Data wrapper type
 
   /**
    * @author ycoppel@google.com (Yohann Coppel)
    *
-   * @param <E> Type of data associated to each Node<Element>.
+   * @param <E> Type of data associated to each CollapseData<Element>.
    */
   public static class CollapseDataWrapper<E> extends PlatformObject {
     private final CollapseData collapseData;
-    private final E content;
+    private final CollapseTreeProvider<E> provider;
     public final CollapseDataWrapper<E> parent;
 
-    public CollapseDataWrapper(
+    private CollapseDataWrapper(
         CollapseData collapseData,
-        E content,
+        CollapseTreeProvider<E> provider,
         CollapseDataWrapper<E> parent) {
       this.collapseData = collapseData;
-      this.content = content;
+      this.provider = provider;
       this.parent= parent;
     }
 
@@ -132,11 +147,20 @@ public class CollapseTreeView<E> {
     }
 
     public E getContent() {
-      return content;
+      return provider.getObject(collapseData);
     }
 
     public CollapseDataWrapper<E> getParent() {
       return parent;
+    }
+
+    public CollapseDataWrapper<E>[] getChildren() {
+      Collection<CollapseData> childrenData =
+          CollapseTreeModel.getChildrenData(collapseData);
+
+      CollapseDataWrapper<E>[] result =
+          buildCollapseDataWrapperArray(childrenData, provider, this);
+      return result;
     }
 
     @Override
@@ -144,6 +168,10 @@ public class CollapseTreeView<E> {
       return getCollapseData().toString();
     }
   }
+
+  @SuppressWarnings("rawtypes")
+  private static final CollapseDataWrapper[] LEAF_KIDS =
+      new CollapseDataWrapper[0];
 
   /**
    * @param <E> Type of data associated to each Node<Element>.
@@ -160,5 +188,29 @@ public class CollapseTreeView<E> {
     public CollapseDataWrapper<E>[] getRoots() {
       return roots;
     }
+  }
+
+  private static <F> CollapseDataWrapper<F>[] buildCollapseDataWrapperArray(
+      Collection<CollapseData> collapseData,
+      CollapseTreeProvider<F> provider,
+      CollapseDataWrapper<F> parent) {
+
+    // All empty children lists look the same,
+    // so early exit with the singleton
+    if (0 == collapseData.size()) {
+      return LEAF_KIDS;
+    }
+
+    @SuppressWarnings("unchecked")
+    CollapseDataWrapper<F>[] result
+        = new CollapseDataWrapper[collapseData.size()];
+    int index = 0;
+    for (CollapseData node : collapseData) {
+      CollapseDataWrapper<F> nodeWrapper =
+          new CollapseDataWrapper<F>(node, provider, parent);
+      result[index] = nodeWrapper;
+      index++;
+    }
+    return result;
   }
 }

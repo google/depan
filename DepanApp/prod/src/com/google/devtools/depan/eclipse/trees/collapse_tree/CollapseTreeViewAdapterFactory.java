@@ -33,17 +33,11 @@ import org.eclipse.ui.model.IWorkbenchAdapter;
  */
 public class CollapseTreeViewAdapterFactory<E> implements IAdapterFactory {
 
-  private final CollapseTreeViewAdapter<E> treeAdapter;
-
-  public CollapseTreeViewAdapterFactory(CollapseTreeViewAdapter<E> treeAdapter) {
-    this.treeAdapter = treeAdapter;
-    
-  }
+  private final CollapseTreeViewAdapter<E> treeAdapter = new CollapseTreeViewAdapter<E>();
 
   // NodeViewAdapterFactory should be parameterized, but cannot make static
   // reference to the non-static type E
-  @SuppressWarnings("unchecked")
-  private static CollapseTreeViewAdapterFactory instance = null;
+  private static CollapseTreeViewAdapterFactory<?> instance = null;
 
   // suppressWarning, because getAdapter have a Class as parameter, but
   // Class should be parameterized. To update if the IAdapterFactory is updated.
@@ -63,9 +57,9 @@ public class CollapseTreeViewAdapterFactory<E> implements IAdapterFactory {
     return new Class[] {IWorkbenchAdapter.class};
   }
 
-  protected static <E> void register(CollapseTreeViewAdapter<E> treeAdapter) {
+  protected static <E> void register() {
     if (null == instance) {
-      instance = new CollapseTreeViewAdapterFactory<E>(treeAdapter);
+      instance = new CollapseTreeViewAdapterFactory<E>();
     }
     Platform.getAdapterManager()
         .registerAdapters(instance, CollapseDataWrapper.class);

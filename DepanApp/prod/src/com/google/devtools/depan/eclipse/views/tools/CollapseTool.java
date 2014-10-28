@@ -20,7 +20,6 @@ import com.google.devtools.depan.eclipse.editors.HierarchyCache;
 import com.google.devtools.depan.eclipse.editors.ViewPrefsListener;
 import com.google.devtools.depan.eclipse.trees.GraphData;
 import com.google.devtools.depan.eclipse.trees.NodeTreeViews;
-import com.google.devtools.depan.eclipse.trees.collapse_tree.CollapseTreeData;
 import com.google.devtools.depan.eclipse.trees.collapse_tree.CollapseTreeProvider;
 import com.google.devtools.depan.eclipse.trees.collapse_tree.CollapseTreeView;
 import com.google.devtools.depan.eclipse.utils.HierarchyViewer;
@@ -63,6 +62,19 @@ import java.util.List;
  */
 public class CollapseTool extends ViewSelectionListenerTool
     implements RelationshipSelectorListener {
+  
+  private CollapseTreeProvider<NodeDisplayProperty> provider =
+      new CollapseTreeProvider<NodeDisplayProperty>() {
+
+    @Override
+    public NodeDisplayProperty getObject(CollapseData collapseData) {
+      if (hasEditor()) {
+        return null;
+      }
+      GraphNode node = collapseData.getMasterNode();
+      return getEditor().getNodeProperty(node);
+    }
+  };
 
   /**
    * Content provider for selected nodes. Fill the list of selected nodes used
@@ -138,9 +150,11 @@ public class CollapseTool extends ViewSelectionListenerTool
     });
     expandButton.setLayoutData(new RowData());
 
-    collapseView = new CollapseTreeView<NodeDisplayProperty>(baseComposite,
+    collapseView = CollapseTreeView.buildCollapseTreeView(
+        baseComposite,
         SWT.VIRTUAL | SWT.FULL_SELECTION | SWT.BORDER
-        | SWT.H_SCROLL | SWT.V_SCROLL);
+        | SWT.H_SCROLL | SWT.V_SCROLL,
+        provider);
 
     TreeViewer viewer = collapseView.getTreeViewer();
     viewer.getControl().setLayoutData(
@@ -429,18 +443,7 @@ public class CollapseTool extends ViewSelectionListenerTool
       return;
     }
 
-    CollapseTreeProvider<NodeDisplayProperty> prov = new CollapseTreeProvider<NodeDisplayProperty>() {
-
-      @Override
-      public NodeDisplayProperty getObject(CollapseData collapseData) {
-        GraphNode node = collapseData.getMasterNode();
-        return getEditor().getNodeProperty(node);
-      }
-    };
-
     CollapseTreeModel collapseTreeModel = getEditor().getCollapseTreeModel();
-    CollapseTreeData<NodeDisplayProperty> data =
-          new CollapseTreeData<NodeDisplayProperty>(prov, collapseTreeModel);
-    collapseView.updateData(data);
+    collapseView.updateData(collapseTreeModel);
   }
 }
