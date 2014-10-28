@@ -42,6 +42,7 @@ import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.RelationshipSet;
 import com.google.devtools.depan.view.CollapseData;
+import com.google.devtools.depan.view.CollapseTreeModel;
 import com.google.devtools.depan.view.EdgeDisplayProperty;
 import com.google.devtools.depan.view.NodeDisplayProperty;
 import com.google.devtools.depan.view.TreeModel;
@@ -834,7 +835,7 @@ public class ViewEditor extends MultiPageEditorPart {
     return exposedGraph;
   }
 
-  public TreeModel getCollapseTreeModel() {
+  public CollapseTreeModel getCollapseTreeModel() {
     return viewInfo.getCollapseTreeModel();
   }
 

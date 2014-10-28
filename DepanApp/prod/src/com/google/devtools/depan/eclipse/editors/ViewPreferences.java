@@ -25,6 +25,7 @@ import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.RelationshipSet;
 import com.google.devtools.depan.view.CollapseData;
+import com.google.devtools.depan.view.CollapseTreeModel;
 import com.google.devtools.depan.view.Collapser;
 import com.google.devtools.depan.view.EdgeDisplayProperty;
 import com.google.devtools.depan.view.NodeDisplayProperty;
@@ -512,7 +513,7 @@ public class ViewPreferences {
   }
 
 
-  public TreeModel getCollapseTreeModel() {
+  public CollapseTreeModel getCollapseTreeModel() {
     return collapser.getTreeModel();
   }
 

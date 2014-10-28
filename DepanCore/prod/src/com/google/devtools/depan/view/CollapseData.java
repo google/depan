@@ -82,6 +82,16 @@ public class CollapseData {
     return childrenCollapse;
   }
 
+  public CollapseData getCollapseData(GraphNode node) {
+    // Someday it might be worth using a hash set for the lookup.
+    for (CollapseData data : childrenCollapse) {
+      if (data.getMasterNode() == node) {
+        return data;
+      }
+    }
+    return null;
+  }
+
   /**
    * Add all nodes included in this collapse data, including any
    * nested collapse data.  The master node is included in the member nodes.

@@ -19,8 +19,10 @@ package com.google.devtools.depan.eclipse.views.tools;
 import com.google.devtools.depan.eclipse.editors.HierarchyCache;
 import com.google.devtools.depan.eclipse.editors.ViewPrefsListener;
 import com.google.devtools.depan.eclipse.trees.GraphData;
-import com.google.devtools.depan.eclipse.trees.NodeTreeView;
 import com.google.devtools.depan.eclipse.trees.NodeTreeViews;
+import com.google.devtools.depan.eclipse.trees.collapse_tree.CollapseTreeData;
+import com.google.devtools.depan.eclipse.trees.collapse_tree.CollapseTreeProvider;
+import com.google.devtools.depan.eclipse.trees.collapse_tree.CollapseTreeView;
 import com.google.devtools.depan.eclipse.utils.HierarchyViewer;
 import com.google.devtools.depan.eclipse.utils.RelationshipSelectorListener;
 import com.google.devtools.depan.eclipse.utils.Resources;
@@ -30,6 +32,7 @@ import com.google.devtools.depan.eclipse.views.ViewSelectionListenerTool;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.RelationshipSet;
 import com.google.devtools.depan.view.CollapseData;
+import com.google.devtools.depan.view.CollapseTreeModel;
 import com.google.devtools.depan.view.NodeDisplayProperty;
 
 import org.eclipse.jface.viewers.ComboViewer;
@@ -40,6 +43,8 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowData;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -68,7 +73,7 @@ public class CollapseTool extends ViewSelectionListenerTool
   /** Provides hierarchy to use for autoCollapse operations */
   private HierarchyViewer<NodeDisplayProperty> autoHierarchyPicker;
 
-  private NodeTreeView<NodeDisplayProperty> collapseView = null;
+  private CollapseTreeView<NodeDisplayProperty> collapseView = null;
 
   private ViewPrefsListener prefsListener;
 
@@ -111,7 +116,29 @@ public class CollapseTool extends ViewSelectionListenerTool
 
     baseComposite.setLayout(new GridLayout(1, false));
 
-    collapseView = new NodeTreeView<NodeDisplayProperty>(baseComposite,
+    Composite options = new Composite(baseComposite, SWT.NONE);
+    options.setLayout(new RowLayout());
+    options.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+
+    Button collapseButton = setupPushButton(options, "collapseAll");
+    collapseButton.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        collapseView.collapseAll();
+      }
+    });
+    collapseButton.setLayoutData(new RowData());
+
+    Button expandButton = setupPushButton(options, "expandAll");
+    expandButton.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        collapseView.expandAll();
+      }
+    });
+    expandButton.setLayoutData(new RowData());
+
+    collapseView = new CollapseTreeView<NodeDisplayProperty>(baseComposite,
         SWT.VIRTUAL | SWT.FULL_SELECTION | SWT.BORDER
         | SWT.H_SCROLL | SWT.V_SCROLL);
 
@@ -402,10 +429,18 @@ public class CollapseTool extends ViewSelectionListenerTool
       return;
     }
 
-    GraphData<NodeDisplayProperty> hierarchy =
-        new GraphData<NodeDisplayProperty>(
-            getEditor().getNodeDisplayPropertyProvider(),
-            getEditor().getCollapseTreeModel());
-    collapseView.updateData(hierarchy);
+    CollapseTreeProvider<NodeDisplayProperty> prov = new CollapseTreeProvider<NodeDisplayProperty>() {
+
+      @Override
+      public NodeDisplayProperty getObject(CollapseData collapseData) {
+        GraphNode node = collapseData.getMasterNode();
+        return getEditor().getNodeProperty(node);
+      }
+    };
+
+    CollapseTreeModel collapseTreeModel = getEditor().getCollapseTreeModel();
+    CollapseTreeData<NodeDisplayProperty> data =
+          new CollapseTreeData<NodeDisplayProperty>(prov, collapseTreeModel);
+    collapseView.updateData(data);
   }
 }

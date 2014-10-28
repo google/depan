@@ -18,7 +18,6 @@ package com.google.devtools.depan.view;
 import com.google.devtools.depan.model.GraphNode;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 import java.util.Collection;
 import java.util.Set;
@@ -28,7 +27,7 @@ import java.util.Set;
  * 
  * @author <a href='mailto:leeca@google.com'>Lee Carver</a>
  */
-public class CollapseTreeModel implements TreeModel {
+public class CollapseTreeModel {
 
   /**
    * Index of interior nodes to their successors.
@@ -39,94 +38,48 @@ public class CollapseTreeModel implements TreeModel {
     this.collapser = collapser;
   }
 
-  @Override
-  public SuccessorEdges getSuccessors(GraphNode node) {
-    // Provide suitable factory when necessary.
-    return SuccessorEdges.EMPTY;
+
+  public Collection<CollapseData> computeRoots() {
+    Set<GraphNode> masterNodes = collapser.getMasterNodeSet();
+    Collection<CollapseData> result =
+        Lists.newArrayListWithExpectedSize(masterNodes.size());
+
+    for (GraphNode node : masterNodes) {
+      result.add(collapser.getCollapseData(node));
+    }
+    return result ;
   }
 
-  @Override
-  public Collection<GraphNode> getSuccessorNodes(GraphNode node) {
+  /////////////////////////////////////
+  // Factory methods
 
-    CollapseData data = collapser.getCollapseData(node);
+  public static Collection<CollapseData> getChildrenData(CollapseData data) {
+
     if (null == data) {
-      return GraphNode.EMPTY_NODE_LIST;
+      return CollapseData.EMPTY_LIST;
     }
 
-    int size = data.getChildrenNodes().size();
-    Collection<GraphNode> result =
-        Lists.newArrayListWithExpectedSize(size);
-    result.addAll(getDirectChildren(node, data));
-
-    return result;
-  }
-
-  private Collection<GraphNode> getDirectChildren(
-      GraphNode node, CollapseData data) {
     Collection<GraphNode> childrenNodes = data.getChildrenNodes();
-    Collection<GraphNode> result =
-        Lists.newArrayListWithCapacity(childrenNodes.size());
-    for (GraphNode child : childrenNodes) {
-      // Oct-14: Child list currently includes master,
-      // same as source of collapse data (node),
-      // but that leads to recursive trees
-      if (node != child) {
-        result.add(child);
-      }
-    }
-    return result;
-  }
-
-  @Override
-  public Collection<GraphNode> computeRoots() {
-    return collapser.getMasterNodeSet();
-  }
-
-  /**
-   * Provide the number of interior nodes in this tree.
-   *
-   * @return number of nodes in this tree
-   */
-  @Override
-  public int countInteriorNodes() {
-    int result = 0;
-
-    for (GraphNode root: computeRoots()) {
-      result += countTree(root);
+    int size = childrenNodes.size();
+    Collection<CollapseData> result =
+        Lists.newArrayListWithExpectedSize(size);
+    for (GraphNode node : childrenNodes) {
+      result.add(loadCollapseData(data, node));
     }
 
     return result;
   }
 
-  private int countTree(GraphNode tree) {
-    CollapseData data = collapser.getCollapseData(tree);
-    int result = 0;
-    for (CollapseData desc : data.getChildrenCollapse()) {
-      result += countTree(desc.getMasterNode());
+  private static CollapseData loadCollapseData(
+      CollapseData data, GraphNode node) {
+    CollapseData collapseNode = data.getCollapseData(node);
+    if (null != collapseNode) {
+      return collapseNode;
     }
-    return result; 
-  }
-
-
-  @Override
-  public Set<GraphNode> computeTreeNodes() {
-    Set<GraphNode> result = Sets.newHashSet();
-
-    for (GraphNode root: computeRoots()) {
-      CollapseData data = collapser.getCollapseData(root);
-      data.addMemberNodes(result);
+    if (data.getChildrenNodes().contains(node)) {
+      return new CollapseData(
+          node, GraphNode.EMPTY_NODE_LIST, CollapseData.EMPTY_LIST);
     }
-
-    return result;
-  }
-
-  /**
-   * Provide the number of nodes in this tree.
-   *
-   * @return number of nodes in this tree
-   */
-  @Override
-  public int countTreeNodes() {
-    return computeTreeNodes().size();
+    return null;
   }
 }
