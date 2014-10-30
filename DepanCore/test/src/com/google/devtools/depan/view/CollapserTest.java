@@ -178,16 +178,16 @@ public class CollapserTest {
     assertGraphNodesEdges(collapser.buildExposedGraph(testGraph), 1, 0);
 
     // Uncollapse each, and check nodes and edges
-    collapser.uncollapse(srcNodes[0], false);
+    collapser.uncollapse(srcNodes[0]);
     assertGraphNodesEdges(collapser.buildExposedGraph(testGraph), 2, 1);
 
-    collapser.uncollapse(srcNodes[1], false);
+    collapser.uncollapse(srcNodes[1]);
     assertGraphNodesEdges(collapser.buildExposedGraph(testGraph), 3, 3);
 
-    collapser.uncollapse(srcNodes[2], false);
+    collapser.uncollapse(srcNodes[2]);
     assertGraphNodesEdges(collapser.buildExposedGraph(testGraph), 4, 6);
 
-    collapser.uncollapse(srcNodes[3], false);
+    collapser.uncollapse(srcNodes[3]);
     assertGraphNodesEdges(collapser.buildExposedGraph(testGraph), 5, 10);
   }
 }
