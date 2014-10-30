@@ -143,7 +143,7 @@ public class CollapseTool extends ViewSelectionListenerTool
     ToolBar rightOptions = new ToolBar(optionsSection, SWT.NONE | SWT.FLAT | SWT.RIGHT);
     rightOptions.setLayoutData(new GridData(SWT.END, SWT.FILL, true, false));
 
-    ToolItem collapseButton = setupCollapseAllPushIcon(rightOptions, "collapseAll");
+    ToolItem collapseButton = setupCollapseAllPushIcon(rightOptions);
     collapseButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -151,7 +151,7 @@ public class CollapseTool extends ViewSelectionListenerTool
       }
     });
 
-    ToolItem expandButton = setupPushToolItem(rightOptions, "expandAll");
+    ToolItem expandButton = setupExpandAllPushIcon(rightOptions);
     expandButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -301,17 +301,17 @@ public class CollapseTool extends ViewSelectionListenerTool
   }
 
 
-  private ToolItem setupPushToolItem(ToolBar parent, String text) {
-    ToolItem result = new ToolItem(parent, SWT.PUSH);
-    result.setText(text);
-    return result;
-  }
-
-  private ToolItem setupCollapseAllPushIcon(ToolBar parent, String text) {
+  private ToolItem setupCollapseAllPushIcon(ToolBar parent) {
     ToolItem result = new ToolItem(parent, SWT.PUSH | SWT.FLAT);
     Image icon = PlatformUI.getWorkbench().getSharedImages().getImage(
         ISharedImages.IMG_ELCL_COLLAPSEALL);
     result.setImage(icon);
+    return result;
+  }
+
+  private ToolItem setupExpandAllPushIcon(ToolBar parent) {
+    ToolItem result = new ToolItem(parent, SWT.PUSH | SWT.FLAT);
+    result.setImage(Resources.IMAGE_EXPANDALL);
     return result;
   }
 

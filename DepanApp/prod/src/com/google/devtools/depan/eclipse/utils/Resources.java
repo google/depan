@@ -55,6 +55,8 @@ public final class Resources {
       Tools.getImageFromPath("icons/infos.png");
   public static final Image IMAGE_COLLAPSE =
     Tools.getImageFromPath("icons/collapse.png");
+  public static final Image IMAGE_EXPANDALL =
+    Tools.getImageFromPath("icons/expandall.png");
 
   // editor names
   public static final String NAME_NODEEDITOR = "Node editor";
