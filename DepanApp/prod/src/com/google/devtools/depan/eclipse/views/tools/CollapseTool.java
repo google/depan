@@ -50,14 +50,16 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowData;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.PlatformUI;
 
 import java.util.Collection;
 import java.util.List;
@@ -134,27 +136,28 @@ public class CollapseTool extends ViewSelectionListenerTool
 
     baseComposite.setLayout(new GridLayout(1, false));
 
-    Composite options = new Composite(baseComposite, SWT.NONE);
-    options.setLayout(new RowLayout());
-    options.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+    Composite optionsSection = new Composite(baseComposite, SWT.NONE);
+    optionsSection.setLayout(new GridLayout(1, false));
+    optionsSection.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
-    Button collapseButton = setupPushButton(options, "collapseAll");
+    ToolBar rightOptions = new ToolBar(optionsSection, SWT.NONE | SWT.FLAT | SWT.RIGHT);
+    rightOptions.setLayoutData(new GridData(SWT.END, SWT.FILL, true, false));
+
+    ToolItem collapseButton = setupCollapseAllPushIcon(rightOptions, "collapseAll");
     collapseButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
         collapseView.collapseAll();
       }
     });
-    collapseButton.setLayoutData(new RowData());
 
-    Button expandButton = setupPushButton(options, "expandAll");
+    ToolItem expandButton = setupPushToolItem(rightOptions, "expandAll");
     expandButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
         collapseView.expandAll();
       }
     });
-    expandButton.setLayoutData(new RowData());
 
     collapseView = CollapseTreeView.buildCollapseTreeView(
         baseComposite,
@@ -294,6 +297,21 @@ public class CollapseTool extends ViewSelectionListenerTool
   private Button setupPushButton(Composite parent, String text) {
     Button result = new Button(parent, SWT.PUSH);
     result.setText(text);
+    return result;
+  }
+
+
+  private ToolItem setupPushToolItem(ToolBar parent, String text) {
+    ToolItem result = new ToolItem(parent, SWT.PUSH);
+    result.setText(text);
+    return result;
+  }
+
+  private ToolItem setupCollapseAllPushIcon(ToolBar parent, String text) {
+    ToolItem result = new ToolItem(parent, SWT.PUSH | SWT.FLAT);
+    Image icon = PlatformUI.getWorkbench().getSharedImages().getImage(
+        ISharedImages.IMG_ELCL_COLLAPSEALL);
+    result.setImage(icon);
     return result;
   }
 
