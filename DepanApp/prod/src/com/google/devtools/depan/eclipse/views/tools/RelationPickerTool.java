@@ -284,7 +284,11 @@ public class RelationPickerTool extends ViewEditorTool {
     if (null != set) {
       selectFinder(set);
     }
-    getEditor().setDisplayRelationSet(set);
+
+    // Persist changed selection
+    if (!hasEditor()) {
+      getEditor().setDisplayRelationSet(set);
+    }
   }
 
   /**
