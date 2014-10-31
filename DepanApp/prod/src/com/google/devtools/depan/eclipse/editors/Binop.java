@@ -17,7 +17,6 @@
 package com.google.devtools.depan.eclipse.editors;
 
 import com.google.devtools.depan.eclipse.utils.Resources;
-import com.google.devtools.depan.eclipse.utils.Tools;
 import com.google.devtools.depan.util.BinaryOperators;
 
 import org.eclipse.core.runtime.IAdapterFactory;
@@ -40,7 +39,6 @@ import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.part.WorkbenchPart;
-import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 
 /**
@@ -110,7 +108,7 @@ public class Binop<T extends BinaryOperators<T>>
     Button and = new Button(buttons, SWT.PUSH);
     and.setText("AND");
     and.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-    and.setImage(Tools.getImageFromPath("icons/and.png"));
+    and.setImage(Resources.IMAGE_AND);
     and.addSelectionListener(new SelectionListener() {
       public void widgetDefaultSelected(SelectionEvent e) {
         newTree(Operators.AND);
@@ -124,7 +122,7 @@ public class Binop<T extends BinaryOperators<T>>
     Button or = new Button(buttons, SWT.PUSH);
     or.setText("OR");
     or.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-    or.setImage(Tools.getImageFromPath("icons/or.png"));
+    or.setImage(Resources.IMAGE_OR);
     or.addSelectionListener(new SelectionListener() {
       public void widgetDefaultSelected(SelectionEvent e) {
         newTree(Operators.OR);
@@ -138,7 +136,7 @@ public class Binop<T extends BinaryOperators<T>>
     Button xor = new Button(buttons, SWT.PUSH);
     xor.setText("XOR");
     xor.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-    xor.setImage(Tools.getImageFromPath("icons/xor.png"));
+    xor.setImage(Resources.IMAGE_XOR);
     xor.addSelectionListener(new SelectionListener() {
       public void widgetDefaultSelected(SelectionEvent e) {
         newTree(Operators.XOR);
@@ -152,7 +150,7 @@ public class Binop<T extends BinaryOperators<T>>
     Button not = new Button(buttons, SWT.PUSH);
     not.setText("NOT");
     not.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-    not.setImage(Tools.getImageFromPath("icons/not.png"));
+    not.setImage(Resources.IMAGE_NOT);
     not.addSelectionListener(new SelectionListener() {
       public void widgetDefaultSelected(SelectionEvent e) {
         newTree(Operators.NOT);
@@ -468,11 +466,11 @@ public class Binop<T extends BinaryOperators<T>>
     @SuppressWarnings("unchecked")
     public ImageDescriptor getImageDescriptor(Object object) {
       if (object instanceof BinTree) {
-        return AbstractUIPlugin.imageDescriptorFromPlugin(
-            Resources.PLUGIN_ID, getIcon(((BinTree) object).op));
-      } else {
-        return null;
+        String icon = getIcon(((BinTree) object).op);
+        return Resources.getImageDescriptor(icon);
       }
+
+      return null;
     }
 
     private String getIcon(Operators o) {

@@ -18,6 +18,7 @@ package com.google.devtools.depan.eclipse.utils;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.Bundle;
 
 import java.net.URL;
@@ -32,31 +33,39 @@ public final class Resources {
 
   // icons
   public static final Image IMAGE_NODEEDITOR =
-      Tools.getImageFromPath("icons/nodeeditor.png");
+      Resources.getImageFromPath("icons/nodeeditor.png");
   public static final Image IMAGE_EDGEEDITOR =
-      Tools.getImageFromPath("icons/edgeeditor.png");
+      Resources.getImageFromPath("icons/edgeeditor.png");
   public static final Image IMAGE_SELECTIONEDITOR =
-      Tools.getImageFromPath("icons/selectioneditor.png");
+      Resources.getImageFromPath("icons/selectioneditor.png");
   public static final Image IMAGE_RELATIONPICKER =
-      Tools.getImageFromPath("icons/relpicker.png");
+      Resources.getImageFromPath("icons/relpicker.png");
   public static final Image IMAGE_HANDTOOL =
-      Tools.getImageFromPath("icons/hand.png");
+      Resources.getImageFromPath("icons/hand.png");
   public static final Image IMAGE_PICKTOOL =
-    Tools.getImageFromPath("icons/arrow.png");
+      Resources.getImageFromPath("icons/arrow.png");
   public static final Image IMAGE_REFACTORING =
-      Tools.getImageFromPath("icons/refactoring.png");
+      Resources.getImageFromPath("icons/refactoring.png");
   public static final Image IMAGE_LAYOUT =
-      Tools.getImageFromPath("icons/layout.png");
+      Resources.getImageFromPath("icons/layout.png");
   public static final Image IMAGE_SUBLAYOUT =
-      Tools.getImageFromPath("icons/sublayout.png");
+      Resources.getImageFromPath("icons/sublayout.png");
   public static final Image IMAGE_ZOOM =
-      Tools.getImageFromPath("icons/zoom.png");
+      Resources.getImageFromPath("icons/zoom.png");
   public static final Image IMAGE_INFOS =
-      Tools.getImageFromPath("icons/infos.png");
+      Resources.getImageFromPath("icons/infos.png");
   public static final Image IMAGE_COLLAPSE =
-    Tools.getImageFromPath("icons/collapse.png");
+      Resources.getImageFromPath("icons/collapse.png");
   public static final Image IMAGE_EXPANDALL =
-    Tools.getImageFromPath("icons/expandall.png");
+      Resources.getImageFromPath("icons/expandall.png");
+  public static final Image IMAGE_AND =
+      Resources.getImageFromPath("icons/and.png");
+  public static final Image IMAGE_OR =
+      Resources.getImageFromPath("icons/or.png");
+  public static final Image IMAGE_XOR =
+      Resources.getImageFromPath("icons/xor.png");
+  public static final Image IMAGE_NOT =
+      Resources.getImageFromPath("icons/not.png");
 
   // editor names
   public static final String NAME_NODEEDITOR = "Node editor";
@@ -72,12 +81,12 @@ public final class Resources {
   public static final String NAME_COLLAPSE = "Collapse operations";
 
   public static final Image IMAGE_ON =
-      Tools.getImageFromPath("icons/brkpi_obj.gif");
+      Resources.getImageFromPath("icons/brkpi_obj.gif");
   public static final Image IMAGE_OFF =
-      Tools.getImageFromPath("icons/brkpd_obj.gif");
+      Resources.getImageFromPath("icons/brkpd_obj.gif");
 
   public static final Image IMAGE_DEFAULT =
-    Tools.getImageFromPath("icons/sample.gif");
+    Resources.getImageFromPath("icons/sample.gif");
   public static final ImageDescriptor IMAGE_DESC_DEFAULT =
       ImageDescriptor.createFromImage(IMAGE_DEFAULT);
 
@@ -96,5 +105,15 @@ public final class Resources {
     } catch (Exception e) {
       return IMAGE_DESC_DEFAULT;
     }
+  }
+
+  public static ImageDescriptor getImageDescriptor(String path) {
+    return AbstractUIPlugin.imageDescriptorFromPlugin(
+          PLUGIN_ID, path);
+    }
+
+  public static Image getImageFromPath(String path) {
+    return AbstractUIPlugin.imageDescriptorFromPlugin(
+        PLUGIN_ID, path).createImage();
   }
 }

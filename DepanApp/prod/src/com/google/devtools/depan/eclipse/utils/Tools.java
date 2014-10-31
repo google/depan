@@ -24,7 +24,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 import java.awt.Color;
 
@@ -48,11 +47,6 @@ public abstract class Tools {
       s[i++] = lowercase ? o.toString().toLowerCase() : o.toString();
     }
     return s;
-  }
-
-  public static Image getImageFromPath(String path) {
-    return AbstractUIPlugin.imageDescriptorFromPlugin(
-        Resources.PLUGIN_ID, path).createImage();
   }
 
   public static String getRgb(Color color) {
