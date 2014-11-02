@@ -864,6 +864,22 @@ public class ViewEditor extends MultiPageEditorPart {
     exposedGraph = viewInfo.buildExposedGraph(viewGraph);
   }
 
+  /**
+   * When a collapse node is removed
+   * (c.f. {@link #uncollapse(GraphNode, Object), above),
+   * propagate any collapse state to the children.
+   */
+  private void updateSelectedNodes(
+      Collection<CollapseData> removed, Object author) {
+    for (CollapseData data : removed) {
+      if (isSelected(data.getMasterNode())) {
+        Collection<GraphNode> childrenNodes = data.getChildrenNodes();
+        viewInfo.editSelectedNodes(
+            GraphNode.EMPTY_NODE_LIST, childrenNodes, author);
+      }
+    }
+  }
+
   private void initCollapseRendering(Collection<CollapseData> state) {
     renderer.updateCollapseChanges(state, CollapseData.EMPTY_LIST);
   }
@@ -1298,6 +1314,7 @@ public class ViewEditor extends MultiPageEditorPart {
         Collection<CollapseData> created,
         Collection<CollapseData> removed,
         Object author) {
+      updateSelectedNodes(removed, author);
       updateExposedGraph();
       renderer.updateCollapseChanges(created, removed);
       markDirty();
