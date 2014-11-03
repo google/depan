@@ -75,13 +75,19 @@ public abstract class HierarchicalLayoutTool {
    * and then assigns positions in a depth first traversal of the tree data. 
    */
   public void layoutTree() {
-    Collection<GraphNode> roots = treeData.computeRoots();
+    Collection<GraphNode> treeRoots = treeData.computeRoots();
+    Collection<GraphNode> layoutRoots = computeLayoutRoots(treeRoots);
 
     // If there are multiple roots, make room for an implicit root above them
-    int level = getRootLevel(roots);
-    for (GraphNode node : roots) {
+    int level = getRootLevel(layoutRoots);
+    for (GraphNode node : layoutRoots) {
       assignChildren(node, level);
     }
+  }
+
+  protected Collection<GraphNode> computeLayoutRoots(
+      Collection<GraphNode> roots) {
+    return roots;
   }
 
   /**

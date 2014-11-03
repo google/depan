@@ -22,6 +22,7 @@ import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
@@ -74,9 +75,10 @@ public class NewRadialLayout extends NewTreeLayout {
     HierarchicalLayoutTool layoutTool =
         new RadialLayoutTool(graphModel, relations, dryRun.getLeafCount());
 
-    positions = Maps.newHashMapWithExpectedSize(graphModel.getNodes().size());
+    Collection<GraphNode> layoutNodes = graphModel.getNodes();
+    positions = Maps.newHashMapWithExpectedSize(layoutNodes.size());
     layoutTool.layoutTree();
-    Point2dUtils.translatePos(region, graphModel.getNodes(), positions);
+    Point2dUtils.translatePos(region, layoutNodes, positions);
   }
 
   /**
@@ -86,7 +88,6 @@ public class NewRadialLayout extends NewTreeLayout {
   private class DryRunTool extends HierarchicalLayoutTool.Planar {
 
     protected Set<GraphNode> orphans = Sets.newHashSet();
-    protected Set<GraphNode> seeds = Sets.newHashSet();
 
     /**
      * Create a DryRun tool for radial layouts.
@@ -107,6 +108,21 @@ public class NewRadialLayout extends NewTreeLayout {
       return layoutLeafs;
     }
 
+    @Override
+    protected Collection<GraphNode> computeLayoutRoots(
+        Collection<GraphNode> roots) {
+      Collection<GraphNode> result =
+          Lists.newArrayListWithExpectedSize(roots.size());
+      for (GraphNode root : roots) {
+        if (getNodeSuccessors(root).isEmpty()) {
+          orphans.add(root);
+        } else {
+          result.add(root);
+        }
+      }
+      return result;
+    }
+
     /**
      * {@inheritDoc}
      * <p>
@@ -115,22 +131,16 @@ public class NewRadialLayout extends NewTreeLayout {
      */
     @Override
     protected int getRootLevel(Collection<GraphNode> roots) {
-      for (GraphNode root : roots) {
-        if (getNodeSuccessors(root).isEmpty()) {
-          orphans.add(root);
-        } else {
-          seeds.add(root);
-        }
-      }
+
       // Don't occupy the center unless there is only one root
-      int seedCount = seeds.size();
-      if (seedCount <= 1) {
+      int rootCount = roots.size();
+      if (rootCount <= 1) {
         return 0;
       }
-      if (seedCount <= 3) {
+      if (rootCount <= 3) {
         return 1;
       }
-      if (seedCount <= 9) {
+      if (rootCount <= 9) {
         return 2;
       }
       return 3;
@@ -158,7 +168,7 @@ public class NewRadialLayout extends NewTreeLayout {
    */
   private class RadialLayoutTool extends DryRunTool {
 
-    protected int maxLevel;
+    private int maxLevel;
 
     /** Number of leaf positions required by this layout. */
     private final int circumference;
@@ -197,11 +207,10 @@ public class NewRadialLayout extends NewTreeLayout {
 
     protected int getCurrOffset(int level) {
       int result = super.getCurrOffset(level);
-      if (result > maxLevel) {
+      if (level > maxLevel) {
         maxLevel = result;
       }
       return result;
-      
     }
 
     /**

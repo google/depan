@@ -191,22 +191,27 @@ public class Point2dUtils {
   /**
    * Update positions of moveNodes using the supplied translator.
    * 
-   * The map of node positions is changed in place.
+   * The map of node positions is changed in place.  Move nodes without
+   * a position are not added.
    */
   public static void translatePos(
       Collection<GraphNode> moveNodes, Map<GraphNode, Point2D> positions,
       Translater intoRegion) {
 
     for (GraphNode node : moveNodes) {
-      Point2D location = positions.get(node);
-      positions.put(node, intoRegion.translate(location));
+      Point2D location = translateNode(node, positions, intoRegion);
+      if (null == location) {
+        continue;
+      }
+      positions.put(node, location);
     }
   }
 
   /**
    * Compute positions of moveNodes using the supplied translator.
    * 
-   * A new map of node positions is provided.
+   * A new map of node positions is provided.  Move nodes without a position
+   * are omitted from the result.
    */
   public static Map<GraphNode, Point2D> translateNodes(
       Collection<GraphNode> moveNodes, Map<GraphNode, Point2D> positions,
@@ -214,14 +219,30 @@ public class Point2dUtils {
 
     Map<GraphNode, Point2D> result =
         Maps.newHashMapWithExpectedSize(moveNodes.size());
+
     for (GraphNode node : moveNodes) {
-      Point2D location = positions.get(node);
+      Point2D location = translateNode(node, positions, translater);
+      if (null == location) {
+        continue;
+      }
       result.put(node, translater.translate(location));
     }
     return result;
   }
 
-  public static void translatePos(Rectangle2D into, Collection<GraphNode> nodes, Map<GraphNode, Point2D> result) {
+
+  private static Point2D translateNode(
+      GraphNode node, Map<GraphNode, Point2D> positions, Translater intoRegion) {
+    Point2D location = positions.get(node);
+    if (null == location) {
+      return null;
+    }
+    Point2D translated = intoRegion.translate(location);
+    return translated;
+  }
+
+  public static void translatePos(
+      Rectangle2D into, Collection<GraphNode> nodes, Map<GraphNode, Point2D> result) {
     // Translate node locations to region
     LayoutScaler scaler = new LayoutScaler(nodes, result);
     Translater intoRegion = scaler.intoRegion(into);
