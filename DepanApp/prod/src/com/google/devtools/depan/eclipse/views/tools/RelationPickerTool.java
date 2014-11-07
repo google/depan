@@ -25,6 +25,7 @@ import com.google.devtools.depan.eclipse.utils.RelationshipSetPickerControl;
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptor;
 import com.google.devtools.depan.eclipse.views.ViewEditorTool;
+import com.google.devtools.depan.eclipse.views.tools.RelEditorTableView.RelPropRepository;
 import com.google.devtools.depan.eclipse.wizards.NewRelationshipSetWizard;
 import com.google.devtools.depan.graph.api.DirectedRelationFinder;
 import com.google.devtools.depan.graph.api.Relation;
@@ -38,8 +39,8 @@ import com.google.common.collect.Lists;
 
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -77,9 +78,9 @@ public class RelationPickerTool extends ViewEditorTool {
   protected Shell shell = null;
 
   /**
-   * List of relations types.
+   * Table of relation data.
    */
-  private ListViewer list;
+  private TableViewer table;
 
   /**
    * A provider for the list of relationships.
@@ -143,10 +144,9 @@ public class RelationPickerTool extends ViewEditorTool {
     listLabel.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, false, 3, 1));
 
-    list = setupRelationList(topLevel);
-    list.getList().setLayoutData(
+    table = setupRelationList(topLevel);
+    table.getControl().setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1));
-
     return topLevel;
   }
 
@@ -185,62 +185,32 @@ public class RelationPickerTool extends ViewEditorTool {
     return region;
   }
 
-  private ListViewer setupRelationList(Composite parent) {
-    ListViewer result = new ListViewer(parent, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
+  private TableViewer setupRelationList(Composite parent) {
+    RelEditorTableView viewer = new RelEditorTableView(
+        new RelPropRepository() {
+          @Override
+          public EdgeDisplayProperty getDisplayProperty(Relation rel) {
+            if (!hasEditor()) {
+              return null;
+            }
 
-    // content
-    contentProvider = new ListContentProvider<Relation>(result);
+            ViewEditor editor = getEditor();
+            return editor.getRelationProperty(rel);
+          }
 
-    // actions
-    result.getList().addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        updateModel();
+          @Override
+          public void setDisplayProperty(Relation rel, EdgeDisplayProperty prop) {
+            if (!hasEditor()) {
+              return;
+            }
 
-        // Invalidate relation set on manual relation selection
-        relSetPicker.clearSelection();
-      }
-    });
+            ViewEditor editor = getEditor();
+            editor.setRelationProperty(rel, prop);
+          }
+        });
 
-    // Populate the list viewer with all known relations.
-    for (SourcePlugin plugin : SourcePluginRegistry.getInstances()) {
-      for (Relation r : plugin.getRelations()) {
-        contentProvider.add(r);
-      }
-    }
-
-    updateView();
-
+    TableViewer result = viewer.setupViewer(parent);
     return result;
-  }
-
-  /**
-   * Inform editor of changes to visible relations.
-   */
-  private void updateModel() {
-    if (!hasEditor()) {
-      return;
-    }
-
-    ViewEditor editor = getEditor();
-    List<Relation> unselected =
-        Lists.newArrayList(contentProvider.getObjects());
-
-    // show selected ones
-    IStructuredSelection selection = (IStructuredSelection) list.getSelection();
-
-    @SuppressWarnings("unchecked")
-    Iterator<Relation> iterator = selection.iterator();
-    while (iterator.hasNext()) {
-      Relation relation = iterator.next();
-      editor.setRelationVisible(relation, true);
-      unselected.remove(relation);
-    }
-
-    // Hide anything left in the unselected list.
-    for (Relation relation : unselected) {
-      editor.setRelationVisible(relation, false);
-    }
   }
 
   /**
@@ -251,7 +221,8 @@ public class RelationPickerTool extends ViewEditorTool {
       return;
     }
 
-    list.setSelection(new StructuredSelection(buildSelected()));
+    table.refresh();
+    table.setSelection(new StructuredSelection(buildSelected()));
   }
 
   private List<Relation> buildSelected() {
@@ -284,11 +255,6 @@ public class RelationPickerTool extends ViewEditorTool {
     if (null != set) {
       selectFinder(set);
     }
-
-    // Persist changed selection
-    if (!hasEditor()) {
-      getEditor().setDisplayRelationSet(set);
-    }
   }
 
   /**
@@ -306,8 +272,8 @@ public class RelationPickerTool extends ViewEditorTool {
   private void selectFinder(DirectedRelationFinder finder) {
     List<Relation> relations = buildRelations(finder);
     ISelection selection = new StructuredSelection(relations);
-    list.setSelection(selection);
-    updateModel();
+    table.setSelection(selection);
+    //$ updateModel();
   }
 
   private List<Relation> buildRelations(DirectedRelationFinder finder) {
@@ -330,7 +296,7 @@ public class RelationPickerTool extends ViewEditorTool {
   // suppressWarnings : IStructuredSelection.iterator() is not parameterized.
   @SuppressWarnings("unchecked")
   protected Collection<Relation> getSelectedRelations() {
-    IStructuredSelection selection = (IStructuredSelection) list.getSelection();
+    IStructuredSelection selection = (IStructuredSelection) table.getSelection();
     Iterator<Relation> iterator = selection.iterator();
     return Lists.newArrayList(iterator);
   }

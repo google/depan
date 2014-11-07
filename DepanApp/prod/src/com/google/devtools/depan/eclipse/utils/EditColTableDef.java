@@ -19,6 +19,8 @@ package com.google.devtools.depan.eclipse.utils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeColumn;
 
 /**
  * Useful class for making multi columns trees or tables.
@@ -99,4 +101,11 @@ public class EditColTableDef {
     }
   }
 
+  public static void setupTree(EditColTableDef[] tableDef, Tree tree) {
+    for (EditColTableDef d : tableDef) {
+      TreeColumn col = new TreeColumn(tree, SWT.LEFT);
+      col.setText(d.getLabel());
+      col.setWidth(d.getWidth());
+    }
+  }
 }

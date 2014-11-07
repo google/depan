@@ -4,10 +4,10 @@
    <extension
          point="com.google.devtools.depan.eclipse.sourceplugin">
       <languagespecific
-         id="com.google.devtools.depan.java"
-         source="java"
-         class="com.google.devtools.depan.java.JavaPlugin"
-      />
+            class="com.google.devtools.depan.java.JavaPlugin"
+            description="Graph elements for Java dependency analysis."
+            id="com.google.devtools.depan.java"
+            source="Java"/>
    </extension>
 
    <!-- ================ PREFERENCES =============== -->

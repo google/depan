@@ -88,12 +88,6 @@ public class TableContentProvider<E> implements IStructuredContentProvider {
     return objects;
   }
 
-  /**
-   * Return the n-th object in the set.
-   * @param n the object position.
-   * @return the n-th object in the set.
-   */
-  // unchecked cast for Object to E
   @SuppressWarnings("unchecked")
   public E getElementAtIndex(int n) {
     if (n < objects.size()) {
@@ -102,30 +96,17 @@ public class TableContentProvider<E> implements IStructuredContentProvider {
     return null;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.jface.viewers.IStructuredContentProvider
-   *      #getElements(java.lang.Object)
-   */
+  @Override
   public Object[] getElements(Object inputElement) {
     return objects.toArray();
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.jface.viewers.IContentProvider#dispose()
-   */
+  @Override
   public void dispose() {
     objects = null;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.jface.viewers.IContentProvider
-   *      #inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object,
-   *      java.lang.Object)
-   */
+  @Override
   public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
   }
 

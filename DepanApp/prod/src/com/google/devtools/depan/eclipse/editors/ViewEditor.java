@@ -768,7 +768,7 @@ public class ViewEditor extends MultiPageEditorPart {
     if (null == edgeProp) {
       edgeProp = new EdgeDisplayProperty();
       edgeProp.setVisible(isVisible);
-      viewInfo.setRelationProperty(relation, edgeProp);
+      setRelationProperty(relation, edgeProp);
       return;
     }
 
@@ -777,7 +777,7 @@ public class ViewEditor extends MultiPageEditorPart {
       return;
     }
     edgeProp.setVisible(isVisible);
-    viewInfo.setRelationProperty(relation, edgeProp);
+    setRelationProperty(relation, edgeProp);
   }
 
   public Collection<Relation> getDisplayRelations() {
@@ -786,6 +786,11 @@ public class ViewEditor extends MultiPageEditorPart {
 
   public EdgeDisplayProperty getRelationProperty(Relation relation) {
     return viewInfo.getRelationProperty(relation);
+  }
+
+  public void setRelationProperty(
+      Relation relation, EdgeDisplayProperty relProp) {
+    viewInfo.setRelationProperty(relation, relProp);
   }
 
   private void initEdgeRendering() {

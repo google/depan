@@ -5,8 +5,9 @@
          point="com.google.devtools.depan.eclipse.sourceplugin">
       <languagespecific
             class="com.google.devtools.depan.filesystem.FileSystemPlugin"
+            description="Graph elements for File System dependency analysis."
             id="com.google.devtools.depan.filesystem"
-            source="java">
+            source="File System">
       </languagespecific>
    </extension>
    <extension

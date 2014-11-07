@@ -5,9 +5,9 @@
          point="com.google.devtools.depan.eclipse.sourceplugin">
       <languagespecific
             class="com.google.devtools.depan.javascript.JavaScriptPlugin"
-            description="Graph elements for JavaScript dependencies"
+            description="Graph elements for JavaScript dependency analysis."
             id="com.google.devtools.depan.javascript"
-            source="java">
+            source="JavaScript">
       </languagespecific>
    </extension>
 

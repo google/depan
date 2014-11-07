@@ -132,11 +132,7 @@ public class NodeEditorTool extends ViewSelectionListenerTool
     Tree tree = nodeTreeView.getTreeViewer().getTree();
     tree.setHeaderVisible(true);
 
-    for (EditColTableDef d : TABLE_DEF) {
-      TreeColumn col = new TreeColumn(tree, SWT.LEFT);
-      col.setText(d.getLabel());
-      col.setWidth(d.getWidth());
-    }
+    EditColTableDef.setupTree(TABLE_DEF, tree);
 
     CellEditor[] cellA = new CellEditor[TABLE_DEF.length];
     cellA[INDEX_NAME] = null;

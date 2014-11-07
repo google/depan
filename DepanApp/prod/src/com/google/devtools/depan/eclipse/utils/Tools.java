@@ -65,6 +65,16 @@ public abstract class Tools {
     return new Color(rgb.red, rgb.green, rgb.blue);
   }
 
+  public static RGB rgbFromColor(Color color) {
+    RGB result = new RGB(color.getRed(), color.getGreen(), color.getBlue());
+    return result;
+  }
+
+  public static Color colorFromRgb(RGB rgb) {
+    Color result = new Color(rgb.red, rgb.green, rgb.blue);
+    return result;
+  }
+
   public static void setBackgroundRecursively(
       org.eclipse.swt.graphics.Color color, Control control) {
     control.setBackground(color);
