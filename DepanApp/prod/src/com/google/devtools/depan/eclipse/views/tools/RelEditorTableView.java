@@ -19,7 +19,10 @@ package com.google.devtools.depan.eclipse.views.tools;
 import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
 import com.google.devtools.depan.eclipse.plugins.SourcePluginEntry;
 import com.google.devtools.depan.eclipse.plugins.SourcePluginRegistry;
+import com.google.devtools.depan.eclipse.utils.AlphabeticSorter;
 import com.google.devtools.depan.eclipse.utils.EditColTableDef;
+import com.google.devtools.depan.eclipse.utils.InverseSorter;
+import com.google.devtools.depan.eclipse.utils.LabelProviderToString;
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.utils.Tools;
 import com.google.devtools.depan.graph.api.Relation;
@@ -39,12 +42,17 @@ import org.eclipse.jface.viewers.ICellModifier;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
 import java.awt.Color;
@@ -121,7 +129,8 @@ public class RelEditorTableView {
   }
 
   public TableViewer setupViewer(Composite parent) {
-    viewer = new TableViewer(parent, SWT.BORDER | SWT.V_SCROLL);
+    viewer = new TableViewer(parent,
+        SWT.FULL_SELECTION | SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
     // set up label provider
     viewer.setLabelProvider(new RelEditorLabelProvider());
 
@@ -151,6 +160,7 @@ public class RelEditorTableView {
     viewer.setCellModifier(new RelEditorCellModifierHandler());
 
     // TODO: Add column sorters, filters?
+    configSorters(relTableControl);
 
     // Configure content last
     viewer.setContentProvider(ArrayContentProvider.getInstance());
@@ -178,6 +188,83 @@ public class RelEditorTableView {
     }
 
     return result;
+  }
+
+  private void configSorters(Table table) {
+    int index = 0;
+    for (TableColumn column : table.getColumns()) {
+      final int colIndex = index++;
+
+      column.addSelectionListener(new SelectionAdapter() {
+        @Override
+        public void widgetSelected(SelectionEvent event) {
+          updateSortColumn((TableColumn) event.widget, colIndex);
+        }
+      });
+    }
+  }
+
+  private void updateSortColumn(TableColumn column, int colIndex) {
+    setSortColumn(column, colIndex, getSortDirection(column));
+  }
+
+  private int getSortDirection(TableColumn column) {
+    Table tableControl = (Table) viewer.getControl();
+    if (column != tableControl.getSortColumn()) {
+      return SWT.DOWN;
+    }
+    // If it is unsorted (SWT.NONE), assume down sort
+    return (SWT.DOWN == tableControl.getSortDirection())
+        ? SWT.UP : SWT.DOWN;
+  }
+
+  private void setSortColumn(
+      TableColumn column, int colIndex, int direction) {
+
+    ViewerSorter sorter = buildColumnSorter(colIndex);
+    if (SWT.UP == direction) {
+      sorter = new InverseSorter(sorter);
+    }
+
+    Table tableControl = (Table) viewer.getControl();
+    viewer.setSorter(sorter);
+    tableControl.setSortColumn(column);
+    tableControl.setSortDirection(direction);
+  }
+
+  private ViewerSorter buildColumnSorter(int colIndex) {
+    // if (INDEX_VISIBLE == colIndex) {
+    //   return new BooleanViewSorter();
+    // }
+    if (INDEX_VISIBLE == colIndex) {
+      return new BooleanViewSorter();
+    }
+
+    // By default, use an alphabetic sort over the column labels.
+    ITableLabelProvider labelProvider =
+        (ITableLabelProvider) viewer.getLabelProvider();
+    ViewerSorter result = new AlphabeticSorter(
+        new LabelProviderToString(labelProvider, colIndex));
+    return result;
+  }
+
+  private class BooleanViewSorter extends ViewerSorter {
+
+    @Override
+    public int compare(Viewer viewer, Object e1, Object e2) {
+      boolean vis1 = isVisible(e1);
+      boolean vis2 = isVisible(e2);
+      return Boolean.compare(vis1, vis2);
+    }
+
+    private boolean isVisible(Object e1) {
+      if (!(e1 instanceof Relation)) {
+        return false;
+      }
+      Relation rel = (Relation) e1;
+      EdgeDisplayProperty prop = getDisplayProperty(rel);
+      return prop.isVisible();
+    }
   }
 
   /**
