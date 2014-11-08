@@ -19,7 +19,6 @@ package com.google.devtools.depan.eclipse.views.tools;
 import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
 import com.google.devtools.depan.eclipse.plugins.SourcePluginRegistry;
-import com.google.devtools.depan.eclipse.utils.ListContentProvider;
 import com.google.devtools.depan.eclipse.utils.RelationshipSelectorListener;
 import com.google.devtools.depan.eclipse.utils.RelationshipSetPickerControl;
 import com.google.devtools.depan.eclipse.utils.Resources;
@@ -56,7 +55,6 @@ import org.eclipse.swt.widgets.Shell;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -81,11 +79,6 @@ public class RelationPickerTool extends ViewEditorTool {
    * Table of relation data.
    */
   private TableViewer table;
-
-  /**
-   * A provider for the list of relationships.
-   */
-  private ListContentProvider<Relation> contentProvider;
 
   @Override
   public Image getIcon() {
@@ -123,36 +116,44 @@ public class RelationPickerTool extends ViewEditorTool {
     gridLayout.verticalSpacing = 10;
     topLevel.setLayout(gridLayout);
 
-    Composite pickerRegion = setupRelationPicker(topLevel);
-    pickerRegion.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-
-    Button reverse = new Button(topLevel, SWT.PUSH);
-    reverse.setText("Reverse selection");
-    reverse.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 3, 1));
-    reverse.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        reverseSelection();
-
-        // Invalidate relation set on manual relation selection
-        relSetPicker.clearSelection();
-      }
-    });
-
-    Label listLabel = new Label(topLevel, SWT.NONE);
-    listLabel.setText("Select relationships to show:");
-    listLabel.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false, 3, 1));
+    Composite commands = setupCommandButtons(topLevel);
+    commands.setLayoutData(
+        new GridData(SWT.FILL, SWT.FILL, true, false));
 
     table = setupRelationList(topLevel);
     table.getControl().setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1));
+        new GridData(SWT.FILL, SWT.FILL, true, true));
+
+    Composite saves = setupSaveButtons(topLevel);
+    saves.setLayoutData(
+        new GridData(SWT.FILL, SWT.FILL, true, false));
+
     return topLevel;
+  }
+
+  private Composite setupCommandButtons(Composite parent) {
+    Composite result = new Composite(parent, SWT.NONE);
+    GridLayout layout = new GridLayout();
+    layout.marginWidth = 0;
+    layout.marginHeight = 0;
+    result.setLayout(layout);
+
+    Composite pickerRegion = setupRelationPicker(result);
+    pickerRegion.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+
+    Composite selectVis =  setupSelectionVisible(result);
+    selectVis.setLayoutData(
+        new GridData(SWT.FILL, SWT.FILL, true, false));
+
+    Composite tableVis =  setupTableVisible(result);
+    tableVis.setLayoutData(
+        new GridData(SWT.FILL, SWT.FILL, true, false));
+
+    return result;
   }
 
   private Composite setupRelationPicker(Composite parent) {
     Composite region = new Composite(parent, SWT.None);
-    region.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
     region.setLayout(new GridLayout(3, false));
 
     Label pickerLabel = RelationshipSetPickerControl.createPickerLabel(region);
@@ -170,19 +171,100 @@ public class RelationPickerTool extends ViewEditorTool {
       }
     });
 
-    Button save = new Button(region, SWT.PUSH);
-    save.setText("Save selection as");
-    save.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false));
-
-    save.addSelectionListener(new SelectionAdapter() {
+    Button reverse = new Button(region, SWT.PUSH);
+    reverse.setText("Reverse selection");
+    reverse.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+    reverse.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
-        saveSelection();
+        reverseSelection();
+
+        // Invalidate relation set on manual relation selection
+        relSetPicker.clearSelection();
       }
     });
 
     return region;
+  }
+
+  private Composite setupSelectionVisible(Composite parent) {
+    Composite result = new Composite(parent, SWT.None);
+    GridLayout layout = new GridLayout(3, false);
+    layout.marginWidth = 0;
+    layout.marginHeight = 0;
+    result.setLayout(layout);
+
+    Button clear = new Button(result, SWT.PUSH);
+    clear.setText("clear selected");
+    clear.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+    clear.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        clearVisibleSelection();
+      }
+    });
+
+    Button invert = new Button(result, SWT.PUSH);
+    invert.setText("invert selected");
+    invert.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+    invert.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        invertVisibleSelection();
+      }
+    });
+
+    Button check = new Button(result, SWT.PUSH);
+    check.setText("check selected");
+    check.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+    check.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        checkVisibleSelection();
+      }
+    });
+
+    return result;
+  }
+
+  private Composite setupTableVisible(Composite parent) {
+    Composite result = new Composite(parent, SWT.None);
+    GridLayout layout = new GridLayout(3, false);
+    layout.marginWidth = 0;
+    layout.marginHeight = 0;
+    result.setLayout(layout);
+
+    Button clear = new Button(result, SWT.PUSH);
+    clear.setText("clear all");
+    clear.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+    clear.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        clearVisibleTable();
+      }
+    });
+
+    Button invert = new Button(result, SWT.PUSH);
+    invert.setText("invert all");
+    invert.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+    invert.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        invertVisibleTable();
+      }
+    });
+
+    Button check = new Button(result, SWT.PUSH);
+    check.setText("check all");
+    check.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+    check.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        checkVisibleTable();
+      }
+    });
+
+    return result;
   }
 
   private TableViewer setupRelationList(Composite parent) {
@@ -213,6 +295,168 @@ public class RelationPickerTool extends ViewEditorTool {
     return result;
   }
 
+  private Composite setupSaveButtons(Composite parent) {
+    Composite result = new Composite(parent, SWT.NONE);
+    GridLayout layout = new GridLayout(2, false);
+    layout.marginWidth = 0;
+    layout.marginHeight = 0;
+    result.setLayout(layout);
+
+    Button saveRels = new Button(result, SWT.PUSH);
+    saveRels.setText("Save selected relations as...");
+    saveRels.setLayoutData(
+        new GridData(SWT.FILL, SWT.FILL, true, false));
+
+    saveRels.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        saveSelection();
+      }
+    });
+
+    Button saveProps = new Button(result, SWT.PUSH);
+    saveProps.setText("Save selected properties as...");
+    saveProps.setLayoutData(
+        new GridData(SWT.FILL, SWT.FILL, true, false));
+
+    saveProps.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        saveSelection();
+      }
+    });
+
+    return result;
+  }
+
+  /////////////////////////////////////
+  // Handlers for visibility events
+
+  private void clearVisibleSelection() {
+    if (!hasEditor()) {
+      return;
+    }
+
+    Collection<Relation> relations = getSelectedRelations();
+    clearRelations(relations);
+  }
+
+  private void invertVisibleSelection() {
+    if (!hasEditor()) {
+      return;
+    }
+
+    Collection<Relation> relations = getSelectedRelations();
+    invertRelations(relations);
+  }
+
+  private void checkVisibleSelection() {
+    if (!hasEditor()) {
+      return;
+    }
+
+    Collection<Relation> relations = getSelectedRelations();
+    checkRelations(relations);
+  }
+
+  private void clearVisibleTable() {
+    if (!hasEditor()) {
+      return;
+    }
+
+    Collection<Relation> relations = getAllRelations();
+    clearRelations(relations);
+  }
+
+  private void invertVisibleTable() {
+    if (!hasEditor()) {
+      return;
+    }
+
+    Collection<Relation> relations = getAllRelations();
+    invertRelations(relations);
+  }
+
+  private void checkVisibleTable() {
+    if (!hasEditor()) {
+      return;
+    }
+
+    Collection<Relation> relations = getAllRelations();
+    checkRelations(relations);
+  }
+
+  private Collection<Relation> getSelectedRelations() {
+    ISelection sel = table.getSelection();
+    if (!(sel instanceof IStructuredSelection)) {
+      return Collections.emptyList();
+    }
+    IStructuredSelection selection = (IStructuredSelection) sel;
+    List<Relation> result =
+        Lists.newArrayListWithExpectedSize(selection.size());
+    for (Object item : selection.toList()) {
+      if (item instanceof Relation) {
+        result.add((Relation) item);
+      }
+    }
+    return result;
+  }
+
+  @SuppressWarnings("unchecked")
+  private Collection<Relation> getAllRelations() {
+    return (Collection<Relation>) table.getInput();
+  }
+
+  private void clearRelations(Collection<Relation> relations) {
+    for (Relation relation : relations) {
+      EdgeDisplayProperty prop = loadRelationProperty(relation);
+      if (null == prop) {
+        continue;
+      }
+      prop.setVisible(false);
+      saveRelationProperty(relation, prop);
+      table.update(relation, RelEditorTableView.UPDATE_VISIBLE);
+    }
+  }
+
+  private void invertRelations(Collection<Relation> relations) {
+    for (Relation relation : relations) {
+      EdgeDisplayProperty prop = getRelationProperty(relation);
+      prop.setVisible(!prop.isVisible());
+      saveRelationProperty(relation, prop);
+      table.update(relation, RelEditorTableView.UPDATE_VISIBLE);
+    }
+  }
+
+  private void checkRelations(Collection<Relation> relations) {
+    for (Relation relation : relations) {
+      EdgeDisplayProperty prop = getRelationProperty(relation);
+      prop.setVisible(true);
+      saveRelationProperty(relation, prop);
+      table.update(relation, RelEditorTableView.UPDATE_VISIBLE);
+    }
+  }
+
+  private void saveRelationProperty(
+      Relation relation, EdgeDisplayProperty prop) {
+    getEditor().setRelationProperty(relation, prop);
+  }
+
+  private EdgeDisplayProperty loadRelationProperty(Relation relation) {
+    return getEditor().getRelationProperty(relation);
+  }
+
+  private EdgeDisplayProperty getRelationProperty(Relation relation) {
+    EdgeDisplayProperty result = loadRelationProperty(relation);
+    if (null != result) {
+      return result;
+    }
+
+    return new EdgeDisplayProperty();
+  }
+
+  /////////////////////////////////////
+
   /**
    * Update the view after a change in the model.
    */
@@ -225,7 +469,7 @@ public class RelationPickerTool extends ViewEditorTool {
     table.setSelection(new StructuredSelection(buildSelected()));
   }
 
-  private List<Relation> buildSelected() {
+  private Collection<Relation> buildSelected() {
     RelationshipSet pickerSet = relSetPicker.getSelection();
     if (null != pickerSet) {
       return buildRelations(pickerSet);
@@ -273,7 +517,6 @@ public class RelationPickerTool extends ViewEditorTool {
     List<Relation> relations = buildRelations(finder);
     ISelection selection = new StructuredSelection(relations);
     table.setSelection(selection);
-    //$ updateModel();
   }
 
   private List<Relation> buildRelations(DirectedRelationFinder finder) {
@@ -286,19 +529,6 @@ public class RelationPickerTool extends ViewEditorTool {
       }
     }
     return result;
-  }
-
-  /**
-   * Return a collection of Relations describing the current selection.
-   *
-   * @return a collection of Relations describing the current selection.
-   */
-  // suppressWarnings : IStructuredSelection.iterator() is not parameterized.
-  @SuppressWarnings("unchecked")
-  protected Collection<Relation> getSelectedRelations() {
-    IStructuredSelection selection = (IStructuredSelection) table.getSelection();
-    Iterator<Relation> iterator = selection.iterator();
-    return Lists.newArrayList(iterator);
   }
 
   /**

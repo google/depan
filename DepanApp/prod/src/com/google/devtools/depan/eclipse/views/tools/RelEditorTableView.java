@@ -73,6 +73,9 @@ public class RelEditorTableView {
   public static final String COL_SHAPE = "Shape";
   public static final String COL_ARROWHEAD = "Arrowhead";
 
+  /** To indicate that the "Visible" column should be updated. */
+  public static final String[] UPDATE_VISIBLE = {COL_VISIBLE};
+
   public static final int INDEX_NAME = 0;
   public static final int INDEX_SOURCE = 1;
   public static final int INDEX_VISIBLE = 2;
@@ -190,6 +193,23 @@ public class RelEditorTableView {
     return result;
   }
 
+  /**
+   * Utility method for both the label provider and cell modifier.
+   * Note that the default constructor for {@link EdgeDisplayProperty}
+   * uses the default values for all member elements.
+   */
+  private EdgeDisplayProperty getDisplayProperty(Relation rel) {
+    EdgeDisplayProperty relProp = propRepo.getDisplayProperty(rel);
+    if (null != relProp) {
+      return relProp;
+    }
+    // Provide the default if none are presisted.
+    return new EdgeDisplayProperty();
+  }
+
+  /////////////////////////////////////
+  // Column sorting
+
   private void configSorters(Table table) {
     int index = 0;
     for (TableColumn column : table.getColumns()) {
@@ -265,20 +285,6 @@ public class RelEditorTableView {
       EdgeDisplayProperty prop = getDisplayProperty(rel);
       return prop.isVisible();
     }
-  }
-
-  /**
-   * Utility method for both the label provider and cell modifier.
-   * Note that the default constructor for {@link EdgeDisplayProperty}
-   * use the default values for all member elements.
-   */
-  private EdgeDisplayProperty getDisplayProperty(Relation rel) {
-    EdgeDisplayProperty relProp = propRepo.getDisplayProperty(rel);
-    if (null != relProp) {
-      return relProp;
-    }
-    // Provide the default if none are presisted.
-    return new EdgeDisplayProperty();
   }
 
   /////////////////////////////////////
