@@ -16,13 +16,13 @@
 
 package com.google.devtools.depan.eclipse.visualization.layout;
 
+import com.google.devtools.depan.eclipse.visualization.ogl.GLScene;
 import com.google.devtools.depan.graph.api.DirectedRelationFinder;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.view.HierarchicalTreeModel;
 import com.google.devtools.depan.view.SuccessorEdges;
 import com.google.devtools.depan.view.TreeModel;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -30,11 +30,15 @@ import java.awt.geom.Point2D;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  * @author <a href='mailto:leeca@google.com'>Lee Carver </a>
  */
 public abstract class HierarchicalLayoutTool {
+
+  private static final Logger logger =
+      Logger.getLogger(GLScene.class.getName());
 
   /** Protection from loops */
   protected transient Set<GraphNode> allreadyDone = Sets.newHashSet();
@@ -163,7 +167,7 @@ public abstract class HierarchicalLayoutTool {
    * Debugging support to display assignments for nodes.
    */
   protected void logAssignNode(GraphNode node, int level, int offset) {
-    System.err.println("[" + level + ", " + offset + "]: " + node);
+    logger.info("[" + level + ", " + offset + "]: " + node);
   }
 
   protected Collection<GraphNode> getNodeSuccessors(GraphNode node) {
@@ -218,7 +222,6 @@ public abstract class HierarchicalLayoutTool {
    */
   protected static Point2D makePoint2D(int level, int offset) {
     Point2D result = new Point2D.Float(level, offset);
-    System.out.println("Point is " + result);
     return result;
   }
 
