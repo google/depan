@@ -203,7 +203,7 @@ public class RelEditorTableView {
     if (null != relProp) {
       return relProp;
     }
-    // Provide the default if none are presisted.
+    // Provide the default if none are persisted.
     return new EdgeDisplayProperty();
   }
 
