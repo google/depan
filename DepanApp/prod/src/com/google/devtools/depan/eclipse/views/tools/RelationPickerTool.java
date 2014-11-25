@@ -194,6 +194,16 @@ public class RelationPickerTool extends ViewEditorTool {
     layout.marginHeight = 0;
     result.setLayout(layout);
 
+    Button check = new Button(result, SWT.PUSH);
+    check.setText("check selected");
+    check.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+    check.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        checkVisibleSelection();
+      }
+    });
+
     Button clear = new Button(result, SWT.PUSH);
     clear.setText("clear selected");
     clear.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -214,16 +224,6 @@ public class RelationPickerTool extends ViewEditorTool {
       }
     });
 
-    Button check = new Button(result, SWT.PUSH);
-    check.setText("check selected");
-    check.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-    check.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        checkVisibleSelection();
-      }
-    });
-
     return result;
   }
 
@@ -233,6 +233,16 @@ public class RelationPickerTool extends ViewEditorTool {
     layout.marginWidth = 0;
     layout.marginHeight = 0;
     result.setLayout(layout);
+
+    Button check = new Button(result, SWT.PUSH);
+    check.setText("check all");
+    check.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+    check.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        checkVisibleTable();
+      }
+    });
 
     Button clear = new Button(result, SWT.PUSH);
     clear.setText("clear all");
@@ -251,16 +261,6 @@ public class RelationPickerTool extends ViewEditorTool {
       @Override
       public void widgetSelected(SelectionEvent e) {
         invertVisibleTable();
-      }
-    });
-
-    Button check = new Button(result, SWT.PUSH);
-    check.setText("check all");
-    check.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-    check.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        checkVisibleTable();
       }
     });
 
@@ -470,13 +470,13 @@ public class RelationPickerTool extends ViewEditorTool {
   }
 
   private Collection<Relation> buildSelected() {
+    if (!hasEditor()) {
+        return Collections.emptyList();
+    }
+
     RelationshipSet pickerSet = relSetPicker.getSelection();
     if (null != pickerSet) {
       return buildRelations(pickerSet);
-    }
-
-    if (!hasEditor()) {
-      return Collections.emptyList();
     }
 
     // Build selection from list of visible relations.
