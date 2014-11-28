@@ -187,6 +187,4 @@ public class NodeDisplayProperty {
   public void setGivenSize(int newSize) {
     this.givenSize = newSize;
   }
-
-
 }
