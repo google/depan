@@ -11,7 +11,7 @@ Bundle-ClassPath: collections-generic-4.01.jar,
  jung-algorithms-2.0.1.jar,
  jung-api-2.0.1.jar,
  jung-graph-impl-2.0.1.jar,
- xstream-1.4.5.jar
+ xstream-1.4.7.jar
 Export-Package: cern.clhep,
  com.google.common.base,
  com.google.common.collect,

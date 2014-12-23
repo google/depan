@@ -67,9 +67,9 @@
 			<locationURI>THIRD_PARTY_HOME/xstream/xstream-1.4.5/lib/xstream/xpp3_min-1.1.4c.jar</locationURI>
 		</link>
 		<link>
-			<name>xstream-1.4.5.jar</name>
+			<name>xstream-1.4.7.jar</name>
 			<type>1</type>
-			<locationURI>THIRD_PARTY_HOME/xstream/xstream-1.4.5/lib/xstream-1.4.5.jar</locationURI>
+			<locationURI>THIRD_PARTY_HOME/xstream/xstream-1.4.7/lib/xstream-1.4.7.jar</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>
