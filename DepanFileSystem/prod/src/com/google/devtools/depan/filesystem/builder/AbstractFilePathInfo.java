@@ -1,4 +1,4 @@
-// Copyright 2010 Google Inc. All Rights Reserved.
+// Copyright 2010 The Depan Project Authors
 
 package com.google.devtools.depan.filesystem.builder;
 
