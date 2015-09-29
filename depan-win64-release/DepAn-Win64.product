@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?pde version="3.5"?>
+
+<product name="DepAn [Win64]" uid="com.pnambic.depan.win64.release" id="com.google.devtools.depan.DepAn" application="com.google.devtools.depan.application" version="1.0.0.qualifier" useFeatures="true" includeLaunchers="true">
+
+   <aboutInfo>
+      <image path="/DepanApp/icons/branding/depan-icon-250x250.gif"/>
+      <text>
+         DepAn - A direct manipulation tool for the visualization, analysis, and refactoring of dependencies in large applications.
+      </text>
+   </aboutInfo>
+
+   <configIni use="default">
+   </configIni>
+
+   <launcherArgs>
+      <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts
+      </vmArgsMac>
+   </launcherArgs>
+
+   <windowImages i16="/DepanApp/icons/branding/depan-icon-16x16.gif" i32="/DepanApp/icons/branding/depan-icon-32x32.gif" i48="/DepanApp/icons/branding/depan-icon-48x48.gif" i64="/DepanApp/icons/branding/depan-icon-64x64.gif"/>
+
+   <splash
+      location="com.google.devtools.depan"
+      startupProgressRect="5,275,445,15"
+      startupMessageRect="7,252,445,20"
+      startupForegroundColor="000000" />
+   <launcher name="DepAn">
+      <solaris/>
+      <win useIco="false">
+         <bmp/>
+      </win>
+   </launcher>
+
+
+   <vm>
+   </vm>
+
+   <plugins>
+   </plugins>
+
+   <features>
+      <feature id="com.pnambic.depan.win64.feature" version="1.0.0.qualifier"/>
+   </features>
+
+   <configurations>
+      <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="2" />
+      <plugin id="org.eclipse.equinox.common" autoStart="true" startLevel="3" />
+      <plugin id="org.eclipse.equinox.ds" autoStart="true" startLevel="3" />
+   </configurations>
+
+</product>

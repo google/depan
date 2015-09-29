@@ -2,8 +2,11 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: DepanCore
 Bundle-SymbolicName: com.google.devtools.depan.core;singleton:=true
-Bundle-Version: 1.0.5
-Bundle-Vendor: Google Inc.
+Bundle-Version: 1.0.5.qualifier
+Bundle-Vendor: Pnambic Computing
+Require-Bundle: com.google.guava,
+ joda-time,
+ depan-jung-library
 Export-Package: com.google.devtools.depan.filters,
  com.google.devtools.depan.graph.api,
  com.google.devtools.depan.graph.basic,
@@ -14,4 +17,3 @@ Export-Package: com.google.devtools.depan.filters,
  com.google.devtools.depan.util,
  com.google.devtools.depan.view
 Bundle-ClassPath: .
-Require-Bundle: com.google.devtools.depan.libraries

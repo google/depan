@@ -8,51 +8,9 @@
   </parent>
 
   <artifactId>depan-luna-target</artifactId>
-  <packaging>pom</packaging>
+  <version>1.0.0-luna</version>
+  <packaging>eclipse-target-definition</packaging>
 
   <name>DepAn Luna Target</name>
-  <description>Luna-based DepAn Target and Platform Definitions</description>
-
-  <repositories>
-    <repository>
-      <id>eclipse-luna</id>
-      <layout>p2</layout>
-      <url>http://download.eclipse.org/releases/luna</url>
-    </repository>
-  </repositories>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.eclipse.tycho</groupId>
-        <artifactId>target-platform-configuration</artifactId>
-        <version>${tycho.version}</version>
-        <configuration>
-          <resolver>p2</resolver>
-          <pomDependencies>consider</pomDependencies>
-
-          <environments>
-            <environment>
-              <os>win32</os>
-              <ws>win32</ws>
-              <arch>x86_64</arch>
-            </environment>
-            <environment>
-              <os>macosx</os>
-              <ws>cocoa</ws>
-              <arch>x86_64</arch>
-            </environment>
-          </environments>
-
-          <target>
-            <artifact>
-              <groupId>${project.groupId}</groupId>
-              <artifactId>depan-luna</artifactId>
-              <version>${project.version}</version>
-            </artifact>
-          </target>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+  <description>Luna-based DepAn Target</description>
 </project>

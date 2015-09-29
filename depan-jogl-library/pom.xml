@@ -1,0 +1,71 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.pnambic.depan</groupId>
+    <artifactId>depan-library-parent</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <relativePath>../depan-library-parent</relativePath>
+  </parent>
+
+  <artifactId>depan-jogl-library</artifactId>
+  <packaging>bundle</packaging>
+
+  <name>Depan JOGL Libraries</name>
+  <description>JOGL libraries packaged for DepAn</description>
+
+  <properties>
+    <jogamp.version>2.1.2</jogamp.version>
+<!-- 
+    # Removes screenshot suppot
+    <jogamp.version>2.2.4</jogamp.version>
+ -->
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.jogamp.gluegen</groupId>
+      <artifactId>gluegen-rt</artifactId>
+      <version>${jogamp.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jogamp.jogl</groupId>
+      <artifactId>jogl-all</artifactId>
+      <version>${jogamp.version}</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <version>${bundle.version}</version>
+        <extensions>true</extensions>
+        <configuration>
+         <instructions>
+           <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+           <Bundle-Vendor>Pnambic Computing</Bundle-Vendor>
+           <Embed-Dependency>*</Embed-Dependency>
+           <Export-Package>
+             com.jogamp.opengl,
+             com.jogamp.opengl.fixedfunc,
+             com.jogamp.opengl.glu,
+             com.jogamp.opengl.util.awt,
+             com.jogamp.opengl.util.texture,
+             javax.media.opengl,
+             javax.media.opengl.glu,
+             javax.media.opengl.fixedfunc
+           </Export-Package>
+           <_nouses>true</_nouses>
+           <_removeheaders>
+             Embed-Dependency,
+             Embed-Artifacts,
+             Import-Package,
+             Private-Package
+           </_removeheaders>
+         </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

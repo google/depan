@@ -8,26 +8,25 @@
     <relativePath>../depan-parent</relativePath>
   </parent>
 
-  <artifactId>depan-luna-master</artifactId>
+  <artifactId>depan-library-master</artifactId>
   <packaging>pom</packaging>
 
-  <name>DepAn Luna Master</name>
-  <description>Master project for DepAn Luna builds</description>
+  <name>DepAn Library Master</name>
+  <description>Aggregation project for DepAn Luna library builds</description>
 
   <modules>
+    <!-- Overall build context -->
     <module>../depan-parent</module>
-    <module>../depan-luna-parent</module>
+    <module>../depan-luna-target</module>
+    <module>../depan-library-parent</module>
 
-    <!-- Plugins -->
-    <module>../DepanCore/prod</module>
-    <module>../DepanApp/prod</module>
+    <!-- Repackaged 3rd Party Modules -->
+    <module>../depan-jogl-library</module>
+    <module>../depan-jung-library</module>
+    <module>../depan-xstream-library</module>
 
-    <!-- Features -->
-    <module>../depan-platform-feature</module>
-    <module>../depan-win64-feature</module>
+    <!-- Features ##>
+    -->
 
-    <!-- Release -->
-    <module>../depan-win64-release</module>
   </modules>
 </project>
-

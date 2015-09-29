@@ -1,0 +1,83 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.pnambic.depan</groupId>
+    <artifactId>depan-library-parent</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <relativePath>../depan-library-parent</relativePath>
+  </parent>
+
+  <artifactId>depan-jung-library</artifactId>
+  <packaging>bundle</packaging>
+
+  <name>DepAn JUNG Library</name>
+  <description>JUNG graph libraries packaged for DepAn</description>
+
+  <properties>
+    <collections-generic.version>4.01</collections-generic.version>
+    <jung.version>2.0.1</jung.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>net.sourceforge.collections</groupId>
+      <artifactId>collections-generic</artifactId>
+      <version>${collections-generic.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.sf.jung</groupId>
+      <artifactId>jung2</artifactId>
+      <version>${jung.version}</version>
+      <type>pom</type>
+    </dependency>
+    <dependency>
+      <groupId>net.sf.jung</groupId>
+      <artifactId>jung-algorithms</artifactId>
+      <version>${jung.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.sf.jung</groupId>
+      <artifactId>jung-api</artifactId>
+      <version>${jung.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.sf.jung</groupId>
+      <artifactId>jung-graph-impl</artifactId>
+      <version>${jung.version}</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <version>${bundle.version}</version>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Bundle-Vendor>Pnambic Computing</Bundle-Vendor>
+            <Embed-Dependency>*</Embed-Dependency>
+            <Export-Package>
+              edu.uci.ics.jung.algorithms.importance,
+              edu.uci.ics.jung.algorithms.layout,
+              edu.uci.ics.jung.algorithms.util,
+              edu.uci.ics.jung.graph,
+              org.apache.commons.collections15,
+              org.apache.commons.collections15.map
+            </Export-Package>
+            <_nouses>true</_nouses>
+            <_removeheaders>
+              Embed-Dependency,
+              Embed-Artifacts,
+              Import-Package,
+              Private-Package
+            </_removeheaders>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

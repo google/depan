@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="com.pnambic.depan.win64.feature"
+      label="DepAn Win64 Release Feature"
+      version="1.0.0.qualifier"
+      provider-name="Pnambic Computing">
+
+   <description url="http://www.example.com/description">
+      [Enter Feature Description here.]
+   </description>
+
+   <copyright url="http://www.example.com/copyright">
+      [Enter Copyright Description here.]
+   </copyright>
+
+   <license url="http://www.example.com/license">
+      [Enter License Description here.]
+   </license>
+
+   <includes
+         id="com.pnambic.depan.platform"
+         version="0.0.0"/>
+
+</feature>
+

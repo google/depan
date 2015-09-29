@@ -9,8 +9,9 @@
 
   <name>DepAn Maven Parent</name>
   <description>Maven build context for all DepAn components</description>
-  
+
   <properties>
+    <maven.compiler.version>3.1</maven.compiler.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <tycho.version>0.23.1</tycho.version>
   </properties>
@@ -20,7 +21,7 @@
 
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.1</version>
+        <version>${maven.compiler.version}</version>
         <configuration>
           <source/>
           <target/>
@@ -32,6 +33,18 @@
         <artifactId>tycho-maven-plugin</artifactId>
         <version>${tycho.version}</version>
         <extensions>true</extensions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>target-platform-configuration</artifactId>
+        <version>${tycho.version}</version>
+
+        <!-- Target details are merged from release parents -->
+        <configuration>
+          <resolver>p2</resolver>
+          <pomDependencies>consider</pomDependencies>
+        </configuration>
       </plugin>
     </plugins>
   </build>

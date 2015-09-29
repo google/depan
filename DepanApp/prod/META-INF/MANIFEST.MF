@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: DepAn
 Bundle-SymbolicName: com.google.devtools.depan;singleton:=true
-Bundle-Version: 0.0.8
+Bundle-Version: 0.0.8.qualifier
 Bundle-Vendor: Google Inc.
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,
@@ -16,8 +16,10 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui.editors,
  org.eclipse.ui.workbench.texteditor,
  com.google.devtools.depan.core,
- com.google.devtools.depan.jogl,
- com.google.devtools.depan.libraries
+ com.google.guava,
+ depan-jogl-library,
+ depan-jung-library,
+ depan-xstream-library
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Export-Package: com.google.devtools.depan.eclipse.cm,

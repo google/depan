@@ -1,0 +1,60 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.pnambic.depan</groupId>
+    <artifactId>depan-library-parent</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <relativePath>../depan-library-parent</relativePath>
+  </parent>
+
+  <artifactId>depan-xstream-library</artifactId>
+  <packaging>bundle</packaging>
+
+  <name>Depan XStream Libraries</name>
+  <description>XStream libraries packages for DepAn</description>
+
+  <properties>
+    <xstream.version>1.4.7</xstream.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.thoughtworks.xstream</groupId>
+      <artifactId>xstream</artifactId>
+      <version>${xstream.version}</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <version>${bundle.version}</version>
+        <extensions>true</extensions>
+        <configuration>
+         <instructions>
+           <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+           <Bundle-Vendor>Pnambic Computing</Bundle-Vendor>
+           <Embed-Dependency>*</Embed-Dependency>
+           <Export-Package>
+              com.thoughtworks.xstream,
+              com.thoughtworks.xstream.converters,
+              com.thoughtworks.xstream.io,
+              com.thoughtworks.xstream.io.xml,
+              com.thoughtworks.xstream.mapper
+           </Export-Package>
+           <_nouses>true</_nouses>
+           <_removeheaders>
+             Embed-Dependency,
+             Embed-Artifacts,
+             Import-Package,
+             Private-Package
+           </_removeheaders>
+         </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
+
