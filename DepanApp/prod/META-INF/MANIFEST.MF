@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: DepAn
 Bundle-SymbolicName: com.google.devtools.depan;singleton:=true
 Bundle-Version: 0.0.8.qualifier
-Bundle-Vendor: Google Inc.
+Bundle-Vendor: Pnambic Computing
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,

@@ -16,4 +16,4 @@ Export-Package: com.google.devtools.depan.filesystem,
  com.google.devtools.depan.filesystem.editors,
  com.google.devtools.depan.filesystem.graph,
  com.google.devtools.depan.filesystem.integration
-Bundle-Vendor: Google Inc.
+Bundle-Vendor: Pnambic Computing

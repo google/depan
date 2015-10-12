@@ -11,5 +11,6 @@
 
   <properties>
     <bundle.version>2.5.3</bundle.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 </project>
