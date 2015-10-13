@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>DepanFileSystem</name>
+	<name>depan-filesystem-feature</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -11,12 +11,7 @@
 			</arguments>
 		</buildCommand>
 		<buildCommand>
-			<name>org.eclipse.pde.ManifestBuilder</name>
-			<arguments>
-			</arguments>
-		</buildCommand>
-		<buildCommand>
-			<name>org.eclipse.pde.SchemaBuilder</name>
+			<name>org.eclipse.pde.FeatureBuilder</name>
 			<arguments>
 			</arguments>
 		</buildCommand>
@@ -27,8 +22,8 @@
 		</buildCommand>
 	</buildSpec>
 	<natures>
-		<nature>org.eclipse.m2e.core.maven2Nature</nature>
-		<nature>org.eclipse.pde.PluginNature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
+		<nature>org.eclipse.m2e.core.maven2Nature</nature>
+		<nature>org.eclipse.pde.FeatureNature</nature>
 	</natures>
 </projectDescription>

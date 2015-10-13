@@ -2,14 +2,16 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: DepanFileSystem
 Bundle-SymbolicName: com.google.devtools.depan.filesystem;singleton:=true
-Bundle-Version: 1.0.3
+Bundle-Version: 1.0.4.qualifier
 Require-Bundle: com.google.devtools.depan,
  com.google.devtools.depan.core,
  org.eclipse.core.resources,
  org.eclipse.core.runtime,
  org.eclipse.jface.text,
  org.eclipse.ui,
- com.google.devtools.depan.libraries
+ com.google.guava,
+ depan-jogl-library,
+ depan-xstream-library
 Export-Package: com.google.devtools.depan.filesystem,
  com.google.devtools.depan.filesystem.builder,
  com.google.devtools.depan.filesystem.eclipse,

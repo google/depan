@@ -21,8 +21,10 @@
     <!-- Plugins -->
     <module>../DepanCore/prod</module>
     <module>../DepanApp/prod</module>
+    <module>../DepanFileSystem/prod</module>
 
     <!-- Features -->
+    <module>../depan-filesystem-feature</module>
     <module>../depan-platform-feature</module>
     <module>../depan-win64-feature</module>
 

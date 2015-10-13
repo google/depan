@@ -21,5 +21,8 @@
          id="com.pnambic.depan.platform"
          version="0.0.0"/>
 
-</feature>
+   <includes
+         id="com.pnambic.depan.filesystem.feature"
+         version="0.0.0"/>
 
+</feature>

@@ -34,17 +34,16 @@
       </win>
    </launcher>
 
-
    <vm>
    </vm>
-
 
    <plugins>
    </plugins>
 
    <features>
-      <feature id="com.pnambic.depan.win64.feature" version="1.0.0.qualifier"/>
-      <feature id="com.pnambic.depan.platform" version="1.0.0.qualifier"/>
+      <feature id="com.pnambic.depan.win64.feature"/>
+      <feature id="com.pnambic.depan.platform"/>
+      <feature id="com.pnambic.depan.filesystem.feature"/>
       <feature id="org.eclipse.emf.ecore"/>
       <feature id="org.eclipse.e4.rcp"/>
       <feature id="org.eclipse.emf.common"/>
