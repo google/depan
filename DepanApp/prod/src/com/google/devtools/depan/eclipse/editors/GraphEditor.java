@@ -146,7 +146,9 @@ public class GraphEditor
         } catch (IllegalArgumentException ex) {
           // bad layout. don't do anything for the layout, but still finish the
           // creation of the view.
-          System.err.println("Bad layout selected.");
+          logger.warning("Bad layout selected.");
+        } catch (Exception errView) {
+          logger.throwing("GraphEditor", "Create View.widgetSelected", errView);
         }
       }
     });
@@ -284,11 +286,13 @@ public class GraphEditor
     CheckboxTreeViewer treeView = checkNodeTreeView.getCheckboxTreeViewer();
     GraphNode topNode = getFirstNode(treeView);
     if (null == topNode) {
+      logger.info("no topNode");
       return;
     }
 
     Collection<GraphNode> nodes = getSelectedNodes(treeView);
     if (nodes.isEmpty()) {
+      logger.info("empty nodes");
       return;
     }
 

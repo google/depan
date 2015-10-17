@@ -274,8 +274,13 @@ public class ViewEditor extends MultiPageEditorPart {
 
   @Override
   protected void createPages() {
-    createDiagramPage();
-    createDetailsPage();
+    try {
+      createDiagramPage();
+      createDetailsPage();
+    } catch (Exception err) {
+      logger.log(Level.SEVERE,
+              "Unable to create View pages", err);
+    }
   }
 
   private void createDiagramPage() {
@@ -286,43 +291,43 @@ public class ViewEditor extends MultiPageEditorPart {
     parent.setLayout(pageLayout);
 
     // bottom composite containing main diagram
-    renderer = new View(parent, SWT.NONE, this);
+    renderer = createView(parent);
     renderer.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, true));
 
     // Configure the rendering pipe before listening for changes.
+    prepareView();
+    renderer.start();
+
+    int index = addPage(parent);
+    setPageText(index, "Graph View");
+  }
+
+  /**
+   * Ensure that any failures in View creation, and the underlying JOGL
+   * rendering system are visible to users.
+   * 
+   * @param parent
+   * @return 
+   */
+  private View createView(Composite parent) {
+    // bottom composite containing main diagram
+    try {
+      return new View(parent, SWT.NONE, this);
+    } catch (Exception err) {
+      logger.log(Level.SEVERE,
+              "Unable to create View pages", err);
+      throw err;
+    }
+}
+
+  private void prepareView() {
     renderer.setGraphModel(getViewGraph(), getJungGraph(), getNodeRanking());
     renderer.initCameraPosition(viewInfo.getScenePrefs());
     renderer.initializeNodeLocations(viewInfo.getNodeLocations());
     initCollapseRendering(viewInfo.getCollapseState());
     initSelectedNodes(getSelectedNodes());
     initEdgeRendering();
-    renderer.start();
-
-    // Force a layout if there are no locations.
-    if (viewInfo.getNodeLocations().isEmpty()) {
-      addDrawingListener(new DrawingListener() {
-
-        @Override
-        public void updateDrawingBounds(
-            Rectangle2D drawing, Rectangle2D viewport) {
-          // Don't layout nodes if no layout is defined
-          LayoutGenerator selectedLayout = getSelectedLayout();
-          if (null == selectedLayout ) {
-            return;
-          }
-
-          // Run the layout process on all nodes in the view.
-          applyLayout(selectedLayout,
-              viewInfo.getLayoutFinder(), viewInfo.getViewNodes());
-
-          // Only need to do this once on startup
-          removeDrawingListener(this);
-        }});
-    }
-
-    int index = addPage(parent);
-    setPageText(index, "Graph View");
   }
 
   protected String edgeToolTip(GraphEdge edge) {
@@ -382,6 +387,29 @@ public class ViewEditor extends MultiPageEditorPart {
     // Listen to changes in the underlying ViewModel
     viewPrefsListener = new Listener();
     viewInfo.addPrefsListener(viewPrefsListener);
+
+    // Force a layout if there are no locations.
+    if (viewInfo.getNodeLocations().isEmpty()) {
+      markDirty();
+      addDrawingListener(new DrawingListener() {
+
+        @Override
+        public void updateDrawingBounds(
+            Rectangle2D drawing, Rectangle2D viewport) {
+          // Don't layout nodes if no layout is defined
+          LayoutGenerator selectedLayout = getSelectedLayout();
+          if (null == selectedLayout ) {
+            return;
+          }
+
+          // Run the layout process on all nodes in the view.
+          applyLayout(selectedLayout,
+              viewInfo.getLayoutFinder(), viewInfo.getViewNodes());
+
+          // Only need to do this once on startup
+          removeDrawingListener(this);
+        }});
+    }
   }
 
   private void initFromInput(IEditorInput input) throws PartInitException {

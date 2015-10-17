@@ -16,6 +16,8 @@
 
 package com.google.devtools.depan.eclipse;
 
+import com.google.devtools.depan.eclipse.visualization.JoglLoader;
+
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.swt.widgets.Display;
@@ -31,6 +33,8 @@ public class Application implements IApplication {
   @Override
   public Object start(IApplicationContext context) throws Exception {
     Display display = PlatformUI.createDisplay();
+    JoglLoader.prepareJoglLoader();
+
     try {
       int returnCode = PlatformUI.createAndRunWorkbench(
           display, new ApplicationWorkbenchAdvisor());
