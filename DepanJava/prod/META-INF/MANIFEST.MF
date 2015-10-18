@@ -2,8 +2,8 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: DepanJava
 Bundle-SymbolicName: com.google.devtools.depan.java;singleton:=true
-Bundle-Version: 1.0.4
-Bundle-Vendor: Google Inc.
+Bundle-Version: 1.0.4.qualifier
+Bundle-Vendor: Pnambic Computing
 Export-Package: com.google.devtools.depan.java,
  com.google.devtools.depan.java.eclipse,
  com.google.devtools.depan.java.editors,
@@ -16,6 +16,6 @@ Require-Bundle: org.eclipse.core.resources,
  com.google.devtools.depan.core,
  com.google.devtools.depan,
  com.google.devtools.depan.filesystem,
- com.google.devtools.depan.libraries
-Bundle-ClassPath: .,
- asm-3.1.jar
+ com.google.guava,
+ depan-xstream-library
+Bundle-ClassPath: .

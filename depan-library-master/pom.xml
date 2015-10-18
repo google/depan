@@ -21,6 +21,7 @@
     <module>../depan-library-parent</module>
 
     <!-- Repackaged 3rd Party Modules -->
+    <module>../depan-asm-library</module>
     <module>../depan-jogl-library</module>
     <module>../depan-jung-library</module>
     <module>../depan-xstream-library</module>
