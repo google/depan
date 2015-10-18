@@ -1,19 +1,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-    <parent>
+  <parent>
     <groupId>com.pnambic.depan</groupId>
     <artifactId>depan-luna-parent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <relativePath>../../depan-luna-parent</relativePath>
   </parent>
 
-  <artifactId>com.google.devtools.depan.java.bytecode</artifactId>
+  <artifactId>com.google.devtools.depan.javascript</artifactId>
   <packaging>eclipse-plugin</packaging>
-  <version>1.0.4-SNAPSHOT</version>
+  <version>0.0.3-SNAPSHOT</version>
 
-  <name>DepAn Bytecode Plugin</name>
-  <description>Bytecode analyzer and graph builder for DepAn</description>
+  <name>Depan JavaScript Analysis Definitions</name>
+  <description>JavaScript analysis definitions for Depan</description>
 
   <build>
     <sourceDirectory>src</sourceDirectory>
@@ -26,24 +26,7 @@
       <artifactId>guava</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>com.pnambic.depan</groupId>
-      <artifactId>depan-jogl-library</artifactId>
-    </dependency>
-
-    <!-- DepAn Packaged libraries -->
-    <dependency>
-      <groupId>com.pnambic.depan</groupId>
-      <artifactId>depan-asm-library</artifactId>
-    </dependency>
-
     <!-- DepAn dependencies -->
-    <dependency>
-      <groupId>com.pnambic.depan</groupId>
-      <artifactId>com.google.devtools.depan.core</artifactId>
-      <version>1.0.5-SNAPSHOT</version>
-    </dependency>
-
     <dependency>
       <groupId>com.pnambic.depan</groupId>
       <artifactId>com.google.devtools.depan.filesystem</artifactId>
@@ -51,5 +34,4 @@
     </dependency>
 
   </dependencies>
-
 </project>

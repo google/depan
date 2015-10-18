@@ -21,13 +21,16 @@
     <!-- Plugins -->
     <module>../DepanCore/prod</module>
     <module>../DepanApp/prod</module>
+
+    <module>../DepanBytecode/prod</module>
     <module>../DepanFileSystem/prod</module>
     <module>../DepanJava/prod</module>
-    <module>../DepanBytecode/prod</module>
+    <module>../DepanJavaScript/prod</module>
 
     <!-- Features -->
-    <module>../depan-java-feature</module>
     <module>../depan-filesystem-feature</module>
+    <module>../depan-java-feature</module>
+    <module>../depan-javascript-feature</module>
     <module>../depan-platform-feature</module>
     <module>../depan-win64-feature</module>
 

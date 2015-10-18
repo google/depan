@@ -1,0 +1,36 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.pnambic.depan</groupId>
+    <artifactId>depan-luna-parent</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <relativePath>../depan-luna-parent</relativePath>
+  </parent>
+
+  <artifactId>com.pnambic.depan.javascript.feature</artifactId>
+  <packaging>eclipse-feature</packaging>
+  <version>1.0.0-SNAPSHOT</version>
+
+  <name>DepAn JavaScript Analysis Feature</name>
+  <description>DepAn JavaScript Analysis Feature</description>
+
+  <dependencies>
+      <!-- Third party dependencies -->
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+    </dependency>
+
+    <!-- DepAn Packaged libraries -->
+
+    <!-- DepAn plugin dependencies -->
+    <dependency>
+      <groupId>com.pnambic.depan</groupId>
+      <artifactId>com.google.devtools.depan.javascript</artifactId>
+      <version>0.0.3-SNAPSHOT</version>
+    </dependency>
+
+  </dependencies>
+
+</project>
