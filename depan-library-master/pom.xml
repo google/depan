@@ -20,6 +20,9 @@
     <module>../depan-luna-target</module>
     <module>../depan-library-parent</module>
 
+    <!-- Pre-packaged OSGi 3rd Party Bundles -->
+    <module>../depan-osgi-library</module>
+
     <!-- Repackaged 3rd Party Modules -->
     <module>../depan-asm-library</module>
     <module>../depan-jogl-library</module>

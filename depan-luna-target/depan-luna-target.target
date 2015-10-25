@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?pde version="3.8"?><target name="DepAn RCP Target" sequenceNumber="0">
+<?pde version="3.8"?><target name="DepAn RCP Target" sequenceNumber="12">
 <locations>
 <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.equinox.executable.feature.group" version="3.6.102.v20150204-1316"/>
@@ -8,5 +8,6 @@
 <unit id="org.eclipse.rcp.sdk.id" version="4.4.2.M20150204-1700"/>
 <repository location="http://download.eclipse.org/releases/luna"/>
 </location>
+<location path="${resource_loc:/depan-osgi-library/target/dependency}" type="Directory"/>
 </locations>
 </target>
