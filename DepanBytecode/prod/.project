@@ -31,11 +31,4 @@
 		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>org.eclipse.pde.PluginNature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>asm-5.0.4.jar</name>
-			<type>1</type>
-			<locationURI>THIRD_PARTY_HOME/asm/asm-5.0.4/lib/asm-5.0.4.jar</locationURI>
-		</link>
-	</linkedResources>
 </projectDescription>
