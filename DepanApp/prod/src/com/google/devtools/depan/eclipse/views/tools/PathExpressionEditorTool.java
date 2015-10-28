@@ -17,6 +17,7 @@
 package com.google.devtools.depan.eclipse.views.tools;
 
 import com.google.common.collect.Sets;
+
 import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.persist.XmlPersistentPathExpression;
 import com.google.devtools.depan.eclipse.plugins.SourcePluginRegistry;
@@ -249,6 +250,7 @@ public class PathExpressionEditorTool
 
     // create an empty composite to make some space between save/load part and
     // list controls
+    @SuppressWarnings("unused")
     Composite dummy = new Composite(column4, SWT.NONE);
 
     Composite saveLoadPanel = new Composite(column4, SWT.BORDER);

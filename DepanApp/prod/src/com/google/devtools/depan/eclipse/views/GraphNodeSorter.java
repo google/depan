@@ -28,8 +28,8 @@ import org.eclipse.jface.viewers.Viewer;
  */
 public class GraphNodeSorter extends NodeSorter {
 
+  @SuppressWarnings("rawtypes")
   @Override
-  @SuppressWarnings({"unchecked", "cast"})
   public int compare(Viewer viewer, Object e1, Object e2) {
     if ((e1 instanceof GraphNode) && (e2 instanceof GraphNode)) {
       return compare(viewer, ((GraphNode) e1),
@@ -38,8 +38,8 @@ public class GraphNodeSorter extends NodeSorter {
     return super.compare(viewer, e1, e2);
   }
 
+  @SuppressWarnings("rawtypes")
   @Override
-  @SuppressWarnings("unchecked")
   public int category(Object element) {
     if (element instanceof NodeWrapper) {
       return category(((NodeWrapper) element).getNode());

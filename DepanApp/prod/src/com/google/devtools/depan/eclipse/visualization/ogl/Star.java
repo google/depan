@@ -28,6 +28,7 @@ import javax.media.opengl.GL2;
  */
 public class Star extends OpenGLShape {
 
+  @SuppressWarnings("unused")
   private static final long serialVersionUID = 0L;
 
   /**

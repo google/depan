@@ -34,12 +34,13 @@ public class NodeViewAdapterFactory<E> implements IAdapterFactory {
 
   // NodeViewAdapterFactory should be parameterized, but cannot make static
   // reference to the non-static type E
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   private static NodeViewAdapterFactory instance = null;
 
   // suppressWarning, because getAdapter have a Class as parameter, but
   // Class should be parameterized. To update if the IAdapterFactory is updated.
-  @SuppressWarnings("unchecked")
+  @Override
+  @SuppressWarnings("rawtypes")
   public Object getAdapter(Object adaptableObject, Class adapterType) {
     if (adapterType != IWorkbenchAdapter.class) {
       return null;
@@ -51,12 +52,13 @@ public class NodeViewAdapterFactory<E> implements IAdapterFactory {
     return null;
   }
 
+  @Override
   public Class<?>[] getAdapterList() {
     return new Class[] {IWorkbenchAdapter.class};
   }
 
   // suppressWarning: NodeViewAdapterFactory should be parameterized.
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   protected static void register() {
     if (null == instance) {
       instance = new NodeViewAdapterFactory();

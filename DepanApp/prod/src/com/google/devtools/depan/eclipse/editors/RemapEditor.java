@@ -192,6 +192,7 @@ public class RemapEditor extends MultiPageEditorPart
     return this.isDirty;
   }
 
+  @Override
   public void dataUpdated(Object source) {
     setDirtyState(true);
     for (MigrationTaskListener listener : taskListeners) {

@@ -68,7 +68,6 @@ public class Binop<T extends BinaryOperators<T>>
    *
    * @author ycoppel@google.com (Yohann Coppel)
    */
-  @SuppressWarnings("hiding")
   public enum Operators {
     AND("&"),
     OR("|"),
@@ -110,10 +109,13 @@ public class Binop<T extends BinaryOperators<T>>
     and.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
     and.setImage(Resources.IMAGE_AND);
     and.addSelectionListener(new SelectionListener() {
+
+      @Override
       public void widgetDefaultSelected(SelectionEvent e) {
         newTree(Operators.AND);
       }
 
+      @Override
       public void widgetSelected(SelectionEvent e) {
         newTree(Operators.AND);
       }
@@ -124,10 +126,13 @@ public class Binop<T extends BinaryOperators<T>>
     or.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
     or.setImage(Resources.IMAGE_OR);
     or.addSelectionListener(new SelectionListener() {
+
+      @Override
       public void widgetDefaultSelected(SelectionEvent e) {
         newTree(Operators.OR);
       }
 
+      @Override
       public void widgetSelected(SelectionEvent e) {
         newTree(Operators.OR);
       }
@@ -138,10 +143,13 @@ public class Binop<T extends BinaryOperators<T>>
     xor.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
     xor.setImage(Resources.IMAGE_XOR);
     xor.addSelectionListener(new SelectionListener() {
+
+      @Override
       public void widgetDefaultSelected(SelectionEvent e) {
         newTree(Operators.XOR);
       }
 
+      @Override
       public void widgetSelected(SelectionEvent e) {
         newTree(Operators.XOR);
       }
@@ -152,10 +160,13 @@ public class Binop<T extends BinaryOperators<T>>
     not.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
     not.setImage(Resources.IMAGE_NOT);
     not.addSelectionListener(new SelectionListener() {
+
+      @Override
       public void widgetDefaultSelected(SelectionEvent e) {
         newTree(Operators.NOT);
       }
 
+      @Override
       public void widgetSelected(SelectionEvent e) {
         newTree(Operators.NOT);
       }
@@ -165,10 +176,14 @@ public class Binop<T extends BinaryOperators<T>>
     delete.setText("Delete tree");
     delete.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
     delete.addSelectionListener(new SelectionListener() {
+
+      @Override
       public void widgetDefaultSelected(SelectionEvent e) {
         widgetSelected(e);
       }
-      @SuppressWarnings("unchecked")
+
+      @Override
+      @SuppressWarnings({ "rawtypes", "unchecked" })
       public void widgetSelected(SelectionEvent e) {
         Object o = ((ITreeSelection) treeViewer.getSelection())
           .getFirstElement();
@@ -196,6 +211,8 @@ public class Binop<T extends BinaryOperators<T>>
     treeViewer.setContentProvider(new BaseWorkbenchContentProvider());
     treeViewer.setInput(rootTree);
     treeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+
+      @Override
       @SuppressWarnings("unchecked")
       public void selectionChanged(SelectionChangedEvent event) {
         Object o = ((ITreeSelection) treeViewer.getSelection())
@@ -212,10 +229,13 @@ public class Binop<T extends BinaryOperators<T>>
     createView.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false,
         numColumns, 1));
     createView.addSelectionListener(new SelectionListener() {
+
+      @Override
       public void widgetDefaultSelected(SelectionEvent e) {
         apply();
       }
 
+      @Override
       public void widgetSelected(SelectionEvent e) {
         apply();
       }
@@ -240,7 +260,6 @@ public class Binop<T extends BinaryOperators<T>>
     updateTree();
   }
 
-  @SuppressWarnings("unchecked")
   private void newTree(Operators op, Tree<T> with, T obj) {
     Tree<T> parent = with.parent;
     BinTree<T> insert = new BinTree<T>(with, new Leaf<T>(obj), op);
@@ -255,7 +274,6 @@ public class Binop<T extends BinaryOperators<T>>
     selectedTree = insert;
   }
 
-  @SuppressWarnings("unchecked")
   private void deleteTree(Tree<T> toDelete) {
     System.out.println("delete " + toDelete);
     Tree<T> parent = toDelete.parent;
@@ -289,7 +307,6 @@ public class Binop<T extends BinaryOperators<T>>
     }
   }
 
-  @SuppressWarnings("unchecked")
   private T build(Tree<T> tree) {
     if (tree instanceof BinTree) {
       return build((BinTree<T>) tree);
@@ -453,7 +470,8 @@ public class Binop<T extends BinaryOperators<T>>
 
   private IWorkbenchAdapter treeAdapter = new IWorkbenchAdapter() {
 
-    @SuppressWarnings("unchecked")
+    @Override
+    @SuppressWarnings("rawtypes")
     public Object[] getChildren(Object o) {
       if (o instanceof Root && null != ((Root) o).getFirstTree()) {
         return new Object[] {((Root) o).getFirstTree()};
@@ -463,7 +481,8 @@ public class Binop<T extends BinaryOperators<T>>
       return new Object[] {};
     }
 
-    @SuppressWarnings("unchecked")
+    @Override
+    @SuppressWarnings("rawtypes")
     public ImageDescriptor getImageDescriptor(Object object) {
       if (object instanceof BinTree) {
         String icon = getIcon(((BinTree) object).op);
@@ -487,21 +506,26 @@ public class Binop<T extends BinaryOperators<T>>
       return "icons/sample.gif";
     }
 
+    @Override
+    @SuppressWarnings("rawtypes")
     public String getLabel(Object o) {
       if (o instanceof BinTree) {
-        return ((BinTree<?>) o).op.toString() + " - " + o.toString();
+        return ((BinTree) o).op.toString() + " - " + o.toString();
       }
       return o.toString();
     }
 
+    @Override
+    @SuppressWarnings("rawtypes")
     public Object getParent(Object o) {
-      return ((Tree<?>) o).parent;
+      return ((Tree) o).parent;
     }
   };
 
   // suppress the warning for the Class, which should be parameterized.
   // We can't here: getAdapter is not declared with a parameterized Class.
-  @SuppressWarnings("unchecked")
+  @Override
+  @SuppressWarnings("rawtypes")
   public Object getAdapter(Object adaptableObject, Class adapterType) {
     if (adapterType != IWorkbenchAdapter.class) {
       return null;
@@ -512,7 +536,8 @@ public class Binop<T extends BinaryOperators<T>>
     return null;
   }
 
-  @SuppressWarnings("unchecked")
+  @Override
+  @SuppressWarnings("rawtypes")
   public Class[] getAdapterList() {
     return new Class[] {IWorkbenchAdapter.class};
   }

@@ -29,6 +29,7 @@ class NodeTreeViewAdapter<E> implements IWorkbenchAdapter {
     return ((NodeTreeView.NodeWrapper<E>) obj).getNode();
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public Object[] getChildren(Object o) {
     if (o instanceof NodeTreeView.NodeWrapper) {
@@ -50,7 +51,7 @@ class NodeTreeViewAdapter<E> implements IWorkbenchAdapter {
     return nodeWrapper.childs;
   }
 
-  @SuppressWarnings("unchecked")
+  @Override
   public ImageDescriptor getImageDescriptor(Object o) {
     if (o instanceof NodeTreeView.NodeWrapper) {
       return SourcePluginRegistry.getImageDescriptor(getGraphNode(o));
@@ -59,7 +60,7 @@ class NodeTreeViewAdapter<E> implements IWorkbenchAdapter {
     }
   }
 
-  @SuppressWarnings("unchecked")
+  @Override
   public String getLabel(Object o) {
     if (o instanceof NodeTreeView.NodeWrapper) {
       return getGraphNode(o).friendlyString();
@@ -70,6 +71,7 @@ class NodeTreeViewAdapter<E> implements IWorkbenchAdapter {
     return o.toString();
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public Object getParent(Object o) {
     if (o instanceof NodeTreeView.NodeWrapper) {

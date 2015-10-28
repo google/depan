@@ -32,15 +32,18 @@ public class ForwardIdentityRelationFinder implements RelationFinder {
   private ForwardIdentityRelationFinder() {
   }
 
+  @Override
   public boolean match(Relation find) {
     // Really?
     return true;
   }
 
+  @Override
   public boolean matchBackward(Relation find) {
     return false;
   }
 
+  @Override
   public boolean matchForward(Relation find) {
     return true;
   }

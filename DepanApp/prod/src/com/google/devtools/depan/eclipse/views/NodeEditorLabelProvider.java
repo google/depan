@@ -54,6 +54,7 @@ public class NodeEditorLabelProvider extends LabelProvider implements
    * @see org.eclipse.jface.viewers.ITableLabelProvider
    *      #getColumnImage(java.lang.Object, int)
    */
+  @Override
   @SuppressWarnings("unchecked")
   public Image getColumnImage(Object element, int columnIndex) {
     if (!(element instanceof NodeWrapper)) {
@@ -85,12 +86,7 @@ public class NodeEditorLabelProvider extends LabelProvider implements
     return viewEditor.isSelected(node);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.jface.viewers.ITableLabelProvider
-   *      #getColumnText(java.lang.Object, int)
-   */
+  @Override
   @SuppressWarnings("unchecked")
   public String getColumnText(Object element, int columnIndex) {
     if (element instanceof NodeWrapper) {

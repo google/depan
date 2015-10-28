@@ -27,6 +27,8 @@ public class JoglLoader {
 
   public static void prepareJoglLoader() {
     JarUtil.setResolver( new JarUtil.Resolver() {
+
+      @Override
       public URL resolve( URL url ) {
           try {
               URL urlTest = FileLocator.resolve( url );

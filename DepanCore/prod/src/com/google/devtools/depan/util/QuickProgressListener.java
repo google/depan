@@ -53,13 +53,8 @@ public class QuickProgressListener implements ProgressListener {
     this.listener = listener;
     this.slowDown = slowDown;
   }
-  
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.google.devtools.depan.util.interfaces.ProgressListener
-   *      #progress(java.lang.String, int, int)
-   */
+
+  @Override
   public void progress(String curentJob, int n, int total) {
     position++;
     // send one progress notification over slowDown;

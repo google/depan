@@ -110,17 +110,22 @@ public class AnalysisOutputPart {
 
     // Install listeners after initial value assignments
     containerText.addModifyListener(new ModifyListener() {
+
+      @Override
       public void modifyText(ModifyEvent e) {
         dialogChanged();
       }
     });
     button.addSelectionListener(new SelectionAdapter() {
+
       @Override
       public void widgetSelected(SelectionEvent e) {
         handleBrowse();
       }
     });
     fileText.addModifyListener(new ModifyListener() {
+
+      @Override
       public void modifyText(ModifyEvent e) {
         dialogChanged();
       }

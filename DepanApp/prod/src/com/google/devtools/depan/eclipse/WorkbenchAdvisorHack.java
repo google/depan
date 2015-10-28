@@ -228,7 +228,6 @@ public abstract class WorkbenchAdvisorHack extends WorkbenchAdvisor {
     return new NavigatorRoot();
   }
 
-  @SuppressWarnings("restriction")
   @Override
   public void preStartup() {
     WorkbenchAdapterBuilder.registerAdapters();

@@ -66,12 +66,7 @@ public class NewRelationshipSetPage extends WizardPage {
         + ".dpans file, or create a new .dpans file with a new set.");
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.jface.dialogs.IDialogPage
-   *      #createControl(org.eclipse.swt.widgets.Composite)
-   */
+  @Override
   public void createControl(Composite parent) {
     Composite composite = new Composite(parent, SWT.NONE);
     GridLayout layout = new GridLayout(4, false);
@@ -88,6 +83,8 @@ public class NewRelationshipSetPage extends WizardPage {
 
     // actions
     ModifyListener listener = new ModifyListener() {
+
+      @Override
       public void modifyText(ModifyEvent e) {
         dialogChanged();
       }

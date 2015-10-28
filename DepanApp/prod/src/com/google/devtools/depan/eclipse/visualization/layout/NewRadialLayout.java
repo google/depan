@@ -100,6 +100,7 @@ public class NewRadialLayout extends NewTreeLayout {
       super(layoutGraph, relations);
     }
 
+    @Override
     public int getLeafCount() {
       int layoutLeafs = super.getLeafCount();
       if (orphans.size() > layoutLeafs) {
@@ -192,6 +193,7 @@ public class NewRadialLayout extends NewTreeLayout {
       this.radiansPerLeaf = 2.0 * Math.PI / this.circumference;
     }
 
+    @Override
     public void layoutTree() {
       super.layoutTree();
       assignOrphans(maxLevel);
@@ -205,6 +207,7 @@ public class NewRadialLayout extends NewTreeLayout {
       }
     }
 
+    @Override
     protected int getCurrOffset(int level) {
       int result = super.getCurrOffset(level);
       if (level > maxLevel) {

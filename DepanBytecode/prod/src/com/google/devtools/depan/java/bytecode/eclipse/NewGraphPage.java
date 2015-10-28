@@ -189,17 +189,22 @@ public class NewGraphPage extends AbstractAnalysisPage {
   private void installListeners() {
     // Listeners for jar selection controls
     jarRadio.addListener(SWT.Selection, new Listener() {
+
+      @Override
       public void handleEvent(Event event) {
         enable(true);
         dialogChanged();
       }
     });
     jarPath.addModifyListener(new ModifyListener() {
+
+      @Override
       public void modifyText(ModifyEvent e) {
         dialogChanged();
       }
     });
     jarBrowse.addSelectionListener(new SelectionAdapter() {
+
       @Override
       public void widgetSelected(SelectionEvent e) {
         handleFileBrowse(jarPath);
@@ -208,12 +213,15 @@ public class NewGraphPage extends AbstractAnalysisPage {
 
     // Listeners for directory selection controls
     dirRadio.addListener(SWT.Selection, new Listener() {
+      @Override
       public void handleEvent(Event event) {
         enable(false);
         dialogChanged();
       }
     });
     dirPath.addModifyListener(new ModifyListener() {
+
+      @Override
       public void modifyText(ModifyEvent e) {
         dialogChanged();
       }
@@ -227,22 +235,28 @@ public class NewGraphPage extends AbstractAnalysisPage {
 
     // Listeners for Filters controls.
     packageFilter.addModifyListener(new ModifyListener() {
+
+      @Override
       public void modifyText(ModifyEvent e) {
         dialogChanged();
       }
     });
     directoryFilter.addModifyListener(new ModifyListener() {
+
+      @Override
       public void modifyText(ModifyEvent e) {
         dialogChanged();
       }
     });
     dirFilterButton.addSelectionListener(new SelectionAdapter() {
+
       @Override
       public void widgetSelected(SelectionEvent e) {
         handleBrowse(directoryFilter);
       }
     });
     infer.addSelectionListener(new SelectionAdapter() {
+
       @Override
       public void widgetSelected(SelectionEvent e) {
         inferDirectoryFilter();

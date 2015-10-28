@@ -45,6 +45,7 @@ public class SteperPlugin extends RenderingPlugin {
     this.elapsedTime = elapsedTime;
   }
 
+  @Override
   public boolean keyPressed(int keycode, char character, boolean ctrl,
       boolean alt, boolean shift) {
     return false;

@@ -71,6 +71,8 @@ public abstract class AbstractAnalysisWizard extends Wizard
   @Override
   public boolean performFinish() {
     IRunnableWithProgress op = new IRunnableWithProgress() {
+
+      @Override
       public void run(IProgressMonitor monitor)
           throws InvocationTargetException {
         performAnalysis(monitor);

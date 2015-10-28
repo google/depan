@@ -63,6 +63,8 @@ public class NewNamedRelationshipSetWizard extends Wizard
     final String containerName = page.getContainerName();
     final String filename = page.getFileName();
     IRunnableWithProgress op = new IRunnableWithProgress() {
+
+      @Override
       public void run(IProgressMonitor monitor)
           throws InvocationTargetException {
         try {

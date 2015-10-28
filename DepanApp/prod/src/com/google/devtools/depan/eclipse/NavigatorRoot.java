@@ -34,7 +34,8 @@ public class NavigatorRoot implements IAdaptable, IPersistableElement,
 
   // suppress the warning for the Class, which should be parameterized.
   // We can't here: getAdapter is not declared with a parameterized Class.
-  @SuppressWarnings("unchecked")
+  @Override
+  @SuppressWarnings("rawtypes")
   public Object getAdapter(Class adapter) {
     if (adapter == IPersistableElement.class) {
       return this;
@@ -45,15 +46,18 @@ public class NavigatorRoot implements IAdaptable, IPersistableElement,
     return null;
   }
 
+  @Override
   public String getFactoryId() {
     return this.getClass().getCanonicalName();
   }
 
+  @Override
   public void saveState(IMemento memento) {
     // TODO Auto-generated method stub
     return;
   }
 
+  @Override
   public IAdaptable createElement(IMemento memento) {
     return ResourcesPlugin.getWorkspace().getRoot();
   }

@@ -42,9 +42,11 @@ public class CollapseTreeViewAdapterFactory<E> implements IAdapterFactory {
 
   // suppressWarning, because getAdapter have a Class as parameter, but
   // Class should be parameterized. To update if the IAdapterFactory is updated.
+  @Override
+  @SuppressWarnings("rawtypes")
   public Object getAdapter(
       Object adaptableObject,
-      @SuppressWarnings("rawtypes") Class adapterType) {
+      Class adapterType) {
     if (adapterType != IWorkbenchAdapter.class) {
       return null;
     }
@@ -57,6 +59,7 @@ public class CollapseTreeViewAdapterFactory<E> implements IAdapterFactory {
     return null;
   }
 
+  @Override
   public Class<?>[] getAdapterList() {
     return new Class[] {IWorkbenchAdapter.class};
   }

@@ -149,7 +149,7 @@ public class ElementKindPicker extends Composite {
     TableColumn[] columns = elementKindTable.getColumns();
 
     int index = 0;
-    for (TableColumn column : elementKindTable.getColumns()) {
+    for (TableColumn column : columns) {
       final int colIndex = index++;
 
       column.addSelectionListener(new SelectionAdapter() {

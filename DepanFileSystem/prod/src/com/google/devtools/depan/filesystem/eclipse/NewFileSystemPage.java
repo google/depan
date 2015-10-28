@@ -90,6 +90,8 @@ public class NewFileSystemPage extends AbstractAnalysisPage {
     pathEntry = new Text(source, SWT.BORDER | SWT.SINGLE);
     pathEntry.setLayoutData(createHorzFillData());
     pathEntry.addModifyListener(new ModifyListener() {
+
+      @Override
       public void modifyText(ModifyEvent e) {
         dialogChanged();
       }

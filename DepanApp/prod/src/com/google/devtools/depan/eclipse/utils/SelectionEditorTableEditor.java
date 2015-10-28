@@ -48,23 +48,13 @@ public class SelectionEditorTableEditor extends LabelProvider
     this.changeListener = changeListener;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.jface.viewers.ICellModifier #canModify(java.lang.Object,
-   *      java.lang.String)
-   */
+  @Override
   public boolean canModify(Object element, String property) {
     return EditColTableDef.get(
         RelationshipPickerHelper.TABLE_DEF, property).isEditable();
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.jface.viewers.ICellModifier #getValue(java.lang.Object,
-   *      java.lang.String)
-   */
+  @Override
   public Object getValue(Object element, String property) {
     if (element instanceof DirectedRelation) {
       DirectedRelation relation = ((DirectedRelation) element);
@@ -77,12 +67,7 @@ public class SelectionEditorTableEditor extends LabelProvider
     return null;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.jface.viewers.ICellModifier #modify(java.lang.Object,
-   *      java.lang.String, java.lang.Object)
-   */
+  @Override
   public void modify(Object element, String property, Object value) {
     if (!(value instanceof Boolean)) {
       return;
@@ -112,13 +97,10 @@ public class SelectionEditorTableEditor extends LabelProvider
     table.update(o, new String[] {property});
   }
 
-  /*
-   * (non-Javadoc)
+  /**
    * return null, since we don't have icons (yet) for relationships.
-   *
-   * @see org.eclipse.jface.viewers.ITableLabelProvider
-   *      #getColumnImage(java.lang.Object, int)
    */
+  @Override
   public Image getColumnImage(Object element, int columnIndex) {
     if (element instanceof DirectedRelation) {
       DirectedRelation relation = ((DirectedRelation) element);
@@ -135,12 +117,7 @@ public class SelectionEditorTableEditor extends LabelProvider
     return null;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.jface.viewers.ITableLabelProvider
-   *      #getColumnText(java.lang.Object, int)
-   */
+  @Override
   public String getColumnText(Object element, int columnIndex) {
     if (element instanceof DirectedRelation) {
       DirectedRelation relation = ((DirectedRelation) element);

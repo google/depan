@@ -27,50 +27,23 @@ import com.google.devtools.depan.tasks.MigrationRule;
  */
 public class MigrationTaskAdapter implements MigrationTaskListener {
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see com.google.devtools.depan.eclipse.editors.MigrationTaskListener
-   *      #dataUpdated()
-   */
+  @Override
   public void dataUpdated(Object source) {
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see com.google.devtools.depan.eclipse.editors.MigrationTaskListener
-   *      #groupUpdated(com.google.devtools.depan.tasks.MigrationGroup)
-   */
+  @Override
   public void groupUpdated(Object source, MigrationGroup group) {
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see com.google.devtools.depan.eclipse.editors.MigrationTaskListener
-   *      #groupsListUpdated()
-   */
+  @Override
   public void groupsListUpdated(Object source) {
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see com.google.devtools.depan.eclipse.editors.MigrationTaskListener
-   *      #ruleListUpdated(com.google.devtools.depan.tasks.MigrationGroup)
-   */
+  @Override
   public void ruleListUpdated(Object source, MigrationGroup group) {
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see com.google.devtools.depan.eclipse.editors.MigrationTaskListener
-   *      #ruleUpdated(java.lang.Object,
-   *      com.google.devtools.depan.tasks.MigrationGroup,
-   *      com.google.devtools.depan.tasks.MigrationRule)
-   */
+  @Override
   public void ruleUpdated(
       Object source, MigrationGroup group, MigrationRule<?> rule) {
   }

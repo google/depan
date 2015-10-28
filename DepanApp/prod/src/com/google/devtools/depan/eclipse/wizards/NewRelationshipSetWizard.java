@@ -76,6 +76,8 @@ public class NewRelationshipSetWizard extends Wizard implements INewWizard {
     final String filename = page.getFilename();
     final String setname = page.getSetname();
     IRunnableWithProgress op = new IRunnableWithProgress() {
+
+      @Override
       public void run(IProgressMonitor monitor) {
         try {
           doFinish(filename, setname, monitor);

@@ -115,12 +115,7 @@ public class RemapOverview extends MigrationTaskAdapter
     return control;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.swt.events.SelectionListener
-   *      #widgetSelected(org.eclipse.swt.events.SelectionEvent)
-   */
+  @Override
   public void widgetSelected(SelectionEvent e) {
     selectGroup(migrationGroupList.getSelected());
   }
@@ -136,33 +131,16 @@ public class RemapOverview extends MigrationTaskAdapter
     remapTable.setData(selectedGroup.getMigrationRules());
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.swt.events.SelectionListener
-   *      #widgetDefaultSelected(org.eclipse.swt.events.SelectionEvent)
-   */
+  @Override
   public void widgetDefaultSelected(SelectionEvent e) {
     // noop
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see com.google.devtools.depan.eclipse.editors.MigrationTaskAdapter
-   *      #dataUpdated(java.lang.Object)
-   */
   @Override
   public void dataUpdated(Object source) {
     migrationTaskView.fillContent();
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see com.google.devtools.depan.eclipse.editors.MigrationTaskAdapter
-   *      #groupsListUpdated(java.lang.Object)
-   */
   @Override
   public void groupsListUpdated(Object source) {
     migrationGroupList.refresh();

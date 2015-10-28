@@ -32,12 +32,7 @@ import com.google.devtools.depan.tasks.MigrationRule;
 public class RemapTableHelper extends LabelProvider
     implements ITableLabelProvider {
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.jface.viewers.ITableLabelProvider
-   *      #getColumnImage(java.lang.Object, int)
-   */
+  @Override
   public Image getColumnImage(Object element, int columnIndex) {
     if (element instanceof MigrationRule) {
       MigrationRule<?> rule = (MigrationRule<?>) element;
@@ -51,12 +46,7 @@ public class RemapTableHelper extends LabelProvider
     return null;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.jface.viewers.ITableLabelProvider
-   *      #getColumnText(java.lang.Object, int)
-   */
+  @Override
   public String getColumnText(Object element, int columnIndex) {
     if (element instanceof MigrationRule) {
       MigrationRule<?> rule = (MigrationRule<?>) element;

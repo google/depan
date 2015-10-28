@@ -48,22 +48,27 @@ public abstract class JavaElementDispatcher<R> implements JavaElementVisitor {
   public abstract R match(InterfaceElement e);
   public abstract R match(PackageElement e);
 
+  @Override
   public void visitTypeElement(TypeElement element) {
     returnValue = match(element);
   }
 
+  @Override
   public void visitMethodElement(MethodElement element) {
     returnValue = match(element);
   }
 
+  @Override
   public void visitFieldElement(FieldElement element) {
     returnValue = match(element);
   }
 
+  @Override
   public void visitInterfaceElement(InterfaceElement element) {
     returnValue = match(element);
   }
 
+  @Override
   public void visitPackageElement(PackageElement element) {
     returnValue = match(element);
   }

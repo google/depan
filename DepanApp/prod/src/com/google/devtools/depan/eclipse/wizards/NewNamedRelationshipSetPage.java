@@ -57,12 +57,7 @@ public class NewNamedRelationshipSetPage extends WizardPage {
     this.selection = selection;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.jface.dialogs.IDialogPage
-   *      #createControl(org.eclipse.swt.widgets.Composite)
-   */
+  @Override
   public void createControl(Composite parent) {
     Composite composite = new Composite(parent, SWT.NONE);
     GridLayout layout = new GridLayout(3, false);
@@ -81,6 +76,8 @@ public class NewNamedRelationshipSetPage extends WizardPage {
 
     // actions
     ModifyListener listener = new ModifyListener() {
+
+      @Override
       public void modifyText(ModifyEvent e) {
         dialogChanged();
       }

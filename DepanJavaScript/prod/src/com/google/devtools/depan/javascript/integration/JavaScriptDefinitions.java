@@ -70,6 +70,8 @@ public class JavaScriptDefinitions {
 
     // Define XML serialization
     CONFIG_XML_PERSIST = new Config() {
+
+      @Override
       public void  config(XStream xstream) {
         xstream.alias("js-builtin", JavaScriptBuiltinElement.class);
         xstream.alias("js-class", JavaScriptClassElement.class);

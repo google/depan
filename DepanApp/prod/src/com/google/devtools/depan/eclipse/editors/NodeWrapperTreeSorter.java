@@ -29,7 +29,7 @@ import org.eclipse.jface.viewers.Viewer;
  */
 public class NodeWrapperTreeSorter extends NodeSorter {
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   @Override
   public int compare(Viewer viewer, Object e1, Object e2) {
     if ((e1 instanceof NodeWrapper) && (e2 instanceof NodeWrapper)) {
@@ -42,7 +42,7 @@ public class NodeWrapperTreeSorter extends NodeSorter {
     return super.compare(viewer, e1, e2);
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   @Override
   public int category(Object element) {
     if (element instanceof NodeWrapper) {

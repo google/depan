@@ -114,11 +114,7 @@ public class DefaultElementFilter extends JavaElementDispatcher<Boolean>
     return passPackageNameFilter(e.getPackageName());
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see ElementFilter#passFilter(GraphNode)
-   */
+  @Override
   public boolean passFilter(GraphNode node) {
     return transform(node);
   }

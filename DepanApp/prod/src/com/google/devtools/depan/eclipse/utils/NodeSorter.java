@@ -28,7 +28,6 @@ import org.eclipse.jface.viewers.ViewerSorter;
  */
 public class NodeSorter extends ViewerSorter {
 
-  @SuppressWarnings("unchecked")
   @Override
   public int compare(Viewer viewer, Object e1, Object e2) {
     if ((e1 instanceof Element) && (e2 instanceof Element)) {
@@ -38,7 +37,6 @@ public class NodeSorter extends ViewerSorter {
   }
 
   // TODO(leeca): add category determination to SourcePluginRegistry
-  @SuppressWarnings("unchecked")
   @Override
   public int category(Object element) {
     return super.category(element);

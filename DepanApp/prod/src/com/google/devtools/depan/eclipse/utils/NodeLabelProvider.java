@@ -29,7 +29,7 @@ import org.eclipse.swt.graphics.Image;
 public class NodeLabelProvider extends LabelProvider implements
     ITableLabelProvider {
 
-  @SuppressWarnings("unchecked")
+  @Override
   public Image getColumnImage(Object element, int columnIndex) {
     if (element instanceof GraphNode) {
       return Tools.getIcon((GraphNode) element);
@@ -37,13 +37,7 @@ public class NodeLabelProvider extends LabelProvider implements
     return null;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.jface.viewers.ITableLabelProvider
-   *      #getColumnText(java.lang.Object, int)
-   */
-  @SuppressWarnings("unchecked")
+  @Override
   public String getColumnText(Object element, int columnIndex) {
     if (element instanceof GraphNode) {
       return getColumnText((GraphNode) element, columnIndex);

@@ -66,12 +66,7 @@ public class RelationshipSetAdapter extends MultipleDirectedRelationFinder
     }
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see com.google.devtools.depan.relationships.RelationshipSet
-   *      #getBackwardRelations()
-   */
+  @Override
   public Collection<Relation> getBackwardRelations() {
     Collection<Relation> backwardRelations = new ArrayList<Relation>();
     for (Relation relation : map.keySet()) {
@@ -83,12 +78,7 @@ public class RelationshipSetAdapter extends MultipleDirectedRelationFinder
     return backwardRelations;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see com.google.devtools.depan.relationships.RelationshipSet
-   *      #getForwardRelations()
-   */
+  @Override
   public Collection<Relation> getForwardRelations() {
     Collection<Relation> forwardRelations = new ArrayList<Relation>();
     for (Relation relation : map.keySet()) {
@@ -100,9 +90,7 @@ public class RelationshipSetAdapter extends MultipleDirectedRelationFinder
     return forwardRelations;
   }
 
-  /* (non-Javadoc)
-   * @see com.google.devtools.depan.relationships.RelationshipSet#getName()
-   */
+  @Override
   public String getName() {
     return name;
   }
@@ -123,25 +111,13 @@ public class RelationshipSetAdapter extends MultipleDirectedRelationFinder
     return getName();
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see com.google.devtools.depan.relationship.RelationshipSet
-   *      #setMatchBackward(com.google.devtools.depan.graph.api.Relation,
-   *      boolean)
-   */
+  @Override
   public void setMatchBackward(Relation relation, boolean isMatching) {
     this.addOrReplaceRelation(
         relation, this.matchForward(relation), isMatching);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see com.google.devtools.depan.relationship.RelationshipSet
-   *      #setMatchForward(com.google.devtools.depan.graph.api.Relation,
-   *      boolean)
-   */
+  @Override
   public void setMatchForward(Relation relation, boolean isMatching) {
     this.addOrReplaceRelation(
         relation, isMatching, this.matchBackward(relation));

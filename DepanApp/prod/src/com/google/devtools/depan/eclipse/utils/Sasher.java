@@ -116,6 +116,8 @@ public class Sasher extends Composite {
 
     // move event / constraints:
     sash.addListener(SWT.Selection, new Listener() {
+
+      @Override
       public void handleEvent(Event e) {
         if (isVertical()) {
           resizeVertical(e, sashData);

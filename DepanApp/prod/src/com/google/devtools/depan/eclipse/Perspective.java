@@ -34,12 +34,7 @@ public class Perspective implements IPerspectiveFactory {
   public static final String PERSPECTIVE_ID =
       "com.google.devtools.depan.eclipse.perspective";
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.ui.IPerspectiveFactory
-   *      #createInitialLayout(org.eclipse.ui.IPageLayout)
-   */
+  @Override
   public void createInitialLayout(IPageLayout layout) {
     // Define shortcuts for DepAn perspective
     layout.addShowViewShortcut(Tools.VIEW_ID);

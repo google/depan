@@ -72,22 +72,28 @@ public class SatelliteView extends ViewPart {
   }
 
   private IPartListener partListener = new IPartListener() {
+
+    @Override
     public void partOpened(IWorkbenchPart part) {
       trackOpenChatEditors(part);
     }
 
+    @Override
     public void partDeactivated(IWorkbenchPart part) {
     }
 
+    @Override
     public void partClosed(IWorkbenchPart part) {
       editor = null;
       refresh();
     }
 
+    @Override
     public void partBroughtToTop(IWorkbenchPart part) {
       trackOpenChatEditors(part);
     }
 
+    @Override
     public void partActivated(IWorkbenchPart part) {
       trackOpenChatEditors(part);
     }

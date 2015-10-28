@@ -98,12 +98,7 @@ public class MultipleDirectedRelationFinder
     map.put(rel, new BasicDirectedRelation(rel, forward, backward));          
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.google.devtools.depan.graph.api.DirectedRelationFinder
-   *      #matchBackward(com.google.devtools.depan.graph.api.Relation)
-   */
+  @Override
   public boolean matchBackward(Relation find) {
     if (map.containsKey(find)) {
       return map.get(find).matchBackward();
@@ -111,12 +106,7 @@ public class MultipleDirectedRelationFinder
     return false;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.google.devtools.depan.graph.api.DirectedRelationFinder
-   *      #matchForward(com.google.devtools.depan.graph.api.Relation)
-   */
+  @Override
   public boolean matchForward(Relation find) {
     if (map.containsKey(find)) {
       return map.get(find).matchForward();
@@ -195,6 +185,7 @@ public class MultipleDirectedRelationFinder
    * @return A collection of <code>GraphNode</code> objects that is the result
    * of applying this filter to the input.
    */
+  @Override
   public Collection<GraphNode> nextMatch(
       GraphModel graph, Collection<GraphNode> input) {
     Collection<GraphNode> result = Sets.newHashSet();

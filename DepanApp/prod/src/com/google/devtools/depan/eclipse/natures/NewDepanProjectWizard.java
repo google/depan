@@ -26,7 +26,6 @@ import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
  */
 public class NewDepanProjectWizard extends BasicNewProjectResourceWizard {
 
-  @SuppressWarnings("hiding")  // Interfering with cheap Project wizard
   public static final String WIZARD_ID =
       "com.google.devtools.depan.eclipse.natures.NewDepanProjectWizard";
 

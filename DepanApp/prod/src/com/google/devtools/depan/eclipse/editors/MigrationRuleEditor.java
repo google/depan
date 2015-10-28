@@ -170,6 +170,8 @@ public class MigrationRuleEditor extends MigrationTaskAdapter {
 
     // actions
     groupSelect.addSelectionChangedListener(new ISelectionChangedListener() {
+
+      @Override
       public void selectionChanged(SelectionChangedEvent event) {
         IStructuredSelection selection =
           (IStructuredSelection) groupSelect.getSelection();
@@ -184,6 +186,8 @@ public class MigrationRuleEditor extends MigrationTaskAdapter {
     });
 
     rules.addSelectionChangedListener(new ISelectionChangedListener() {
+
+      @Override
       public void selectionChanged(SelectionChangedEvent event) {
         IStructuredSelection selection =
             (IStructuredSelection) rules.getSelection();

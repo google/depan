@@ -50,6 +50,7 @@ public class LayoutPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
     return true;
   }
 
+  @Override
   public void postFrame() {
   }
 

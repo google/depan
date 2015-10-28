@@ -46,6 +46,8 @@ public class AlphabeticSorter extends ViewerSorter {
 
   private static final ViewerObjectToString DEFAULT_TO_STRING =
     new ViewerObjectToString() {
+
+    @Override
       public String getString(Object object) {
         return object.toString();
       }

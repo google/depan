@@ -42,6 +42,8 @@ public class UniversalRadialLayout extends UniversalTreeLayout {
       LazyMap.decorate(
           new HashMap<GraphNode, PolarPoint>(),
           new Transformer<GraphNode, PolarPoint>() {
+
+            @Override
             public PolarPoint transform(GraphNode arg0) {
               return new PolarPoint();
             }

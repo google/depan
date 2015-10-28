@@ -29,6 +29,8 @@ import com.thoughtworks.xstream.XStream;
 public class JavaDefinitions {
 
   public static Config configXmlPersist = new Config() {
+
+    @Override
     public void  config(XStream xstream) {
       xstream.alias("java-field", FieldElement.class);
       xstream.alias("java-interface", InterfaceElement.class);

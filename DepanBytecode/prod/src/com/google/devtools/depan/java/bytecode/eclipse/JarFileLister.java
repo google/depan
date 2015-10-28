@@ -97,8 +97,6 @@ public class JarFileLister {
     int count = zipFile.size();
     int index = 0;
 
-    String dir =  null;
-
     Enumeration<? extends ZipEntry> entries = zipFile.entries();
     while (entries.hasMoreElements()) {
       ZipEntry entry = entries.nextElement();

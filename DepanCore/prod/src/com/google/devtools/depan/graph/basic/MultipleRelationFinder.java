@@ -29,39 +29,23 @@ import java.util.HashSet;
 public class MultipleRelationFinder implements RelationFinder {
 
   private HashSet<Relation> set = new HashSet<Relation>();
-  
+
   public MultipleRelationFinder(Collection<Relation> matchingRelations) {
     set.addAll(matchingRelations);
   }
-  
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.google.devtools.depan.graph.api.RelationFinder
-   *      #match(com.google.devtools.depan.graph.api.Relation)
-   */
+
+  @Override
   public boolean match(Relation find) {
     return set.contains(find);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.google.devtools.depan.graph.api.DirectedRelationFinder
-   *      #matchBackward(com.google.devtools.depan.graph.api.Relation)
-   */
+  @Override
   public boolean matchBackward(Relation find) {
     return match(find);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.google.devtools.depan.graph.api.DirectedRelationFinder
-   *      #matchForward(com.google.devtools.depan.graph.api.Relation)
-   */
+  @Override
   public boolean matchForward(Relation find) {
     return match(find);
   }
-
 }

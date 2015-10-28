@@ -187,6 +187,8 @@ public class MigrationGroupEditor extends MigrationTaskAdapter {
 
     // actions
     groupSelect.addSelectionChangedListener(new ISelectionChangedListener() {
+
+      @Override
       public void selectionChanged(SelectionChangedEvent event) {
         newSelection();
       }
@@ -230,6 +232,8 @@ public class MigrationGroupEditor extends MigrationTaskAdapter {
     InputDialog dialog = new InputDialog(control.getShell(),
         "New Migration Group", "Select a name for the group", "",
         new IInputValidator() {
+
+          @Override
           public String isValid(String newText) {
             if (newText.length() <= 0) {
               return "The name must contains at least one character.";
