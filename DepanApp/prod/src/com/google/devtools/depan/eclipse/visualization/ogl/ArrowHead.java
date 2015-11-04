@@ -18,9 +18,9 @@ package com.google.devtools.depan.eclipse.visualization.ogl;
 
 import com.google.devtools.depan.eclipse.editors.EdgeDisplayProperty.ArrowheadStyle;
 
-import java.awt.geom.Point2D;
+import com.jogamp.opengl.GL2;
 
-import javax.media.opengl.GL2;
+import java.awt.geom.Point2D;
 
 /**
  * Abstract class that represents an arrow head.

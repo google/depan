@@ -16,6 +16,8 @@
 
 package com.google.devtools.depan.eclipse.visualization.ogl;
 
+import com.jogamp.opengl.GL2;
+
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
@@ -23,8 +25,6 @@ import java.awt.geom.CubicCurve2D;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-
-import javax.media.opengl.GL2;
 
 /**
  * A class capable of drawing <strong>simple</strong> AWT shapes on an openGL

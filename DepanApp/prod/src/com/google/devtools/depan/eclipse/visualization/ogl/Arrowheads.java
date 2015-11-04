@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.eclipse.visualization.ogl;
 
-import javax.media.opengl.GL2;
+import com.jogamp.opengl.GL2;
 
 /**
  * Holds a number of Arrowhead implementation. This class cannot be

@@ -16,6 +16,13 @@
 
 package com.google.devtools.depan.eclipse.visualization.ogl;
 
+import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GLContext;
+import com.jogamp.opengl.GLDrawableFactory;
+import com.jogamp.opengl.GLProfile;
+import com.jogamp.opengl.glu.GLU;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
@@ -36,13 +43,6 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.nio.IntBuffer;
 import java.util.logging.Logger;
-
-import javax.media.opengl.GL;
-import javax.media.opengl.GL2;
-import javax.media.opengl.GLContext;
-import javax.media.opengl.GLDrawableFactory;
-import javax.media.opengl.GLProfile;
-import javax.media.opengl.glu.GLU;
 
 /**
  * An abstract GLScene. Handling OpenGL specific details.

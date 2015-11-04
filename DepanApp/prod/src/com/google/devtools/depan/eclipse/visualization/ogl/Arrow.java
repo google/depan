@@ -18,10 +18,10 @@ package com.google.devtools.depan.eclipse.visualization.ogl;
 
 import com.google.devtools.depan.eclipse.editors.EdgeDisplayProperty.ArrowheadStyle;
 
+import com.jogamp.opengl.GL2;
+
 import java.awt.geom.Point2D;
 import java.awt.geom.QuadCurve2D;
-
-import javax.media.opengl.GL2;
 
 /**
  * An arrow shape: the line, and the head.

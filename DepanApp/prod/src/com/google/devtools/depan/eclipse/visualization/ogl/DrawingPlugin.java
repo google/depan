@@ -19,14 +19,13 @@ package com.google.devtools.depan.eclipse.visualization.ogl;
 import com.google.devtools.depan.eclipse.visualization.plugins.core.EdgeRenderingPlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.core.NodeRenderingPlugin;
 
+import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureCoords;
 
 import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-
-import javax.media.opengl.GL2;
 
 /**
  * Plugin drawing nodes and edges on an openGL canvas.

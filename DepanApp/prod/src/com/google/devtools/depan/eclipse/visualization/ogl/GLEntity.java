@@ -16,10 +16,10 @@
 
 package com.google.devtools.depan.eclipse.visualization.ogl;
 
+import com.jogamp.opengl.GL2;
+
 import java.awt.Shape;
 import java.awt.geom.Rectangle2D;
-
-import javax.media.opengl.GL2;
 
 /**
  * Abstract class for any shape, that can be rendered on an openGL canvas.
@@ -58,4 +58,3 @@ public abstract class GLEntity implements Shape {
   public abstract void fill(GL2 gl);
 
 }
-

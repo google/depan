@@ -14,11 +14,7 @@
   <description>JOGL libraries packaged for DepAn</description>
 
   <properties>
-    <jogamp.version>2.1.2</jogamp.version>
-<!-- 
-    # Removes screenshot suppot
-    <jogamp.version>2.2.4</jogamp.version>
- -->
+    <jogamp.version>2.3.2</jogamp.version>
   </properties>
 
   <dependencies>
@@ -47,14 +43,12 @@
            <Bundle-Vendor>Pnambic Computing</Bundle-Vendor>
            <Embed-Dependency>*</Embed-Dependency>
            <Embed-Transitive>true</Embed-Transitive>
-<!-- 
-           <Embed-StripVersion>true</Embed-StripVersion>
- -->
            <Export-Package>
              com.jogamp.common.util,
              com.jogamp.opengl,
              com.jogamp.opengl.fixedfunc,
              com.jogamp.opengl.glu,
+             com.jogamp.opengl.util,
              com.jogamp.opengl.util.awt,
              com.jogamp.opengl.util.texture,
              javax.media.opengl,

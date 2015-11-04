@@ -23,8 +23,7 @@ import java.awt.font.FontRenderContext;
 import java.awt.font.TextLayout;
 import java.awt.geom.Rectangle2D;
 
-import javax.media.opengl.GL2;
-
+import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.awt.TextRenderer;
 import com.jogamp.opengl.util.awt.TextureRenderer;
 

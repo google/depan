@@ -16,9 +16,9 @@
 
 package com.google.devtools.depan.eclipse.visualization.ogl;
 
-import java.awt.geom.Point2D;
+import com.jogamp.opengl.GL2;
 
-import javax.media.opengl.GL2;
+import java.awt.geom.Point2D;
 
 /**
  * Create a star, or a regular polygon, depending on the insideness value.
