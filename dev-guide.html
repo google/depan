@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>DepAn</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-light.css">
+    <meta name="viewport" content="width=device-width">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>DepAn</h1>
+        <p>Direct manipulation tool for visualization, analysis, and refactoring of dependencies in large applications.</p>
+
+        <p class="view"><a href="https://github.com/google/depan">View the Project on GitHub <small>google/depan</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/google/depan/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/google/depan/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/google/depan">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h3>
+<a id="depan-dev-guide" class="anchor" href="#depan-dev-guide" aria-hidden="true"><span class="octicon octicon-link"></span></a>DepAn Developer 
+Quick Start</h3>
+
+<p>Experienced Eclipse and Maven practitioners should be able to get started with this abbreviated sequence:</p>
+<ol>
+  <li>Clone the repository.
+    <br><code>git clone git@github.com:google/depan.git</code></li>
+  <li>Build the libraries.
+    <br><code>mvn -f depan-library-master</code></li>
+  <li>Start Eclipse.</li>
+  <li>Import only the projects <code>depan-luna-target</code>, <code>depan-osgi-library</code>,
+   and <code>Tools</code>.</li>
+  <li>Set the target from <code>depan-luna-target/depan-luna-target.target</code>.</li>
+  <li>Import remaining projects from DepAn repository.
+    <br>Except Test projects.  Delete them from workspace.</li>
+</ol>
+Details for Eclipse setup, including coding conventions, etc., are included in the detailed sections.
+
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/google">google</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
