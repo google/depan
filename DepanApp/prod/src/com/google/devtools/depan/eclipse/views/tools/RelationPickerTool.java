@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.eclipse.views.tools;
 
+import com.google.devtools.depan.eclipse.editors.EdgeDisplayProperty;
 import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
 import com.google.devtools.depan.eclipse.plugins.SourcePluginRegistry;
@@ -32,7 +33,6 @@ import com.google.devtools.depan.graph.api.RelationFinder;
 import com.google.devtools.depan.graph.basic.MultipleRelationFinder;
 import com.google.devtools.depan.graph.basic.ReversedDirectedRelationFinder;
 import com.google.devtools.depan.model.RelationshipSet;
-import com.google.devtools.depan.view.EdgeDisplayProperty;
 
 import com.google.common.collect.Lists;
 

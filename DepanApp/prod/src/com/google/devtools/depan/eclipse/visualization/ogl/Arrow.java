@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.eclipse.visualization.ogl;
 
-import com.google.devtools.depan.view.EdgeDisplayProperty.ArrowheadStyle;
+import com.google.devtools.depan.eclipse.editors.EdgeDisplayProperty.ArrowheadStyle;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.QuadCurve2D;

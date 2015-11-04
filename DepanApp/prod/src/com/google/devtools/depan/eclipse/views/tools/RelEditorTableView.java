@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.eclipse.views.tools;
 
+import com.google.devtools.depan.eclipse.editors.EdgeDisplayProperty;
 import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
 import com.google.devtools.depan.eclipse.plugins.SourcePluginEntry;
 import com.google.devtools.depan.eclipse.plugins.SourcePluginRegistry;
@@ -26,7 +27,6 @@ import com.google.devtools.depan.eclipse.utils.LabelProviderToString;
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.utils.Tools;
 import com.google.devtools.depan.graph.api.Relation;
-import com.google.devtools.depan.view.EdgeDisplayProperty;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;

@@ -5,8 +5,7 @@ Bundle-SymbolicName: com.google.devtools.depan.core;singleton:=true
 Bundle-Version: 1.0.5.qualifier
 Bundle-Vendor: Pnambic Computing
 Require-Bundle: com.google.guava,
- joda-time,
- depan-jung-library
+ joda-time
 Export-Package: com.google.devtools.depan.filters,
  com.google.devtools.depan.graph.api,
  com.google.devtools.depan.graph.basic,

@@ -30,7 +30,6 @@ import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerators;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.RelationshipSet;
-import com.google.devtools.depan.view.EdgeDisplayProperty;
 
 import com.google.common.collect.Sets;
 

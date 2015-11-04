@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.view;
+package com.google.devtools.depan.eclipse.editors;
 
 import java.awt.Color;
 

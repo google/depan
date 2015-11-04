@@ -29,11 +29,6 @@
       <groupId>joda-time</groupId>
       <artifactId>joda-time</artifactId>
     </dependency>
-
-    <dependency>
-      <groupId>com.pnambic.depan</groupId>
-      <artifactId>depan-jung-library</artifactId>
-    </dependency>
   </dependencies>
 
 </project>

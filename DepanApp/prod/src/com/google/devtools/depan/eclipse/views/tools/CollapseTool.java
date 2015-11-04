@@ -17,6 +17,7 @@
 package com.google.devtools.depan.eclipse.views.tools;
 
 import com.google.devtools.depan.eclipse.editors.HierarchyCache;
+import com.google.devtools.depan.eclipse.editors.NodeDisplayProperty;
 import com.google.devtools.depan.eclipse.editors.ViewPrefsListener;
 import com.google.devtools.depan.eclipse.trees.GraphData;
 import com.google.devtools.depan.eclipse.trees.collapse_tree.CollapseTreeProvider;
@@ -33,7 +34,6 @@ import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.RelationshipSet;
 import com.google.devtools.depan.view.CollapseData;
 import com.google.devtools.depan.view.CollapseTreeModel;
-import com.google.devtools.depan.view.NodeDisplayProperty;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;

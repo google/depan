@@ -16,13 +16,13 @@
 
 package com.google.devtools.depan.eclipse.views;
 
+import com.google.devtools.depan.eclipse.editors.NodeDisplayProperty;
 import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.trees.NodeTreeView.NodeWrapper;
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.utils.Tools;
 import com.google.devtools.depan.eclipse.views.tools.NodeEditorTool;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.view.NodeDisplayProperty;
 
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;

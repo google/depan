@@ -43,8 +43,6 @@ import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.RelationshipSet;
 import com.google.devtools.depan.view.CollapseData;
 import com.google.devtools.depan.view.CollapseTreeModel;
-import com.google.devtools.depan.view.EdgeDisplayProperty;
-import com.google.devtools.depan.view.NodeDisplayProperty;
 import com.google.devtools.depan.view.TreeModel;
 
 import com.google.common.collect.Lists;

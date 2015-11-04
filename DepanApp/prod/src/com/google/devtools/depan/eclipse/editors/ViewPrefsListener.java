@@ -20,8 +20,6 @@ import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.view.CollapseData;
-import com.google.devtools.depan.view.EdgeDisplayProperty;
-import com.google.devtools.depan.view.NodeDisplayProperty;
 
 import java.awt.geom.Point2D;
 import java.util.Collection;
