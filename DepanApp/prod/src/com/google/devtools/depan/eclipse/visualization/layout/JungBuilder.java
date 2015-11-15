@@ -15,9 +15,9 @@
  */
 package com.google.devtools.depan.eclipse.visualization.layout;
 
-import com.google.devtools.depan.graph.api.DirectedRelationFinder;
-import com.google.devtools.depan.graph.basic.ForwardIdentityRelationFinder;
 import com.google.devtools.depan.model.GraphEdge;
+import com.google.devtools.depan.model.GraphEdgeMatcherDescriptor;
+import com.google.devtools.depan.model.GraphEdgeMatcherDescriptors;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 
@@ -41,8 +41,8 @@ public class JungBuilder {
   private final GraphModel graphModel;
   private Collection<GraphNode> movableNodes = GraphNode.EMPTY_NODE_LIST;
   private Collection<GraphNode> fixedNodes = GraphNode.EMPTY_NODE_LIST;
-  private DirectedRelationFinder relationFinder = 
-          ForwardIdentityRelationFinder.FINDER;
+  private GraphEdgeMatcherDescriptor edgeMatcher = 
+      GraphEdgeMatcherDescriptors.FORWARD;
 
   public JungBuilder(GraphModel graphModel) {
     this.graphModel = graphModel;
@@ -56,8 +56,8 @@ public class JungBuilder {
     this.fixedNodes = fixedNodes;
   }
 
-  public void setRelations(DirectedRelationFinder relations) {
-    this.relationFinder = relations;
+  public void setEdgeMatcher(GraphEdgeMatcherDescriptor edgeMatcher) {
+    this.edgeMatcher = edgeMatcher;
   }
 
   public DirectedGraph<GraphNode, GraphEdge> build() {
@@ -93,10 +93,10 @@ public class JungBuilder {
       if (!includedNodes.contains(edge.getTail()))
         continue;
 
-      if (relationFinder.matchForward(edge.getRelation())) {
+      if (edgeMatcher.edgeForward(edge)) {
         addForwardEdge(result, edge);
       }
-      else if (relationFinder.matchBackward(edge.getRelation())) {
+      else if (edgeMatcher.edgeReverse(edge)) {
         addReverseEdge(result, edge);
       }
     }

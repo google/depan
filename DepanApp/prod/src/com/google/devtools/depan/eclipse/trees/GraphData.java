@@ -16,15 +16,15 @@
 
 package com.google.devtools.depan.eclipse.trees;
 
-import com.google.common.collect.Maps;
-
 import com.google.devtools.depan.eclipse.trees.NodeTreeView.NodeWrapper;
 import com.google.devtools.depan.eclipse.trees.NodeTreeView.NodeWrapperRoot;
-import com.google.devtools.depan.graph.api.DirectedRelationFinder;
+import com.google.devtools.depan.model.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.view.HierarchicalTreeModel;
 import com.google.devtools.depan.view.TreeModel;
+
+import com.google.common.collect.Maps;
 
 import org.eclipse.jface.viewers.TreePath;
 
@@ -75,9 +75,9 @@ public class GraphData<F> {
 
   public static <F> GraphData<F> createGraphData(
       NodeTreeProvider<F> provider,
-      GraphModel graph, DirectedRelationFinder relFinder) {
+      GraphModel graph, GraphEdgeMatcherDescriptor edgeMatcher) {
     TreeModel hierarchy =
-        new HierarchicalTreeModel(graph.computeSpanningHierarchy(relFinder));
+        new HierarchicalTreeModel(graph.computeSpanningHierarchy(edgeMatcher));
     return new GraphData<F>(provider, hierarchy);
   }
 

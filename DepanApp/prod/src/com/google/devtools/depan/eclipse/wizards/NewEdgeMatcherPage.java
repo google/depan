@@ -39,12 +39,15 @@ import org.eclipse.ui.dialogs.ResourceSelectionDialog;
 import org.eclipse.ui.dialogs.SaveAsDialog;
 
 /**
- * A wizard page to create a new named relationship set.
+ * A wizard page to create a new named edge matcher.
  *
+ * Based on the legacy {@code NewRelationshipSetWizard}, and should share the
+ * same Toolkit persistance model with it.
+ * 
  * @author ycoppel@google.com (Yohann Coppel)
  *
  */
-public class NewRelationshipSetPage extends WizardPage {
+public class NewEdgeMatcherPage extends WizardPage {
 
   /**
    * The file where we want to add the new relationship set (can be a new file)
@@ -59,10 +62,10 @@ public class NewRelationshipSetPage extends WizardPage {
   /**
    * Construct the new Wizard page.
    */
-  protected NewRelationshipSetPage() {
-    super("New Named set of relationships");
-    setTitle("New Named set of relationships");
-    setDescription("Add a new set of relationships to a already existing "
+  protected NewEdgeMatcherPage() {
+    super("New Named Edge Matcher");
+    setTitle("New Named Edge Matcher");
+    setDescription("Add an edge matcher to a already existing "
         + ".dpans file, or create a new .dpans file with a new set.");
   }
 
@@ -198,5 +201,4 @@ public class NewRelationshipSetPage extends WizardPage {
   public String getSetname() {
     return setName.getText();
   }
-
 }

@@ -25,13 +25,11 @@ import com.google.devtools.depan.eclipse.trees.collapse_tree.CollapseTreeView;
 import com.google.devtools.depan.eclipse.trees.collapse_tree.CollapseTreeView.CollapseDataWrapper;
 import com.google.devtools.depan.eclipse.trees.collapse_tree.CollapseTreeWrapperSorter;
 import com.google.devtools.depan.eclipse.utils.HierarchyViewer;
-import com.google.devtools.depan.eclipse.utils.RelationshipSelectorListener;
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.utils.TableContentProvider;
-import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptor;
 import com.google.devtools.depan.eclipse.views.ViewSelectionListenerTool;
+import com.google.devtools.depan.model.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.model.RelationshipSet;
 import com.google.devtools.depan.view.CollapseData;
 import com.google.devtools.depan.view.CollapseTreeModel;
 
@@ -70,9 +68,8 @@ import java.util.List;
  *
  * @author ycoppel@google.com (Yohann Coppel)
  */
-public class CollapseTool extends ViewSelectionListenerTool
-    implements RelationshipSelectorListener {
-  
+public class CollapseTool extends ViewSelectionListenerTool {
+
   private static final CollapseTreeWrapperSorter<NodeDisplayProperty> SORTER =
       new CollapseTreeWrapperSorter<NodeDisplayProperty>();
 
@@ -262,7 +259,7 @@ public class CollapseTool extends ViewSelectionListenerTool
 
   private void setupAutoCollapseGroup(Composite parent) {
     Group autoCollapse = new Group(parent, SWT.NONE);
-    autoCollapse.setText("Automatic collapsing based on a relation set");
+    autoCollapse.setText("Automatic collapsing based on an edge matcher");
 
     autoCollapse.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, false));
@@ -352,10 +349,13 @@ public class CollapseTool extends ViewSelectionListenerTool
     super.updateControls();
 
     // Update the RelSet picker for auto-collapse.
-    HierarchyCache<NodeDisplayProperty> hierarchies = getEditor().getHierarchies();
-    RelationshipSet selectedRelSet = getEditor().getContainerRelSet();
-    List<RelSetDescriptor> choices = getEditor().getRelSetChoices();
-    autoHierarchyPicker.setInput(hierarchies, selectedRelSet, choices);
+    HierarchyCache<NodeDisplayProperty> hierarchies =
+        getEditor().getHierarchies();
+    GraphEdgeMatcherDescriptor edgeMatcher =
+        getEditor().getTreeEdgeMatcher();
+    List<GraphEdgeMatcherDescriptor> choices =
+        getEditor().getTreeEdgeMatcherChoices();
+    autoHierarchyPicker.setInput(hierarchies, edgeMatcher, choices);
 
     updateCollapseView();
   }
@@ -420,11 +420,6 @@ public class CollapseTool extends ViewSelectionListenerTool
   @Override
   public String getName() {
     return Resources.NAME_COLLAPSE;
-  }
-
-  @Override
-  public void selectedSetChanged(RelationshipSet set) {
-    // nothing to do here, use the RelationshipSet only when clicking a button.
   }
 
   /**

@@ -16,22 +16,18 @@
 
 package com.google.devtools.depan.eclipse.views.tools;
 
-import com.google.common.collect.Sets;
-
 import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.persist.XmlPersistentPathExpression;
-import com.google.devtools.depan.eclipse.plugins.SourcePluginRegistry;
 import com.google.devtools.depan.eclipse.utils.EditColTableDef;
-import com.google.devtools.depan.eclipse.utils.RelationshipPicker;
+import com.google.devtools.depan.eclipse.utils.GraphEdgeMatcherEditorPart;
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.utils.TableContentProvider;
-import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptor;
 import com.google.devtools.depan.filters.PathExpression;
 import com.google.devtools.depan.filters.PathMatcher;
 import com.google.devtools.depan.filters.PathMatcherTerm;
-import com.google.devtools.depan.graph.basic.MultipleDirectedRelationFinder;
-import com.google.devtools.depan.model.RelationshipSet;
-import com.google.devtools.depan.model.RelationshipSetAdapter;
+import com.google.devtools.depan.model.GraphEdgeMatcherDescriptor;
+
+import com.google.common.collect.Sets;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -91,10 +87,10 @@ public class PathExpressionEditorTool
       pathMatchersContent;
 
   /**
-   * The <code>RelationshipPicker</code> object where users can select relations
-   * to append to the list.
+   * The <code>EdgeMatcherEditor</code> where users can define which relations
+   * define an edge.
    */
-  private RelationshipPicker relationshipPicker;
+  private GraphEdgeMatcherEditorPart edgeMatcherEditor;
 
   /**
    * The model which applies filters to selected nodes to reach relevant nodes.
@@ -167,11 +163,11 @@ public class PathExpressionEditorTool
 
   @Override
   public void updateControl(ViewEditor viewEditor) {
-    relationshipPicker.updateTable(viewEditor.getBuiltinAnalysisPlugins());
+    edgeMatcherEditor.updateTable(viewEditor.getBuiltinAnalysisPlugins());
 
-    RelationshipSet selectedRelSet = viewEditor.getContainerRelSet();
-    List<RelSetDescriptor> choices = viewEditor.getRelSetChoices();
-    relationshipPicker.updateRelSetPicker(selectedRelSet, choices );
+    GraphEdgeMatcherDescriptor edgeMatcher = viewEditor.getTreeEdgeMatcher();
+    List<GraphEdgeMatcherDescriptor> choices = viewEditor.getTreeEdgeMatcherChoices();
+    edgeMatcherEditor.updateEdgeMatcherSelector(edgeMatcher, choices );
   }
 
   /**
@@ -189,9 +185,9 @@ public class PathExpressionEditorTool
     control.setLayout(new GridLayout(4, false));
 
     // Column 1: Matcher picking area
-    relationshipPicker = new RelationshipPicker();
-    Control relationsPanel = relationshipPicker.getControl(control);
-    relationsPanel.setLayoutData(
+    edgeMatcherEditor = new GraphEdgeMatcherEditorPart();
+    Control edgeMatcherPanel = edgeMatcherEditor.getControl(control);
+    edgeMatcherPanel.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, false, true));
 
     // Column 2: Matcher/path expression actions
@@ -397,7 +393,7 @@ public class PathExpressionEditorTool
    * object to the table.
    */
   private void appendSelection() {
-    String setName = relationshipPicker.getSelectedRelationshipSet().getName();
+/* WORK NEEDED
     MultipleDirectedRelationFinder finder =
         relationshipPicker.getRelationShips();
     RelationshipSetAdapter setAdapterFromPicker =
@@ -410,6 +406,7 @@ public class PathExpressionEditorTool
     pathMatchers.add(termToAppend);
     Table matcherTable = pathMatchers.getTable();
     matcherTable.setSelection(matcherTable.getItemCount() - 1);
+ */
   }
 
   /**

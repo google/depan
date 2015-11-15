@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.eclipse.visualization.layout;
 
-import com.google.devtools.depan.graph.api.DirectedRelationFinder;
+import com.google.devtools.depan.graph.api.EdgeMatcher;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
@@ -51,13 +51,13 @@ public class UniversalRadialLayout extends UniversalTreeLayout {
 
   protected UniversalRadialLayout(
       Graph<GraphNode, GraphEdge> graph,
-      GraphModel graphModel, DirectedRelationFinder relations,
+      GraphModel graphModel, EdgeMatcher<String> edgeMatcher,
       Dimension size) {
-    super(graph, graphModel, relations, size);
+    super(graph, graphModel, edgeMatcher, size);
   }
 
   @Override
-  void buildTree() {
+  protected void buildTree() {
     super.buildTree();
     setRadialLocations();
   }

@@ -16,20 +16,19 @@
 
 package com.google.devtools.depan.eclipse.utils;
 
-import com.google.devtools.depan.model.RelationshipSet;
+import com.google.devtools.depan.model.RelationSetDescriptor;
 
 /**
- * An interface for applying a relationshipSet to an object.
+ * An interface for applying a relationSet to an object.
  *
  * @author ycoppel@google.com (Yohann Coppel)
  *
  */
-public interface RelationshipSelectorListener {
+public interface RelationSetSelectorListener {
 
   /**
-   * Apply the given {@link RelationshipSet} to this object.
+   * Apply the given {@link RelationSetDescriptor} to this object.
    * @param set
    */
-  public void selectedSetChanged(RelationshipSet set);
+  public void selectedSetChanged(RelationSetDescriptor set);
 }
-

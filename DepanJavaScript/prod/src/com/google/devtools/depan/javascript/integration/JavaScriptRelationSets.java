@@ -16,11 +16,12 @@
 
 package com.google.devtools.depan.javascript.integration;
 
-import com.google.common.collect.Lists;
 import com.google.devtools.depan.filesystem.graph.FileSystemRelation;
 import com.google.devtools.depan.javascript.graph.JavaScriptRelation;
-import com.google.devtools.depan.model.RelationshipSet;
-import com.google.devtools.depan.model.RelationshipSetAdapter;
+import com.google.devtools.depan.model.RelationSetDescriptor;
+import com.google.devtools.depan.model.RelationSetDescriptor.Builder;
+
+import com.google.common.collect.Lists;
 
 import java.util.Collection;
 
@@ -36,44 +37,41 @@ public class JavaScriptRelationSets {
   /**
    * List of all built-in RelationshipSets. Make it easier to iterate.
    */
-  private static final Collection<RelationshipSet> BUILTIN_SETS;
+  private static final Collection<RelationSetDescriptor> BUILTIN_SETS;
 
   /**
    * The default RelationshipSets exported by the JavaScript plug-in.
    */
-  private static final RelationshipSet DEFAULT_SET;
+  private static final RelationSetDescriptor DEFAULT_SET;
 
   /**
    * A standard containment relationship for all JavaScript components,
    * including the common FileSystem relations.
    */
-  private static final RelationshipSetAdapter LEXICAL_CONTAINMENT =
-      new RelationshipSetAdapter("JavaScript Lexical Containment");
+  private static final RelationSetDescriptor LEXICAL_CONTAINMENT;
 
   /**
    * A containment relationship for JavaScript components that only include
    * scope binding.
    */
-  private static final RelationshipSetAdapter BINDING_CONTAINMENT =
-      new RelationshipSetAdapter("JavaScript Binding Containment");
+  private static final RelationSetDescriptor BINDING_CONTAINMENT;
 
   static {
     // container relationships
-    LEXICAL_CONTAINMENT.addOrReplaceRelation(
-        FileSystemRelation.CONTAINS_DIR, true, false);
-    LEXICAL_CONTAINMENT.addOrReplaceRelation(
-        FileSystemRelation.CONTAINS_FILE, true, false);
-    LEXICAL_CONTAINMENT.addOrReplaceRelation(
-        FileSystemRelation.SYMBOLIC_LINK, true, false);
-    LEXICAL_CONTAINMENT.addOrReplaceRelation(
-        JavaScriptRelation.DEFINES_NAME, true, false);
-    LEXICAL_CONTAINMENT.addOrReplaceRelation(
-        JavaScriptRelation.IMPLIES_NAME, true, false);
-    LEXICAL_CONTAINMENT.addOrReplaceRelation(
-        JavaScriptRelation.BINDS_ELEMENT, true, false);
+    Builder lexBuilder = RelationSetDescriptor.createBuilder(
+        "JavaScript Lexical Containment");
+    lexBuilder.addRelation(FileSystemRelation.CONTAINS_DIR);
+    lexBuilder.addRelation(FileSystemRelation.CONTAINS_FILE);
+    lexBuilder.addRelation(FileSystemRelation.SYMBOLIC_LINK);
+    lexBuilder.addRelation(JavaScriptRelation.DEFINES_NAME);
+    lexBuilder.addRelation(JavaScriptRelation.IMPLIES_NAME);
+    lexBuilder.addRelation(JavaScriptRelation.BINDS_ELEMENT);
+    LEXICAL_CONTAINMENT = lexBuilder.build();
 
-    BINDING_CONTAINMENT.addOrReplaceRelation(
-      JavaScriptRelation.BINDS_ELEMENT, true, false);
+    Builder bindBuilder = RelationSetDescriptor.createBuilder(
+        "JavaScript Binding Containment");
+    bindBuilder.addRelation(JavaScriptRelation.BINDS_ELEMENT);
+    BINDING_CONTAINMENT = bindBuilder.build();
 
     // Publish the built-in relation sets
     BUILTIN_SETS = Lists.newArrayList();
@@ -95,7 +93,7 @@ public class JavaScriptRelationSets {
    *
    * @return Built-in relationship sets provided by the JavaScript plug-in.
    */
-  public static Collection<RelationshipSet> getBuiltinSets() {
+  public static Collection<RelationSetDescriptor> getBuiltinSets() {
     return BUILTIN_SETS;
   }
 
@@ -104,7 +102,7 @@ public class JavaScriptRelationSets {
    *
    * @return The default relationship set provided by the JavaScript plug-in.
    */
-  public static RelationshipSet getDefaultRelationshipSet() {
+  public static RelationSetDescriptor getDefaultRelationshipSet() {
     return DEFAULT_SET;
   }
 }

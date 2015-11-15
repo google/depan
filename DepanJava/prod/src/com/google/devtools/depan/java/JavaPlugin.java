@@ -16,11 +16,10 @@
 
 package com.google.devtools.depan.java;
 
-import com.google.common.collect.Lists;
 import com.google.devtools.depan.eclipse.persist.XStreamFactory.Config;
+import com.google.devtools.depan.eclipse.plugins.AbstractSourcePlugin;
 import com.google.devtools.depan.eclipse.plugins.ElementClassTransformer;
 import com.google.devtools.depan.eclipse.plugins.ElementTransformer;
-import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
 import com.google.devtools.depan.eclipse.utils.ElementEditor;
 import com.google.devtools.depan.eclipse.visualization.ogl.GLEntity;
 import com.google.devtools.depan.graph.api.Relation;
@@ -39,7 +38,9 @@ import com.google.devtools.depan.java.graph.TypeElement;
 import com.google.devtools.depan.java.integration.JavaDefinitions;
 import com.google.devtools.depan.java.integration.JavaRelationSets;
 import com.google.devtools.depan.model.Element;
-import com.google.devtools.depan.model.RelationshipSet;
+import com.google.devtools.depan.model.RelationSetDescriptor;
+
+import com.google.common.collect.Lists;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
@@ -48,7 +49,7 @@ import java.awt.Color;
 import java.util.Collection;
 import java.util.Comparator;
 
-public class JavaPlugin implements SourcePlugin {
+public class JavaPlugin extends AbstractSourcePlugin {
 
   final static Collection<Class<? extends Element>> classes;
   final static Collection<Relation> relations;
@@ -83,6 +84,10 @@ public class JavaPlugin implements SourcePlugin {
     nodeColors = new PreferencesNodePainter();
   }
 
+  public JavaPlugin() {
+    setupEdgeMatchers();
+  }
+
   @Override
   public Collection<Class<? extends Element>> getElementClasses() {
     return classes;
@@ -94,12 +99,12 @@ public class JavaPlugin implements SourcePlugin {
   }
 
   @Override
-  public Collection<? extends RelationshipSet> getBuiltinRelationshipSets() {
+  public Collection<? extends RelationSetDescriptor> getBuiltinRelationshipSets() {
     return JavaRelationSets.builtins;
   }
 
   @Override
-  public RelationshipSet getDefaultRelationshipSet() {
+  public RelationSetDescriptor getDefaultRelationSetDescriptor() {
     return JavaRelationSets.PKG_MEMBER;
   }
 

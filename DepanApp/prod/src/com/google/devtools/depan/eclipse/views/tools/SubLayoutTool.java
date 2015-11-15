@@ -18,11 +18,10 @@ package com.google.devtools.depan.eclipse.views.tools;
 
 import com.google.devtools.depan.eclipse.utils.LayoutChoicesControl;
 import com.google.devtools.depan.eclipse.utils.Resources;
-import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptor;
 import com.google.devtools.depan.eclipse.views.ViewEditorTool;
 import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerator;
 import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerators;
-import com.google.devtools.depan.model.RelationshipSet;
+import com.google.devtools.depan.model.GraphEdgeMatcherDescriptor;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -86,9 +85,10 @@ public class SubLayoutTool extends ViewEditorTool {
     super.updateControls();
 
     // Update the RelSet picker for auto-collapse.
-    RelationshipSet selectedRelSet = getEditor().getContainerRelSet();
-    List<RelSetDescriptor> choices = getEditor().getRelSetChoices();
-    layoutChoices.setRelSetInput(selectedRelSet, choices );
+    GraphEdgeMatcherDescriptor edgeMatcher = getEditor().getTreeEdgeMatcher();
+    List<GraphEdgeMatcherDescriptor> choices =
+        getEditor().getTreeEdgeMatcherChoices();
+    layoutChoices.setEdgeMatcherInput(edgeMatcher, choices);
     toolPanel.layout();
   }
 
@@ -99,7 +99,7 @@ public class SubLayoutTool extends ViewEditorTool {
 
     try {
       LayoutGenerator layout = layoutChoices.getLayoutGenerator();
-      getEditor().applyLayout(layout, layoutChoices.getRelationSet());
+      getEditor().applyLayout(layout, layoutChoices.getEdgeMatcher());
     } catch (IllegalArgumentException ex) {
       // bad layout. don't do anything for the layout, but still finish the
       // creation of the view.

@@ -1,10 +1,10 @@
 /*
- * Copyright 2006 The Depan Project Authors
- * 
+ * Copyright 2015 The Depan Project Authors
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -17,9 +17,9 @@
 package com.google.devtools.depan.graph.api;
 
 /**
- * @author <a href="leeca@google.com">Lee Carver</a>
+ * @author <a href="mailto:leeca@pnambic.com">Lee Carver</a>
  */
-public interface RelationFinder extends DirectedRelationFinder {
-  
-  boolean match(Relation find);
+public interface RelationSet {
+
+  boolean contains(Relation relation);
 }

@@ -16,16 +16,18 @@
 
 package com.google.devtools.depan.eclipse.views.tools;
 
+import com.google.devtools.depan.eclipse.editors.EdgeDisplayProperty;
 import com.google.devtools.depan.eclipse.editors.ViewEditor;
-import com.google.devtools.depan.eclipse.utils.RelationshipPicker;
-import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptor;
+import com.google.devtools.depan.eclipse.utils.RelationSetEditorPart;
+import com.google.devtools.depan.eclipse.views.tools.RelEditorTableView.RelPropRepository;
 import com.google.devtools.depan.eclipse.views.tools.RelationCount.RangeData;
 import com.google.devtools.depan.eclipse.views.tools.RelationCount.RangeOption;
 import com.google.devtools.depan.eclipse.views.tools.RelationCount.Settings;
 import com.google.devtools.depan.filters.PathMatcher;
 import com.google.devtools.depan.filters.RelationCountMatcher;
 import com.google.devtools.depan.filters.RelationCountMatcher.EdgeCountPredicate;
-import com.google.devtools.depan.model.RelationshipSet;
+import com.google.devtools.depan.graph.api.Relation;
+import com.google.devtools.depan.model.RelationSetDescriptor;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -39,8 +41,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 
-import java.util.List;
-
 /**
  * Allow the user to select nodes based on a count of the forward (departing)
  * or reverse (arriving) edges.
@@ -50,15 +50,42 @@ import java.util.List;
 public class RelationCountNodeSelectorTool extends Composite {
 
   /**
-   * The <code>RelationshipPicker</code> object where users can select relations
-   * to append to the list.
+   * The <code>RelationSetEditorPart</code> object where users can select
+   * relations in the list.
    */
-  private RelationshipPicker relationshipPicker;
+  private RelationSetEditorPart relationSetEditor;
+
+  /**
+   * Source of much data, and the store for any changes.
+   */
+  private ViewEditor editor;
+
   private RangeTool forwardRange;
   private RangeTool reverseRange;
 
   public static final RelationCount.Settings EMPTY_SETTINGS =
       new RelationCount.Settings();
+
+  private class ToolPropRepo implements RelPropRepository {
+    @Override
+    public EdgeDisplayProperty getDisplayProperty(Relation rel) {
+      if (null == editor) {
+        return null;
+      }
+
+      return editor.getRelationProperty(rel);
+    }
+
+    @Override
+    public void setDisplayProperty(
+        Relation rel, EdgeDisplayProperty prop) {
+      if (null == editor) {
+        return;
+      }
+
+      editor.setRelationProperty(rel, prop);
+    }
+  }
 
   public static Settings getEditorSettings(ViewEditor editor) {
     if (null == editor) {
@@ -74,18 +101,22 @@ public class RelationCountNodeSelectorTool extends Composite {
    * @param settings initial set of choices
    */
   public RelationCountNodeSelectorTool(
-      Composite parent, int style, RelationCount.Settings settings) {
+      Composite parent, int style,
+      ViewEditor editor) {
     super(parent, style);
+    this.editor = editor;
 
     setLayout(new GridLayout());
 
     // Top: Relation selection
-    relationshipPicker = new RelationshipPicker();
-    Control relationshipPickerControl = relationshipPicker.getControl(this);
+    relationSetEditor = new RelationSetEditorPart();
+    Control relationshipPickerControl =
+        relationSetEditor.getControl(this, new ToolPropRepo());
     relationshipPickerControl.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, true));
 
     // Bottom: Count selection
+    RelationCount.Settings settings = getEditorSettings(editor);
     Composite rangeArea = new Composite(this, SWT.NONE);
     rangeArea.setLayout(new GridLayout(2, true));
     forwardRange = 
@@ -103,7 +134,7 @@ public class RelationCountNodeSelectorTool extends Composite {
     if (null == settings) {
       return;
     }
-    relationshipPicker.selectedSetChanged(settings.relations);
+
     forwardRange.setLimits(settings.forward);
     reverseRange.setLimits(settings.reverse);
   }
@@ -115,13 +146,14 @@ public class RelationCountNodeSelectorTool extends Composite {
    * @param editor source of settings for UI configuration
    */
   public void updateControls(ViewEditor editor) {
+    this.editor = editor;
     updateControls(getEditorSettings(editor));
 
-    relationshipPicker.updateTable(editor.getBuiltinAnalysisPlugins());
-
-    RelationshipSet selectedRelSet = editor.getContainerRelSet();
-    List<RelSetDescriptor> choices = editor.getRelSetChoices();
-    relationshipPicker.updateRelSetPicker(selectedRelSet, choices );
+    relationSetEditor.updateTable(editor.getBuiltinAnalysisPlugins());
+    RelationSetDescriptor relationSet = editor.getDisplayRelationSet();
+    java.util.List<RelationSetDescriptor> choices =
+        editor.getRelationSetChoices();
+    relationSetEditor.setRelationSetSelectorInput(relationSet, choices );
   }
 
   @Override
@@ -323,15 +355,14 @@ public class RelationCountNodeSelectorTool extends Composite {
     public Composite createControl(
         Composite parent, int style, ViewEditor viewEditor) {
       selectorTool = new RelationCountNodeSelectorTool(
-          parent, style,
-          RelationCountNodeSelectorTool.getEditorSettings(viewEditor));
+          parent, style, viewEditor);
       return selectorTool;
     }
 
     @Override
     public PathMatcher getNodeSelector() {
       return new RelationCountMatcher(
-          selectorTool.relationshipPicker.getSelectedRelationshipSet(),
+          selectorTool.relationSetEditor.getSelectedRelationSet(),
           selectorTool.forwardRange.getIncludeTest(),
           selectorTool.reverseRange.getIncludeTest());
     }

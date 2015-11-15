@@ -16,12 +16,14 @@
 
 package com.google.devtools.depan.eclipse.editors;
 
+import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
+import com.google.devtools.depan.model.GraphEdgeMatcherDescriptor;
+import com.google.devtools.depan.model.GraphModel;
+import com.google.devtools.depan.model.RelationSetDescriptor;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
-import com.google.devtools.depan.model.GraphModel;
-import com.google.devtools.depan.model.RelationshipSet;
 
 import java.util.Collection;
 import java.util.List;
@@ -142,13 +144,25 @@ public class GraphDocument {
   }
 
   /**
-   * Provide a complete list of all RelationshipSets that are built-in by
-   * any of the analysis plug-ins.
+   * Provide a complete list of all {@link RelationSetDescriptor} that are
+   * built-in by any of the analysis plug-ins.
    */
-  public Collection<RelationshipSet> getBuiltinAnalysisRelSets() {
-    Set<RelationshipSet> result = Sets.newHashSet();
+  public Collection<RelationSetDescriptor> getBuiltinRelationSets() {
+    Set<RelationSetDescriptor> result = Sets.newHashSet();
     for (SourcePlugin plugin : getAnalyzers()) {
       result.addAll(plugin.getBuiltinRelationshipSets());
+    }
+    return result;
+  }
+
+  /**
+   * Provide a complete list of all {@link EdgeMatchers} that are
+   * built-in by any of the analysis plug-ins.
+   */
+  public Collection<GraphEdgeMatcherDescriptor> getBuiltinEdgeMatchers() {
+    Set<GraphEdgeMatcherDescriptor> result = Sets.newHashSet();
+    for (SourcePlugin plugin : getAnalyzers()) {
+      result.addAll(plugin.getBuiltinEdgeMatchers());
     }
     return result;
   }

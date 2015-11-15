@@ -17,9 +17,9 @@
 package com.google.devtools.depan.javascript;
 
 import com.google.devtools.depan.eclipse.persist.XStreamFactory.Config;
+import com.google.devtools.depan.eclipse.plugins.AbstractSourcePlugin;
 import com.google.devtools.depan.eclipse.plugins.ElementClassTransformer;
 import com.google.devtools.depan.eclipse.plugins.ElementTransformer;
-import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
 import com.google.devtools.depan.eclipse.utils.ElementEditor;
 import com.google.devtools.depan.eclipse.visualization.ogl.GLEntity;
 import com.google.devtools.depan.graph.api.Relation;
@@ -32,7 +32,7 @@ import com.google.devtools.depan.javascript.editors.ElementEditors;
 import com.google.devtools.depan.javascript.integration.JavaScriptDefinitions;
 import com.google.devtools.depan.javascript.integration.JavaScriptRelationSets;
 import com.google.devtools.depan.model.Element;
-import com.google.devtools.depan.model.RelationshipSet;
+import com.google.devtools.depan.model.RelationSetDescriptor;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
@@ -48,7 +48,7 @@ import java.util.Comparator;
  * 
  * @author <a href="leeca@google.com">Lee Carver</a>
  */
-public class JavaScriptPlugin implements SourcePlugin {
+public class JavaScriptPlugin extends AbstractSourcePlugin {
 
   private static final NodePainter NODE_PAINTER =
       new NodePainter();
@@ -63,13 +63,17 @@ public class JavaScriptPlugin implements SourcePlugin {
   private static final NodeComparator NODE_COMPARATOR =
       new NodeComparator();
 
+  public JavaScriptPlugin() {
+    setupEdgeMatchers();
+  }
+
   @Override
-  public Collection<? extends RelationshipSet> getBuiltinRelationshipSets() {
+  public Collection<? extends RelationSetDescriptor> getBuiltinRelationshipSets() {
     return JavaScriptRelationSets.getBuiltinSets();
   }
 
   @Override
-  public RelationshipSet getDefaultRelationshipSet() {
+  public RelationSetDescriptor getDefaultRelationSetDescriptor() {
     return JavaScriptRelationSets.getDefaultRelationshipSet();
   }
 

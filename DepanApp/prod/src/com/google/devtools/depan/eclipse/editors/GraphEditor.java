@@ -21,15 +21,16 @@ import com.google.devtools.depan.eclipse.trees.CheckNodeTreeView;
 import com.google.devtools.depan.eclipse.trees.GraphData;
 import com.google.devtools.depan.eclipse.trees.NodeTreeProvider;
 import com.google.devtools.depan.eclipse.trees.NodeTreeView.NodeWrapper;
+import com.google.devtools.depan.eclipse.utils.GraphEdgeMatcherDescriptors;
 import com.google.devtools.depan.eclipse.utils.HierarchyViewer;
 import com.google.devtools.depan.eclipse.utils.HierarchyViewer.HierarchyChangeListener;
 import com.google.devtools.depan.eclipse.utils.LayoutChoicesControl;
-import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptor;
-import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptors;
+// import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptors;
 import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerators;
 import com.google.devtools.depan.graph.api.Relation;
+import com.google.devtools.depan.model.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.model.RelationshipSet;
+import com.google.devtools.depan.model.RelationSetDescriptor;
 
 import com.google.common.collect.Sets;
 
@@ -178,11 +179,10 @@ public class GraphEditor
         parent, LayoutChoicesControl.Style.LINEAR);
     result.setLayoutChoices(LayoutGenerators.getLayoutNames(false));
 
-    RelationshipSet selectedRelSet =
-        graph.getDefaultAnalysis().getDefaultRelationshipSet();
-    java.util.List<RelSetDescriptor> choices =
-        RelSetDescriptors.buildGraphChoices(graph);
-    result.setRelSetInput(selectedRelSet, choices);
+    GraphEdgeMatcherDescriptor edgeMatcher = getDefaultEdgeMatcher();
+    java.util.List<GraphEdgeMatcherDescriptor> choices =
+        GraphEdgeMatcherDescriptors.buildGraphChoices(graph);
+    result.setEdgeMatcherInput(edgeMatcher, choices);
 
     return result;
   }
@@ -190,13 +190,22 @@ public class GraphEditor
   private void setupHierarchyViewer(Composite parent) {
     hierarchyView = new HierarchyViewer<GraphNode>(parent, false);
 
-    RelationshipSet selectedRelSet =
-        graph.getDefaultAnalysis().getDefaultRelationshipSet();
-    java.util.List<RelSetDescriptor> choices =
-        RelSetDescriptors.buildGraphChoices(graph);
+    GraphEdgeMatcherDescriptor selectedRelSet = getDefaultEdgeMatcher();
+    java.util.List<GraphEdgeMatcherDescriptor> choices =
+        GraphEdgeMatcherDescriptors.buildGraphChoices(graph);
     hierarchyView.setInput(hierarchies, selectedRelSet, choices);
 
     hierarchyView.addChangeListener(this);
+  }
+
+  /**
+   * Really should have separate edge matchers from default display
+   * relation.
+   * 
+   * TODO: Separate hierarchy edge matcher from display relation set.
+   */
+  private GraphEdgeMatcherDescriptor getDefaultEdgeMatcher() {
+    return graph.getDefaultAnalysis().getDefaultEdgeMatcherDescriptor();
   }
 
   private void createPage1() {
@@ -312,10 +321,10 @@ public class GraphEditor
     // is constructed.
     String layoutName = layoutChoices.getLayoutName();
     result.setSelectedLayout(layoutName);
-    result.setLayoutFinder(layoutChoices.getRelationSet());
+    result.setLayoutFinder(layoutChoices.getEdgeMatcher());
 
     SourcePlugin toolkit = graph.getDefaultAnalysis();
-    result.setDisplayRelationSet(toolkit.getDefaultRelationshipSet());
+    result.setDisplayRelationSet(toolkit.getDefaultRelationSetDescriptor());
     for (Relation relation : toolkit.getRelations()) {
       EdgeDisplayProperty edgeProp = new EdgeDisplayProperty();
       result.setRelationProperty(relation, edgeProp);

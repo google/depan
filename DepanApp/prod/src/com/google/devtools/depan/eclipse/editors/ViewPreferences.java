@@ -18,12 +18,12 @@ package com.google.devtools.depan.eclipse.editors;
 
 import com.google.devtools.depan.eclipse.trees.NodeTreeProvider;
 import com.google.devtools.depan.eclipse.utils.ListenerManager;
-import com.google.devtools.depan.graph.api.DirectedRelationFinder;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.model.GraphEdge;
+import com.google.devtools.depan.model.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.model.RelationshipSet;
+import com.google.devtools.depan.model.RelationSetDescriptor;
 import com.google.devtools.depan.view.CollapseData;
 import com.google.devtools.depan.view.CollapseTreeModel;
 import com.google.devtools.depan.view.Collapser;
@@ -86,7 +86,7 @@ public class ViewPreferences {
    * A value of {@code null} indicates that the {@link #relationProperties}
    * should be used as an anonymous relation set.
    */
-  private RelationshipSet edgeDisplayRelSet;
+  private RelationSetDescriptor edgeDisplayRelationSet;
 
   /**
    * Manager object for handling all collapsed nodes.
@@ -102,16 +102,16 @@ public class ViewPreferences {
   private ScenePreferences scenePrefs;
 
   /**
-   * Relation finder used by layout algorithms by default if it wasn't
+   * Edge matcher used by layout algorithms by default if it wasn't
    * specified.
    */
-  private DirectedRelationFinder layoutFinder;
+  private GraphEdgeMatcherDescriptor layoutEdgeMatcher;
 
   /**
-   * Defines the relationship set used to define the view hierarchy
+   * Defines the edge matcher used to define the view hierarchy
    */
   @SuppressWarnings("unused")  // Should be useful soon.
-  private DirectedRelationFinder treeRelationshipSet;
+  private GraphEdgeMatcherDescriptor treeEdgeMatcher;
 
   /////////////////////////////////////
   // Transient instance members
@@ -336,12 +336,12 @@ public class ViewPreferences {
     });
   }
 
-  public DirectedRelationFinder getLayoutFinder() {
-    return layoutFinder;
+  public GraphEdgeMatcherDescriptor getLayoutFinder() {
+    return layoutEdgeMatcher;
   }
 
-  public void setLayoutFinder(DirectedRelationFinder finder) {
-    layoutFinder = finder;
+  public void setLayoutFinder(GraphEdgeMatcherDescriptor layoutEdgeMatcher) {
+    this.layoutEdgeMatcher = layoutEdgeMatcher;
   }
 
   public String getSelectedLayout() {
@@ -470,12 +470,13 @@ public class ViewPreferences {
     });
   }
 
-  public RelationshipSet getDisplayRelationSet() {
-    return edgeDisplayRelSet;
+  public RelationSetDescriptor getDisplayRelationSet() {
+    return edgeDisplayRelationSet;
   }
 
-  public void setDisplayRelationSet(RelationshipSet newDisplay) {
-    edgeDisplayRelSet = newDisplay;
+  public void setDisplayRelationSet(
+      RelationSetDescriptor edgeDisplayRelationSetDescriptor) {
+    this.edgeDisplayRelationSet = edgeDisplayRelationSetDescriptor;
   }
 
   /////////////////////////////////////

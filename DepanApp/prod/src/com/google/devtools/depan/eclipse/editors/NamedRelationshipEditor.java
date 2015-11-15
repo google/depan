@@ -18,13 +18,12 @@ package com.google.devtools.depan.eclipse.editors;
 
 import com.google.devtools.depan.eclipse.persist.ObjectXmlPersist;
 import com.google.devtools.depan.eclipse.persist.XStreamFactory;
+import com.google.devtools.depan.eclipse.utils.GraphEdgeMatcherEditorPart;
 import com.google.devtools.depan.eclipse.utils.ModificationListener;
-import com.google.devtools.depan.eclipse.utils.RelationshipPicker;
-import com.google.devtools.depan.eclipse.utils.RelationshipPickerHelper;
 import com.google.devtools.depan.eclipse.utils.TableContentProvider;
-import com.google.devtools.depan.graph.api.DirectedRelation;
-import com.google.devtools.depan.model.RelationshipSet;
-import com.google.devtools.depan.model.RelationshipSetAdapter;
+import com.google.devtools.depan.graph.api.Relation;
+import com.google.devtools.depan.model.GraphEdgeMatcher;
+import com.google.devtools.depan.model.GraphEdgeMatcherDescriptor;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -55,8 +54,7 @@ import java.util.Collection;
 /**
  * @author ycoppel@google.com (Yohann Coppel)
  */
-public class NamedRelationshipEditor extends EditorPart implements
-    ModificationListener<DirectedRelation, Boolean> {
+public class NamedRelationshipEditor extends EditorPart {
 
   public static final String ID =
       "com.google.devtools.depan.eclipse.editors.RelationshipSetEditor";
@@ -64,28 +62,27 @@ public class NamedRelationshipEditor extends EditorPart implements
   /**
    * Existing sets of relationship.
    */
-  private Collection<RelationshipSet> sets;
+  private Collection<GraphEdgeMatcherDescriptor> edgeMatchers;
 
   /**
    * List of sets.
    */
-  private ListViewer setsList = null;
+  private ListViewer setsList;
 
   /**
    * Content provider for setsList.
    */
-  private TableContentProvider<RelationshipSet> setsContentProvider = null;
+  private TableContentProvider<GraphEdgeMatcherDescriptor> edgeMatcherContentProvider;
 
   /**
-   * Quick picker for existing relationship sets, copying their definition
-   * to the current edition.
+   * Relation editing table for EdgeMatcher.
    */
-  private RelationshipPicker relationshipPicker;
+  private GraphEdgeMatcherEditorPart edgeMatcherEditor;
 
   /**
    * Selected set.
    */
-  private RelationshipSet selectedSet = null;
+  private GraphEdgeMatcherDescriptor selectedSet = null;
 
   /**
    * Dirty state.
@@ -103,7 +100,7 @@ public class NamedRelationshipEditor extends EditorPart implements
       // TODO(leeca):  Is this configured with the correct XStream flavor?
       ObjectXmlPersist persist =
           new ObjectXmlPersist(XStreamFactory.getSharedRefXStream());
-      persist.save(file.getRawLocationURI(), sets);
+      persist.save(file.getRawLocationURI(), edgeMatchers);
 
       setDirtyState(false);
 
@@ -142,7 +139,7 @@ public class NamedRelationshipEditor extends EditorPart implements
         ObjectXmlPersist persist =
             new ObjectXmlPersist(XStreamFactory.getSharedRefXStream());
 
-        sets = loadNamedRelationship(persist, file.getRawLocationURI());
+        edgeMatchers = loadNamedRelationship(persist, file.getRawLocationURI());
 
         setDirtyState(false);
       } catch (IOException errIo) {
@@ -160,9 +157,9 @@ public class NamedRelationshipEditor extends EditorPart implements
    * Isolate unchecked conversion.
    */
   @SuppressWarnings("unchecked")
-  private Collection<RelationshipSet> loadNamedRelationship(
+  private Collection<GraphEdgeMatcherDescriptor> loadNamedRelationship(
       ObjectXmlPersist persist, URI fromUri) throws IOException {
-    return (Collection<RelationshipSet>) persist.load(fromUri);
+    return (Collection<GraphEdgeMatcherDescriptor>) persist.load(fromUri);
   }
 
   /**
@@ -197,25 +194,32 @@ public class NamedRelationshipEditor extends EditorPart implements
     // components
     Composite leftPanel = new Composite(container, SWT.NONE);
     setsList = new ListViewer(leftPanel, SWT.V_SCROLL | SWT.BORDER);
-    new Label(leftPanel, SWT.NONE).setText("New set named: ");
+    new Label(leftPanel, SWT.NONE).setText("New edges named: ");
     final Text newSet = new Text(leftPanel, SWT.SINGLE);
     Button create = new Button(leftPanel, SWT.PUSH);
     Button delete = new Button(leftPanel, SWT.PUSH);
 
     // relation picker (list of relationships with forward/backward selectors)
-    relationshipPicker = new RelationshipPicker();
-    Control picker = relationshipPicker.getControl(container);
+    edgeMatcherEditor = new GraphEdgeMatcherEditorPart();
+    Control picker = edgeMatcherEditor.getControl(container);
 
     create.setText("Create set");
     delete.setText("Delete selected set");
 
     // content for the list
-    setsContentProvider = new TableContentProvider<RelationshipSet>();
-    setsContentProvider.initViewer(setsList);
+    edgeMatcherContentProvider = new TableContentProvider<GraphEdgeMatcherDescriptor>();
+    edgeMatcherContentProvider.initViewer(setsList);
 
     // listening for changes, so we can set dirtyState.
-    relationshipPicker.registerListener(this);
+    edgeMatcherEditor.registerListener(
+        new ModificationListener<Relation, Boolean>() {
 
+          @Override
+          public void modify(Relation element, String property, Boolean value) {
+            handleModify(element, property, value);
+          }
+        });
+    
     // event listeners
     setsList.getList().addSelectionListener(new SelectionAdapter() {
       @Override
@@ -232,7 +236,7 @@ public class NamedRelationshipEditor extends EditorPart implements
     delete.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
-        deleteSelectedSet();
+        deleteEdgeMatcher();
       }
     });
 
@@ -251,11 +255,11 @@ public class NamedRelationshipEditor extends EditorPart implements
   /**
    * delete the currently selected set.
    */
-  protected void deleteSelectedSet() {
-    RelationshipSet set = (RelationshipSet)
+  protected void deleteEdgeMatcher() {
+    GraphEdgeMatcherDescriptor set = (GraphEdgeMatcherDescriptor)
         ((IStructuredSelection) setsList.getSelection()).getFirstElement();
-    sets.remove(set);
-    setsContentProvider.remove(set);
+    edgeMatchers.remove(set);
+    edgeMatcherContentProvider.remove(set);
 
     setDirtyState(true);
   }
@@ -264,31 +268,32 @@ public class NamedRelationshipEditor extends EditorPart implements
    * @param text create a new set with the given name.
    */
   protected void createSet(String text) {
-    RelationshipSet set = new RelationshipSetAdapter(text);
-    sets.add(set);
-    setsContentProvider.add(set);
+    GraphEdgeMatcherDescriptor set = 
+        new GraphEdgeMatcherDescriptor(text, new GraphEdgeMatcher());
+    edgeMatchers.add(set);
+    edgeMatcherContentProvider.add(set);
 
     setDirtyState(true);
   }
 
   /**
-   * update the relationship picker with the currently selected picker.
+   * update the edge matcher picker with the currently selected picker.
    * Happens when someone click on a given name in the setList.
    */
   protected void updatePicker() {
-    RelationshipSet selected = (RelationshipSet)
+    GraphEdgeMatcherDescriptor selected = (GraphEdgeMatcherDescriptor)
         ((IStructuredSelection) setsList.getSelection()).getFirstElement();
 
     this.selectedSet = selected;
-    relationshipPicker.selectRelationshipSet(selected);
+    edgeMatcherEditor.selectEdgeMatcher(selected, false);
   }
 
   /**
    * Fill the list of sets with loaded data from the file.
    */
   private void fill() {
-    for (RelationshipSet set : sets) {
-      setsContentProvider.add(set);
+    for (GraphEdgeMatcherDescriptor edgeMatcher : edgeMatchers) {
+      edgeMatcherContentProvider.add(edgeMatcher);
     }
   }
 
@@ -296,16 +301,10 @@ public class NamedRelationshipEditor extends EditorPart implements
   public void setFocus() {
   }
 
-  @Override
-  public void modify(DirectedRelation element, String property, Boolean value) {
-    if (null == this.selectedSet) {
+  private void handleModify(Relation element, String property, Boolean value) {
+    if (null == selectedSet) {
       return;
     }
     setDirtyState(true);
-    if (RelationshipPickerHelper.COL_FORWARD.equals(property)) {
-      this.selectedSet.setMatchForward(element.getRelation(), value);
-    } else if (RelationshipPickerHelper.COL_BACKWARD.equals(property)) {
-      this.selectedSet.setMatchBackward(element.getRelation(), value);
-    }
   }
 }

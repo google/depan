@@ -18,20 +18,20 @@ package com.google.devtools.depan.eclipse.editors;
 
 import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
 import com.google.devtools.depan.eclipse.trees.NodeTreeProvider;
-import com.google.devtools.depan.graph.api.DirectedRelationFinder;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.model.GraphEdge;
+import com.google.devtools.depan.model.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.model.RelationshipSet;
+import com.google.devtools.depan.model.RelationSetDescriptor;
 import com.google.devtools.depan.model.interfaces.GraphBuilder;
 import com.google.devtools.depan.view.CollapseData;
 import com.google.devtools.depan.view.CollapseTreeModel;
 import com.google.devtools.depan.view.TreeModel;
 
-import org.eclipse.core.resources.IResource;
-
 import com.google.common.collect.ImmutableList;
+
+import org.eclipse.core.resources.IResource;
 
 import java.awt.geom.Point2D;
 import java.util.Collection;
@@ -103,16 +103,20 @@ public class ViewDocument {
     return parentGraph.getLocation();
   }
 
-  public RelationshipSet getDefaultContainerRelSet() {
-    return parentGraph.getGraph().getDefaultAnalysis().getDefaultRelationshipSet();
+  public RelationSetDescriptor getDefaultRelationSet() {
+    return parentGraph.getGraph().getDefaultAnalysis().getDefaultRelationSetDescriptor();
   }
 
   public List<SourcePlugin> getBuiltinAnalysisPlugins() {
     return parentGraph.getGraph().getAnalyzers();
   }
 
-  public Collection<RelationshipSet> getBuiltinAnalysisRelSets() {
-    return parentGraph.getGraph().getBuiltinAnalysisRelSets();
+  public Collection<RelationSetDescriptor> getBuiltinRelationSets() {
+    return parentGraph.getGraph().getBuiltinRelationSets();
+  }
+
+  public Collection<GraphEdgeMatcherDescriptor> getBuiltinEdgeMatchers() {
+    return parentGraph.getGraph().getBuiltinEdgeMatchers();
   }
 
   public Collection<GraphNode> getViewNodes() {
@@ -163,11 +167,11 @@ public class ViewDocument {
     userPrefs.setRelationProperty(relation, edgeProp);
   }
 
-  public RelationshipSet getDisplayRelationSet() {
+  public RelationSetDescriptor getDisplayRelationSetDescriptor() {
     return userPrefs.getDisplayRelationSet();
   }
 
-  public void setDisplayRelationSet(RelationshipSet newDisplay) {
+  public void setDisplayRelationSetDescriptor(RelationSetDescriptor newDisplay) {
     userPrefs.setDisplayRelationSet(newDisplay);
   }
 
@@ -194,12 +198,12 @@ public class ViewDocument {
     userPrefs.editSelectedNodes(removeNodes, addNodes, author);
   }
 
-  public DirectedRelationFinder getLayoutFinder() {
+  public GraphEdgeMatcherDescriptor getLayoutFinder() {
     return userPrefs.getLayoutFinder();
   }
 
-  public void setLayoutFinder(DirectedRelationFinder finder) {
-    userPrefs.setLayoutFinder(finder);
+  public void setLayoutEdgeMatcher(GraphEdgeMatcherDescriptor layoutEdgeMatcher) {
+    userPrefs.setLayoutFinder(layoutEdgeMatcher);
   }
 
   public NodeTreeProvider<NodeDisplayProperty>

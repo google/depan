@@ -18,9 +18,10 @@ package com.google.devtools.depan.eclipse.wizards;
 
 import com.google.devtools.depan.eclipse.persist.ObjectXmlPersist;
 import com.google.devtools.depan.eclipse.persist.XStreamFactory;
-import com.google.devtools.depan.eclipse.utils.DefaultRelationshipSet;
-import com.google.devtools.depan.graph.api.DirectedRelationFinder;
-import com.google.devtools.depan.model.RelationshipSet;
+import com.google.devtools.depan.model.GraphEdgeMatcher;
+import com.google.devtools.depan.model.GraphEdgeMatcherDescriptor;
+
+import com.google.common.collect.Lists;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -38,37 +39,37 @@ import org.eclipse.ui.IWorkbench;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * A wizard to add a new {@link RelationshipSet} in an existing file, or to
- * create a new file with this set.
+ * A wizard to add a new {@link GraphEdgeMatcherDescriptor} in an existing
+ * file, or to create a new file with this set.
  *
+ * Based on the legacy {@code NewRelationshipSetWizard}, and should share the
+ * same Toolkit persistance model with it.
+ * 
  * @author ycoppel@google.com (Yohann Coppel)
- *
  */
-public class NewRelationshipSetWizard extends Wizard implements INewWizard {
+public class NewEdgeMatcherWizard extends Wizard implements INewWizard {
 
   /**
    * The unique page for this wizard.
    */
-  private NewRelationshipSetPage page;
+  private NewEdgeMatcherPage page;
 
   /**
-   * {@link DirectedRelationFinder} describing the {@link RelationshipSet}.
+   * {@link GraphEdgeMatcher} to be named and saved.
    */
-  @SuppressWarnings("unused")  // This needs rework.
-  private final DirectedRelationFinder finder;
+  private final GraphEdgeMatcher edgeMatcher;
 
   /**
    * Constructor for a new wizard, for the creation of a new named
-   * {@link RelationshipSet} described by <code>finder</code>.
+   * {@link GraphEdgeMatcherDescriptor} described by {@code edgeMatcher}.
    *
    * @param finder A {@link DirectedRelationFinder} describing the new set.
    */
-  public NewRelationshipSetWizard(DirectedRelationFinder finder) {
-    this.finder = finder;
+  public NewEdgeMatcherWizard(GraphEdgeMatcher edgeMatcher) {
+    this.edgeMatcher = edgeMatcher;
   }
 
   @Override
@@ -103,7 +104,6 @@ public class NewRelationshipSetWizard extends Wizard implements INewWizard {
     return true;
   }
 
-
   /**
    * Add the relationship to the file (creates the file if necessary).
    *
@@ -122,10 +122,13 @@ public class NewRelationshipSetWizard extends Wizard implements INewWizard {
     //IResource resource = root.findMember(fileName);
     IFile file = root.getFile(new Path(fileName));
 
+    // TODO(leeca):  Is this configured with the correct XStream flavor?
+    ObjectXmlPersist persist =
+        new ObjectXmlPersist(XStreamFactory.getSharedRefXStream());
     if (file.exists()) {
-      addToSet(file, setName);
+      addToSet(persist, file, setName);
     } else {
-      newFileAndSet(file, setName);
+      newFileAndSet(persist, file, setName);
     }
 
     monitor.worked(1);
@@ -137,26 +140,14 @@ public class NewRelationshipSetWizard extends Wizard implements INewWizard {
    * @param file the existing file
    * @param setName the set name
    */
-  private void addToSet(IFile file, String setName)
+  private void addToSet(ObjectXmlPersist persist, IFile file, String setName)
       throws IOException, CoreException {
-    // TODO(leeca):  Is this configured with the correct XStream flavor?
-    ObjectXmlPersist persist =
-        new ObjectXmlPersist(XStreamFactory.getSharedRefXStream());
-    Collection<RelationshipSet> updateSet = loadRelationshipSet(persist, file);
-    RelationshipSet set = DefaultRelationshipSet.SET;
-    updateSet.add(set);
-    persist.save(file.getLocationURI(), updateSet);
-    file.refreshLocal(IResource.DEPTH_ZERO, null);
+
+    Collection<GraphEdgeMatcherDescriptor> updateSet =
+        loadEdgeMatchers(persist, file);
+    persistUpdatedBundle(persist, file, updateSet, setName);
   }
 
-  /**
-   * Isolate unchecked conversion.
-   */
-  @SuppressWarnings("unchecked")
-  private Collection<RelationshipSet> loadRelationshipSet(
-      ObjectXmlPersist persist, IFile file) throws IOException {
-    return (Collection<RelationshipSet>) persist.load(file.getLocationURI());
-  }
 
   /**
    * Create a new file and save into it the set under <code>setName</code>.
@@ -164,24 +155,39 @@ public class NewRelationshipSetWizard extends Wizard implements INewWizard {
    * @param file a new file
    * @param setName the set name
    */
-  private void newFileAndSet(IFile file, String setName)
+  private void newFileAndSet(
+      ObjectXmlPersist persist, IFile file, String setName)
       throws IOException, CoreException {
-    RelationshipSet set = DefaultRelationshipSet.SET;
 
-    Collection<RelationshipSet> collection = new ArrayList<RelationshipSet>();
-    collection.add(set);
+    Collection<GraphEdgeMatcherDescriptor> collection = Lists.newArrayList();
+    persistUpdatedBundle(persist, file, collection, setName);
+  }
 
-    // save data in the file
-    // TODO(leeca):  Is this configured with the correct XStream flavor?
-    ObjectXmlPersist persist =
-        new ObjectXmlPersist(XStreamFactory.getSharedRefXStream());
-    persist.save(file.getLocationURI(), collection);
+  /**
+   * Isolate unchecked conversion.
+   */
+  @SuppressWarnings("unchecked")
+  private Collection<GraphEdgeMatcherDescriptor> loadEdgeMatchers(
+      ObjectXmlPersist persist, IFile file) throws IOException {
+    return (Collection<GraphEdgeMatcherDescriptor>) persist.load(file.getLocationURI());
+  }
+
+  private void persistUpdatedBundle(
+      ObjectXmlPersist persist, IFile file,
+      Collection<GraphEdgeMatcherDescriptor> bundle,
+      String newName)
+      throws IOException, CoreException {
+    GraphEdgeMatcherDescriptor descriptor =
+        new GraphEdgeMatcherDescriptor(newName, edgeMatcher);
+    bundle.add(descriptor);
+
+    persist.save(file.getLocationURI(), bundle);
     file.refreshLocal(IResource.DEPTH_ZERO, null);
   }
 
   @Override
   public void addPages() {
-    page = new NewRelationshipSetPage();
+    page = new NewEdgeMatcherPage();
     addPage(page);
   }
 

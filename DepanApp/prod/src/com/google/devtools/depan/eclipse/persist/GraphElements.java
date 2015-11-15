@@ -93,7 +93,7 @@ public class GraphElements {
       xstream.registerConverter(new Point2DConverter(xstream.getMapper()));
 
       CameraPosConverter.configXStream(xstream);
-      RelSetConverter.configXStream(xstream);
+      RelationSetConverter.configXStream(xstream);
     }
   };
 }

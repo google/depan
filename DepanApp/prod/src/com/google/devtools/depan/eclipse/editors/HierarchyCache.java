@@ -18,7 +18,7 @@ package com.google.devtools.depan.eclipse.editors;
 
 import com.google.devtools.depan.eclipse.trees.GraphData;
 import com.google.devtools.depan.eclipse.trees.NodeTreeProvider;
-import com.google.devtools.depan.graph.api.DirectedRelationFinder;
+import com.google.devtools.depan.model.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.view.TreeModel;
@@ -39,12 +39,13 @@ import java.util.Map;
 public class HierarchyCache<T> {
   private final NodeTreeProvider<T> provider;
   private final GraphModel graph;
+
   /**
    * We store all the trees for now, which allows quick switch when changing
    * from one view to another. If it's too memory consuming, we could change
    * that easily.
    */
-  private Map<DirectedRelationFinder, GraphData<T>> hierarchies =
+  private Map<GraphEdgeMatcherDescriptor, GraphData<T>> hierarchies =
       Maps.newHashMap();
 
   /**
@@ -60,21 +61,21 @@ public class HierarchyCache<T> {
 
   /**
    * Provide a description of a hierarchy ({@code GraphData}) based on the
-   * internal set of nodes and the provided set of relations.  A new
-   * {@code GraphData} is created if the {@code relFinder} has not been
+   * internal set of nodes and the provided edge matcher.  A new
+   * {@code GraphData} is created if the {@code edgeMatcher} has not been
    * used before.
    * 
-   * @param relFinder relations to use for hierarchy construction
+   * @param edgeMatcher Edge matcher to use for hierarchy construction
    * @return description of hierarchy
    */
-  public GraphData<T> getHierarchy(DirectedRelationFinder relFinder) {
-    if (!hierarchies.containsKey(relFinder)) {
+  public GraphData<T> getHierarchy(GraphEdgeMatcherDescriptor edgeMatcher) {
+    if (!hierarchies.containsKey(edgeMatcher)) {
       GraphData<T> result =
-          GraphData.createGraphData(provider, graph, relFinder);
-      hierarchies.put(relFinder, result);
+          GraphData.createGraphData(provider, graph, edgeMatcher);
+      hierarchies.put(edgeMatcher, result);
     }
 
-    return hierarchies.get(relFinder);
+    return hierarchies.get(edgeMatcher);
   }
 
   public GraphData<T> allNodes() {

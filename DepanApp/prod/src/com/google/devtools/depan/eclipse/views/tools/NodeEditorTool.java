@@ -18,9 +18,9 @@ package com.google.devtools.depan.eclipse.views.tools;
 
 import com.google.devtools.depan.eclipse.editors.HierarchyCache;
 import com.google.devtools.depan.eclipse.editors.NodeDisplayProperty;
+import com.google.devtools.depan.eclipse.editors.NodeDisplayProperty.Size;
 import com.google.devtools.depan.eclipse.editors.NodeWrapperTreeSorter;
 import com.google.devtools.depan.eclipse.editors.ViewEditor;
-import com.google.devtools.depan.eclipse.editors.NodeDisplayProperty.Size;
 import com.google.devtools.depan.eclipse.trees.GraphData;
 import com.google.devtools.depan.eclipse.trees.NodeTreeProvider;
 import com.google.devtools.depan.eclipse.trees.NodeTreeView;
@@ -30,11 +30,10 @@ import com.google.devtools.depan.eclipse.utils.HierarchyViewer;
 import com.google.devtools.depan.eclipse.utils.HierarchyViewer.HierarchyChangeListener;
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.utils.Tools;
-import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptor;
 import com.google.devtools.depan.eclipse.views.NodeEditorLabelProvider;
 import com.google.devtools.depan.eclipse.views.ViewSelectionListenerTool;
+import com.google.devtools.depan.model.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.model.RelationshipSet;
 import com.google.devtools.depan.util.StringUtils;
 
 import com.google.common.collect.Lists;
@@ -65,8 +64,7 @@ import java.util.List;
  *
  */
 public class NodeEditorTool extends ViewSelectionListenerTool
-    implements ICellModifier, NodeTreeProvider<NodeDisplayProperty>,
-    HierarchyChangeListener {
+    implements ICellModifier, NodeTreeProvider<NodeDisplayProperty> {
 
   /**
    * Node Tree View handling the TreeViewer, and the data inside.
@@ -164,7 +162,13 @@ public class NodeEditorTool extends ViewSelectionListenerTool
 
     HierarchyViewer<NodeDisplayProperty> result =
         new HierarchyViewer<NodeDisplayProperty>(parent, false);
-    result.addChangeListener(this);
+    result.addChangeListener(new HierarchyChangeListener() {
+
+      @Override
+      public void hierarchyChanged() {
+        handleHierarchyChanged();
+      }
+    });
 
     return result;
   }
@@ -185,10 +189,12 @@ public class NodeEditorTool extends ViewSelectionListenerTool
     super.updateControls();
 
     // Update the hierarchy picker for the new editor.
-    HierarchyCache<NodeDisplayProperty> hierarchies = getEditor().getHierarchies();
-    RelationshipSet selectedRelSet = getEditor().getContainerRelSet();
-    List<RelSetDescriptor> choices = getEditor().getRelSetChoices();
-    hierarchyPicker.setInput(hierarchies, selectedRelSet, choices );
+    HierarchyCache<NodeDisplayProperty> hierarchies =
+        getEditor().getHierarchies();
+    GraphEdgeMatcherDescriptor edgeMatcher = getEditor().getTreeEdgeMatcher();
+    List<GraphEdgeMatcherDescriptor> choices =
+        getEditor().getTreeEdgeMatcherChoices();
+    hierarchyPicker.setInput(hierarchies, edgeMatcher, choices);
   }
 
   @Override
@@ -385,8 +391,7 @@ public class NodeEditorTool extends ViewSelectionListenerTool
     updateSelectedExtend(selection);
   }
 
-  @Override
-  public void hierarchyChanged() {
+  private void handleHierarchyChanged() {
     if (!hasEditor()) {
       return;
     }

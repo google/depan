@@ -17,12 +17,13 @@
 package com.google.devtools.depan.eclipse.visualization.layout;
 
 import com.google.devtools.depan.eclipse.visualization.ogl.GLScene;
-import com.google.devtools.depan.graph.api.DirectedRelationFinder;
+import com.google.devtools.depan.graph.api.EdgeMatcher;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.view.HierarchicalTreeModel;
 import com.google.devtools.depan.view.SuccessorEdges;
 import com.google.devtools.depan.view.TreeModel;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -63,14 +64,14 @@ public abstract class HierarchicalLayoutTool {
    * @param relations set of relations that define the hierarchy
    */
   public HierarchicalLayoutTool(
-      GraphModel layoutGraph, DirectedRelationFinder relations) {
-    this(createTreeModel(layoutGraph, relations));
+      GraphModel layoutGraph, EdgeMatcher<String> edgeMatcher) {
+    this(createTreeModel(layoutGraph, edgeMatcher));
   }
 
   public static TreeModel createTreeModel(
-      GraphModel layoutGraph, DirectedRelationFinder relations) {
+      GraphModel layoutGraph, EdgeMatcher<String> edgeMatcher) {
     return new HierarchicalTreeModel(
-      layoutGraph.computeSuccessorHierarchy(relations));
+      layoutGraph.computeSuccessorHierarchy(edgeMatcher));
   }
 
   /**
@@ -240,10 +241,10 @@ public abstract class HierarchicalLayoutTool {
      * Create a planar layout tool for the given graph and hierarchy.
      * 
      * @param layouGraph set of nodes to layout
-     * @param relations set of relations that define the hierarchy
+     * @param edgeMatcher edge matcher that defines the hierarchy
      */
-    public Planar(GraphModel layoutGraph, DirectedRelationFinder relations) {
-      super(layoutGraph, relations);
+    public Planar(GraphModel layoutGraph, EdgeMatcher<String> edgeMatcher) {
+      super(layoutGraph, edgeMatcher);
     }
 
     /**

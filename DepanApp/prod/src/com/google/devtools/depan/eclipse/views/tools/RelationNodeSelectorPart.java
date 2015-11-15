@@ -17,10 +17,9 @@
 package com.google.devtools.depan.eclipse.views.tools;
 
 import com.google.devtools.depan.eclipse.editors.ViewEditor;
-import com.google.devtools.depan.eclipse.utils.RelationshipPicker;
-import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptor;
+import com.google.devtools.depan.eclipse.utils.GraphEdgeMatcherEditorPart;
 import com.google.devtools.depan.filters.PathMatcher;
-import com.google.devtools.depan.model.RelationshipSet;
+import com.google.devtools.depan.model.GraphEdgeMatcherDescriptor;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -40,13 +39,12 @@ public class RelationNodeSelectorPart
     implements SelectionEditorTool.NodeSelectorPart {
 
   private Composite control;
-  private RelationshipPicker relationshipPicker;
+  private GraphEdgeMatcherEditorPart edgeMatcherEditor;
   private boolean recursiveSearch;
 
   @Override
   public PathMatcher getNodeSelector() {
-    relationshipPicker.createPathMatcherModel(recursiveSearch);
-    return relationshipPicker.getPathMatcherModel();
+    return edgeMatcherEditor.createPathMatcherModel(recursiveSearch);
   }
 
   @Override
@@ -56,8 +54,8 @@ public class RelationNodeSelectorPart
     control.setLayout(new GridLayout());
 
     // Use a standard RelationPicker part
-    relationshipPicker = new RelationshipPicker();
-    Control relationsPanel = relationshipPicker.getControl(control);
+    edgeMatcherEditor = new GraphEdgeMatcherEditorPart();
+    Control relationsPanel = edgeMatcherEditor.getControl(control);
     relationsPanel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
     // Add a recursive selection checkbox
@@ -78,10 +76,10 @@ public class RelationNodeSelectorPart
 
   @Override
   public void updateControl(ViewEditor viewEditor) {
-    relationshipPicker.updateTable(viewEditor.getBuiltinAnalysisPlugins());
+    edgeMatcherEditor.updateTable(viewEditor.getBuiltinAnalysisPlugins());
 
-    RelationshipSet selectedRelSet = viewEditor.getContainerRelSet();
-    List<RelSetDescriptor> choices = viewEditor.getRelSetChoices();
-    relationshipPicker.updateRelSetPicker(selectedRelSet, choices );
+    GraphEdgeMatcherDescriptor selectedRelSet = viewEditor.getTreeEdgeMatcher();
+    List<GraphEdgeMatcherDescriptor> choices = viewEditor.getTreeEdgeMatcherChoices();
+    edgeMatcherEditor.updateEdgeMatcherSelector(selectedRelSet, choices );
   }
 }

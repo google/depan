@@ -16,14 +16,16 @@
 
 package com.google.devtools.depan.eclipse.visualization.layout;
 
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import com.google.devtools.depan.graph.api.DirectedRelationFinder;
+import com.google.devtools.depan.graph.api.EdgeMatcher;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.model.RelationshipTreeBuilder;
-import com.google.devtools.depan.util.Tree;
+import com.google.devtools.depan.view.HierarchicalTreeModel;
+import com.google.devtools.depan.view.SuccessorEdges;
+import com.google.devtools.depan.view.TreeModel;
+
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import edu.uci.ics.jung.algorithms.layout.AbstractLayout;
 import edu.uci.ics.jung.graph.Graph;
@@ -56,62 +58,50 @@ public class UniversalTreeLayout extends
   protected int distY = DEFAULT_DIST_Y;
   protected transient Point mCurrentPoint = new Point();
 
-  protected Set<GraphNode> roots;
   protected GraphModel graphModel;
-  protected DirectedRelationFinder relations;
 
-  protected Collection<Tree<GraphNode>> hierarchy = null;
+  protected EdgeMatcher<String> edgeMatcher;
+
+  TreeModel hierarchy = TreeModel.EMPTY;
 
   protected UniversalTreeLayout(
       Graph<GraphNode, GraphEdge> graph,
-      GraphModel graphModel, DirectedRelationFinder relations,
+      GraphModel graphModel, EdgeMatcher<String> edgeMatcher,
       Dimension size) {
     super(graph, size);
     this.graphModel = graphModel;
-    this.relations = relations;
+    this.edgeMatcher = edgeMatcher;
   }
 
   @Override
   public void initialize() {
     allreadyDone.clear();
-    hierarchy = new RelationshipTreeBuilder(
-        graphModel.getEdges(),
-        graphModel.getNodes(),
-        relations).buildTree();
-    findRoots();
+    hierarchy = new HierarchicalTreeModel(
+        graphModel.computeSpanningHierarchy(edgeMatcher));
     buildTree();
   }
 
-  private void findRoots() {
-    roots = Sets.newHashSet();
-    for (Tree<GraphNode> tree : hierarchy) {
-      roots.add(tree.getHead());
-    }
+  private Collection<GraphNode> getSuccessors(GraphNode node) {
+    SuccessorEdges successors = hierarchy.getSuccessors(node);
+    return successors.computeSuccessorNodes();
   }
 
-  protected Collection<GraphNode> getSuccessors(
-      GraphNode node) {
-    Collection<GraphNode> successors =
-        Tree.getSuccessors(node, hierarchy);
-    return successors;
-  }
-
-  void buildTree() {
+  /**
+   * To be overridden
+   */
+  protected void buildTree() {
+    Collection<GraphNode> roots = hierarchy.computeRoots();
     this.mCurrentPoint = new Point(0, 20);
     if (roots.size() > 0) {
-      for (GraphNode v : roots) {
-        calculateDimensionX(v);
-        mCurrentPoint.x += this.basePositions.get(v) / 2 + 50;
-        buildTree(v, this.mCurrentPoint.x);
+      for (GraphNode node : roots) {
+        calculateDimensionX(node);
+        mCurrentPoint.x += this.basePositions.get(node) / 2 + 50;
+        buildTree(node, this.mCurrentPoint.x);
       }
-    }
-    int width = 0;
-    for (GraphNode v : roots) {
-      width += basePositions.get(v);
     }
   }
 
-  void buildTree(GraphNode v, int x) {
+  private void buildTree(GraphNode v, int x) {
     if (!allreadyDone.contains(v)) {
       allreadyDone.add(v);
 

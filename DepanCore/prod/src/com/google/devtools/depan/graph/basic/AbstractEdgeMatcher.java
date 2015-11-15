@@ -1,10 +1,10 @@
 /*
- * Copyright 2007 The Depan Project Authors
- * 
+ * Copyright 2015 The Depan Project Authors
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -14,19 +14,23 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.graph.api;
+package com.google.devtools.depan.graph.basic;
+
+import com.google.devtools.depan.graph.api.Edge;
+import com.google.devtools.depan.graph.api.EdgeMatcher;
 
 /**
- * @author ycoppel@google.com (Yohann Coppel)
- *
+ * @author <a href="mailto:leeca@pnambic.com">Lee Carver</a>
  */
-public interface DirectedRelation {
+public abstract class AbstractEdgeMatcher<T> implements EdgeMatcher<T> {
 
-  public Relation getRelation();
+  @Override
+  public boolean edgeForward(Edge<T> edge) {
+    return relationForward(edge.getRelation());
+  }
 
-  public boolean matchForward();
-  public boolean matchBackward();
-
-  public void setMatchForward(boolean matches);
-  public void setMatchBackward(boolean matches);
+  @Override
+  public boolean edgeReverse(Edge<T> edge) {
+    return relationReverse(edge.getRelation());
+  }
 }

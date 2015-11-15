@@ -16,11 +16,12 @@
 
 package com.google.devtools.depan.java.integration;
 
-import com.google.common.collect.Lists;
 import com.google.devtools.depan.filesystem.graph.FileSystemRelation;
 import com.google.devtools.depan.java.graph.JavaRelation;
-import com.google.devtools.depan.model.RelationshipSet;
-import com.google.devtools.depan.model.RelationshipSetAdapter;
+import com.google.devtools.depan.model.RelationSetDescriptor;
+import com.google.devtools.depan.model.RelationSetDescriptor.Builder;
+
+import com.google.common.collect.Lists;
 
 import java.util.Collection;
 
@@ -33,125 +34,112 @@ public class JavaRelationSets {
   /**
    * List of all built-in RelationshipSets. Make it easier to iterate.
    */
-  public static Collection<RelationshipSet> builtins;
+  public static final Collection<RelationSetDescriptor> builtins;
 
-  /**
-   * Container relationships.
-   */
-  public static final RelationshipSetAdapter CONTAINER =
-      new RelationshipSetAdapter("Java Containers");
+  public static final RelationSetDescriptor CONTAINER;
 
-  /**
-   *
-   */
-  public static final RelationshipSetAdapter PKG_MEMBER =
-      new RelationshipSetAdapter("Package Members");
+  public static final RelationSetDescriptor PKG_MEMBER;
 
-  /**
-   *
-   */
-  public static final RelationshipSetAdapter CLASS_MEMBER =
-      new RelationshipSetAdapter("Class Members");
+  public static final RelationSetDescriptor CLASS_MEMBER;
 
-  /**
-   *
-   */
-  public static final RelationshipSetAdapter STATIC_MEMBER =
-      new RelationshipSetAdapter("Static Members");
+  public static final RelationSetDescriptor STATIC_MEMBER;
 
-  /**
-   *
-   */
-  public static final RelationshipSetAdapter INSTANCE_MEMBER =
-      new RelationshipSetAdapter("Instance Members");
+  public static final RelationSetDescriptor INSTANCE_MEMBER;
 
-  /**
-   *
-   */
-  public static final RelationshipSetAdapter EXTENSION =
-      new RelationshipSetAdapter("Extensions");
+  public static final RelationSetDescriptor EXTENSION;
 
-  /**
-   *
-   */
-  public static final RelationshipSetAdapter USES =
-      new RelationshipSetAdapter("Uses");
+  public static final RelationSetDescriptor USES;
 
-  /**
-   * A set matching all relations in both directions.
-   */
-  public static final RelationshipSetAdapter ALL =
-      new RelationshipSetAdapter("All Java");
+  public static final RelationSetDescriptor ALL;
 
   static {
     // container relationships
-    CONTAINER.addOrReplaceRelation(
-        FileSystemRelation.CONTAINS_DIR, true, true);
-    CONTAINER.addOrReplaceRelation(
-        FileSystemRelation.CONTAINS_FILE, true, true);
-    CONTAINER.addOrReplaceRelation(JavaRelation.CLASS, true, true);
-    CONTAINER.addOrReplaceRelation(JavaRelation.CLASSFILE, true, true);
-    CONTAINER.addOrReplaceRelation(JavaRelation.PACKAGE, true, true);
-    CONTAINER.addOrReplaceRelation(JavaRelation.LOCAL_VARIABLE, true, true);
-    CONTAINER.addOrReplaceRelation(JavaRelation.INNER_TYPE, true, true);
-    CONTAINER.addOrReplaceRelation(JavaRelation.MEMBER_FIELD, true, true);
-    CONTAINER.addOrReplaceRelation(JavaRelation.MEMBER_METHOD, true, true);
-    CONTAINER.addOrReplaceRelation(JavaRelation.MEMBER_TYPE, true, true);
-    CONTAINER.addOrReplaceRelation(JavaRelation.STATIC_FIELD, true, true);
-    CONTAINER.addOrReplaceRelation(JavaRelation.STATIC_METHOD, true, true);
-    CONTAINER.addOrReplaceRelation(JavaRelation.STATIC_TYPE, true, true);
-    CONTAINER.addOrReplaceRelation(JavaRelation.ANONYMOUS_TYPE, true, true);
+    Builder containerBuilder = RelationSetDescriptor.createBuilder(
+        "Java Containers");
+    containerBuilder.addRelation(FileSystemRelation.CONTAINS_DIR);
+    containerBuilder.addRelation(FileSystemRelation.CONTAINS_FILE);
+    containerBuilder.addRelation(JavaRelation.CLASS);
+    containerBuilder.addRelation(JavaRelation.CLASSFILE);
+    containerBuilder.addRelation(JavaRelation.PACKAGE);
+    containerBuilder.addRelation(JavaRelation.LOCAL_VARIABLE);
+    containerBuilder.addRelation(JavaRelation.INNER_TYPE);
+    containerBuilder.addRelation(JavaRelation.MEMBER_FIELD);
+    containerBuilder.addRelation(JavaRelation.MEMBER_METHOD);
+    containerBuilder.addRelation(JavaRelation.MEMBER_TYPE);
+    containerBuilder.addRelation(JavaRelation.STATIC_FIELD);
+    containerBuilder.addRelation(JavaRelation.STATIC_METHOD);
+    containerBuilder.addRelation(JavaRelation.STATIC_TYPE);
+    containerBuilder.addRelation(JavaRelation.ANONYMOUS_TYPE);
+    CONTAINER = containerBuilder.build();
 
     // package + class member relationships
-    PKG_MEMBER.addOrReplaceRelation(JavaRelation.CLASS, true, false);
-    PKG_MEMBER.addOrReplaceRelation(JavaRelation.PACKAGE, true, false);
-    PKG_MEMBER.addOrReplaceRelation(JavaRelation.INNER_TYPE, true, false);
-    PKG_MEMBER.addOrReplaceRelation(JavaRelation.MEMBER_FIELD, true, false);
-    PKG_MEMBER.addOrReplaceRelation(JavaRelation.MEMBER_METHOD, true, false);
-    PKG_MEMBER.addOrReplaceRelation(JavaRelation.MEMBER_TYPE, true, false);
-    PKG_MEMBER.addOrReplaceRelation(JavaRelation.STATIC_FIELD, true, false);
-    PKG_MEMBER.addOrReplaceRelation(JavaRelation.STATIC_METHOD, true, false);
-    PKG_MEMBER.addOrReplaceRelation(JavaRelation.STATIC_TYPE, true, false);
+    Builder pkgBuilder = RelationSetDescriptor.createBuilder(
+        "Package Members");
+    pkgBuilder.addRelation(JavaRelation.CLASS);
+    pkgBuilder.addRelation(JavaRelation.PACKAGE);
+    pkgBuilder.addRelation(JavaRelation.INNER_TYPE);
+    pkgBuilder.addRelation(JavaRelation.MEMBER_FIELD);
+    pkgBuilder.addRelation(JavaRelation.MEMBER_METHOD);
+    pkgBuilder.addRelation(JavaRelation.MEMBER_TYPE);
+    pkgBuilder.addRelation(JavaRelation.STATIC_FIELD);
+    pkgBuilder.addRelation(JavaRelation.STATIC_METHOD);
+    pkgBuilder.addRelation(JavaRelation.STATIC_TYPE);
+    PKG_MEMBER = pkgBuilder.build();
 
     // class member relationships only
-    CLASS_MEMBER.addOrReplaceRelation(JavaRelation.INNER_TYPE, true, false);
-    CLASS_MEMBER.addOrReplaceRelation(JavaRelation.MEMBER_FIELD, true, false);
-    CLASS_MEMBER.addOrReplaceRelation(JavaRelation.MEMBER_METHOD, true, false);
-    CLASS_MEMBER.addOrReplaceRelation(JavaRelation.MEMBER_TYPE, true, false);
-    CLASS_MEMBER.addOrReplaceRelation(JavaRelation.STATIC_FIELD, true, false);
-    CLASS_MEMBER.addOrReplaceRelation(JavaRelation.STATIC_METHOD, true, false);
-    CLASS_MEMBER.addOrReplaceRelation(JavaRelation.STATIC_TYPE, true, false);
+    Builder classBuilder = RelationSetDescriptor.createBuilder(
+        "Class Members");
+    classBuilder.addRelation(JavaRelation.INNER_TYPE);
+    classBuilder.addRelation(JavaRelation.MEMBER_FIELD);
+    classBuilder.addRelation(JavaRelation.MEMBER_METHOD);
+    classBuilder.addRelation(JavaRelation.MEMBER_TYPE);
+    classBuilder.addRelation(JavaRelation.STATIC_FIELD);
+    classBuilder.addRelation(JavaRelation.STATIC_METHOD);
+    classBuilder.addRelation(JavaRelation.STATIC_TYPE);
+    CLASS_MEMBER = classBuilder.build();
 
     // static class member relationships
-    STATIC_MEMBER.addOrReplaceRelation(JavaRelation.STATIC_FIELD, true, false);
-    STATIC_MEMBER.addOrReplaceRelation(JavaRelation.STATIC_METHOD, true, false);
-    STATIC_MEMBER.addOrReplaceRelation(JavaRelation.STATIC_TYPE, true, false);
+    Builder staticBuilder = RelationSetDescriptor.createBuilder(
+        "Static Members");
+    staticBuilder.addRelation(JavaRelation.STATIC_FIELD);
+    staticBuilder.addRelation(JavaRelation.STATIC_METHOD);
+    staticBuilder.addRelation(JavaRelation.STATIC_TYPE);
+    STATIC_MEMBER = staticBuilder.build();
 
     // instance class member relationships
-    INSTANCE_MEMBER.addOrReplaceRelation(
-        JavaRelation.MEMBER_FIELD, true, false);
-    INSTANCE_MEMBER.addOrReplaceRelation(
-        JavaRelation.MEMBER_METHOD, true, false);
-    INSTANCE_MEMBER.addOrReplaceRelation(JavaRelation.MEMBER_TYPE, true, false);
+    Builder instanceBuilder = RelationSetDescriptor.createBuilder(
+        "Instance Members");
+    instanceBuilder.addRelation(JavaRelation.MEMBER_FIELD);
+    instanceBuilder.addRelation(JavaRelation.MEMBER_METHOD);
+    instanceBuilder.addRelation(JavaRelation.MEMBER_TYPE);
+    INSTANCE_MEMBER = instanceBuilder.build();
 
     // object extension relationships
-    EXTENSION.addOrReplaceRelation(JavaRelation.WRITE, true, false);
-    EXTENSION.addOrReplaceRelation(JavaRelation.EXTENDS, true, false);
-    EXTENSION.addOrReplaceRelation(JavaRelation.IMPLEMENTS, true, false);
-    EXTENSION.addOrReplaceRelation(JavaRelation.INTERFACE_EXTENDS, true, false);
-    EXTENSION.addOrReplaceRelation(JavaRelation.METHOD_OVERLOAD, true, false);
-    EXTENSION.addOrReplaceRelation(JavaRelation.METHOD_OVERRIDE, true, false);
-    EXTENSION.addOrReplaceRelation(JavaRelation.ERROR_HANDLING, true, false);
+    Builder extBuilder = RelationSetDescriptor.createBuilder(
+        "Extensions");
+    extBuilder.addRelation(JavaRelation.WRITE);
+    extBuilder.addRelation(JavaRelation.EXTENDS);
+    extBuilder.addRelation(JavaRelation.IMPLEMENTS);
+    extBuilder.addRelation(JavaRelation.INTERFACE_EXTENDS);
+    extBuilder.addRelation(JavaRelation.METHOD_OVERLOAD);
+    extBuilder.addRelation(JavaRelation.METHOD_OVERRIDE);
+    extBuilder.addRelation(JavaRelation.ERROR_HANDLING);
+    EXTENSION = extBuilder.build();
 
     // object use relationships
-    USES.addOrReplaceRelation(JavaRelation.CALL, true, false);
-    USES.addOrReplaceRelation(JavaRelation.READ, true, false);
-    USES.addOrReplaceRelation(JavaRelation.TYPE, true, false);
+    Builder useBuilder = RelationSetDescriptor.createBuilder(
+        "Uses");
+    useBuilder.addRelation(JavaRelation.CALL);
+    useBuilder.addRelation(JavaRelation.READ);
+    useBuilder.addRelation(JavaRelation.TYPE);
+    USES = useBuilder.build();
 
     // check all relationships
+    Builder allBuilder = RelationSetDescriptor.createBuilder("All Java");
     for (JavaRelation relation : JavaRelation.values()) {
-      ALL.addOrReplaceRelation(relation, true, true);
+      allBuilder.addRelation(relation);
     }
+    ALL = allBuilder.build();
 
     // add predefined sets to the built-in list
     builtins = Lists.newArrayList();

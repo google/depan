@@ -24,13 +24,12 @@ import com.google.devtools.depan.eclipse.utils.NodeLabelProvider;
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.utils.Sasher;
 import com.google.devtools.depan.eclipse.utils.TableContentProvider;
-import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptor;
 import com.google.devtools.depan.eclipse.views.ViewSelectionListenerTool;
 import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerators;
 import com.google.devtools.depan.filters.PathMatcher;
+import com.google.devtools.depan.model.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.model.RelationshipSet;
 
 import com.google.common.collect.Lists;
 
@@ -412,7 +411,7 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
 
     String layoutName = layoutChoices.getLayoutName();
     viewDoc.setSelectedLayout(layoutName);
-    viewDoc.setLayoutFinder(layoutChoices.getRelationSet());
+    viewDoc.setLayoutEdgeMatcher(layoutChoices.getEdgeMatcher());
 
     // Preserve locations if no new layout is selected.
     // Otherwise, allow layout to happen on editor initialization.
@@ -459,9 +458,10 @@ public class SelectionEditorTool extends ViewSelectionListenerTool {
     super.updateControls();
 
     // Update the RelSet picker
-    RelationshipSet selectedRelSet = getEditor().getContainerRelSet();
-    List<RelSetDescriptor> choices = getEditor().getRelSetChoices();
-    layoutChoices.setRelSetInput(selectedRelSet, choices );
+    GraphEdgeMatcherDescriptor edgeMatcher = getEditor().getTreeEdgeMatcher();
+    List<GraphEdgeMatcherDescriptor> choices =
+        getEditor().getTreeEdgeMatcherChoices();
+    layoutChoices.setEdgeMatcherInput(edgeMatcher, choices);
     toolPanel.layout();
   }
 

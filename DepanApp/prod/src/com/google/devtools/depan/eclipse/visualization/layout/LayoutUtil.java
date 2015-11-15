@@ -15,9 +15,9 @@
  */
 package com.google.devtools.depan.eclipse.visualization.layout;
 
-import com.google.devtools.depan.graph.api.DirectedRelationFinder;
-import com.google.devtools.depan.graph.basic.ForwardIdentityRelationFinder;
 import com.google.devtools.depan.model.GraphEdge;
+import com.google.devtools.depan.model.GraphEdgeMatcherDescriptor;
+import com.google.devtools.depan.model.GraphEdgeMatcherDescriptors;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 
@@ -69,7 +69,7 @@ public class LayoutUtil {
 
     builder.setMovableNodes(context.getMovableNodes());
     builder.setFixedNodes(context.getFixedNodes());
-    builder.setRelations(context.getRelations());
+    builder.setEdgeMatcher(context.getEdgeMatcher());
 
     DirectedGraph<GraphNode, GraphEdge> result = builder.build();
     return result;
@@ -78,15 +78,15 @@ public class LayoutUtil {
   public static LayoutContext newLayoutContext(
       GraphModel parentGraph,
       Collection<GraphNode> viewNodes,
-      DirectedRelationFinder viewRelations) {
+      GraphEdgeMatcherDescriptor edgeMatcher) {
     LayoutContext layoutContext = new LayoutContext();
     layoutContext.setGraphModel(parentGraph);
     layoutContext.setMovableNodes(viewNodes);
 
-    if (null == viewRelations) {
-      layoutContext.setRelations(ForwardIdentityRelationFinder.FINDER);
+    if (null == edgeMatcher) {
+      layoutContext.setEdgeMatcher(GraphEdgeMatcherDescriptors.FORWARD);
     } else {
-      layoutContext.setRelations(viewRelations);
+      layoutContext.setEdgeMatcher(edgeMatcher);
     }
     return layoutContext;
   }

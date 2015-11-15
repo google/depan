@@ -17,7 +17,8 @@ package com.google.devtools.depan.eclipse.persist;
 
 import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
 import com.google.devtools.depan.eclipse.plugins.SourcePluginRegistry;
-import com.google.devtools.depan.model.RelationshipSet;
+import com.google.devtools.depan.graph.api.RelationSet;
+import com.google.devtools.depan.model.RelationSetDescriptor;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.Converter;
@@ -27,7 +28,7 @@ import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
 /**
- * {@code XStream} converter to handle {@code RelationshipSet}s.
+ * {@code XStream} converter to handle {@link RelationSet}s.
  * In order to facilitate selection, etc., make sure that all built-in
  * relation sets use the same instance.
  * 
@@ -36,7 +37,7 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
  * 
  * @author <a href="mailto:leeca@google.com">Lee Carver</a>
  */
-public class RelSetConverter implements Converter {
+public class RelationSetConverter implements Converter {
 
   private static final String RELATION_SET_TAG = "relation-set";
 
@@ -44,29 +45,29 @@ public class RelSetConverter implements Converter {
   private static final String REL_SET = "rel-set";
   private static final String PLUGIN_ID = "plugin-id";
 
-  public RelSetConverter() {
+  public RelationSetConverter() {
   }
 
   public static void configXStream(XStream xstream) {
-    xstream.aliasType(RELATION_SET_TAG, RelSetConverter.class);
-    xstream.registerConverter(new RelSetConverter());
+    xstream.aliasType(RELATION_SET_TAG, RelationSetConverter.class);
+    xstream.registerConverter(new RelationSetConverter());
   }
 
   @Override
   @SuppressWarnings("rawtypes")  // Parent type uses raw type Class
   public boolean canConvert(Class type) {
-    return RelationshipSet.class.isAssignableFrom(type);
+    return RelationSet.class.isAssignableFrom(type);
   }
 
   @Override
   public void marshal(Object source, HierarchicalStreamWriter writer,
       MarshallingContext context) {
-    RelationshipSet relSet = (RelationshipSet) source;
-    SourcePlugin plugin = findBuiltIn(relSet);
+    RelationSetDescriptor relationSet = (RelationSetDescriptor) source;
+    SourcePlugin plugin = findBuiltIn(relationSet);
     if (null != plugin) {
       String entryId = SourcePluginRegistry.getInstance().getPluginId(plugin);
       writer.addAttribute(PLUGIN_ID, entryId);
-      writer.addAttribute(REL_SET, relSet.getName());
+      writer.addAttribute(REL_SET, relationSet.getName());
     }
   }
 
@@ -81,7 +82,7 @@ public class RelSetConverter implements Converter {
         if (null == plugin) {
           return null;
         }
-        for (RelationshipSet builtIn : plugin.getBuiltinRelationshipSets()) {
+        for (RelationSetDescriptor builtIn : plugin.getBuiltinRelationshipSets()) {
           if (relSetName.equals(builtIn.getName())) {
             return builtIn;
           }
@@ -94,10 +95,10 @@ public class RelSetConverter implements Converter {
     }
   }
 
-  private SourcePlugin findBuiltIn(RelationshipSet relSet) {
+  private SourcePlugin findBuiltIn(RelationSetDescriptor relSet) {
     // Populate the list viewer with all known relations.
     for (SourcePlugin plugin : SourcePluginRegistry.getInstances()) {
-      for (RelationshipSet builtIn : plugin.getBuiltinRelationshipSets()) {
+      for (RelationSetDescriptor builtIn : plugin.getBuiltinRelationshipSets()) {
         if (builtIn == relSet) {
           return plugin;
         }

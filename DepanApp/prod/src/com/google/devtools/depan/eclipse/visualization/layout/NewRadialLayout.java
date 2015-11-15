@@ -17,7 +17,7 @@
 package com.google.devtools.depan.eclipse.visualization.layout;
 
 import com.google.devtools.depan.eclipse.editors.Point2dUtils;
-import com.google.devtools.depan.graph.api.DirectedRelationFinder;
+import com.google.devtools.depan.graph.api.EdgeMatcher;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
@@ -53,12 +53,13 @@ public class NewRadialLayout extends NewTreeLayout {
    * 
    * @param graph JUNG graph for layout (ignored)
    * @param viewModel source of nodes (exposed graph) to layout
-   * @param relations set of relations that define the hierarchy
+   * @param edgeMatcher edge matcher that defines the hierarchy
    * @param size available rendering space (ignored)
    */
-  protected NewRadialLayout(Graph<GraphNode, GraphEdge> graph,
-      GraphModel graphModel, DirectedRelationFinder relations, Rectangle2D region) {
-    super(graph, graphModel, relations, region);
+  protected NewRadialLayout(
+      Graph<GraphNode, GraphEdge> graph, GraphModel graphModel,
+      EdgeMatcher<String> edgeMatcher, Rectangle2D region) {
+    super(graph, graphModel, edgeMatcher, region);
   }
 
   /**
@@ -68,12 +69,12 @@ public class NewRadialLayout extends NewTreeLayout {
   public void initialize() {
 
     // Determine number of leafs ("circumference" of the circles).
-    DryRunTool dryRun = new DryRunTool(graphModel, relations);
+    DryRunTool dryRun = new DryRunTool(graphModel, edgeMatcher);
     dryRun.layoutTree();
 
     // Now assign locations
     HierarchicalLayoutTool layoutTool =
-        new RadialLayoutTool(graphModel, relations, dryRun.getLeafCount());
+        new RadialLayoutTool(graphModel, edgeMatcher, dryRun.getLeafCount());
 
     Collection<GraphNode> layoutNodes = graphModel.getNodes();
     positions = Maps.newHashMapWithExpectedSize(layoutNodes.size());
@@ -96,8 +97,8 @@ public class NewRadialLayout extends NewTreeLayout {
      * @param relations relations that define the hierarchy
      */
     public DryRunTool(
-        GraphModel layoutGraph, DirectedRelationFinder relations) {
-      super(layoutGraph, relations);
+        GraphModel layoutGraph, EdgeMatcher<String> edgeMatcher) {
+      super(layoutGraph, edgeMatcher);
     }
 
     @Override
@@ -186,9 +187,9 @@ public class NewRadialLayout extends NewTreeLayout {
      * @param circumference number of leaf positions around the circle
      */
     public RadialLayoutTool(
-        GraphModel layoutGraph, DirectedRelationFinder relations,
+        GraphModel layoutGraph, EdgeMatcher<String> edgeMatcher,
         int circumference) {
-      super(layoutGraph, relations);
+      super(layoutGraph, edgeMatcher);
       this.circumference = circumference;
       this.radiansPerLeaf = 2.0 * Math.PI / this.circumference;
     }

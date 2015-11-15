@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 The Depan Project Authors
+ * Copyright 2015 The Depan Project Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,38 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.devtools.depan.graph.basic;
 
 import com.google.devtools.depan.graph.api.Relation;
-import com.google.devtools.depan.graph.api.RelationFinder;
+import com.google.devtools.depan.graph.api.RelationSet;
 
 /**
- * Match all relations in the forward direction.
- * 
- * @author <a href='mailto:lee.carver@servicenow.com'>Lee Carver</a>
+ * @author <a href="mailto:leeca@pnambic.com">Lee Carver</a>
  */
-public class ForwardIdentityRelationFinder implements RelationFinder {
+public class BinaryEdgeMatcher<T> extends AbstractEdgeMatcher<T> {
+  private final RelationSet forward;
+  private final RelationSet reverse;
 
-  // Only need one of these
-  public static final ForwardIdentityRelationFinder FINDER =
-      new ForwardIdentityRelationFinder();
-
-  private ForwardIdentityRelationFinder() {
+  public BinaryEdgeMatcher(RelationSet forward, RelationSet reverse) {
+    this.forward = forward;
+    this.reverse = reverse;
   }
 
   @Override
-  public boolean match(Relation find) {
-    // Really?
-    return true;
+  public boolean relationForward(Relation relation) {
+    return forward.contains(relation);
   }
 
   @Override
-  public boolean matchBackward(Relation find) {
-    return false;
-  }
-
-  @Override
-  public boolean matchForward(Relation find) {
-    return true;
+  public boolean relationReverse(Relation relation) {
+    return reverse.contains(relation);
   }
 }

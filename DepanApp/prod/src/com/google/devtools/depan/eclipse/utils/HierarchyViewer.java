@@ -17,9 +17,8 @@ package com.google.devtools.depan.eclipse.utils;
 
 import com.google.devtools.depan.eclipse.editors.HierarchyCache;
 import com.google.devtools.depan.eclipse.trees.GraphData;
-import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptor;
+import com.google.devtools.depan.model.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.model.RelationshipSet;
 import com.google.devtools.depan.view.TreeModel;
 
 import org.eclipse.swt.SWT;
@@ -42,8 +41,7 @@ import java.util.logging.Logger;
  * 
  * @author <a href="mailto:leeca@pnambic.com">Lee Carver</a>
  */
-public class HierarchyViewer<T> extends Composite 
-    implements RelationshipSelectorListener {
+public class HierarchyViewer<T> extends Composite {
 
   private static final Logger logger =
       Logger.getLogger(HierarchyViewer.class.getName());
@@ -52,7 +50,7 @@ public class HierarchyViewer<T> extends Composite
 
   private boolean isInvertSelect;
 
-  private RelationshipSetPickerControl relSetPicker;
+  private GraphEdgeMatcherSelectorControl edgeMatcherSelector;
 
   /** Listener when the selection change. */
   // private List<HierarchyChangeListener> listeners = Lists.newArrayList();
@@ -76,14 +74,25 @@ public class HierarchyViewer<T> extends Composite
     viewerLayout.marginHeight = 0;
     this.setLayout(viewerLayout);
 
-    Label pickerLabel = RelationshipSetPickerControl.createPickerLabel(this);
-    pickerLabel.setLayoutData(
+    Label selectorLabel = new Label(this, SWT.NONE);
+    selectorLabel.setText("Hierarchy from");
+    selectorLabel.setLayoutData(
         new GridData(SWT.LEFT, SWT.CENTER, false, false));
 
-    relSetPicker = new RelationshipSetPickerControl(this);
-    relSetPicker.addChangeListener(this);
-    relSetPicker.setLayoutData(
+    edgeMatcherSelector = new GraphEdgeMatcherSelectorControl(this);
+    edgeMatcherSelector.setLayoutData(
         new GridData(SWT.FILL, SWT.CENTER, true, false));
+
+    edgeMatcherSelector.addChangeListener(
+        new GraphEdgeMatcherSelectorControl.SelectorListener() {
+
+          @Override
+          public void selectedEdgeMatcherChanged(
+              GraphEdgeMatcherDescriptor edgeMatcher) {
+            fireSelectionChange();
+          }
+        }
+      );
 
     final Button invertSelect = new Button(this, SWT.CHECK);
     invertSelect.setText("Invert");
@@ -101,8 +110,9 @@ public class HierarchyViewer<T> extends Composite
 
   public void setInput(
       HierarchyCache<T> hierarchies,
-      RelationshipSet selectedRelSet, List<RelSetDescriptor> choices) {
-    relSetPicker.setInput(selectedRelSet, choices );
+      GraphEdgeMatcherDescriptor selectedEdgeMatcher,
+      List<GraphEdgeMatcherDescriptor> choices) {
+    edgeMatcherSelector.setInput(selectedEdgeMatcher, choices );
     this.hierarchies = hierarchies;
   }
 
@@ -138,7 +148,7 @@ public class HierarchyViewer<T> extends Composite
   }
 
   private static class SimpleDispatcher
-  implements ListenerManager.Dispatcher<HierarchyChangeListener> {
+    implements ListenerManager.Dispatcher<HierarchyChangeListener> {
 
     @Override
     public void dispatch(HierarchyChangeListener listener) {
@@ -151,11 +161,6 @@ public class HierarchyViewer<T> extends Composite
     }
   }
 
-  @Override // from RelationshipSelectorListener
-  public void selectedSetChanged(RelationshipSet set) {
-    fireSelectionChange();
-  }
-
   /**
    * Provide the currently selected hierarchy data as a GraphData
    * instance.  If invert selection is chosen, GraphData for the graph nodes
@@ -166,8 +171,12 @@ public class HierarchyViewer<T> extends Composite
       return new GraphData<T>(null, TreeModel.EMPTY);
     }
 
-    GraphData<T> baseData = hierarchies
-        .getHierarchy(relSetPicker.getSelection());
+    GraphEdgeMatcherDescriptor selectedEdgeMatcher =
+        edgeMatcherSelector.getSelection();
+    if (null == selectedEdgeMatcher) {
+      return new GraphData<T>(null, TreeModel.EMPTY);
+    }
+    GraphData<T> baseData = hierarchies.getHierarchy(selectedEdgeMatcher);
 
     // Synthesize a inverse tree if requested.
     // These are not cached.  The inverted hierarchies are often small,

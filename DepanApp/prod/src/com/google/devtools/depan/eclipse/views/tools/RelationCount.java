@@ -16,13 +16,14 @@
 
 package com.google.devtools.depan.eclipse.views.tools;
 
+import com.google.devtools.depan.filters.RelationCountMatcher.EdgeCountPredicate;
 import com.google.devtools.depan.filters.RelationCountMatcher.IncludeAbove;
 import com.google.devtools.depan.filters.RelationCountMatcher.IncludeBelow;
 import com.google.devtools.depan.filters.RelationCountMatcher.IncludeEquals;
 import com.google.devtools.depan.filters.RelationCountMatcher.IncludeInRange;
 import com.google.devtools.depan.filters.RelationCountMatcher.IncludeOutside;
-import com.google.devtools.depan.filters.RelationCountMatcher.EdgeCountPredicate;
-import com.google.devtools.depan.model.RelationshipSet;
+import com.google.devtools.depan.graph.api.RelationSet;
+import com.google.devtools.depan.model.RelationSets;
 
 /**
  * Define the various UI options and data structures for a relation count
@@ -136,12 +137,12 @@ public class RelationCount {
    * count ranges for those edges.
    */
   public static class Settings {
-    public RelationshipSet relations;
+    public RelationSet relationSet;
     public RangeData forward;
     public RangeData reverse;
 
     public Settings() {
-      relations = RelationshipSet.EMTPY;
+      relationSet = RelationSets.EMPTY;
       forward = new RangeData(RangeOption.EXACTLY, 0, 0);
       reverse = new RangeData(RangeOption.IGNORE, 0, 0);
     }

@@ -17,7 +17,7 @@
 package com.google.devtools.depan.eclipse.visualization.layout;
 
 import com.google.devtools.depan.eclipse.editors.Point2dUtils;
-import com.google.devtools.depan.graph.api.DirectedRelationFinder;
+import com.google.devtools.depan.graph.api.EdgeMatcher;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
@@ -42,8 +42,8 @@ public class NewTreeLayout {
   /** The source of nodes for layout. */
   protected final GraphModel graphModel;
 
-  /** The set of relations that define the hierarchy. */
-  protected final DirectedRelationFinder relations;
+  /** Edge matcher that defines the tree hierarchy. */
+  protected final EdgeMatcher<String> edgeMatcher;
 
   /** The region to fill with the layout. */
   protected final Rectangle2D region;
@@ -59,14 +59,14 @@ public class NewTreeLayout {
    * 
    * @param graph JUNG graph for layout (ignored)
    * @param viewModel source of nodes (exposed graph) to layout
-   * @param relations set of relations that define the hierarchy
+   * @param edgeMatcher edge matcher that defines the hierarchy
    * @param size available rendering space (ignored)
    */
   protected NewTreeLayout(Graph<GraphNode, GraphEdge> graph,
-      GraphModel graphModel, DirectedRelationFinder relations,
+      GraphModel graphModel, EdgeMatcher<String> edgeMatcher,
       Rectangle2D region) {
     this.graphModel = graphModel;
-    this.relations = relations;
+    this.edgeMatcher = edgeMatcher;
     this.region = region;
   }
 
@@ -74,7 +74,7 @@ public class NewTreeLayout {
    * Does the complete left-to-right planar layout.
    */
   public void initialize() {
-    LayoutTool layoutTool = new LayoutTool(graphModel, relations);
+    LayoutTool layoutTool = new LayoutTool(graphModel, edgeMatcher);
 
     positions = Maps.newHashMapWithExpectedSize(graphModel.getNodes().size());
     layoutTool.layoutTree();
@@ -102,12 +102,13 @@ public class NewTreeLayout {
 
     /**
      * Create a LayoutTool for left-to-right planar hierarchies.
-     * @param layoutGraph
-     * @param relations
+     * 
+     * @param layoutGraph source of nodes (exposed graph) to layout
+     * @param edgeMatcher edge matcher that defines the hierarchy
      */
     public LayoutTool(
-        GraphModel layoutGraph, DirectedRelationFinder relations) {
-      super(layoutGraph, relations);
+        GraphModel layoutGraph, EdgeMatcher<String> edgeMatcher) {
+      super(layoutGraph, edgeMatcher);
     }
 
     @Override

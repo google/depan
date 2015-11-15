@@ -18,8 +18,8 @@ package com.google.devtools.depan.eclipse.views.tools;
 
 import com.google.devtools.depan.eclipse.editors.EdgeDisplayProperty;
 import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
-import com.google.devtools.depan.eclipse.plugins.SourcePluginEntry;
 import com.google.devtools.depan.eclipse.plugins.SourcePluginRegistry;
+import com.google.devtools.depan.eclipse.plugins.SourcePlugins;
 import com.google.devtools.depan.eclipse.utils.AlphabeticSorter;
 import com.google.devtools.depan.eclipse.utils.EditColTableDef;
 import com.google.devtools.depan.eclipse.utils.InverseSorter;
@@ -30,8 +30,8 @@ import com.google.devtools.depan.graph.api.Relation;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellEditor;
@@ -39,8 +39,11 @@ import org.eclipse.jface.viewers.CheckboxCellEditor;
 import org.eclipse.jface.viewers.ColorCellEditor;
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
 import org.eclipse.jface.viewers.ICellModifier;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
@@ -56,6 +59,9 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
 import java.awt.Color;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -124,8 +130,10 @@ public class RelEditorTableView {
   }
 
   private final RelPropRepository propRepo;
+
   private TableViewer viewer;
-  private Map<Relation, SourcePluginEntry> relPlugin = Maps.newHashMap();;
+
+  private Map<Relation, SourcePlugin> relPlugin = Maps.newHashMap();
 
   public RelEditorTableView(RelPropRepository propRepo) {
     this.propRepo = propRepo;
@@ -165,32 +173,50 @@ public class RelEditorTableView {
     // TODO: Add column sorters, filters?
     configSorters(relTableControl);
 
-    // Configure content last
+    // Configure content last: use updateTable() to render relations
     viewer.setContentProvider(ArrayContentProvider.getInstance());
-    viewer.setInput(buildRelations());
 
     return viewer;
   }
 
-  private List<Relation> buildRelations() {
-    List<Relation> result = Lists.newArrayList();
-
-    // Populate the list viewer with all known relations.
-    for (SourcePluginEntry entry : SourcePluginRegistry.getEntries()) {
-      SourcePlugin plugin;
-      try {
-        plugin = entry.getInstance();
-      } catch (CoreException e) {
-        e.printStackTrace();
-        continue;
-      }
-      for (Relation r : plugin.getRelations()) {
-        relPlugin.put(r, entry);
-        result.add(r);
+  /**
+   * Fill the list with {@link Relation}s.
+   */
+  public void updateTable(List<SourcePlugin> plugins) {
+    // Build mapping from relations to their defining plugins.
+    // TODO: Make this a property of the view.
+    for (SourcePlugin plugin : plugins) {
+      for (Relation relation : plugin.getRelations()) {
+        relPlugin.put(relation, plugin);
       }
     }
 
-    return result;
+    // Since rendering depends on relPlugin, set input after
+    // relPlugin is updated.
+    viewer.setInput(SourcePlugins.getRelations(plugins));
+  }
+
+  @SuppressWarnings("unchecked")
+  public List<Relation> getTableRelations() {
+    return (List<Relation>) viewer.getInput();
+  }
+
+  /////////////////////////////////////
+  // Property repository methods
+
+  /**
+   * Acquire properties directly, avoid setting up a default.
+   */
+  private void saveDisplayProperty(
+      Relation relation, EdgeDisplayProperty props) {
+    propRepo.setDisplayProperty(relation, props);
+  }
+
+  /**
+   * Acquire properties directly, avoid setting up a default.
+   */
+  private EdgeDisplayProperty loadDisplayProperty(Relation relation) {
+    return propRepo.getDisplayProperty(relation);
   }
 
   /**
@@ -198,13 +224,134 @@ public class RelEditorTableView {
    * Note that the default constructor for {@link EdgeDisplayProperty}
    * uses the default values for all member elements.
    */
-  private EdgeDisplayProperty getDisplayProperty(Relation rel) {
-    EdgeDisplayProperty relProp = propRepo.getDisplayProperty(rel);
-    if (null != relProp) {
-      return relProp;
+  private EdgeDisplayProperty getDisplayProperty(Relation relation) {
+    EdgeDisplayProperty relationProp = propRepo.getDisplayProperty(relation);
+    if (null != relationProp) {
+      return relationProp;
     }
     // Provide the default if none are persisted.
     return new EdgeDisplayProperty();
+  }
+
+  public void clearVisibleSelection() {
+    clearRelations(getSelectedRelations());
+  }
+
+  public void invertVisibleSelection() {
+    invertRelations(getSelectedRelations());
+  }
+
+  public void checkVisibleSelection() {
+    checkRelations(getSelectedRelations());
+  }
+
+  public void clearVisibleTable() {
+    clearRelations(getTableRelations());
+  }
+
+  public void invertVisibleTable() {
+    invertRelations(getTableRelations());
+  }
+
+  public void checkVisibleTable() {
+    checkRelations(getTableRelations());
+  }
+ 
+  /////////////////////////////////////
+  // Convenience for modifying visibility property.
+  // Useful for buttons external to the table (e.g. clear all)
+
+  public void clearRelations(Collection<Relation> relations) {
+    for (Relation relation : relations) {
+      EdgeDisplayProperty prop = loadDisplayProperty(relation);
+      if (null == prop) {
+        continue;
+      }
+      prop.setVisible(false);
+      saveDisplayProperty(relation, prop);
+      viewer.update(relation, UPDATE_VISIBLE);
+    }
+  }
+
+  public void invertRelations(Collection<Relation> relations) {
+    for (Relation relation : relations) {
+      EdgeDisplayProperty prop = getDisplayProperty(relation);
+      prop.setVisible(!prop.isVisible());
+      saveDisplayProperty(relation, prop);
+      viewer.update(relation, UPDATE_VISIBLE);
+    }
+  }
+
+  public void checkRelations(Collection<Relation> relations) {
+    for (Relation relation : relations) {
+      EdgeDisplayProperty prop = getDisplayProperty(relation);
+      prop.setVisible(true);
+      saveDisplayProperty(relation, prop);
+      viewer.update(relation, UPDATE_VISIBLE);
+    }
+  }
+
+  public Collection<Relation> getVisibleRelations() {
+    Collection<Relation> relations = getTableRelations();
+    Collection<Relation> result =
+        Lists.newArrayListWithExpectedSize(relations.size());
+    for (Relation relation : relations) {
+      EdgeDisplayProperty edgeProp = getDisplayProperty(relation);
+      if (edgeProp.isVisible()) {
+        result.add(relation);
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Invert the set of relations selected in the table.
+   * Don't change the state of any relation.
+   */
+  public void invertSelectedRelations() {
+    ISelection selection = viewer.getSelection();
+    if (!(selection instanceof IStructuredSelection)) {
+      return;
+    }
+
+    IStructuredSelection structuredSelection = (IStructuredSelection) selection;
+    Collection<Relation> inverse =
+        computeInverseRelations(getTableRelations(), structuredSelection);
+
+    StructuredSelection nextSelection =
+        new StructuredSelection(inverse.toArray());
+    viewer.setSelection(nextSelection, true);
+  }
+
+  private Collection<Relation> getSelectedRelations() {
+    ISelection selection = viewer.getSelection();
+    if (!(selection instanceof IStructuredSelection)) {
+      return Collections.emptyList();
+    }
+
+    Collection<Relation> result = Sets.newHashSet();
+    @SuppressWarnings("rawtypes")
+    Iterator iter = ((IStructuredSelection) selection).iterator();
+    while (iter.hasNext()) {
+      result.add((Relation) iter.next());
+    }
+    return result;
+  }
+
+  private Collection<Relation> computeInverseRelations(
+      Collection<Relation> universe, IStructuredSelection selection) {
+
+    if (selection.isEmpty()) {
+      return universe;
+    }
+
+    Collection<Relation> inverse = Sets.newHashSet(universe);
+    @SuppressWarnings("rawtypes")
+    Iterator iter = selection.iterator();
+    while (iter.hasNext()) {
+      inverse.remove((Relation) iter.next());
+    }
+    return inverse;
   }
 
   /////////////////////////////////////
@@ -302,7 +449,7 @@ public class RelEditorTableView {
         case INDEX_NAME:
           return rel.toString();
         case INDEX_SOURCE:
-          return relPlugin.get(rel).getSource();
+          return getSourceLabelForRelation(rel);
         case INDEX_COLOR:
           return getColorName(prop);
         // case INDEX_WIDTH:
@@ -320,6 +467,13 @@ public class RelEditorTableView {
       }
       // TODO Auto-generated method stub
       return null;
+    }
+
+    private String getSourceLabelForRelation(Relation relation) {
+      SourcePlugin plugin = relPlugin.get(relation);
+      SourcePluginRegistry registry = SourcePluginRegistry.getInstance();
+      String sourceId = registry.getPluginId(plugin);
+      return registry.getSourcePluginEntry(sourceId).getSource();
     }
 
     @Override

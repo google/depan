@@ -22,25 +22,24 @@ import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
 import com.google.devtools.depan.eclipse.stats.ElementKindStats;
 import com.google.devtools.depan.eclipse.trees.GraphData;
 import com.google.devtools.depan.eclipse.trees.NodeTreeProvider;
+import com.google.devtools.depan.eclipse.utils.GraphEdgeMatcherDescriptors;
 import com.google.devtools.depan.eclipse.utils.ListenerManager;
 import com.google.devtools.depan.eclipse.utils.elementkinds.ElementKindDescriptor;
 import com.google.devtools.depan.eclipse.utils.elementkinds.ElementKindDescriptors;
-import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptor;
-import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptors;
 import com.google.devtools.depan.eclipse.views.tools.RelationCount;
+import com.google.devtools.depan.eclipse.views.tools.RelEditorTableView.RelPropRepository;
 import com.google.devtools.depan.eclipse.visualization.View;
 import com.google.devtools.depan.eclipse.visualization.layout.LayoutContext;
 import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerator;
 import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerators;
 import com.google.devtools.depan.eclipse.visualization.layout.LayoutScaler;
 import com.google.devtools.depan.eclipse.visualization.layout.LayoutUtil;
-import com.google.devtools.depan.graph.api.DirectedRelationFinder;
 import com.google.devtools.depan.graph.api.Relation;
-import com.google.devtools.depan.graph.basic.ForwardIdentityRelationFinder;
 import com.google.devtools.depan.model.GraphEdge;
+import com.google.devtools.depan.model.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.model.RelationshipSet;
+import com.google.devtools.depan.model.RelationSetDescriptor;
 import com.google.devtools.depan.view.CollapseData;
 import com.google.devtools.depan.view.CollapseTreeModel;
 import com.google.devtools.depan.view.TreeModel;
@@ -175,11 +174,13 @@ public class ViewEditor extends MultiPageEditorPart {
   private RelationCount.Settings relationCountData =
     new RelationCount.Settings();
 
-  private List<RelSetDescriptor> relSetChoices;
+  private List<RelationSetDescriptor> relationSetChoices;
 
   private Collection<ElementKindDescriptor> elementKindChoices;
 
   private Collection<ElementKindStats.Info> elementKindStats;
+
+  private List<GraphEdgeMatcherDescriptor> edgeMatcherChoices;
 
   /////////////////////////////////////
   // Basic Getters and Setters
@@ -204,24 +205,32 @@ public class ViewEditor extends MultiPageEditorPart {
     return viewInfo.getBuiltinAnalysisPlugins();
   }
 
-  public Collection<RelationshipSet> getBuiltinAnalysisRelSets() {
-    return viewInfo.getBuiltinAnalysisRelSets();
+  public Collection<RelationSetDescriptor> getBuiltinRelationSets() {
+    return viewInfo.getBuiltinRelationSets();
   }
 
-  public List<RelSetDescriptor> getRelSetChoices() {
-    return relSetChoices;
+  public List<RelationSetDescriptor> getRelationSetChoices() {
+    return relationSetChoices;
   }
 
-  public RelationshipSet getContainerRelSet() {
-    return viewInfo.getDefaultContainerRelSet();
+  public RelationSetDescriptor getDefaultRelationSet() {
+    return viewInfo.getDefaultRelationSet();
   }
 
-  public RelationshipSet getDisplayRelationSet() {
-    return viewInfo.getDisplayRelationSet();
+  public GraphEdgeMatcherDescriptor getTreeEdgeMatcher() {
+    return viewInfo.getLayoutFinder();
   }
 
-  public void setDisplayRelationSet(RelationshipSet newDisplay) {
-    viewInfo.setDisplayRelationSet(newDisplay);
+  public List<GraphEdgeMatcherDescriptor> getTreeEdgeMatcherChoices() {
+    return edgeMatcherChoices;
+  }
+
+  public RelationSetDescriptor getDisplayRelationSet() {
+    return viewInfo.getDisplayRelationSetDescriptor();
+  }
+
+  public void setDisplayRelationSet(RelationSetDescriptor newDisplay) {
+    viewInfo.setDisplayRelationSetDescriptor(newDisplay);
   }
 
   /**
@@ -241,6 +250,28 @@ public class ViewEditor extends MultiPageEditorPart {
 
   public Map<GraphNode, Double> getNodeRanking() {
     return ranking;
+  }
+
+  /////////////////////////////////////
+  // Provide standardized access to this views property repository
+
+  // Only need one prop repo for this view editor
+  private final RelPropRepository EDGE_DISPLAY_PROP_REPO =
+      new RelPropRepository() {
+
+        @Override
+        public EdgeDisplayProperty getDisplayProperty(Relation rel) {
+          return getRelationProperty(rel);
+        }
+
+        @Override
+        public void setDisplayProperty(Relation rel, EdgeDisplayProperty prop) {
+          setRelationProperty(rel, prop);
+        }
+      };
+
+  public RelPropRepository getEdgeDisplayPropRepo() {
+    return EDGE_DISPLAY_PROP_REPO;
   }
 
   /////////////////////////////////////
@@ -450,8 +481,9 @@ public class ViewEditor extends MultiPageEditorPart {
         getNodeDisplayPropertyProvider(),
         getViewGraph());
 
-    relSetChoices = RelSetDescriptors.buildViewChoices(viewInfo);
+    relationSetChoices = buildViewChoices(viewInfo);
     elementKindChoices = ElementKindDescriptors.buildViewChoices(viewInfo);
+    edgeMatcherChoices = GraphEdgeMatcherDescriptors.buildViewChoices(viewInfo);
 
     ElementKindStats stats = new ElementKindStats(elementKindChoices);
     stats.incrStats(viewInfo.getViewNodes());
@@ -459,6 +491,13 @@ public class ViewEditor extends MultiPageEditorPart {
 
     jungGraph = buildJungGraph();
     ranking = rankGraph(jungGraph);
+  }
+
+  public List<RelationSetDescriptor> buildViewChoices(
+      ViewDocument viewInfo) {
+    // TODO: Better strategy for setting order of built-in relation sets.
+    return Lists.newArrayList(getBuiltinRelationSets());
+    // TODO: add project and temporary relation set descriptors, too.
   }
 
   /**
@@ -500,8 +539,8 @@ public class ViewEditor extends MultiPageEditorPart {
     LayoutContext context = new LayoutContext();
     context.setGraphModel(getExposedGraph());
     context.setMovableNodes(viewGraph.getNodes());
-    // TODO: Compute ranking based on selected relations
-    context.setRelations(ForwardIdentityRelationFinder.FINDER);
+    // TODO: Compute ranking based on selected edge matcher
+    context.setEdgeMatcher(com.google.devtools.depan.model.GraphEdgeMatcherDescriptors.FORWARD);
 
     return LayoutUtil.buildJungGraph(context);
   }
@@ -870,8 +909,9 @@ public class ViewEditor extends MultiPageEditorPart {
     return viewInfo.getCollapseTreeModel();
   }
 
-  public void autoCollapse(DirectedRelationFinder finder, Object author) {
-    GraphData<NodeDisplayProperty> tree = hierarchies.getHierarchy(finder);
+  public void autoCollapse(
+      GraphEdgeMatcherDescriptor edgeMatcher, Object author) {
+    GraphData<NodeDisplayProperty> tree = hierarchies.getHierarchy(edgeMatcher);
     TreeModel treeData = tree.getTreeModel();
     collapseTree(treeData, author);
   }
@@ -1051,14 +1091,14 @@ public class ViewEditor extends MultiPageEditorPart {
   }
 
   public void applyLayout(
-          LayoutGenerator layout, DirectedRelationFinder relationFinder) {
+          LayoutGenerator layout, GraphEdgeMatcherDescriptor edgeMatcher) {
 
     Collection<GraphNode> layoutNodes = getLayoutNodes();
     if (layoutNodes.size() < 2) {
       // TODO: Notify user that a single node cannot be positioned.
       return;
     }
-    applyLayout(layout, relationFinder, layoutNodes);
+    applyLayout(layout, edgeMatcher, layoutNodes);
   }
 
   private Collection<GraphNode> getLayoutNodes() {
@@ -1075,18 +1115,18 @@ public class ViewEditor extends MultiPageEditorPart {
    * build a tree if the layout need one, to the graph.
    *
    * @param layout the new Layout to apply
-   * @param relationFinder {@link DirectedRelationFinder} to restrict
-   *        relations for layout.
+   * @param edgeMatcher {@link GraphEdgeMatcherDescriptor} to defined edges
+   *        considered for layout.
    * @param layoutNodes nodes that participate in the layout
    */
   private void applyLayout(
-      LayoutGenerator layout, DirectedRelationFinder relationFinder,
+      LayoutGenerator layout, GraphEdgeMatcherDescriptor edgeMatcher,
       Collection<GraphNode> layoutNodes) {
 
     LayoutContext context = new LayoutContext();
     context.setGraphModel(getExposedGraph());
     context.setMovableNodes(layoutNodes);
-    context.setRelations(relationFinder);
+    context.setEdgeMatcher(edgeMatcher);
     context.setNodeLocations(getNodeLocations());
 
     Rectangle2D viewport = renderer.getOGLViewport();
@@ -1269,8 +1309,8 @@ public class ViewEditor extends MultiPageEditorPart {
   }
 
   public GraphData<NodeDisplayProperty> getHierarchy(
-      DirectedRelationFinder relFinder) {
-    return hierarchies.getHierarchy(relFinder);
+      GraphEdgeMatcherDescriptor edgeMatcher) {
+    return hierarchies.getHierarchy(edgeMatcher);
   }
 
   public RelationCount.Settings getRelationCountData() {

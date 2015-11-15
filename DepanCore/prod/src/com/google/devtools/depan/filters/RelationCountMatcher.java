@@ -17,9 +17,10 @@
 package com.google.devtools.depan.filters;
 
 import com.google.common.collect.Sets;
+
+import com.google.devtools.depan.graph.api.RelationSet;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.model.RelationshipSet;
 
 import java.util.Collection;
 import java.util.Map;
@@ -35,7 +36,7 @@ import java.util.Set;
 public class RelationCountMatcher implements PathMatcher {
 
   /** Set of relations used to compute all edge counts. */
-  private final RelationshipSet relationSet;
+  private final RelationSet relationSet;
 
   /** Filter to use for forward edge counts. */
   private final EdgeCountPredicate forwardTest;
@@ -53,7 +54,7 @@ public class RelationCountMatcher implements PathMatcher {
    * @param reverseTest filter for reverse edge counts, or {@code null} if
    *     forward edge counts should not be used at all
    */
-  public RelationCountMatcher(RelationshipSet relationSet,
+  public RelationCountMatcher(RelationSet relationSet,
       EdgeCountPredicate forwardTest, EdgeCountPredicate reverseTest) {
     this.relationSet = relationSet;
     this.forwardTest = forwardTest;

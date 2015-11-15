@@ -15,9 +15,8 @@
  */
 package com.google.devtools.depan.eclipse.utils;
 
-import com.google.devtools.depan.eclipse.utils.relsets.RelSetDescriptor;
 import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerator;
-import com.google.devtools.depan.model.RelationshipSet;
+import com.google.devtools.depan.model.GraphEdgeMatcherDescriptor;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -63,7 +62,7 @@ public class LayoutChoicesControl extends Composite {
 
   private LayoutPickerControl layoutPicker;
 
-  private RelationshipSetPickerControl relSetPicker;
+  private GraphEdgeMatcherSelectorControl edgeMatcherSelector;
 
   public LayoutChoicesControl(Composite parent, Style style) {
     super(parent, SWT.NONE);
@@ -80,12 +79,12 @@ public class LayoutChoicesControl extends Composite {
     layoutPicker = new LayoutPickerControl(this);
     gridDataBldr.applyTo(layoutPicker);
 
-    Label relSetLabel = new Label(this, SWT.NONE);
-    relSetLabel.setText("Layout relations: ");
-    gridDataBldr.applyTo(relSetLabel);
+    Label edgeMatcherLabel = new Label(this, SWT.NONE);
+    edgeMatcherLabel.setText("Layout edges: ");
+    gridDataBldr.applyTo(edgeMatcherLabel);
 
-    relSetPicker = new RelationshipSetPickerControl(this);
-    gridDataBldr.applyTo(relSetPicker);
+    edgeMatcherSelector = new GraphEdgeMatcherSelectorControl(this);
+    gridDataBldr.applyTo(edgeMatcherSelector);
   }
 
   public void setLayoutChoices(List<String> layoutNames) {
@@ -104,16 +103,16 @@ public class LayoutChoicesControl extends Composite {
     return layoutPicker.getLayoutName();
   }
 
-  public RelationshipSet getRelationSet() {
-    return relSetPicker.getSelection();
+  public GraphEdgeMatcherDescriptor getEdgeMatcher() {
+    return edgeMatcherSelector.getSelection();
   }
 
   /**
    * After changing the relation set choices, the parent for this control
    * often needs to be resized with a {@code layout()} call.
    */
-  public void setRelSetInput(
-      RelationshipSet selectedRelSet, List<RelSetDescriptor> choices) {
-    relSetPicker.setInput(selectedRelSet, choices);
+  public void setEdgeMatcherInput(
+      GraphEdgeMatcherDescriptor selectedRelSet, List<GraphEdgeMatcherDescriptor> choices) {
+    edgeMatcherSelector.setInput(selectedRelSet, choices);
   }
 }

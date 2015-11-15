@@ -16,11 +16,10 @@
 
 package com.google.devtools.depan.filesystem;
 
-import com.google.common.collect.Lists;
 import com.google.devtools.depan.eclipse.persist.XStreamFactory.Config;
 import com.google.devtools.depan.eclipse.plugins.ElementClassTransformer;
 import com.google.devtools.depan.eclipse.plugins.ElementTransformer;
-import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
+import com.google.devtools.depan.eclipse.plugins.AbstractSourcePlugin;
 import com.google.devtools.depan.eclipse.utils.ElementEditor;
 import com.google.devtools.depan.eclipse.visualization.ogl.GLEntity;
 import com.google.devtools.depan.filesystem.eclipse.FileSystemIconTransformer;
@@ -36,8 +35,10 @@ import com.google.devtools.depan.filesystem.graph.FileSystemRelation;
 import com.google.devtools.depan.filesystem.integration.FileSystemDefinitions;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.model.Element;
-import com.google.devtools.depan.model.RelationshipSet;
-import com.google.devtools.depan.model.RelationshipSetAdapter;
+import com.google.devtools.depan.model.RelationSetDescriptor;
+import com.google.devtools.depan.model.RelationSetDescriptor.Builder;
+
+import com.google.common.collect.Lists;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
@@ -53,7 +54,7 @@ import java.util.Comparator;
  *
  * @author tugrul@google.com (Tugrul Ince)
  */
-public class FileSystemPlugin implements SourcePlugin {
+public class FileSystemPlugin extends AbstractSourcePlugin {
 
   /**
    * List of Analysis wizards to include in the DepAn perspective.
@@ -73,15 +74,14 @@ public class FileSystemPlugin implements SourcePlugin {
   /**
    * Collection of built-in relationship sets for a file system.
    */
-  protected static final Collection<RelationshipSet> builtinSets =
+  protected static final Collection<RelationSetDescriptor> builtinSets =
       Lists.newArrayList();
 
   /**
    * Default built-in relationship set. It represents any container relations
    * between elements of this File System Plug-in.
    */
-  protected static final RelationshipSetAdapter FS_CONTAINER =
-      new RelationshipSetAdapter("Filesystem Containers");
+  protected static final RelationSetDescriptor FS_CONTAINER;
 
   static {
     ANALYSIS_WIZARD_IDS = Lists.newArrayList();
@@ -91,12 +91,15 @@ public class FileSystemPlugin implements SourcePlugin {
     classes.add(DirectoryElement.class);
     classes.add(FileElement.class);
 
-    relations = Lists.newArrayList();
+    Builder containerBuilder = RelationSetDescriptor.createBuilder(
+        "Filesystem Containers");
+    relations = Lists.newArrayList(); 
     for (Relation r : FileSystemRelation.values()) {
       relations.add(r);
-      FS_CONTAINER.addRelation(r, true, true);
+      containerBuilder.addRelation(r);
     }
 
+    FS_CONTAINER = containerBuilder.build();
     builtinSets.add(FS_CONTAINER);
   }
 
@@ -119,6 +122,10 @@ public class FileSystemPlugin implements SourcePlugin {
     return relations;
   }
 
+  public FileSystemPlugin() {
+    setupEdgeMatchers();
+  }
+
   @Override
   public Collection<Class<? extends Element>> getElementClasses() {
     return classes;
@@ -130,12 +137,12 @@ public class FileSystemPlugin implements SourcePlugin {
   }
 
   @Override
-  public Collection<? extends RelationshipSet> getBuiltinRelationshipSets() {
+  public Collection<? extends RelationSetDescriptor> getBuiltinRelationshipSets() {
     return builtinSets;
   }
 
   @Override
-  public RelationshipSet getDefaultRelationshipSet() {
+  public RelationSetDescriptor getDefaultRelationSetDescriptor() {
     return FS_CONTAINER;
   }
 

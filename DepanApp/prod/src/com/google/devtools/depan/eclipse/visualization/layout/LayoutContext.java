@@ -15,8 +15,7 @@
  */
 package com.google.devtools.depan.eclipse.visualization.layout;
 
-import com.google.devtools.depan.graph.api.DirectedRelationFinder;
-import com.google.devtools.depan.graph.basic.ForwardIdentityRelationFinder;
+import com.google.devtools.depan.model.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 
@@ -40,8 +39,7 @@ public class LayoutContext {
 
   private GraphModel graphModel;
 
-  private DirectedRelationFinder relations= 
-      ForwardIdentityRelationFinder.FINDER;
+  private GraphEdgeMatcherDescriptor edgeMatcher;
 
   private Rectangle2D viewport = DEFAULT_REGION;
 
@@ -63,8 +61,8 @@ public class LayoutContext {
     this.fixedNodes = fixedNodes;
   }
 
-  public void setRelations(DirectedRelationFinder relations) {
-    this.relations = relations;
+  public void setEdgeMatcher(GraphEdgeMatcherDescriptor edgeMatcher) {
+    this.edgeMatcher = edgeMatcher;
   }
 
   public void setViewport(Rectangle2D viewport) {
@@ -102,8 +100,8 @@ public class LayoutContext {
     return fixedNodes;
   }
 
-  public DirectedRelationFinder getRelations() {
-    return relations;
+  public GraphEdgeMatcherDescriptor getEdgeMatcher() {
+    return edgeMatcher;
   }
 
   public Rectangle2D getViewport() {
