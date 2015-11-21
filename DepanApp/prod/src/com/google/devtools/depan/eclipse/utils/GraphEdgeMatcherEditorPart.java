@@ -65,7 +65,7 @@ public class GraphEdgeMatcherEditorPart {
    */
   private TableViewer tableViewer = null;
 
-  private SelectionEditorTableEditor editor;
+  private GraphEdgeMatcherRelationTableEditor editor;
 
   /**
    * The quick selector on top of this widget applying a selection to the list
@@ -122,7 +122,7 @@ public class GraphEdgeMatcherEditorPart {
     allRels.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, false));
 
-    editor = new SelectionEditorTableEditor(
+    editor = new GraphEdgeMatcherRelationTableEditor(
         new ModificationListener<Relation, Boolean>() {
 
           @Override

@@ -51,7 +51,7 @@ import java.util.Set;
  * @author ycoppel@google.com (Yohann Coppel)
  *
  */
-public class SelectionEditorTableEditor {
+public class GraphEdgeMatcherRelationTableEditor {
 
   public static final String COL_RELATION = "Relation";
   public static final String COL_FORWARD = "Forward";
@@ -85,7 +85,7 @@ public class SelectionEditorTableEditor {
 
   private ModificationListener<Relation, Boolean> changeListener;
 
-  protected SelectionEditorTableEditor(
+  protected GraphEdgeMatcherRelationTableEditor(
       ModificationListener<Relation, Boolean> changeListener) {
     this.changeListener = changeListener;
   }
@@ -98,7 +98,7 @@ public class SelectionEditorTableEditor {
     Table relationTable = viewer.getTable();
     relationTable.setHeaderVisible(true);
     EditColTableDef.setupTable(
-        SelectionEditorTableEditor.TABLE_DEF, relationTable);
+        GraphEdgeMatcherRelationTableEditor.TABLE_DEF, relationTable);
 
     CellEditor[] cellEditors = new CellEditor[3];
     cellEditors[0] = null;
@@ -108,7 +108,7 @@ public class SelectionEditorTableEditor {
     // cell content
     viewer.setCellEditors(cellEditors);
     viewer.setColumnProperties(EditColTableDef.getProperties(
-        SelectionEditorTableEditor.TABLE_DEF));
+        GraphEdgeMatcherRelationTableEditor.TABLE_DEF));
 
     viewer.setLabelProvider(new CellLabelProvider());
     viewer.setCellModifier(new CellModifier());
