@@ -18,8 +18,7 @@ package com.google.devtools.depan.eclipse.utils;
 
 import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
 import com.google.devtools.depan.eclipse.plugins.SourcePluginRegistry;
-import com.google.devtools.depan.eclipse.views.tools.RelEditorTableView;
-import com.google.devtools.depan.eclipse.views.tools.RelEditorTableView.RelPropRepository;
+import com.google.devtools.depan.eclipse.utils.RelationSetRelationTableEditor.RelPropRepository;
 import com.google.devtools.depan.eclipse.wizards.NewRelationSetWizard;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.api.RelationSet;
@@ -72,7 +71,7 @@ public class RelationSetEditorPart {
   /**
    * Manages the relation set data.
    */
-  private RelEditorTableView viewer;
+  private RelationSetRelationTableEditor viewer;
 
   /**
    * The {@link RelationshipSetSelector} to choose a named set.
@@ -96,7 +95,7 @@ public class RelationSetEditorPart {
     commands.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, false));
 
-    viewer = new RelEditorTableView(propRepo);
+    viewer = new RelationSetRelationTableEditor(propRepo);
     table = viewer.setupViewer(topLevel);
     table.getControl().setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, true));

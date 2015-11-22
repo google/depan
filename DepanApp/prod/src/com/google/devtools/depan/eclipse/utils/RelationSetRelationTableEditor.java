@@ -14,18 +14,12 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.eclipse.views.tools;
+package com.google.devtools.depan.eclipse.utils;
 
 import com.google.devtools.depan.eclipse.editors.EdgeDisplayProperty;
 import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
 import com.google.devtools.depan.eclipse.plugins.SourcePluginRegistry;
 import com.google.devtools.depan.eclipse.plugins.SourcePlugins;
-import com.google.devtools.depan.eclipse.utils.AlphabeticSorter;
-import com.google.devtools.depan.eclipse.utils.EditColTableDef;
-import com.google.devtools.depan.eclipse.utils.InverseSorter;
-import com.google.devtools.depan.eclipse.utils.LabelProviderToString;
-import com.google.devtools.depan.eclipse.utils.Resources;
-import com.google.devtools.depan.eclipse.utils.Tools;
 import com.google.devtools.depan.graph.api.Relation;
 
 import com.google.common.collect.Lists;
@@ -68,7 +62,7 @@ import java.util.Map;
 /**
  * Run a view of the known relations as its own reusable "part".
  */
-public class RelEditorTableView {
+public class RelationSetRelationTableEditor {
 
   public static final String COL_NAME = "Name";
   public static final String COL_SOURCE = "Source";
@@ -135,7 +129,7 @@ public class RelEditorTableView {
 
   private Map<Relation, SourcePlugin> relPlugin = Maps.newHashMap();
 
-  public RelEditorTableView(RelPropRepository propRepo) {
+  public RelationSetRelationTableEditor(RelPropRepository propRepo) {
     this.propRepo = propRepo;
   }
 

@@ -19,7 +19,7 @@ package com.google.devtools.depan.eclipse.views.tools;
 import com.google.devtools.depan.eclipse.editors.EdgeDisplayProperty;
 import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.utils.RelationSetEditorPart;
-import com.google.devtools.depan.eclipse.views.tools.RelEditorTableView.RelPropRepository;
+import com.google.devtools.depan.eclipse.utils.RelationSetRelationTableEditor.RelPropRepository;
 import com.google.devtools.depan.eclipse.views.tools.RelationCount.RangeData;
 import com.google.devtools.depan.eclipse.views.tools.RelationCount.RangeOption;
 import com.google.devtools.depan.eclipse.views.tools.RelationCount.Settings;

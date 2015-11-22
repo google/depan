@@ -20,8 +20,8 @@ import com.google.devtools.depan.eclipse.editors.EdgeDisplayProperty;
 import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.utils.RelationSetEditorPart;
 import com.google.devtools.depan.eclipse.utils.Resources;
+import com.google.devtools.depan.eclipse.utils.RelationSetRelationTableEditor.RelPropRepository;
 import com.google.devtools.depan.eclipse.views.ViewEditorTool;
-import com.google.devtools.depan.eclipse.views.tools.RelEditorTableView.RelPropRepository;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.model.RelationSetDescriptor;
 
