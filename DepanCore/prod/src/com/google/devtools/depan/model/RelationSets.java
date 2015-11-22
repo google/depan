@@ -43,6 +43,14 @@ public class RelationSets {
     }
   };
 
+  public static final RelationSet ALL = new RelationSet() {
+
+    @Override
+    public boolean contains(Relation relation) {
+      return true;
+    }
+  };
+
   public static RelationSet createArray(Relation[] relations) {
     return new Array(relations);
   }
@@ -76,5 +84,24 @@ public class RelationSets {
     public boolean contains(Relation relation) {
       return relationSet.contains(relation);
     }
+  }
+
+  public static RelationSet createSingle(Relation relation) {
+    return new Single(relation);
+  }
+
+  public static class Single implements RelationSet {
+
+    private final Relation single;
+
+    public Single(Relation single) {
+      this.single = single;
+    }
+
+    @Override
+    public boolean contains(Relation relation) {
+      return (single == relation);
+    }
+    
   }
 }

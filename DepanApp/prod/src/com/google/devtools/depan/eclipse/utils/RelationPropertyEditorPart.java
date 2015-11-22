@@ -18,7 +18,7 @@ package com.google.devtools.depan.eclipse.utils;
 
 import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
 import com.google.devtools.depan.eclipse.plugins.SourcePluginRegistry;
-import com.google.devtools.depan.eclipse.utils.RelationSetRelationTableEditor.RelationCheckedRepository;
+import com.google.devtools.depan.eclipse.utils.RelationPropertyRelationTableEditor.RelPropRepository;
 import com.google.devtools.depan.eclipse.wizards.NewRelationSetWizard;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.api.RelationSet;
@@ -45,6 +45,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -58,7 +59,7 @@ import java.util.List;
  * @author ycoppel@google.com (Yohann Coppel)
  * @author <a href="mailto:leeca@pnambic.com">Lee Carver</a>
  */
-public class RelationSetEditorPart {
+public class RelationPropertyEditorPart {
 
   /////////////////////////////////////
   // UX Elements
@@ -71,7 +72,7 @@ public class RelationSetEditorPart {
   /**
    * Manages the relation set data.
    */
-  private RelationSetRelationTableEditor viewer;
+  private RelationPropertyRelationTableEditor viewer;
 
   /**
    * The {@link RelationshipSetSelector} to choose a named set.
@@ -83,8 +84,7 @@ public class RelationSetEditorPart {
    */
   protected Shell shell = null;
 
-  public Control getControl(
-      Composite parent, RelationCheckedRepository visRepo) {
+  public Control getControl(Composite parent, RelPropRepository propRepo) {
     this.shell = parent.getShell();
 
     Composite topLevel = new Composite(parent, SWT.NONE);
@@ -96,7 +96,7 @@ public class RelationSetEditorPart {
     commands.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, false));
 
-    viewer = new RelationSetRelationTableEditor(visRepo);
+    viewer = new RelationPropertyRelationTableEditor(propRepo);
     table = viewer.setupViewer(topLevel);
     table.getControl().setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -117,14 +117,6 @@ public class RelationSetEditorPart {
 
     Composite pickerRegion = setupRelationSetSelector(result);
     pickerRegion.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-
-    Composite selectVis =  setupSelectionVisible(result);
-    selectVis.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false));
-
-    Composite tableVis =  setupTableVisible(result);
-    tableVis.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false));
 
     return result;
   }
@@ -162,86 +154,6 @@ public class RelationSetEditorPart {
     });
 
     return region;
-  }
-
-  private Composite setupSelectionVisible(Composite parent) {
-    Composite result = new Composite(parent, SWT.None);
-    GridLayout layout = new GridLayout(3, false);
-    layout.marginWidth = 0;
-    layout.marginHeight = 0;
-    result.setLayout(layout);
-
-    Button check = new Button(result, SWT.PUSH);
-    check.setText("check selected");
-    check.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-    check.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        viewer.checkVisibleSelection();
-      }
-    });
-
-    Button clear = new Button(result, SWT.PUSH);
-    clear.setText("clear selected");
-    clear.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-    clear.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        viewer.clearVisibleSelection();
-      }
-    });
-
-    Button invert = new Button(result, SWT.PUSH);
-    invert.setText("invert selected");
-    invert.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-    invert.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        viewer.invertVisibleSelection();
-      }
-    });
-
-    return result;
-  }
-
-  private Composite setupTableVisible(Composite parent) {
-    Composite result = new Composite(parent, SWT.None);
-    GridLayout layout = new GridLayout(3, false);
-    layout.marginWidth = 0;
-    layout.marginHeight = 0;
-    result.setLayout(layout);
-
-    Button check = new Button(result, SWT.PUSH);
-    check.setText("check all");
-    check.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-    check.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        viewer.checkVisibleTable();
-      }
-    });
-
-    Button clear = new Button(result, SWT.PUSH);
-    clear.setText("clear all");
-    clear.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-    clear.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        viewer.clearVisibleTable();
-      }
-    });
-
-    Button invert = new Button(result, SWT.PUSH);
-    invert.setText("invert all");
-    invert.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-    invert.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        viewer.invertVisibleTable();
-      }
-    });
-
-    return result;
   }
 
   private Composite setupSaveButtons(Composite parent) {
@@ -285,10 +197,7 @@ public class RelationSetEditorPart {
     if (null != pickerSet) {
       return buildRelations(pickerSet);
     }
-    viewer.getTableRelations();
-
-    // Build selection from list of visible relations.
-    return viewer.getVisibleRelations();
+    return Collections.emptyList();
   }
 
   /**

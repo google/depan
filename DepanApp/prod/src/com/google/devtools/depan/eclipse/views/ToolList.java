@@ -21,7 +21,8 @@ import com.google.devtools.depan.eclipse.views.tools.EdgeEditorTool;
 import com.google.devtools.depan.eclipse.views.tools.InformationsTool;
 import com.google.devtools.depan.eclipse.views.tools.NodeEditorTool;
 import com.google.devtools.depan.eclipse.views.tools.RefactorTool;
-import com.google.devtools.depan.eclipse.views.tools.RelationPickerTool;
+import com.google.devtools.depan.eclipse.views.tools.RelationVisibleTool;
+import com.google.devtools.depan.eclipse.views.tools.RelationPropertyTool;
 import com.google.devtools.depan.eclipse.views.tools.ScaleTool;
 import com.google.devtools.depan.eclipse.views.tools.SelectionEditorTool;
 import com.google.devtools.depan.eclipse.views.tools.SubLayoutTool;
@@ -36,7 +37,8 @@ public final class ToolList {
   public static Tool[] tools = new Tool[] {
     new ScaleTool(),
     new CollapseTool(),
-    new RelationPickerTool(),
+    new RelationVisibleTool(),
+    new RelationPropertyTool(),
     new NodeEditorTool(),
     new EdgeEditorTool(),
     new SelectionEditorTool(),

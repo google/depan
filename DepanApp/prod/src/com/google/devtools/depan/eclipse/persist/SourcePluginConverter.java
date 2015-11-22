@@ -27,6 +27,8 @@ import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import com.thoughtworks.xstream.mapper.Mapper;
 
+import org.eclipse.core.runtime.CoreException;
+
 /**
  * Custom {@code XStream} converter for {@link SourcePlugin}s.
  * This serializes only the id for the plugin, and reconstitutes it
@@ -70,7 +72,7 @@ public class SourcePluginConverter implements Converter {
    * {@inheritDoc}
    * 
    * <p>Reads in plugin's id, and obtain its mapping from the
-   * {@link SourcePluginRegistry}.
+   * known Source Plugin {@link #registry}.
    * 
    * @see EdgeConverter#unmarshal(HierarchicalStreamReader, UnmarshallingContext)
    */
@@ -79,6 +81,11 @@ public class SourcePluginConverter implements Converter {
       HierarchicalStreamReader reader, UnmarshallingContext context) {
 
     String pluginId = (String) context.convertAnother(null, String.class);
-    return SourcePluginRegistry.getSourcePlugin(pluginId);
+    try {
+      return registry.getSourcePluginEntry(pluginId).getInstance();
+    } catch (CoreException errCore) {
+      throw new IllegalArgumentException(
+          "Unrecognized plugin id " + pluginId, errCore);
+    }
   }
 }

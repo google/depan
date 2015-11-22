@@ -22,12 +22,14 @@ import java.awt.Color;
  * Handles display properties of edges. The editable properties are edge color,
  * edge line style (solid vs. dashed) and arrow head style
  * (filled/unfilled etc.)
+ * 
+ * Edge visibility is handled separately.  Display properties describe the
+ * attributes of the edge if it were rendered.  The decision to render is
+ * managed separately.
  *
  * @author tugrul@google.com (Tugrul Ince)
  */
 public class EdgeDisplayProperty {
-
-  private boolean isVisible;
 
   /**
    * The <code>Color</code> of this edge.
@@ -129,7 +131,7 @@ public class EdgeDisplayProperty {
    * style, default arrow head style and default color.
    */
   public EdgeDisplayProperty() {
-    this(true, null, LineStyle.getDefault(), ArrowheadStyle.getDefault());
+    this(null, LineStyle.getDefault(), ArrowheadStyle.getDefault());
   }
 
   /**
@@ -140,9 +142,7 @@ public class EdgeDisplayProperty {
    * @param lineColor <code>Color</code> of the object.
    */
   public EdgeDisplayProperty(
-      boolean isVisible, Color lineColor,
-      LineStyle lineStyle, ArrowheadStyle arrowhead) {
-    this.isVisible = isVisible;
+      Color lineColor, LineStyle lineStyle, ArrowheadStyle arrowhead) {
     this.color = lineColor;
     this.lineStyle = lineStyle;
     this.arrowhead = arrowhead;
@@ -153,16 +153,7 @@ public class EdgeDisplayProperty {
    * @param current
    */
   public EdgeDisplayProperty(EdgeDisplayProperty current) {
-    this(current.isVisible(), current.getColor(),
-        current.getLineStyle(), current.getArrowhead());
-  }
-
-  public boolean isVisible() {
-    return isVisible;
-  }
-
-  public void setVisible(boolean isVisible) {
-    this.isVisible = isVisible;
+    this(current.getColor(), current.getLineStyle(), current.getArrowhead());
   }
 
   /**

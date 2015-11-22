@@ -18,11 +18,11 @@ package com.google.devtools.depan.eclipse.visualization;
 
 import com.google.devtools.depan.eclipse.editors.CameraPosPreference;
 import com.google.devtools.depan.eclipse.editors.EdgeDisplayProperty;
+import com.google.devtools.depan.eclipse.editors.EdgeDisplayProperty.LineStyle;
 import com.google.devtools.depan.eclipse.editors.NodeDisplayProperty;
+import com.google.devtools.depan.eclipse.editors.NodeDisplayProperty.Size;
 import com.google.devtools.depan.eclipse.editors.ScenePreferences;
 import com.google.devtools.depan.eclipse.editors.ViewEditor;
-import com.google.devtools.depan.eclipse.editors.EdgeDisplayProperty.LineStyle;
-import com.google.devtools.depan.eclipse.editors.NodeDisplayProperty.Size;
 import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds;
 import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerator;
 import com.google.devtools.depan.eclipse.visualization.ogl.ArrowHead;
@@ -158,7 +158,6 @@ public class View {
 
     glPanel.setArrowhead(edge,
         ArrowHead.createNewArrowhead(property.getArrowhead()));
-    glPanel.setEdgeVisible(edge, property.isVisible());
   }
 
   /////////////////////////////////////

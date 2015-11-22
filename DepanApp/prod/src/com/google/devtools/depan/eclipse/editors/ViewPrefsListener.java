@@ -17,6 +17,7 @@
 package com.google.devtools.depan.eclipse.editors;
 
 import com.google.devtools.depan.graph.api.Relation;
+import com.google.devtools.depan.graph.api.RelationSet;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.view.CollapseData;
@@ -36,6 +37,14 @@ public interface ViewPrefsListener {
    * Provides simple "ignore all events" bodies for every event method.
    */
   public class Simple implements ViewPrefsListener {
+
+    @Override
+    public void relationSetVisibleChanged(RelationSet visibleSet) {
+    }
+
+    @Override
+    public void relationVisibleChanged(Relation relation, boolean visible) {
+    }
 
     @Override
     public void edgePropertyChanged(
@@ -77,18 +86,25 @@ public interface ViewPrefsListener {
   }
 
   /////////////////////////////////////
+  // Relation visibility callbacks
+
+  void relationSetVisibleChanged(RelationSet visibleSet);
+
+  void relationVisibleChanged(Relation relation, boolean visible);
+
+  /////////////////////////////////////
   // Edge related callbacks
 
-  public void edgePropertyChanged(
+  void edgePropertyChanged(
       GraphEdge node, EdgeDisplayProperty newProperty);
 
-  public void relationPropertyChanged(
+  void relationPropertyChanged(
       Relation relation, EdgeDisplayProperty newProperty);
 
   /////////////////////////////////////
   // Node related callbacks
 
-  public void nodePropertyChanged(
+  void nodePropertyChanged(
       GraphNode node, NodeDisplayProperty newProperty);
 
   /**
@@ -98,7 +114,7 @@ public interface ViewPrefsListener {
    * @param collection of nodes at new locations.
    * @param author the initiator of the change.
    */
-  public void nodeLocationsSet(Map<GraphNode, Point2D> newLocations);
+  void nodeLocationsSet(Map<GraphNode, Point2D> newLocations);
 
   /**
    * Callback when node locations change.  Any nodes omitted from the map
@@ -107,7 +123,7 @@ public interface ViewPrefsListener {
    * @param collection of nodes at new locations.
    * @param author the initiator of the change.
    */
-  public void nodeLocationsChanged(
+  void nodeLocationsChanged(
       Map<GraphNode, Point2D> newLocations, Object author);
 
   /**
@@ -117,7 +133,7 @@ public interface ViewPrefsListener {
    * @param removed Collection of now un-collapsed nodes
    * @param author the initiator of the change
    */
-  public void collapseChanged(
+  void collapseChanged(
       Collection<CollapseData> created,
       Collection<CollapseData> removed,
       Object author);
@@ -129,11 +145,10 @@ public interface ViewPrefsListener {
    * @param removed Collection of now un-collapsed nodes.
    * @param author the initiator of the change.
    */
-  public void selectionChanged(
+  void selectionChanged(
       Collection<GraphNode> previous,
       Collection<GraphNode> current,
       Object author);
 
-  public void descriptionChanged(String description);
-
+  void descriptionChanged(String description);
 }

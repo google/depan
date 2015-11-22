@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.eclipse.views;
 
-import com.google.devtools.depan.eclipse.views.tools.RelationPickerTool;
+import com.google.devtools.depan.eclipse.views.tools.RelationVisibleTool;
 
 /**
  * @author ycoppel@google.com (Yohann Coppel)
@@ -24,6 +24,6 @@ import com.google.devtools.depan.eclipse.views.tools.RelationPickerTool;
 public class RelationPicker extends ViewEditorToolView {
 
   public RelationPicker() {
-    super(new RelationPickerTool());
+    super(new RelationVisibleTool());
   }
 }

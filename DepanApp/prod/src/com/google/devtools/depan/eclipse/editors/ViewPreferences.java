@@ -19,11 +19,13 @@ package com.google.devtools.depan.eclipse.editors;
 import com.google.devtools.depan.eclipse.trees.NodeTreeProvider;
 import com.google.devtools.depan.eclipse.utils.ListenerManager;
 import com.google.devtools.depan.graph.api.Relation;
+import com.google.devtools.depan.graph.api.RelationSet;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.RelationSetDescriptor;
+import com.google.devtools.depan.model.RelationSets;
 import com.google.devtools.depan.view.CollapseData;
 import com.google.devtools.depan.view.CollapseTreeModel;
 import com.google.devtools.depan.view.Collapser;
@@ -74,6 +76,11 @@ public class ViewPreferences {
    * edge in graph.
    */
   private Map<GraphEdge, EdgeDisplayProperty> edgeProperties;
+
+  /**
+   * The set of edges that are currently visible in the diagram.
+   */
+  private RelationSet visibleRelationSet;
 
   /**
    * Hash map that contains a list of edge display property objects
@@ -154,6 +161,7 @@ public class ViewPreferences {
         ScenePreferences.getDefaultScenePrefs(),
         Maps.<GraphNode, Point2D>newHashMap(),
         Maps.<GraphNode, NodeDisplayProperty>newHashMap(),
+        RelationSets.ALL,
         Maps.<GraphEdge, EdgeDisplayProperty>newHashMap(),
         Maps.<Relation, EdgeDisplayProperty>newHashMap(),
         ImmutableList.<GraphNode>of(),
@@ -164,6 +172,7 @@ public class ViewPreferences {
       ScenePreferences gripPrefs,
       Map<GraphNode, Point2D> newNodeLocations,
       Map<GraphNode, NodeDisplayProperty> newNodeProperties,
+      RelationSet visibleRelationSet,
       Map<GraphEdge, EdgeDisplayProperty> newEdgeProperties,
       Map<Relation, EdgeDisplayProperty> newRelationProperties,
       Collection<GraphNode> newSelectedNodes,
@@ -174,6 +183,7 @@ public class ViewPreferences {
     this.scenePrefs = gripPrefs;
     this.nodeLocations = newNodeLocations;
     this.nodeProperties = newNodeProperties;
+    this.visibleRelationSet = visibleRelationSet;
     this.edgeProperties = newEdgeProperties;
     this.relationProperties = newRelationProperties;
     this.selectedNodes = newSelectedNodes;
@@ -202,6 +212,9 @@ public class ViewPreferences {
     }
     if (null == nodeProperties) {
       nodeProperties = Maps.newHashMap();
+    }
+    if (null == visibleRelationSet) {
+      visibleRelationSet = RelationSets.ALL;
     }
     if (null == edgeProperties) {
       edgeProperties = Maps.newHashMap();
@@ -268,7 +281,7 @@ public class ViewPreferences {
     ViewPreferences result = new ViewPreferences(
         ScenePreferences.getDefaultScenePrefs(),
         newNodeLocations, newNodeProperties,
-        newEdgeProperties, newRelationProps,
+        source.visibleRelationSet, newEdgeProperties, newRelationProps,
         newSelectedNodes, newDescription);
 
     return result;
@@ -448,6 +461,65 @@ public class ViewPreferences {
         listener.edgePropertyChanged(edge, newProperty);
       }
     });
+  }
+
+  public RelationSet getVisibleRelationSet() {
+    return visibleRelationSet;
+  }
+
+  public void setVisibleRelationSet(RelationSet relationSet) {
+    visibleRelationSet = relationSet;
+
+    listeners.fireEvent(new SimpleDispatcher() {
+      @Override
+      public void dispatch(ViewPrefsListener listener) {
+        listener.relationSetVisibleChanged(visibleRelationSet);
+      }
+    });
+  }
+
+  public boolean isVisibleRelation(Relation relation) {
+    return visibleRelationSet.contains(relation);
+  }
+
+  public void setVisibleRelation(
+      final Relation relation, final boolean isVisible) {
+    boolean nowVisible = isVisibleRelation(relation);
+    if (nowVisible == isVisible) {
+      return;
+    }
+
+    Set<Relation> visibleRelations = getVisibleRelations();
+    if (isVisible) {
+      visibleRelations.add(relation);
+      visibleRelationSet = RelationSets.createSimple(visibleRelations);
+
+      listeners.fireEvent(new SimpleDispatcher() {
+        @Override
+        public void dispatch(ViewPrefsListener listener) {
+          listener.relationVisibleChanged(relation, isVisible);
+        }
+      });
+    } else {
+      visibleRelations.remove(relation);
+      visibleRelationSet = RelationSets.createSimple(visibleRelations);
+
+      listeners.fireEvent(new SimpleDispatcher() {
+        @Override
+        public void dispatch(ViewPrefsListener listener) {
+          listener.relationVisibleChanged(relation, isVisible);
+        }
+      });
+    }
+  }
+
+  private Set<Relation> getVisibleRelations() {
+    Set<Relation> result = Sets.newHashSet();
+    for (Relation relation : getDisplayRelations()) {
+      if (isVisibleRelation(relation))
+        result.add(relation);
+    }
+    return result;
   }
 
   public Collection<Relation> getDisplayRelations() {

@@ -24,7 +24,8 @@ import com.google.devtools.depan.eclipse.trees.GraphData;
 import com.google.devtools.depan.eclipse.trees.NodeTreeProvider;
 import com.google.devtools.depan.eclipse.utils.GraphEdgeMatcherDescriptors;
 import com.google.devtools.depan.eclipse.utils.ListenerManager;
-import com.google.devtools.depan.eclipse.utils.RelationSetRelationTableEditor.RelPropRepository;
+import com.google.devtools.depan.eclipse.utils.RelationSetRelationTableEditor.RelationCheckedRepository;
+import com.google.devtools.depan.eclipse.utils.RelationPropertyRelationTableEditor.RelPropRepository;
 import com.google.devtools.depan.eclipse.utils.elementkinds.ElementKindDescriptor;
 import com.google.devtools.depan.eclipse.utils.elementkinds.ElementKindDescriptors;
 import com.google.devtools.depan.eclipse.views.tools.RelationCount;
@@ -35,11 +36,13 @@ import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerators;
 import com.google.devtools.depan.eclipse.visualization.layout.LayoutScaler;
 import com.google.devtools.depan.eclipse.visualization.layout.LayoutUtil;
 import com.google.devtools.depan.graph.api.Relation;
+import com.google.devtools.depan.graph.api.RelationSet;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.RelationSetDescriptor;
+import com.google.devtools.depan.model.RelationSets;
 import com.google.devtools.depan.view.CollapseData;
 import com.google.devtools.depan.view.CollapseTreeModel;
 import com.google.devtools.depan.view.TreeModel;
@@ -250,28 +253,6 @@ public class ViewEditor extends MultiPageEditorPart {
 
   public Map<GraphNode, Double> getNodeRanking() {
     return ranking;
-  }
-
-  /////////////////////////////////////
-  // Provide standardized access to this views property repository
-
-  // Only need one prop repo for this view editor
-  private final RelPropRepository EDGE_DISPLAY_PROP_REPO =
-      new RelPropRepository() {
-
-        @Override
-        public EdgeDisplayProperty getDisplayProperty(Relation rel) {
-          return getRelationProperty(rel);
-        }
-
-        @Override
-        public void setDisplayProperty(Relation rel, EdgeDisplayProperty prop) {
-          setRelationProperty(rel, prop);
-        }
-      };
-
-  public RelPropRepository getEdgeDisplayPropRepo() {
-    return EDGE_DISPLAY_PROP_REPO;
   }
 
   /////////////////////////////////////
@@ -810,6 +791,60 @@ public class ViewEditor extends MultiPageEditorPart {
     viewInfo.setNodeProperty(node, newProperty);
   }
 
+  /////////////////////////////////////
+  // Provide standardized access to this view's
+  // relation visibility
+
+  private final RelationCheckedRepository RELATION_VISIBLE_REPO =
+      new RelationCheckedRepository() {
+
+        @Override
+        public boolean getRelationChecked(Relation relation) {
+          return viewInfo.isVisibleRelation(relation);
+        }
+
+        @Override
+        public void setRelationChecked(Relation relation, boolean isChecked) {
+          viewInfo.setVisibleRelation(relation, isChecked);
+        }
+      
+  };
+
+  public RelationCheckedRepository getRelationVisibleRepo() {
+    return RELATION_VISIBLE_REPO;
+  }
+
+  public boolean isVisibleRelation(Relation relation) {
+    return viewInfo.isVisibleRelation(relation);
+  }
+
+  public void setVisibleRelation(Relation relation, boolean isChecked) {
+    viewInfo.setVisibleRelation(relation, isChecked);
+  }
+
+  /////////////////////////////////////
+  // Provide standardized access to this view's
+  // edge property repository
+
+  // Only need one prop repo for this view editor
+  private final RelPropRepository EDGE_DISPLAY_PROP_REPO =
+      new RelPropRepository() {
+
+        @Override
+        public EdgeDisplayProperty getDisplayProperty(Relation rel) {
+          return getRelationProperty(rel);
+        }
+
+        @Override
+        public void setDisplayProperty(Relation rel, EdgeDisplayProperty prop) {
+          setRelationProperty(rel, prop);
+        }
+      };
+
+  public RelPropRepository getEdgeDisplayPropRepo() {
+    return EDGE_DISPLAY_PROP_REPO;
+  }
+
   /**
    * Provide an {@code EdgeDisplayProperty} for any {@code GraphEdge}.
    * If there is no persistent value, synthesize one, but it won't be save
@@ -829,20 +864,7 @@ public class ViewEditor extends MultiPageEditorPart {
   }
 
   public void setRelationVisible(Relation relation, boolean isVisible) {
-    EdgeDisplayProperty edgeProp = getRelationProperty(relation);
-    if (null == edgeProp) {
-      edgeProp = new EdgeDisplayProperty();
-      edgeProp.setVisible(isVisible);
-      setRelationProperty(relation, edgeProp);
-      return;
-    }
-
-    // Don't change a relation that is already visible
-    if (edgeProp.isVisible() == isVisible) {
-      return;
-    }
-    edgeProp.setVisible(isVisible);
-    setRelationProperty(relation, edgeProp);
+    viewInfo.setVisibleRelation(relation, isVisible);
   }
 
   public Collection<Relation> getDisplayRelations() {
@@ -879,8 +901,19 @@ public class ViewEditor extends MultiPageEditorPart {
     }
   }
 
-  private void updateEdgesToRelations() {
+  private void updateEdgesToVisible(RelationSet relationSet) {
     for (GraphEdge edge : viewGraph.getEdges()) {
+      if (relationSet.contains(edge.getRelation())) {
+        // Set edge visibility
+        boolean isVisible = isVisibleRelation(edge.getRelation());
+        renderer.setEdgeVisible(edge, isVisible);
+      }
+    }
+  }
+
+  private void updateEdgesToRelationProperties() {
+    for (GraphEdge edge : viewGraph.getEdges()) {
+
       // If the edge has explicit display properties, leave those.
       EdgeDisplayProperty edgeProp = viewInfo.getEdgeProperty(edge);
       if (null != edgeProp) {
@@ -893,8 +926,8 @@ public class ViewEditor extends MultiPageEditorPart {
         renderer.setEdgeVisible(edge, false);
         continue;
       }
-
       renderer.updateEdgeProperty(edge, relationProp);
+
     }
   }
 
@@ -1354,6 +1387,28 @@ public class ViewEditor extends MultiPageEditorPart {
    */
   private class Listener implements ViewPrefsListener {
     @Override
+    public void relationSetVisibleChanged(RelationSet visibleSet) {
+      if (null == renderer) {
+        return;
+      }
+      // The visible relations in view preferences has already
+      // changed to the supplied visibleSet.
+      updateEdgesToVisible(RelationSets.ALL);
+      markDirty();
+    }
+
+    @Override
+    public void relationVisibleChanged(Relation relation, boolean visible) {
+      if (null == renderer) {
+        return;
+      }
+      // The relation's visibility in view preferences has already
+      // changed to the supplied value.
+      updateEdgesToVisible(RelationSets.createSingle(relation));
+      markDirty();
+    }
+
+    @Override
     public void edgePropertyChanged(
         GraphEdge edge, EdgeDisplayProperty newProperty) {
       if (null == renderer) {
@@ -1366,7 +1421,7 @@ public class ViewEditor extends MultiPageEditorPart {
     @Override
     public void relationPropertyChanged(
         Relation relation,  EdgeDisplayProperty newProperty) {
-      updateEdgesToRelations();
+      updateEdgesToRelationProperties();
       markDirty();
     }
 

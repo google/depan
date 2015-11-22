@@ -22,14 +22,12 @@ import com.google.devtools.depan.eclipse.plugins.SourcePluginRegistry;
 import com.google.devtools.depan.eclipse.plugins.SourcePlugins;
 import com.google.devtools.depan.graph.api.Relation;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellEditor;
-import org.eclipse.jface.viewers.CheckboxCellEditor;
 import org.eclipse.jface.viewers.ColorCellEditor;
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
 import org.eclipse.jface.viewers.ICellModifier;
@@ -39,7 +37,6 @@ import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -62,51 +59,69 @@ import java.util.Map;
 /**
  * Run a view of the known relations as its own reusable "part".
  */
-public class RelationSetRelationTableEditor {
+public class RelationPropertyRelationTableEditor {
 
   public static final String COL_NAME = "Name";
   public static final String COL_SOURCE = "Source";
-  public static final String COL_VISIBLE = "Visible";
-
-  /** To indicate that the "Visible" column should be updated. */
-  public static final String[] UPDATE_VISIBLE = {COL_VISIBLE};
+  public static final String COL_COLOR = "Color";
+  public static final String COL_WIDTH = "Width";
+  public static final String COL_STYLE = "Style";
+  public static final String COL_SHAPE = "Shape";
+  public static final String COL_ARROWHEAD = "Arrowhead";
 
   public static final int INDEX_NAME = 0;
   public static final int INDEX_SOURCE = 1;
-  public static final int INDEX_VISIBLE = 2;
+  public static final int INDEX_COLOR = 2;
+  public static final int INDEX_STYLE = 3;
+  public static final int INDEX_ARROWHEAD = 4;
+//  public static final int INDEX_WIDTH = 2;
+//  public static final int INDEX_SHAPE = 0;
 
   private static final EditColTableDef[] TABLE_DEF = new EditColTableDef[] {
     new EditColTableDef(COL_NAME, false, COL_NAME, 180),
     new EditColTableDef(COL_SOURCE, false, COL_SOURCE, 80),
-    new EditColTableDef(COL_VISIBLE, true, COL_VISIBLE, 70),
+    new EditColTableDef(COL_COLOR, true, COL_COLOR, 80),
+//    new EditColTableDef(COL_WIDTH, false, COL_WIDTH, 180),
+    new EditColTableDef(COL_STYLE, true, COL_STYLE, 60),
+    new EditColTableDef(COL_ARROWHEAD, true, COL_ARROWHEAD, 110),
+//    new EditColTableDef(COL_SHAPE, false, COL_SHAPE, 180),
+  };
+
+  private static final String[] LINE_WIDTHS = {
+    "0", "1", "2", "3", "4"
+  };
+
+  private static final String[] LINE_SHAPES = {
+    "arched", "straight"
   };
 
   /**
-   * Abstract repository that provides access to the relation selection.
+   * Abstract repository that provides access to the relation properties.
+   * 
+   * The normal one, from RelationPickerTool, is editor aware.
    */
-  public static interface RelationCheckedRepository {
+  public static interface RelPropRepository {
 
     /**
-     * Indicate whether the supplied {@code relation} is checked
-     * in the table.
+     * Provide the display properties for the supplied relation.
      */
-    boolean getRelationChecked(Relation relation);
+    EdgeDisplayProperty getDisplayProperty(Relation rel);
 
     /**
-     * Change the visibility of the supplied {@code relation} to the
-     * state of the supplied {@code isChecked}.
+     * Change the display properties for the supplied relation to the new
+     * values.
      */
-    void setRelationChecked(Relation relation, boolean isChecked);
+    void setDisplayProperty(Relation rel, EdgeDisplayProperty prop);
   }
 
-  private final RelationCheckedRepository visRepo;
+  private final RelPropRepository propRepo;
 
   private TableViewer viewer;
 
   private Map<Relation, SourcePlugin> relPlugin = Maps.newHashMap();
 
-  public RelationSetRelationTableEditor(RelationCheckedRepository visRepo) {
-    this.visRepo = visRepo;
+  public RelationPropertyRelationTableEditor(RelPropRepository propRepo) {
+    this.propRepo = propRepo;
   }
 
   public TableViewer setupViewer(Composite parent) {
@@ -129,7 +144,11 @@ public class RelationSetRelationTableEditor {
     CellEditor[] cellEditors = new CellEditor[6];
     cellEditors[INDEX_NAME] = null;
     cellEditors[INDEX_SOURCE] = null;
-    cellEditors[INDEX_VISIBLE] = new CheckboxCellEditor(relTableControl);
+    cellEditors[INDEX_COLOR] = new ColorCellEditor(relTableControl);
+    cellEditors[INDEX_STYLE] = new ComboBoxCellEditor(relTableControl,
+        Tools.toString(EdgeDisplayProperty.LineStyle.values(), true));
+    cellEditors[INDEX_ARROWHEAD] = new ComboBoxCellEditor(relTableControl,
+        Tools.toString(EdgeDisplayProperty.ArrowheadStyle.values(), true));
 
     viewer.setCellEditors(cellEditors);
     viewer.setColumnProperties(EditColTableDef.getProperties(TABLE_DEF));
@@ -167,68 +186,38 @@ public class RelationSetRelationTableEditor {
   }
 
   /////////////////////////////////////
-  // Convenience for modifying visibility property.
-  // Useful for buttons external to the table (e.g. clear all)
+  // Property repository methods
 
-  public void clearVisibleSelection() {
-    clearRelations(getSelectedRelations());
-  }
-
-  public void invertVisibleSelection() {
-    invertRelations(getSelectedRelations());
-  }
-
-  public void checkVisibleSelection() {
-    checkRelations(getSelectedRelations());
-  }
-
-  public void clearVisibleTable() {
-    clearRelations(getTableRelations());
-  }
-
-  public void invertVisibleTable() {
-    invertRelations(getTableRelations());
-  }
-
-  public void checkVisibleTable() {
-    checkRelations(getTableRelations());
-  }
-
-  public void clearRelations(Collection<Relation> relations) {
-    for (Relation relation : relations) {
-      visRepo.setRelationChecked(relation, false);
-      viewer.update(relation, UPDATE_VISIBLE);
-    }
-  }
-
-  public void invertRelations(Collection<Relation> relations) {
-    for (Relation relation : relations) {
-      boolean wasChecked = visRepo.getRelationChecked(relation);
-      visRepo.setRelationChecked(relation, !wasChecked);
-      viewer.update(relation, UPDATE_VISIBLE);
-    }
-  }
-
-  public void checkRelations(Collection<Relation> relations) {
-    for (Relation relation : relations) {
-      visRepo.setRelationChecked(relation, true);
-      viewer.update(relation, UPDATE_VISIBLE);
-    }
-  }
-
-  public Collection<Relation> getVisibleRelations() {
-    Collection<Relation> relations = getTableRelations();
-    Collection<Relation> result =
-        Lists.newArrayListWithExpectedSize(relations.size());
-    for (Relation relation : relations) {
-      if (visRepo.getRelationChecked(relation)) {
-        result.add(relation);
-      }
-    }
-    return result;
+  /**
+   * Acquire properties directly, avoid setting up a default.
+   */
+  private void saveDisplayProperty(
+      Relation relation, EdgeDisplayProperty props) {
+    propRepo.setDisplayProperty(relation, props);
   }
 
   /**
+   * Acquire properties directly, avoid setting up a default.
+   */
+  private EdgeDisplayProperty loadDisplayProperty(Relation relation) {
+    return propRepo.getDisplayProperty(relation);
+  }
+
+  /**
+   * Utility method for both the label provider and cell modifier.
+   * Note that the default constructor for {@link EdgeDisplayProperty}
+   * uses the default values for all member elements.
+   */
+  private EdgeDisplayProperty getDisplayProperty(Relation relation) {
+    EdgeDisplayProperty relationProp = loadDisplayProperty(relation);
+    if (null != relationProp) {
+      return relationProp;
+    }
+    // Provide the default if none are persisted.
+    return new EdgeDisplayProperty();
+  }
+
+   /**
    * Invert the set of relations selected in the table.
    * Don't change the state of any relation.
    */
@@ -324,36 +313,12 @@ public class RelationSetRelationTableEditor {
   }
 
   private ViewerSorter buildColumnSorter(int colIndex) {
-    // if (INDEX_VISIBLE == colIndex) {
-    //   return new BooleanViewSorter();
-    // }
-    if (INDEX_VISIBLE == colIndex) {
-      return new BooleanViewSorter();
-    }
-
     // By default, use an alphabetic sort over the column labels.
     ITableLabelProvider labelProvider =
         (ITableLabelProvider) viewer.getLabelProvider();
     ViewerSorter result = new AlphabeticSorter(
         new LabelProviderToString(labelProvider, colIndex));
     return result;
-  }
-
-  private class BooleanViewSorter extends ViewerSorter {
-
-    @Override
-    public int compare(Viewer viewer, Object e1, Object e2) {
-      boolean vis1 = isVisible(e1);
-      boolean vis2 = isVisible(e2);
-      return Boolean.compare(vis1, vis2);
-    }
-
-    private boolean isVisible(Object e1) {
-      if (!(e1 instanceof Relation)) {
-        return false;
-      }
-      return visRepo.getRelationChecked((Relation) e1);
-    }
   }
 
   /////////////////////////////////////
@@ -365,14 +330,29 @@ public class RelationSetRelationTableEditor {
     @Override
     public String getColumnText(Object element, int columnIndex) {
       if (element instanceof Relation) {
-        Relation relation = (Relation) element;
+        Relation rel = (Relation) element;
+        EdgeDisplayProperty prop = getDisplayProperty(rel);
         switch (columnIndex) {
         case INDEX_NAME:
-          return relation.toString();
+          return rel.toString();
         case INDEX_SOURCE:
-          return getSourceLabelForRelation(relation);
+          return getSourceLabelForRelation(rel);
+        case INDEX_COLOR:
+          return getColorName(prop);
+        // case INDEX_WIDTH:
+        case INDEX_STYLE:
+          if (null != prop) {
+            return prop.getLineStyle().toString().toLowerCase();
+          }
+          return null;
+        case INDEX_ARROWHEAD:
+          if (null != prop) {
+            return prop.getArrowhead().toString().toLowerCase();
+          }
+          return null;
         }
       }
+      // TODO Auto-generated method stub
       return null;
     }
 
@@ -383,17 +363,21 @@ public class RelationSetRelationTableEditor {
       return registry.getSourcePluginEntry(sourceId).getSource();
     }
 
-    @Override
-    public Image getColumnImage(Object element, int columnIndex) {
-      if (!(element instanceof Relation)) {
+    private String getColorName(EdgeDisplayProperty prop) {
+      if (null == prop) {
         return null;
       }
-
-      switch (columnIndex) {
-      case INDEX_VISIBLE:
-        boolean isVis = visRepo.getRelationChecked((Relation) element);
-        return Resources.getOnOff(isVis);
+      Color color = prop.getColor();
+      if (null == color) {
+        return null;
       }
+      String result = StringConverter.asString(Tools.rgbFromColor(color));
+      return "(" + result + ")";
+    }
+
+    @Override
+    public Image getColumnImage(Object element, int columnIndex) {
+      // No table columns use an image.
       return null;
     }
   }
@@ -410,13 +394,28 @@ public class RelationSetRelationTableEditor {
 
     @Override
     public Object getValue(Object element, String property) {
-      if (!(element instanceof Relation)) {
-        return null;
+      if (element instanceof Relation) {
+        Relation rel = (Relation) element;
+        EdgeDisplayProperty relProp = getDisplayProperty(rel);
+        if (COL_COLOR.equals(property)) {
+          Color relColor = relProp.getColor();
+          if (null == relColor) {
+            return new RGB(0, 0, 0);
+          }
+          RGB result = Tools.rgbFromColor(relColor);
+          return result;
+        }
+        if (COL_ARROWHEAD.equals(property)) {
+          return relProp.getArrowhead().ordinal();
+        }
+        if (COL_STYLE.equals(property)) {
+          return relProp.getLineStyle().ordinal();
+        }
+        if (COL_SHAPE.equals(property)) {
+          
+        }
       }
-      Relation relation = (Relation) element;
-      if (COL_VISIBLE.equals(property)) {
-        return visRepo.getRelationChecked(relation);
-      }
+      // TODO Auto-generated method stub
       return null;
     }
 
@@ -429,12 +428,25 @@ public class RelationSetRelationTableEditor {
       if (!(modifiedObject instanceof Relation)) {
         return;
       }
-      if (property.equals(COL_VISIBLE) && (value instanceof Boolean)) {
-        Relation relation = (Relation) modifiedObject;
-        visRepo.setRelationChecked(
-            relation, ((Boolean) value).booleanValue());
-        viewer.update(relation, UPDATE_VISIBLE);
+
+      Relation relation = (Relation) modifiedObject;
+
+      EdgeDisplayProperty relProp = loadDisplayProperty(relation);
+      if (null == relProp) {
+        return; // For example, when there is no editor.
       }
+
+      if (property.equals(COL_STYLE) && (value instanceof Integer)) {
+        relProp.setLineStyle(EdgeDisplayProperty.LineStyle.values()[(Integer) value]);
+      } else if (property.equals(COL_ARROWHEAD) && (value instanceof Integer)) {
+        relProp.setArrowhead(EdgeDisplayProperty.ArrowheadStyle.values()[(Integer) value]);
+      } else if (property.equals(COL_COLOR) && (value instanceof RGB)) {
+        Color newColor = Tools.colorFromRgb((RGB) value);
+        relProp.setColor(newColor);
+      }
+
+      saveDisplayProperty(relation, relProp);
+      viewer.update(relation, new String[] {property});
     }
   }
 }

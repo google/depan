@@ -16,10 +16,9 @@
 
 package com.google.devtools.depan.eclipse.views.tools;
 
-import com.google.devtools.depan.eclipse.editors.EdgeDisplayProperty;
 import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.utils.RelationSetEditorPart;
-import com.google.devtools.depan.eclipse.utils.RelationSetRelationTableEditor.RelPropRepository;
+import com.google.devtools.depan.eclipse.utils.RelationSetRelationTableEditor.RelationCheckedRepository;
 import com.google.devtools.depan.eclipse.views.tools.RelationCount.RangeData;
 import com.google.devtools.depan.eclipse.views.tools.RelationCount.RangeOption;
 import com.google.devtools.depan.eclipse.views.tools.RelationCount.Settings;
@@ -66,24 +65,22 @@ public class RelationCountNodeSelectorTool extends Composite {
   public static final RelationCount.Settings EMPTY_SETTINGS =
       new RelationCount.Settings();
 
-  private class ToolPropRepo implements RelPropRepository {
+  private class ToolRelationRepo implements RelationCheckedRepository {
     @Override
-    public EdgeDisplayProperty getDisplayProperty(Relation rel) {
+    public boolean getRelationChecked(Relation relation) {
       if (null == editor) {
-        return null;
+        return false;
       }
 
-      return editor.getRelationProperty(rel);
+      return editor.isVisibleRelation(relation);
     }
 
     @Override
-    public void setDisplayProperty(
-        Relation rel, EdgeDisplayProperty prop) {
+      public void setRelationChecked(Relation relation, boolean isChecked) {
       if (null == editor) {
         return;
       }
-
-      editor.setRelationProperty(rel, prop);
+      editor.setVisibleRelation(relation, isChecked);
     }
   }
 
@@ -111,7 +108,7 @@ public class RelationCountNodeSelectorTool extends Composite {
     // Top: Relation selection
     relationSetEditor = new RelationSetEditorPart();
     Control relationshipPickerControl =
-        relationSetEditor.getControl(this, new ToolPropRepo());
+        relationSetEditor.getControl(this, new ToolRelationRepo());
     relationshipPickerControl.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, true));
 

@@ -19,6 +19,7 @@ package com.google.devtools.depan.eclipse.editors;
 import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
 import com.google.devtools.depan.eclipse.trees.NodeTreeProvider;
 import com.google.devtools.depan.graph.api.Relation;
+import com.google.devtools.depan.graph.api.RelationSet;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphModel;
@@ -143,6 +144,22 @@ public class ViewDocument {
   public void setNodeProperty(
       GraphNode node, NodeDisplayProperty newProperty) {
     userPrefs.setNodeProperty(node, newProperty);
+  }
+
+  public RelationSet getVisibleRelationSet() {
+    return userPrefs.getVisibleRelationSet();
+  }
+
+  public void setVisibleRelationSet(RelationSet relationSet) {
+    userPrefs.setVisibleRelationSet(relationSet);
+  }
+
+  public boolean isVisibleRelation(Relation relation) {
+    return userPrefs.isVisibleRelation(relation);
+  }
+
+  public void setVisibleRelation(Relation relation, boolean isVisible) {
+    userPrefs.setVisibleRelation(relation, isVisible);
   }
 
   public EdgeDisplayProperty getEdgeProperty(GraphEdge edge) {

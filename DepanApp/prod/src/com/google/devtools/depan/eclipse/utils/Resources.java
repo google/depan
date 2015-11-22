@@ -71,7 +71,8 @@ public final class Resources {
   public static final String NAME_NODEEDITOR = "Node editor";
   public static final String NAME_EDGEEDITOR = "Edge editor";
   public static final String NAME_SELECTIONEDITOR = "Selection editor";
-  public static final String NAME_RELATIONPICKERTOOL = "Relation picker";
+  public static final String NAME_RELATIONVISIBLETOOL = "Visible Relations";
+  public static final String NAME_RELATIONPROPERTYTOOL = "Relation Properties";
   public static final String NAME_HANDTOOL = "Hand tool";
   public static final String NAME_PICKTOOL = "Picking tool";
   public static final String NAME_REFACTORING = "Refactoring tool";
