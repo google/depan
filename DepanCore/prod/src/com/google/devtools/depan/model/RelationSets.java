@@ -19,6 +19,8 @@ package com.google.devtools.depan.model;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.api.RelationSet;
 
+import com.google.common.collect.Sets;
+
 import java.util.Arrays;
 import java.util.Set;
 
@@ -32,59 +34,33 @@ import java.util.Set;
 public class RelationSets {
 
   private RelationSets() {
-    // Prevent instantiation
+    // Prevent instantiation.
   }
 
-  public static RelationSet EMPTY = new RelationSet() {
+  /////////////////////////////////////
+  // ALL Relation Set
 
-    @Override
-    public boolean contains(Relation relation) {
-      return false;
-    }
-  };
-
-  public static final RelationSet ALL = new RelationSet() {
-
+  // Only need one instance
+  public static final RelationSet ALL = new  RelationSet() {
     @Override
     public boolean contains(Relation relation) {
       return true;
     }
   };
 
-  public static RelationSet createArray(Relation[] relations) {
-    return new Array(relations);
-  }
+  /////////////////////////////////////
+  // EMPTY Relation Set
 
-  public static class Array implements RelationSet {
-
-    private final Relation[] relations;
-
-    public Array(Relation[] relations) {
-      this.relations = relations;
-    }
-
+  // Only need one instance
+  public static RelationSet EMPTY = new RelationSet() {
     @Override
     public boolean contains(Relation relation) {
-      return Arrays.asList(relations).contains(relation);
+      return false;
     }
   };
 
-  public static RelationSet createSimple(Set<Relation> relationSet) {
-    return new Simple(relationSet);
-  }
-
-  public static class Simple implements RelationSet {
-    private final Set<Relation> relationSet;
-
-    public Simple(Set<Relation> relationSet) {
-      this.relationSet = relationSet;
-    }
-
-    @Override
-    public boolean contains(Relation relation) {
-      return relationSet.contains(relation);
-    }
-  }
+  /////////////////////////////////////
+  // Relation sets for a single relation
 
   public static RelationSet createSingle(Relation relation) {
     return new Single(relation);
@@ -102,6 +78,71 @@ public class RelationSets {
     public boolean contains(Relation relation) {
       return (single == relation);
     }
-    
+
+    /**
+     * Provide the one relation in this relation-set.
+     * Intended primarily for serialization.
+     */
+    public Relation getRelation() {
+      return single;
+    }
+  }
+
+  /////////////////////////////////////
+  // Array implemented relation sets
+  // Common for plugin definitions.
+
+  public static RelationSet createArray(Relation[] relations) {
+    return new Array(relations);
+  }
+
+  public static class Array implements RelationSet {
+
+    private final Relation[] relations;
+
+    public Array(Relation[] relations) {
+      this.relations = relations;
+    }
+
+    @Override
+    public boolean contains(Relation relation) {
+      return Arrays.asList(relations).contains(relation);
+    }
+
+    /**
+     * Provide a snapshot of the array of relations.
+     * Intended primarily for serialization.
+     */
+    public Relation[] getRelations() {
+      return Arrays.copyOf(relations, relations.length);
+    }
+  };
+
+  /////////////////////////////////////
+  // Set implemented relation sets
+
+  public static RelationSet createSimple(Set<Relation> relationSet) {
+    return new Simple(relationSet);
+  }
+
+  public static class Simple implements RelationSet {
+    private final Set<Relation> relationSet;
+
+    public Simple(Set<Relation> relationSet) {
+      this.relationSet = relationSet;
+    }
+
+    @Override
+    public boolean contains(Relation relation) {
+      return relationSet.contains(relation);
+    }
+
+    /**
+     * Provide a snapshot of the set of relations.
+     * Intended primarily for serialization.
+     */
+    public Set<Relation> getRelations() {
+      return Sets.newHashSet(relationSet);
+    }
   }
 }

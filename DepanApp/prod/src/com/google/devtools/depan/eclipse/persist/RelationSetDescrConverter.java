@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 The Depan Project Authors
+ * Copyright 2015 The Depan Project Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,37 +37,37 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
  * 
  * @author <a href="mailto:leeca@google.com">Lee Carver</a>
  */
-public class RelationSetConverter implements Converter {
+public class RelationSetDescrConverter implements Converter {
 
-  private static final String RELATION_SET_TAG = "relation-set";
+  private static final String RELATION_SET_DESCR_TAG = "relation-set-descr";
 
   // Attribute names
   private static final String REL_SET = "rel-set";
   private static final String PLUGIN_ID = "plugin-id";
 
-  public RelationSetConverter() {
+  public RelationSetDescrConverter() {
   }
 
   public static void configXStream(XStream xstream) {
-    xstream.aliasType(RELATION_SET_TAG, RelationSetConverter.class);
-    xstream.registerConverter(new RelationSetConverter());
+    xstream.aliasType(RELATION_SET_DESCR_TAG, RelationSetDescriptor.class);
+    xstream.registerConverter(new RelationSetDescrConverter());
   }
 
   @Override
   @SuppressWarnings("rawtypes")  // Parent type uses raw type Class
   public boolean canConvert(Class type) {
-    return RelationSet.class.isAssignableFrom(type);
+    return RelationSetDescriptor.class.isAssignableFrom(type);
   }
 
   @Override
   public void marshal(Object source, HierarchicalStreamWriter writer,
       MarshallingContext context) {
-    RelationSetDescriptor relationSet = (RelationSetDescriptor) source;
-    SourcePlugin plugin = findBuiltIn(relationSet);
+    RelationSetDescriptor setDescr = (RelationSetDescriptor) source;
+    SourcePlugin plugin = findBuiltIn(setDescr);
     if (null != plugin) {
       String entryId = SourcePluginRegistry.getInstance().getPluginId(plugin);
       writer.addAttribute(PLUGIN_ID, entryId);
-      writer.addAttribute(REL_SET, relationSet.getName());
+      writer.addAttribute(REL_SET, setDescr.getName());
     }
   }
 
