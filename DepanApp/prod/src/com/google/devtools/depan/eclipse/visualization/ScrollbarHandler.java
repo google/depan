@@ -64,7 +64,7 @@ public class ScrollbarHandler {
             ((double) vertBar.getSelection() / (double) vertBar.getMaximum()));
         double xPos = horizSelBase + (horizRange *
             ((double) horizBar.getSelection() / (double) horizBar.getMaximum()));
-        scene.moveToCamera((float) xPos, (float) yPos);
+        scene.moveToPosition((float) xPos, (float) yPos);
       }
 
       @Override

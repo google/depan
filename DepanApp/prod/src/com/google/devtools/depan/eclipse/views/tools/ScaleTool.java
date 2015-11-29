@@ -16,7 +16,12 @@
 
 package com.google.devtools.depan.eclipse.views.tools;
 
+import com.google.devtools.depan.eclipse.editors.CameraDirPreference;
+import com.google.devtools.depan.eclipse.editors.CameraPosPreference;
 import com.google.devtools.depan.eclipse.editors.DrawingListener;
+import com.google.devtools.depan.eclipse.editors.ScenePreferences;
+import com.google.devtools.depan.eclipse.editors.ScenePreferences.Listener;
+import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.views.ViewEditorTool;
 
@@ -50,6 +55,9 @@ public class ScaleTool extends ViewEditorTool {
   private Label rightViewport;
   private Label bottomViewport;
 
+  private CameraPositionGroup position;
+  private CameraDirectionGroup direction;
+
   private Label frameRate;
   private int frameUpdate;
   private int framePrev;
@@ -59,6 +67,7 @@ public class ScaleTool extends ViewEditorTool {
   private DrawingListener drawingListener;
 
   private DecimalFormat fpsFormat = new DecimalFormat("###.00");
+  private Listener sceneListener;
 
   @Override
   public Image getIcon() {
@@ -110,6 +119,8 @@ public class ScaleTool extends ViewEditorTool {
         + "anything, and a stretch value of 200% always makes the graph two "
         + "times larger even if applied multiple times consecutivelly.\n");
 
+    position = setupCameraPositionGroup(baseComposite);
+    direction = setupCameraDirectionGroup(baseComposite);
     Composite metrics = setupMetrics(baseComposite);
     Composite rate = setupFrameRate(baseComposite);
 
@@ -123,6 +134,10 @@ public class ScaleTool extends ViewEditorTool {
         new GridData(SWT.FILL, SWT.FILL, true, false));
     zoomPercents.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, false));
+    position.setLayoutData(
+        new GridData(SWT.FILL, SWT.FILL, true, false, 4, 1));
+    direction.setLayoutData(
+        new GridData(SWT.FILL, SWT.FILL, true, false, 4, 1));
     metrics.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, false, 4, 1));
     rate.setLayoutData(
@@ -165,6 +180,94 @@ public class ScaleTool extends ViewEditorTool {
     });
 
     return baseComposite;
+  }
+
+  private CameraPositionGroup setupCameraPositionGroup(Composite parent) {
+    CameraPositionGroup result = new CameraPositionGroup(parent);
+
+    result.addPositionChangeListener(new CameraPositionGroup.Listener() {
+
+      @Override
+      public void xChanged(float value) {
+        if (!hasEditor()) {
+          return;
+        }
+
+        ViewEditor editor = getEditor();
+        ScenePreferences scene = editor.getScenePrefs();
+        editor.moveToCamera(value, scene.getCameraPos().getY());
+      }
+
+      @Override
+      public void yChanged(float value) {
+        if (!hasEditor()) {
+          return;
+        }
+
+        ViewEditor editor = getEditor();
+        ScenePreferences scene = editor.getScenePrefs();
+        editor.moveToCamera(scene.getCameraPos().getX(), value);
+      }
+
+      @Override
+      public void zChanged(float value) {
+        if (!hasEditor()) {
+          return;
+        }
+
+        ViewEditor editor = getEditor();
+        editor.zoomToCamera(value);
+      }
+
+    });
+
+    return result;
+  }
+
+  private CameraDirectionGroup setupCameraDirectionGroup(Composite parent) {
+    CameraDirectionGroup result = new CameraDirectionGroup(parent);
+
+    result.addPositionChangeListener(new CameraDirectionGroup.Listener() {
+
+      @Override
+      public void xChanged(float value) {
+        if (!hasEditor()) {
+          return;
+        }
+
+        ViewEditor editor = getEditor();
+        ScenePreferences scene = editor.getScenePrefs();
+        CameraDirPreference dir = scene.getCameraDir();
+        editor.rotateToDirection(value, dir.getY(), dir.getZ());
+      }
+
+      @Override
+      public void yChanged(float value) {
+        if (!hasEditor()) {
+          return;
+        }
+
+        ViewEditor editor = getEditor();
+        ScenePreferences scene = editor.getScenePrefs();
+        CameraDirPreference dir = scene.getCameraDir();
+        editor.rotateToDirection(dir.getX(), value, dir.getZ());
+      }
+
+      @Override
+      public void zChanged(float value) {
+        if (!hasEditor()) {
+          return;
+        }
+
+        ViewEditor editor = getEditor();
+        ScenePreferences scene = editor.getScenePrefs();
+        CameraDirPreference dir = scene.getCameraDir();
+        editor.rotateToDirection(dir.getX(), dir.getY(), value);
+      }
+
+    });
+
+    return result;
   }
 
   private Composite setupMetrics(Composite parent) {
@@ -237,7 +340,17 @@ public class ScaleTool extends ViewEditorTool {
     forViewPort.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
   }
 
+  private void updateCameraPosition(CameraPosPreference pos) {
+    position.updateCameraPosition(pos);
+  }
+
+  private void updateCameraDirection(CameraDirPreference dir) {
+    direction.updateCameraDirection(dir);
+  }
+
   public void updateMetrics(Rectangle2D drawing, Rectangle2D viewport) {
+    position.updateDrawingLimits(drawing);
+
     topDrawing.setText(Double.toString(drawing.getMaxY()));
     leftDrawing.setText(Double.toString(drawing.getMinX()));
     rightDrawing.setText(Double.toString(drawing.getMaxX()));
@@ -273,13 +386,33 @@ public class ScaleTool extends ViewEditorTool {
   protected void acquireResources() {
     super.acquireResources();
 
-    getEditor().addDrawingListener(drawingListener);
+    ViewEditor editor = getEditor();
+    editor.addDrawingListener(drawingListener);
+
+    ScenePreferences camera = editor.getScenePrefs();
+    sceneListener = new ScenePreferences.Listener() {
+
+      @Override
+      public void positionChanged(ScenePreferences camera) {
+        updateCameraPosition(camera.getCameraPos());
+      }
+
+      @Override
+      public void directionChanged(ScenePreferences camera) {
+        updateCameraDirection(camera.getCameraDir());
+      }
+    };
+    editor.addSceneListener(sceneListener);
+    updateCameraPosition(camera.getCameraPos());
   }
 
   @Override
   protected void releaseResources() {
     if (hasEditor()) {
-      getEditor().removeDrawingListener(drawingListener);
+      ViewEditor editor = getEditor();
+      editor.removeDrawingListener(drawingListener);
+      editor.removeSceneListener(sceneListener);
+      
     }
 
     super.releaseResources();

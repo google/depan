@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 The Depan Project Authors
+ * Copyright 2015 The Depan Project Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,17 +18,17 @@ package com.google.devtools.depan.eclipse.editors;
 import com.google.devtools.depan.eclipse.visualization.ogl.GLScene;
 
 /**
- * Capture the camera location as type.
+ * Capture the camera direction as type.
  * A dedicated type make XStream serialization work better.
  * 
  * @author <a href="mailto:leeca@pnambic.com">Lee Carver</a>
  */
-public class CameraPosPreference {
+public class CameraDirPreference {
   private float x;
   private float y;
   private float z;
 
-  public CameraPosPreference(float x, float y, float z) {
+  public CameraDirPreference(float x, float y, float z) {
     this.x = x;
     this.y = y;
     this.z = z;
@@ -58,12 +58,7 @@ public class CameraPosPreference {
     this.z = z;
   }
 
-  public static CameraPosPreference getDefaultCameraPos() {
-    float[] pos = GLScene.DEFAULT_CAMERA_POSITION;
-    return new CameraPosPreference(pos[0], pos[1], pos[2]);
-  }
-
-  public static CameraDirPreference getDefaultCameraDir() {
+  public static CameraDirPreference getDefaultCameraPos() {
     float[] pos = GLScene.DEFAULT_CAMERA_DIRECTION;
     return new CameraDirPreference(pos[0], pos[1], pos[2]);
   }

@@ -158,6 +158,9 @@ public class ViewEditor extends MultiPageEditorPart {
   private ListenerManager<SelectionChangeListener> selectionListeners =
       new ListenerManager<SelectionChangeListener>();
 
+  private ListenerManager<ScenePreferences.Listener> sceneListeners =
+      new ListenerManager<ScenePreferences.Listener>();
+
   private ListenerManager<DrawingListener> drawingListeners =
       new ListenerManager<DrawingListener>();
 
@@ -184,6 +187,18 @@ public class ViewEditor extends MultiPageEditorPart {
   private Collection<ElementKindStats.Info> elementKindStats;
 
   private List<GraphEdgeMatcherDescriptor> edgeMatcherChoices;
+
+  /////////////////////////////////////
+  // Dispatch errors to go our logger
+
+  private abstract static class SimpleDispatcher<T>
+      implements ListenerManager.Dispatcher<T> {
+
+    @Override
+    public void captureException(RuntimeException errAny) {
+      logger.log(Level.WARNING, "Listener dispatch failure", errAny);
+    }
+  }
 
   /////////////////////////////////////
   // Basic Getters and Setters
@@ -234,6 +249,10 @@ public class ViewEditor extends MultiPageEditorPart {
 
   public void setDisplayRelationSet(RelationSetDescriptor newDisplay) {
     viewInfo.setDisplayRelationSetDescriptor(newDisplay);
+  }
+
+  public ScenePreferences getScenePrefs() {
+    return viewInfo.getScenePrefs();
   }
 
   /**
@@ -333,7 +352,7 @@ public class ViewEditor extends MultiPageEditorPart {
 
   private void prepareView() {
     renderer.setGraphModel(getViewGraph(), getJungGraph(), getNodeRanking());
-    renderer.initCameraPosition(viewInfo.getScenePrefs());
+    renderer.initializeScenePrefs(getScenePrefs());
     renderer.initializeNodeLocations(viewInfo.getNodeLocations());
     initCollapseRendering(viewInfo.getCollapseState());
     initSelectedNodes(getSelectedNodes());
@@ -1002,8 +1021,30 @@ public class ViewEditor extends MultiPageEditorPart {
   public Map<GraphNode, Point2D> getNodeLocations() {
     return viewInfo.getNodeLocations();
   }
+
   /////////////////////////////////////
   // Update node positions in the View Document
+
+  /**
+   * Move the camera to the supplied x and y coordinates.
+   */
+  public void moveToCamera(float camX, float camY) {
+    renderer.moveToPosition(camX, camY);
+  }
+
+  /**
+   * Zoom by moving camera to supplied z coordinate.
+   */
+  public void zoomToCamera(float camZ) {
+    renderer.zoomToCamera(camZ);
+  }
+
+  /**
+   * Zoom by moving camera to supplied z coordinate.
+   */
+  public void rotateToDirection(float xRot, float yRot, float zRot) {
+    renderer.rotateToDirection(xRot, yRot, zRot);
+  }
 
   /**
    * Zoom to supplied scale.
@@ -1219,6 +1260,38 @@ public class ViewEditor extends MultiPageEditorPart {
   }
 
   /////////////////////////////////////
+  // Listeners for camera preferences
+
+  public void addSceneListener(ScenePreferences.Listener listener) {
+    sceneListeners.addListener(listener);
+  }
+
+  public void removeSceneListener(ScenePreferences.Listener listener) {
+    sceneListeners.removeListener(listener);
+  }
+
+  private void firePositionChanged(final ScenePreferences camera) {
+    sceneListeners.fireEvent(new SimpleDispatcher<ScenePreferences.Listener>() {
+
+      @Override
+      public void dispatch(ScenePreferences.Listener listener) {
+        listener.positionChanged(camera);
+      }
+    });
+    
+  }
+
+  private void fireDirectionChanged(final ScenePreferences camera) {
+    sceneListeners.fireEvent(new SimpleDispatcher<ScenePreferences.Listener>() {
+
+      @Override
+      public void dispatch(ScenePreferences.Listener listener) {
+        listener.directionChanged(camera);
+      }
+    });
+  }
+
+  /////////////////////////////////////
   // Listeners for drawing metrics
 
   public void addDrawingListener(DrawingListener listener) {
@@ -1249,7 +1322,7 @@ public class ViewEditor extends MultiPageEditorPart {
    */
   public void sceneChanged() {
     markDirty();
-    ScenePreferences prefs = viewInfo.getScenePrefs();
+    ScenePreferences prefs = getScenePrefs();
     if (null == prefs) {
       prefs = ScenePreferences.getDefaultScenePrefs();
       viewInfo.setScenePrefs(prefs);
@@ -1257,19 +1330,13 @@ public class ViewEditor extends MultiPageEditorPart {
 
     // Capture the newly stable current camera position in the prefs object.
     renderer.saveCameraPosition(prefs);
+    renderer.saveCameraDirection(prefs);
+    firePositionChanged(prefs);
+    fireDirectionChanged(prefs);
   }
 
   /////////////////////////////////////
   // Notifications from ViewEditor toward Tools and other ViewEditor listeners
-
-  private abstract static class SimpleDispatcher
-      implements ListenerManager.Dispatcher<SelectionChangeListener> {
-
-    @Override
-    public void captureException(RuntimeException errAny) {
-      logger.log(Level.WARNING, "Listener dispatch failure", errAny);
-    }
-  }
 
   public void addSelectionChangeListener(SelectionChangeListener listener) {
     selectionListeners.addListener(listener);
@@ -1285,7 +1352,7 @@ public class ViewEditor extends MultiPageEditorPart {
       return;
     }
 
-    selectionListeners.fireEvent(new SimpleDispatcher() {
+    selectionListeners.fireEvent(new SimpleDispatcher<SelectionChangeListener>() {
       @Override
       public void dispatch(SelectionChangeListener listener) {
         listener.extendSelection(extension);
@@ -1299,7 +1366,7 @@ public class ViewEditor extends MultiPageEditorPart {
       return;
     }
 
-    selectionListeners.fireEvent(new SimpleDispatcher() {
+    selectionListeners.fireEvent(new SimpleDispatcher<SelectionChangeListener>() {
       @Override
       public void dispatch(SelectionChangeListener listener) {
         listener.reduceSelection(reduction);

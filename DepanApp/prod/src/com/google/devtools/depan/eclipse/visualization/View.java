@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.eclipse.visualization;
 
+import com.google.devtools.depan.eclipse.editors.CameraDirPreference;
 import com.google.devtools.depan.eclipse.editors.CameraPosPreference;
 import com.google.devtools.depan.eclipse.editors.EdgeDisplayProperty;
 import com.google.devtools.depan.eclipse.editors.EdgeDisplayProperty.LineStyle;
@@ -259,6 +260,31 @@ public class View {
     glPanel.updateNodeLocations(newLocations);
   }
 
+  /**
+   * Move the camera to the supplied x and y coordinates.
+   */
+  public void moveToPosition(float camX, float camY) {
+    glPanel.moveToPosition(camX, camY);
+  }
+
+  /**
+   * Zoom by moving camera to supplied z coordinate.
+   */
+  public void zoomToCamera(float camZ) {
+    glPanel.zoomToCamera(camZ);
+  }
+
+  /**
+   * Set the direction of the camera.
+   * 
+   * TODO: Make sure these match their behaviors
+   * @param xRot - amount to tilt up or down
+   * @param yRot - amount to pan left or right
+   * @param zRot - amount to turn/twist clockwise or counterclockwise.
+   */
+  public void rotateToDirection(float xRot, float yRot, float zRot) {
+    glPanel.rotateToDirection(xRot, yRot, zRot);
+  }
 
   /**
    * Zoom to supplied scale.
@@ -286,33 +312,66 @@ public class View {
   }
 
   /**
-   * Move the camera position to the supplied ScenePreferences as a "cut",
+   * Save the current camera position into the supplied ScenePreferences
+   * instance.
+   */
+  public void saveCameraDirection(ScenePreferences prefs) {
+    CameraDirPreference prefsDir = prefs.getCameraDir();
+    if (null == prefsDir) {
+      prefsDir = CameraPosPreference.getDefaultCameraDir();
+      prefs.setCameraDir(prefsDir);
+    }
+
+    float[] scenePos = glPanel.getCameraDirection();
+    prefsDir.setX(scenePos[0]);
+    prefsDir.setY(scenePos[1]);
+    prefsDir.setZ(scenePos[2]);
+  }
+
+  /**
+   * Move the camera position to the supplied position as a "cut",
    * without animation.
    * 
    * A scene changed event to indicate the newly stable diagram rendering
    * can occur despite the lack of animation.
    */
-  public void setCameraPosition(ScenePreferences prefs) {
-    if (null == prefs) {
-      return;
-    }
-    CameraPosPreference prefsPos = prefs.getCameraPos();
-    if (null == prefsPos) {
+  private void setCameraPosition(CameraPosPreference posPrefs) {
+    if (null == posPrefs) {
       return;
     }
 
-    GLScene scene = glPanel;
-    scene.moveToCamera(prefsPos.getX(), prefsPos.getY());
-    scene.zoomToCamera(prefsPos.getZ());
-    scene.cutCamera();
+    glPanel.moveToPosition(posPrefs.getX(), posPrefs.getY());
+    glPanel.zoomToCamera(posPrefs.getZ());
+    glPanel.cutCamera();
+  }
+
+  /**
+   * Rotate the camera position to the supplied direction as a "cut",
+   * without animation.
+   * 
+   * A scene changed event to indicate the newly stable diagram rendering
+   * can occur despite the lack of animation.
+   */
+  private void setCameraDirection(CameraDirPreference dirPrefs) {
+    if (null == dirPrefs) {
+      return;
+    }
+
+    glPanel.rotateToDirection(dirPrefs.getX(), dirPrefs.getY(), dirPrefs.getZ());
+    glPanel.cutCamera();
   }
 
   /**
    * Initialize the camera position to the supplied ScenePreferences,
-   * without animation.  No scene changed event is genereated.
+   * without animation.  No scene changed event is generated.
    */
-  public void initCameraPosition(ScenePreferences prefs) {
-    setCameraPosition(prefs);
+  public void initializeScenePrefs(ScenePreferences prefs) {
+    if (null == prefs) {
+      return;
+    }
+
+    setCameraPosition(prefs.getCameraPos());
+    setCameraDirection(prefs.getCameraDir());
     glPanel.clearChanges();
   }
 

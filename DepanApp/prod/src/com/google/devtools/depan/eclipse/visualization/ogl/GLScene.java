@@ -96,6 +96,10 @@ public abstract class GLScene {
     0.0f, 0.0f, HUNDRED_PERCENT_ZOOM
   };
 
+  public static final float[] DEFAULT_CAMERA_DIRECTION = {
+    0.0f, 0.0f, 0.0f
+  };
+
   // Full laptop screen vertical space:
   // 7" vertical from 22" is ~ 20 degrees.
   public static final float FOV = 20.0f;
@@ -351,13 +355,24 @@ public abstract class GLScene {
     return new float[] {-xoff, -yoff, zoff};
   }
 
-  public void homeCamera() {
-    targetXrot = 0.0f;
-    targetYoff = 0.0f;
-    targetZrot = 0.0f;
+  /**
+   * Provide the direction of the camera.
+   * 
+   * @return the camera (eye) direction.
+   */
+  public float[] getCameraDirection() {
+    return new float[] {xrot, yrot, zrot};
+  }
 
-    moveToCamera(0.0f, 0.0f);
-    zoomToCamera(HUNDRED_PERCENT_ZOOM);
+  public void homeCamera() {
+    rotateToDirection(
+        DEFAULT_CAMERA_DIRECTION[0],
+        DEFAULT_CAMERA_DIRECTION[1],
+        DEFAULT_CAMERA_DIRECTION[2]);
+    moveToPosition(
+        DEFAULT_CAMERA_POSITION[0],
+        DEFAULT_CAMERA_POSITION[1]);
+    zoomToCamera(DEFAULT_CAMERA_POSITION[2]);
   }
 
   /**
@@ -366,7 +381,7 @@ public abstract class GLScene {
    * @param camX x coordinate
    * @param camY y coordinate
    */
-  public void moveToCamera(float camX, float camY) {
+  public void moveToPosition(float camX, float camY) {
     targetXoff = -camX;
     targetYoff = -camY;
     isSceneChanged = true;
@@ -379,8 +394,8 @@ public abstract class GLScene {
    * No direct assignments to targetZoff.
    */
   public void zoomToCamera(float zOffset) {
-    if (zOffset > (GLScene.Z_FAR - 1.0)) {
-      zOffset = GLScene.Z_FAR - 1.0f;
+    if (zOffset > (Z_FAR - 1.0f)) {
+      zOffset = Z_FAR - 1.0f;
       logger.info("clamped zoom at " + zOffset);
     }
     if (zOffset < (ZOOM_MAX)) {
@@ -389,6 +404,21 @@ public abstract class GLScene {
     }
 
     targetZoff = zOffset;
+    isSceneChanged = true;
+  }
+
+  /**
+   * Set the direction of the camera.
+   * 
+   * TODO: Make sure these match their behaviors
+   * @param xRot - amount to tilt up or down
+   * @param yRot - amount to pan left or right
+   * @param zRot - amount to turn/twist clockwise or counterclockwise.
+   */
+  public void rotateToDirection(float xRot, float yRot, float zRot) {
+    targetXrot = xRot;
+    targetYrot = yRot;
+    targetZrot = zRot;
     isSceneChanged = true;
   }
 
@@ -402,6 +432,13 @@ public abstract class GLScene {
     if (yoff != targetYoff)
       return false;
     if (zoff != targetZoff)
+      return false;
+
+    if (xrot != targetXrot)
+      return false;
+    if (yrot != targetYrot)
+      return false;
+    if (zrot != targetZrot)
       return false;
 
     clearChanges();
@@ -450,7 +487,7 @@ public abstract class GLScene {
     // zoomValue
     double percent = zoomValue / normalized[2];
 
-    moveToCamera(
+    moveToPosition(
         - (float) (targetXoff + normalized[0] * percent),
         - (float) (targetYoff + normalized[1] * percent));
     zoomToCamera((float) (targetZoff + normalized[2] * percent));
@@ -474,7 +511,7 @@ public abstract class GLScene {
    * Change camera position vertically (up or down)
    */
   public void pedestalCamera(float size) {
-    moveToCamera(
+    moveToPosition(
         - (float) (targetXoff + (size * Math.sin(Math.toRadians(zrot)))),
         - (float) (targetYoff + (size * Math.cos(Math.toRadians(zrot)))));
   }
@@ -484,7 +521,7 @@ public abstract class GLScene {
    */
   public void truckCamera(float size) {
     // TODO:  Isn't the -90 just swapping sin/cos?
-    moveToCamera(
+    moveToPosition(
         - (float) (targetXoff + (size * Math.sin(Math.toRadians(zrot - 90)))),
         - (float) (targetYoff + (size * Math.cos(Math.toRadians(zrot - 90)))));
   }
@@ -494,7 +531,7 @@ public abstract class GLScene {
    */
   public void cutCamera() {
     xrot = targetXrot;
-    yoff = targetYoff;
+    yrot = targetYrot;
     zrot = targetZrot;
 
     xoff = targetXoff;
@@ -563,7 +600,10 @@ public abstract class GLScene {
     step();
 
     if (!GLScene.hyperbolic) {
+      // logger.info("position: " + xoff + ", " + yoff + ", " + zoff);
+      // logger.info("rotation: " + xrot + ", " + yrot + ", " + zrot);
       gl.glRotatef(xrot, 1.0f, 0.0f, 0.0f);
+      gl.glRotatef(yrot, 0.0f, 1.0f, 0.0f);
       gl.glRotatef(zrot, 0.0f, 0.0f, 1.0f);
       gl.glTranslatef(xoff, yoff, -zoff);
     } else {

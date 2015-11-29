@@ -16,23 +16,40 @@
 package com.google.devtools.depan.eclipse.editors;
 
 public class ScenePreferences {
-  
-  private CameraPosPreference cameraPos;
 
-  public ScenePreferences(CameraPosPreference camera) {
+  private CameraPosPreference cameraPos;
+  private CameraDirPreference cameraDir;
+
+  public ScenePreferences(
+      CameraPosPreference camera, CameraDirPreference cameraDir) {
     this.cameraPos = camera;
+    this.cameraDir = cameraDir;
   }
 
   public CameraPosPreference getCameraPos() {
     return cameraPos;
   }
 
-  public void setCameraPos(CameraPosPreference camera) {
-    this.cameraPos = camera;
+  public void setCameraPos(CameraPosPreference cameraPos) {
+    this.cameraPos = cameraPos;
+  }
+
+  public CameraDirPreference getCameraDir() {
+    return cameraDir;
+  }
+
+  public void setCameraDir(CameraDirPreference cameraDir) {
+    this.cameraDir = cameraDir;
   }
 
   public static ScenePreferences getDefaultScenePrefs() {
     CameraPosPreference pos = CameraPosPreference.getDefaultCameraPos();
-    return new ScenePreferences(pos);
+    CameraDirPreference dir = CameraPosPreference.getDefaultCameraDir();
+    return new ScenePreferences(pos, dir);
+  }
+
+  public static interface Listener {
+    void positionChanged(ScenePreferences camera);
+    void directionChanged(ScenePreferences camera);
   }
 }

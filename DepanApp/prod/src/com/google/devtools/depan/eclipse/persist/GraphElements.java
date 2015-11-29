@@ -65,7 +65,7 @@ public class GraphElements {
   public static final Config REF_XML_PERSIST = new Config() {
 
     @Override
-    public void  config(XStream xstream) {
+    public void config(XStream xstream) {
 
       xstream.alias(
           GraphModelReferenceConverter.GRAPH_REF_TAG,
@@ -92,6 +92,7 @@ public class GraphElements {
       xstream.aliasType(Point2DConverter.POS_TAG, Point2D.class);
       xstream.registerConverter(new Point2DConverter(xstream.getMapper()));
 
+      CameraDirConverter.configXStream(xstream);
       CameraPosConverter.configXStream(xstream);
       RelationSetConverters.configXStream(xstream);
     }

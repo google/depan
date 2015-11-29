@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 The Depan Project Authors
+ * Copyright 2015 The Depan Project Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package com.google.devtools.depan.eclipse.persist;
 
-import com.google.devtools.depan.eclipse.editors.CameraPosPreference;
+import com.google.devtools.depan.eclipse.editors.CameraDirPreference;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.Converter;
@@ -25,40 +25,39 @@ import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
 /**
- * {@code XStream} converter to handle {@code Point2D}s.  Although that type
- * is just an interface, we serialize everything as the Double flavor.
+ * {@code XStream} converter to handle {@code CameraDirPreference}s.
  * 
  * @author <a href="mailto:leeca@pnambic.com">Lee Carver</a>
  */
-public class CameraPosConverter implements Converter {
+public class CameraDirConverter implements Converter {
 
-  public static final String CAMERA_POS_TAG = "camera-pos";
+  public static final String CAMERA_DIR_TAG = "camera-dir";
 
-  public CameraPosConverter() {
+  public CameraDirConverter() {
   }
 
   public static void configXStream(XStream xstream) {
-    xstream.aliasType(CAMERA_POS_TAG, CameraPosPreference.class);
-    xstream.registerConverter(new CameraPosConverter());
+    xstream.aliasType(CAMERA_DIR_TAG, CameraDirPreference.class);
+    xstream.registerConverter(new CameraDirConverter());
   }
 
   @Override
   @SuppressWarnings("rawtypes")  // Parent type uses raw type Class
   public boolean canConvert(Class type) {
-    return CameraPosPreference.class.isAssignableFrom(type);
+    return CameraDirPreference.class.isAssignableFrom(type);
   }
 
   @Override
   public void marshal(Object source, HierarchicalStreamWriter writer,
       MarshallingContext context) {
-    CameraPosPreference pos = (CameraPosPreference) source;
-    Float posX = pos.getX();
-    Float posY = pos.getY();
-    Float posZ = pos.getZ();
+    CameraDirPreference dir = (CameraDirPreference) source;
+    Float dirX = dir.getX();
+    Float dirY = dir.getY();
+    Float dirZ = dir.getZ();
 
-    writer.addAttribute("x", Float.toString(posX));
-    writer.addAttribute("y", Float.toString(posY));
-    writer.addAttribute("z", Float.toString(posZ));
+    writer.addAttribute("x", Float.toString(dirX));
+    writer.addAttribute("y", Float.toString(dirY));
+    writer.addAttribute("z", Float.toString(dirZ));
   }
 
   @Override
@@ -68,10 +67,10 @@ public class CameraPosConverter implements Converter {
       String textX = reader.getAttribute("x");
       String textY = reader.getAttribute("y");
       String textZ = reader.getAttribute("z");
-      Float posX = Float.valueOf(textX);
-      Float posY = Float.valueOf(textY);
-      Float posZ = Float.valueOf(textZ);
-      return new CameraPosPreference(posX, posY, posZ);
+      Float dirX = Float.valueOf(textX);
+      Float dirY = Float.valueOf(textY);
+      Float dirZ = Float.valueOf(textZ);
+      return new CameraDirPreference(dirX, dirY, dirZ);
     } catch (RuntimeException err) {
       err.printStackTrace();
       throw err;
