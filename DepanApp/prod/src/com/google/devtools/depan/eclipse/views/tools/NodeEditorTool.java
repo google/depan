@@ -30,7 +30,6 @@ import com.google.devtools.depan.eclipse.utils.HierarchyViewer;
 import com.google.devtools.depan.eclipse.utils.HierarchyViewer.HierarchyChangeListener;
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.utils.Tools;
-import com.google.devtools.depan.eclipse.views.NodeEditorLabelProvider;
 import com.google.devtools.depan.eclipse.views.ViewSelectionListenerTool;
 import com.google.devtools.depan.model.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphNode;
