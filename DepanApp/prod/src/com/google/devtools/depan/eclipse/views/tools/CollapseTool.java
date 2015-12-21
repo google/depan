@@ -54,6 +54,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.TabFolder;
+import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.ISharedImages;
@@ -111,9 +113,8 @@ public class CollapseTool extends ViewSelectionListenerTool {
     topGrid.verticalSpacing = 9;
     topComposite.setLayout(topGrid);
 
-    // Setup the manual collapse controls
-    setupManualCollapseGroup(topComposite);
-    setupAutoCollapseGroup(topComposite);
+    // Setup the collapse controls.
+    setupCollapseTabs(topComposite);
     setupCollapseHierarchy(topComposite);
 
     // content
@@ -140,7 +141,7 @@ public class CollapseTool extends ViewSelectionListenerTool {
     ToolBar rightOptions = new ToolBar(optionsSection, SWT.NONE | SWT.FLAT | SWT.RIGHT);
     rightOptions.setLayoutData(new GridData(SWT.END, SWT.FILL, true, false));
 
-    ToolItem collapseButton = setupCollapseAllPushIcon(rightOptions);
+    ToolItem collapseButton = createCollapseAllPushIcon(rightOptions);
     collapseButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -148,7 +149,7 @@ public class CollapseTool extends ViewSelectionListenerTool {
       }
     });
 
-    ToolItem expandButton = setupExpandAllPushIcon(rightOptions);
+    ToolItem expandButton = createExpandAllPushIcon(rightOptions);
     expandButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -209,31 +210,40 @@ public class CollapseTool extends ViewSelectionListenerTool {
     viewer.getControl().setMenu(menu);
   }
 
-  private void setupManualCollapseGroup(Composite parent) {
-    Group manualCollapse = new Group(parent, SWT.NONE);
-    manualCollapse.setText("Manual collapsing");
-    manualCollapse.setLayoutData(
-      new GridData(SWT.FILL, SWT.FILL, true, false));
+  private void setupCollapseTabs(Composite parent) {
+    TabFolder folder = new TabFolder(parent, SWT.NONE);
+
+    TabItem selected = new TabItem(folder, SWT.None);
+    selected.setText("Selected Nodes");
+    selected.setControl(createSelectedCollapse(folder));
+
+    TabItem byEdge = new TabItem(folder, SWT.None);
+    byEdge.setText("By Edge");
+    byEdge.setControl(createEdgeCollapse(folder));
+  }
+
+  private Composite createSelectedCollapse(Composite parent) {
+    Composite result = new Composite(parent, SWT.NONE);
 
     GridLayout manualGrid = new GridLayout(2, true);
     manualGrid.marginWidth = 10;
     manualGrid.marginHeight = 10;
-    manualCollapse.setLayout(manualGrid);
+    result.setLayout(manualGrid);
 
-    Label collapseLabel = setupLabel(manualCollapse, "Collapse under");
+    Label collapseLabel = createLabel(result, "Collapse under");
     collapseLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
 
-    masterViewer = new ComboViewer(manualCollapse, SWT.READ_ONLY | SWT.FLAT);
+    masterViewer = new ComboViewer(result, SWT.READ_ONLY | SWT.FLAT);
     masterViewer.getCombo().setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
 
-    Button eraseCollapse = setupPushButton(manualCollapse, "collapse / erase");
+    Button eraseCollapse = createPushButton(result, "collapse / erase");
     eraseCollapse.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 
-    Button collapseButton = setupPushButton(manualCollapse, "collapse / add");
+    Button collapseButton = createPushButton(result, "collapse / add");
     collapseButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 
-    Button uncollapseAll = setupPushButton(manualCollapse, "Uncollapse All Selected");
+    Button uncollapseAll = createPushButton(result, "Uncollapse All Selected");
     uncollapseAll.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 
     // actions
@@ -255,25 +265,26 @@ public class CollapseTool extends ViewSelectionListenerTool {
         uncollapseAllSelected();
       }
     });
+
+    return result;
   }
 
-  private void setupAutoCollapseGroup(Composite parent) {
-    Group autoCollapse = new Group(parent, SWT.NONE);
-    autoCollapse.setText("Automatic collapsing based on an edge matcher");
+  private Composite createEdgeCollapse(Composite parent) {
+    Composite result = new Composite(parent, SWT.NONE);
 
-    autoCollapse.setLayoutData(
+    result.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, false));
 
     GridLayout autoGrid = new GridLayout(2, false);
     autoGrid.marginWidth = 10;
     autoGrid.marginHeight = 10;
-    autoCollapse.setLayout(autoGrid);
+    result.setLayout(autoGrid);
 
     autoHierarchyPicker =
-        new HierarchyViewer<NodeDisplayProperty>(autoCollapse, false);
+        new HierarchyViewer<NodeDisplayProperty>(result, false);
     autoHierarchyPicker.setLayoutData(
         new GridData(SWT.FILL, SWT.CENTER, true, false));
-    Button doAutoGrouping = setupPushButton(autoCollapse, "Collapse");
+    Button doAutoGrouping = createPushButton(result, "Collapse");
     doAutoGrouping.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 
     // actions
@@ -283,22 +294,24 @@ public class CollapseTool extends ViewSelectionListenerTool {
         autoCollapse();
       }
     });
+
+    return result;
   }
 
-  private Label setupLabel(Group manualCollapse, String text) {
+  private Label createLabel(Composite manualCollapse, String text) {
     Label result = new Label(manualCollapse, SWT.NONE);
     result.setText(text);
     return result;
   }
 
-  private Button setupPushButton(Composite parent, String text) {
+  private Button createPushButton(Composite parent, String text) {
     Button result = new Button(parent, SWT.PUSH);
     result.setText(text);
     return result;
   }
 
 
-  private ToolItem setupCollapseAllPushIcon(ToolBar parent) {
+  private ToolItem createCollapseAllPushIcon(ToolBar parent) {
     ToolItem result = new ToolItem(parent, SWT.PUSH | SWT.FLAT);
     Image icon = PlatformUI.getWorkbench().getSharedImages().getImage(
         ISharedImages.IMG_ELCL_COLLAPSEALL);
@@ -306,7 +319,7 @@ public class CollapseTool extends ViewSelectionListenerTool {
     return result;
   }
 
-  private ToolItem setupExpandAllPushIcon(ToolBar parent) {
+  private ToolItem createExpandAllPushIcon(ToolBar parent) {
     ToolItem result = new ToolItem(parent, SWT.PUSH | SWT.FLAT);
     result.setImage(Resources.IMAGE_EXPANDALL);
     return result;
