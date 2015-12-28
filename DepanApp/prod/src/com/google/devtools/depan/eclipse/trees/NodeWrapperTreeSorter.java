@@ -14,10 +14,9 @@
  * the License.
  */
 
-package com.google.devtools.depan.eclipse.editors;
+package com.google.devtools.depan.eclipse.trees;
 
 import com.google.devtools.depan.eclipse.plugins.SourcePluginRegistry;
-import com.google.devtools.depan.eclipse.trees.NodeTreeView.NodeWrapper;
 import com.google.devtools.depan.eclipse.utils.NodeSorter;
 import com.google.devtools.depan.model.Element;
 

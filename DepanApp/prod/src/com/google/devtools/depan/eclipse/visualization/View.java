@@ -28,7 +28,6 @@ import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds;
 import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerator;
 import com.google.devtools.depan.eclipse.visualization.ogl.ArrowHead;
 import com.google.devtools.depan.eclipse.visualization.ogl.GLPanel;
-import com.google.devtools.depan.eclipse.visualization.ogl.GLScene;
 import com.google.devtools.depan.eclipse.visualization.ogl.RendererChangeListener;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.CollapsePlugin;
 import com.google.devtools.depan.model.GraphEdge;
@@ -204,19 +203,20 @@ public class View {
       Collection<CollapseData> removed) {
     CollapsePlugin collapsePlugin =
         glPanel.getRenderingPipe().getCollapsePlugin();
-    for (CollapseData data : created) {
-      // collapse each child under the parent
-      for (GraphNode child : data.getChildrenNodes()) {
-        collapsePlugin.collapseUnder(
-            glPanel.node2property(child),
-            glPanel.node2property(data.getMasterNode()));
-      }
-    }
 
     for (CollapseData data : removed) {
       // uncollapse every children
       for (GraphNode child : data.getChildrenNodes()) {
         collapsePlugin.unCollapse(
+            glPanel.node2property(child),
+            glPanel.node2property(data.getMasterNode()));
+      }
+    }
+
+    for (CollapseData data : created) {
+      // collapse each child under the parent
+      for (GraphNode child : data.getChildrenNodes()) {
+        collapsePlugin.collapseUnder(
             glPanel.node2property(child),
             glPanel.node2property(data.getMasterNode()));
       }

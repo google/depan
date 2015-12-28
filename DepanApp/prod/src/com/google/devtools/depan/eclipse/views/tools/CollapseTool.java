@@ -18,30 +18,18 @@ package com.google.devtools.depan.eclipse.views.tools;
 
 import com.google.devtools.depan.eclipse.editors.HierarchyCache;
 import com.google.devtools.depan.eclipse.editors.NodeDisplayProperty;
+import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.editors.ViewPrefsListener;
 import com.google.devtools.depan.eclipse.trees.GraphData;
-import com.google.devtools.depan.eclipse.trees.collapse_tree.CollapseTreeProvider;
-import com.google.devtools.depan.eclipse.trees.collapse_tree.CollapseTreeView;
-import com.google.devtools.depan.eclipse.trees.collapse_tree.CollapseTreeView.CollapseDataWrapper;
-import com.google.devtools.depan.eclipse.trees.collapse_tree.CollapseTreeWrapperSorter;
+import com.google.devtools.depan.eclipse.trees.GraphNodeViewer;
 import com.google.devtools.depan.eclipse.utils.HierarchyViewer;
 import com.google.devtools.depan.eclipse.utils.Resources;
-import com.google.devtools.depan.eclipse.utils.TableContentProvider;
+import com.google.devtools.depan.eclipse.utils.SelectedNodeChoicesControl;
 import com.google.devtools.depan.eclipse.views.ViewSelectionListenerTool;
 import com.google.devtools.depan.model.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.view.CollapseData;
-import com.google.devtools.depan.view.CollapseTreeModel;
 
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.action.IMenuListener;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -51,15 +39,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
-import org.eclipse.swt.widgets.ToolBar;
-import org.eclipse.swt.widgets.ToolItem;
-import org.eclipse.ui.ISharedImages;
-import org.eclipse.ui.PlatformUI;
 
 import java.util.Collection;
 import java.util.List;
@@ -72,36 +54,17 @@ import java.util.List;
  */
 public class CollapseTool extends ViewSelectionListenerTool {
 
-  private static final CollapseTreeWrapperSorter<NodeDisplayProperty> SORTER =
-      new CollapseTreeWrapperSorter<NodeDisplayProperty>();
-
-  private CollapseTreeProvider<NodeDisplayProperty> provider =
-      new CollapseTreeProvider<NodeDisplayProperty>() {
-
-    @Override
-    public NodeDisplayProperty getObject(CollapseData collapseData) {
-      if (hasEditor()) {
-        return null;
-      }
-      GraphNode node = collapseData.getMasterNode();
-      return getEditor().getNodeProperty(node);
-    }
-  };
-
-  /**
-   * Content provider for selected nodes. Fill the list of selected nodes used
-   * to choose the master node for a new collapse group.
-   */
-  private TableContentProvider<GraphNode> collapseMaster = null;
-
-  private ComboViewer masterViewer;
+  // UX Elelements
+  /** For manual collapse selecting master node for new collapse group */
+  private SelectedNodeChoicesControl selectedNodes;
 
   /** Provides hierarchy to use for autoCollapse operations. */
   private HierarchyViewer<NodeDisplayProperty> autoHierarchyPicker;
 
-  /** Provides a tree view of the collapseData. */
-  private CollapseTreeView<NodeDisplayProperty> collapseView = null;
+  private GraphNodeViewer<NodeDisplayProperty> nodeViewer =
+      new GraphNodeViewer<NodeDisplayProperty>();
 
+  /** Monitor changes on the underlying persistent document */
   private ViewPrefsListener prefsListener;
 
   @Override
@@ -114,112 +77,28 @@ public class CollapseTool extends ViewSelectionListenerTool {
     topComposite.setLayout(topGrid);
 
     // Setup the collapse controls.
-    setupCollapseTabs(topComposite);
-    setupCollapseHierarchy(topComposite);
+    TabFolder folder = createCollapseTabs(topComposite);
+    folder.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
-    // content
-    collapseMaster = new TableContentProvider<GraphNode>();
-    collapseMaster.initViewer(masterViewer);
-
-    //FIXME(yc): select first set
-    //namedSet.selectSet(BuiltinRelationshipSets.CONTAINER);
+    Composite treeControl = nodeViewer.createNodeViewer(topComposite);
+    treeControl.setLayoutData(
+        new GridData(SWT.FILL, SWT.FILL, true, true));
 
     return topComposite;
   }
 
-  private Composite setupCollapseHierarchy(Composite parent) {
-    Composite baseComposite = new Composite(parent, SWT.NONE);
-    baseComposite.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, true));
+  private TabFolder createCollapseTabs(Composite parent) {
+    TabFolder result = new TabFolder(parent, SWT.NONE);
 
-    baseComposite.setLayout(new GridLayout(1, false));
-
-    Composite optionsSection = new Composite(baseComposite, SWT.NONE);
-    optionsSection.setLayout(new GridLayout(1, false));
-    optionsSection.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-
-    ToolBar rightOptions = new ToolBar(optionsSection, SWT.NONE | SWT.FLAT | SWT.RIGHT);
-    rightOptions.setLayoutData(new GridData(SWT.END, SWT.FILL, true, false));
-
-    ToolItem collapseButton = createCollapseAllPushIcon(rightOptions);
-    collapseButton.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        collapseView.collapseAll();
-      }
-    });
-
-    ToolItem expandButton = createExpandAllPushIcon(rightOptions);
-    expandButton.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        collapseView.expandAll();
-      }
-    });
-
-    collapseView = CollapseTreeView.buildCollapseTreeView(
-        baseComposite,
-        SWT.VIRTUAL | SWT.FULL_SELECTION | SWT.BORDER
-        | SWT.H_SCROLL | SWT.V_SCROLL,
-        provider);
-
-    TreeViewer viewer = collapseView.getTreeViewer();
-    setupHierarchyMenu(viewer);
-    viewer.setSorter(SORTER);
-    viewer.getControl().setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, true));
-
-    return baseComposite;
-  }
-
-  private void setupHierarchyMenu(final TreeViewer viewer) {
-    MenuManager menuMgr = new MenuManager();
-
-    Menu menu = menuMgr.createContextMenu(viewer.getControl());
-
-    menuMgr.addMenuListener(new IMenuListener() {
-
-      @Override
-      public void menuAboutToShow(IMenuManager manager) {
-        ISelection selection = viewer.getSelection();
-        if (selection.isEmpty()) {
-          return;
-        }
-
-        if (selection instanceof IStructuredSelection) {
-          IStructuredSelection items = (IStructuredSelection) selection;
-          @SuppressWarnings("unchecked")
-          final CollapseDataWrapper<NodeDisplayProperty> data =
-              (CollapseDataWrapper<NodeDisplayProperty>) items.getFirstElement();
-
-          if (null != data.getParent()) {
-            return;
-          }
-
-          manager.add(new Action("uncollapse", IAction.AS_PUSH_BUTTON) {
-            @Override
-            public void run() {
-              getEditor().uncollapse(
-                  data.getCollapseData().getMasterNode(), null);
-            }
-          });
-        }
-      }
-    });
-    menuMgr.setRemoveAllWhenShown(true);
-    viewer.getControl().setMenu(menu);
-  }
-
-  private void setupCollapseTabs(Composite parent) {
-    TabFolder folder = new TabFolder(parent, SWT.NONE);
-
-    TabItem selected = new TabItem(folder, SWT.None);
+    TabItem selected = new TabItem(result, SWT.None);
     selected.setText("Selected Nodes");
-    selected.setControl(createSelectedCollapse(folder));
+    selected.setControl(createSelectedCollapse(result));
 
-    TabItem byEdge = new TabItem(folder, SWT.None);
+    TabItem byEdge = new TabItem(result, SWT.None);
     byEdge.setText("By Edge");
-    byEdge.setControl(createEdgeCollapse(folder));
+    byEdge.setControl(createEdgeCollapse(result));
+
+    return result;
   }
 
   private Composite createSelectedCollapse(Composite parent) {
@@ -233,8 +112,8 @@ public class CollapseTool extends ViewSelectionListenerTool {
     Label collapseLabel = createLabel(result, "Collapse under");
     collapseLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
 
-    masterViewer = new ComboViewer(result, SWT.READ_ONLY | SWT.FLAT);
-    masterViewer.getCombo().setLayoutData(
+    selectedNodes = new SelectedNodeChoicesControl(result);
+    selectedNodes.getCombo().setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
 
     Button eraseCollapse = createPushButton(result, "collapse / erase");
@@ -310,21 +189,6 @@ public class CollapseTool extends ViewSelectionListenerTool {
     return result;
   }
 
-
-  private ToolItem createCollapseAllPushIcon(ToolBar parent) {
-    ToolItem result = new ToolItem(parent, SWT.PUSH | SWT.FLAT);
-    Image icon = PlatformUI.getWorkbench().getSharedImages().getImage(
-        ISharedImages.IMG_ELCL_COLLAPSEALL);
-    result.setImage(icon);
-    return result;
-  }
-
-  private ToolItem createExpandAllPushIcon(ToolBar parent) {
-    ToolItem result = new ToolItem(parent, SWT.PUSH | SWT.FLAT);
-    result.setImage(Resources.IMAGE_EXPANDALL);
-    return result;
-  }
-
   /////////////////////////////////////
   // Tool life-cycle methods
 
@@ -334,7 +198,7 @@ public class CollapseTool extends ViewSelectionListenerTool {
 
     updateCollapseView();
 
-    prefsListener = new ViewPrefsListener.Simple()  {
+    prefsListener = new ViewPrefsListener.Simple() {
 
       @Override
       public void collapseChanged(
@@ -394,9 +258,7 @@ public class CollapseTool extends ViewSelectionListenerTool {
    * Uncollapses <b>all</b> selected nodes.
    */
   private void uncollapseAllSelected() {
-    int selectionNumber = masterViewer.getCombo().getItemCount();
-    for (int i = 0; i < selectionNumber; i++) {
-      GraphNode master = collapseMaster.getElementAtIndex(i);
+    for (GraphNode master : selectedNodes.getSelectedNodes()) {
       getEditor().uncollapse(master, null);
     }
   }
@@ -409,20 +271,9 @@ public class CollapseTool extends ViewSelectionListenerTool {
    *        existing group.
    */
   private void collapse(boolean erase) {
-    GraphNode master = collapseMaster.getElementAtIndex(
-        masterViewer.getCombo().getSelectionIndex());
-    Collection<GraphNode> objects = collapseMaster.getObjects();
+    GraphNode master = selectedNodes.getChosenNode();
+    Collection<GraphNode> objects = selectedNodes.getSelectionNodes();
     getEditor().collapse(master, objects, erase, null);
-  }
-
-  @Override
-  public void emptySelection() {
-    if (null != collapseMaster) {
-      collapseMaster.clear();
-    }
-    if (null != masterViewer) {
-      masterViewer.refresh(false);
-    }
   }
 
   @Override
@@ -435,16 +286,17 @@ public class CollapseTool extends ViewSelectionListenerTool {
     return Resources.NAME_COLLAPSE;
   }
 
+  @Override
+  public void emptySelection() {
+    selectedNodes.emptySelection();
+  }
+
   /**
    * Add newly selected nodes to the content of the collapseMaster combo.
    */
   @Override
   public void updateSelectedExtend(Collection<GraphNode> extension) {
-    for (GraphNode node : extension) {
-      collapseMaster.add(node);
-    }
-    masterViewer.refresh(false);
-    masterViewer.getCombo().select(0);
+    selectedNodes.extendSelection(extension);
   }
 
   /**
@@ -452,11 +304,7 @@ public class CollapseTool extends ViewSelectionListenerTool {
    */
   @Override
   public void updateSelectedReduce(Collection<GraphNode> reduction) {
-    for (GraphNode node : reduction) {
-      collapseMaster.remove(node);
-    }
-    masterViewer.refresh(false);
-    masterViewer.getCombo().select(0);
+    selectedNodes.reduceSelection(reduction);
   }
 
   /**
@@ -473,7 +321,10 @@ public class CollapseTool extends ViewSelectionListenerTool {
       return;
     }
 
-    CollapseTreeModel collapseTreeModel = getEditor().getCollapseTreeModel();
-    collapseView.updateData(collapseTreeModel);
+    ViewEditor editor = getEditor();
+    nodeViewer.setGraphModel(editor.getViewGraph());
+    nodeViewer.setCollapseTreeModel(editor.getCollapseTreeModel());
+    nodeViewer.setProvider(editor.getNodeDisplayPropertyProvider());
+    nodeViewer.refresh();
   }
 }

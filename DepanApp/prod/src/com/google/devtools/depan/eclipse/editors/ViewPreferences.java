@@ -130,6 +130,11 @@ public class ViewPreferences {
    */
   private transient ListenerManager<ViewPrefsListener> listeners;
 
+  /**
+   * Cached "read-only" version of Collapser
+   */
+  private transient CollapseTreeModel collapseTree;
+
   /////////////////////////////////////
   // Listeners for structures changes
 
@@ -583,19 +588,20 @@ public class ViewPreferences {
     return collapser.buildExposedGraph(graph);
   }
 
-
+  /**
+   * Provide read-only access to the {@link Collapser}.  Any collapse changes
+   * should use the ViewPreferences accessor to ensure listeners are notified
+   * properly.
+   */
   public CollapseTreeModel getCollapseTreeModel() {
-    return collapser.getTreeModel();
+    if (null == collapseTree) {
+      collapseTree = new CollapseTreeModel(collapser);
+    }
+    return collapseTree;
   }
 
   public Collection<CollapseData> getCollapseState() {
-    Set<GraphNode> masters = collapser.getMasterNodeSet();
-    Collection<CollapseData> result = Lists.newArrayListWithExpectedSize(masters.size());
-    for (GraphNode node : masters) {
-      result.add(collapser.getCollapseData(node));
-    };
-    return result;
-    
+    return collapser.computeRoots();
   }
 
   /**

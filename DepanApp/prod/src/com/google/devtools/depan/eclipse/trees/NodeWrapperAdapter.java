@@ -22,51 +22,38 @@ import com.google.devtools.depan.model.GraphNode;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 
-class NodeTreeViewAdapter<E> implements IWorkbenchAdapter {
+class NodeWrapperAdapter<E> implements IWorkbenchAdapter {
 
   @SuppressWarnings("unchecked")
   private GraphNode getGraphNode(Object obj) {
-    return ((NodeTreeView.NodeWrapper<E>) obj).getNode();
+    return ((NodeWrapper<E>) obj).getNode();
   }
 
   @Override
   @SuppressWarnings("unchecked")
   public Object[] getChildren(Object o) {
-    if (o instanceof NodeTreeView.NodeWrapper) {
-      return getChildren((NodeTreeView.NodeWrapper<E>) o);
-    }
-    if (o instanceof NodeTreeView.NodeWrapperRoot) {
-      return (((NodeTreeView.NodeWrapperRoot<E>) o).roots);
+    if (o instanceof NodeWrapper) {
+      return getChildren((NodeWrapper<E>) o);
     }
     return new Object[] {};
   }
 
-  private Object[] getChildren(NodeTreeView.NodeWrapper<E> nodeWrapper) {
-
-    // Cache the children if we don't have them already
-    if (null == nodeWrapper.childs) {
-      nodeWrapper.childs = nodeWrapper.data.getChildren(nodeWrapper);
-    }
-
-    return nodeWrapper.childs;
+  private Object[] getChildren(NodeWrapper<E> nodeWrapper) {
+    return nodeWrapper.getChildren();
   }
 
   @Override
   public ImageDescriptor getImageDescriptor(Object o) {
-    if (o instanceof NodeTreeView.NodeWrapper) {
+    if (o instanceof NodeWrapper) {
       return SourcePluginRegistry.getImageDescriptor(getGraphNode(o));
-    } else {
-      return null;
     }
+    return null;
   }
 
   @Override
   public String getLabel(Object o) {
-    if (o instanceof NodeTreeView.NodeWrapper) {
+    if (o instanceof NodeWrapper) {
       return getGraphNode(o).friendlyString();
-    }
-    if (o instanceof NodeTreeView.NodeWrapperRoot) {
-      return "";
     }
     return o.toString();
   }
@@ -74,15 +61,13 @@ class NodeTreeViewAdapter<E> implements IWorkbenchAdapter {
   @Override
   @SuppressWarnings("unchecked")
   public Object getParent(Object o) {
-    if (o instanceof NodeTreeView.NodeWrapper) {
-      return getParent((NodeTreeView.NodeWrapper<E>) o);
-    } else {
-      return null;
+    if (o instanceof NodeWrapper) {
+      return getParent((NodeWrapper<E>) o);
     }
+    return null;
   }
 
-  public NodeTreeView.NodeWrapper<E> getParent(NodeTreeView.NodeWrapper<E> n) {
-    // can return null or not...
-    return n.parent;
+  public NodeWrapper<E> getParent(NodeWrapper<E> wrapper) {
+    return wrapper.getParent();
   }
 }

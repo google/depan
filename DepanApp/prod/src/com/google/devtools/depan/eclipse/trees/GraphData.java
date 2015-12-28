@@ -16,8 +16,6 @@
 
 package com.google.devtools.depan.eclipse.trees;
 
-import com.google.devtools.depan.eclipse.trees.NodeTreeView.NodeWrapper;
-import com.google.devtools.depan.eclipse.trees.NodeTreeView.NodeWrapperRoot;
 import com.google.devtools.depan.model.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
@@ -43,21 +41,21 @@ public class GraphData<F> {
   public static final TreePath[] EMPTY_PATHS =
     new TreePath[0];
 
-  @SuppressWarnings("rawtypes")
-  private static final NodeTreeView.NodeWrapper[] LEAF_KIDS =
-      new NodeTreeView.NodeWrapper[0];
-
+  /** Convert from {@link GraphNode} to supplied data type. */
   private final NodeTreeProvider<F> provider;
 
   /** Generated hierarchical view */
   private final TreeModel treeData;
 
-  private NodeWrapperRoot<F> hierarchyRoots;
-
-  private Map<GraphNode, NodeTreeView.NodeWrapper<F>>
+  private Map<GraphNode, NodeWrapper<F>>
       reverseMap = Maps.newHashMap();
 
   private TreePath[] expandState = EMPTY_PATHS;
+
+  // Cache the root objects, so the root objects are the same one.
+  private Collection<GraphNode> rootNodes;
+  private NodeWrapper<F>[] rootWrapper;
+  private NodeWrapperRoot<F> hierarchyRoots;
 
   /**
    * Comprehensive constructor for GraphData.
@@ -87,7 +85,10 @@ public class GraphData<F> {
    * @param parent Parent node for children
    * @return Array of children NodeWrappers.
    */
-  public NodeWrapper<F>[] getChildren(NodeTreeView.NodeWrapper<F> parent) {
+  public NodeWrapper<F>[] getChildren(NodeWrapper<F> parent) {
+    if (null != parent.childs) {
+      return parent.childs;
+    }
     Collection<GraphNode> childList =
         treeData.getSuccessorNodes(parent.getNode());
 
@@ -104,53 +105,28 @@ public class GraphData<F> {
    */
   public NodeWrapperRoot<F> getHierarchyRoots() {
     if (null == hierarchyRoots) {
-      hierarchyRoots = computeRoots();
+      hierarchyRoots = new NodeWrapperRoot<F>(computeRootWrappers());
     }
     return hierarchyRoots;
   }
 
-  /**
-   * Compute the roots for the relationship for this graph.
-   * This should only be called once - lazily, or by the constructor.
-   * 
-   * @return node wrapper with all roots
-   */
-  private NodeWrapperRoot<F> computeRoots() {
-    Collection<GraphNode> roots = treeData.computeRoots();
-
-    NodeWrapperRoot<F> wrapper = new NodeWrapperRoot<F>();
-    wrapper.roots = buildNodeWrapperArray(roots);
-    return wrapper;
+  public NodeWrapper<F>[] computeRootWrappers() {
+    if (null == rootNodes) {
+      rootNodes = treeData.computeRoots();
+    }
+    if (null == rootWrapper) {
+      rootWrapper = buildNodeWrapperArray(rootNodes);
+    }
+    return rootWrapper;
   }
 
-  @SuppressWarnings("unchecked")
   private NodeWrapper<F>[] buildNodeWrapperArray(Collection<GraphNode> nodes) {
-
-    // All empty children lists look the same,
-    // so early exit with the singleton
-    if (0 == nodes.size()) {
-      return LEAF_KIDS;
+    NodeWrapper<F>[] result = NodeWrapper.buildNodeWrapperArray(
+        nodes, provider, null, this);
+    for (NodeWrapper<F> item : result) {
+      reverseMap.put(item.getNode(), item);
     }
-
-    NodeWrapper<F>[] children = new NodeWrapper[nodes.size()];
-    int index = 0;
-    for (GraphNode node : nodes) {
-      NodeWrapper<F> nodeWrapper = createNodeWrapper(node, null);
-      children[index] = nodeWrapper;
-      reverseMap.put(node, children[index]);
-      index++;
-    }
-    return children;
-  }
-
-  /**
-   * @param node
-   * @return
-   */
-  private NodeWrapper<F> createNodeWrapper(
-      GraphNode node, NodeWrapper<F> parent) {
-    return new NodeWrapper<F>(
-        node, provider.getObject(node), parent, this);
+    return result;
   }
 
   /**

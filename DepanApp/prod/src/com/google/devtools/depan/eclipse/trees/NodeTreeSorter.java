@@ -14,10 +14,8 @@
  * the License.
  */
 
-package com.google.devtools.depan.eclipse.trees.collapse_tree;
+package com.google.devtools.depan.eclipse.trees;
 
-import com.google.devtools.depan.eclipse.trees.NodeTreeView.NodeWrapper;
-import com.google.devtools.depan.eclipse.trees.collapse_tree.CollapseTreeView.CollapseDataWrapper;
 import com.google.devtools.depan.eclipse.utils.NodeSorter;
 import com.google.devtools.depan.model.GraphNode;
 
@@ -26,26 +24,29 @@ import org.eclipse.jface.viewers.Viewer;
 /**
  * Sort collapse tree entries based on the master node.
  */
-public class CollapseTreeWrapperSorter<E> extends NodeSorter {
+public class NodeTreeSorter<E> extends NodeSorter {
 
+  @SuppressWarnings("unchecked")
   @Override
   public int compare(Viewer viewer, Object e1, Object e2) {
     if ((e1 instanceof CollapseDataWrapper) && (e2 instanceof CollapseDataWrapper)) {
-      return compare(viewer, getGraphNode(e1), getGraphNode(e2));
+      return compare(viewer,
+          getGraphNode((CollapseDataWrapper<E>) e1),
+          getGraphNode((CollapseDataWrapper<E>) e2));
     }
     return super.compare(viewer, e1, e2);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public int category(Object element) {
-    if (element instanceof NodeWrapper) {
-      return category(getGraphNode(element));
+    if (element instanceof CollapseDataWrapper<?>) {
+      return category(getGraphNode((CollapseDataWrapper<E>) element));
     }
     return super.category(element);
   }
 
-  @SuppressWarnings("unchecked")
-  public GraphNode getGraphNode(Object obj) {
-    return ((CollapseDataWrapper<E>) obj).getCollapseData().getMasterNode();
+  public GraphNode getGraphNode(CollapseDataWrapper<E> wrapper) {
+    return wrapper.getCollapseData().getMasterNode();
   }
 }

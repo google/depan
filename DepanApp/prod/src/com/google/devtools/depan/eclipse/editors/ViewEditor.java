@@ -24,8 +24,8 @@ import com.google.devtools.depan.eclipse.trees.GraphData;
 import com.google.devtools.depan.eclipse.trees.NodeTreeProvider;
 import com.google.devtools.depan.eclipse.utils.GraphEdgeMatcherDescriptors;
 import com.google.devtools.depan.eclipse.utils.ListenerManager;
-import com.google.devtools.depan.eclipse.utils.RelationSetRelationTableEditor.RelationCheckedRepository;
 import com.google.devtools.depan.eclipse.utils.RelationPropertyRelationTableEditor.RelPropRepository;
+import com.google.devtools.depan.eclipse.utils.RelationSetRelationTableEditor.RelationCheckedRepository;
 import com.google.devtools.depan.eclipse.utils.elementkinds.ElementKindDescriptor;
 import com.google.devtools.depan.eclipse.utils.elementkinds.ElementKindDescriptors;
 import com.google.devtools.depan.eclipse.views.tools.RelationCount;
@@ -354,7 +354,7 @@ public class ViewEditor extends MultiPageEditorPart {
     renderer.setGraphModel(getViewGraph(), getJungGraph(), getNodeRanking());
     renderer.initializeScenePrefs(getScenePrefs());
     renderer.initializeNodeLocations(viewInfo.getNodeLocations());
-    initCollapseRendering(viewInfo.getCollapseState());
+    initCollapseRendering(viewInfo.getCollapseTreeModel());
     initSelectedNodes(getSelectedNodes());
     initEdgeRendering();
   }
@@ -1003,8 +1003,9 @@ public class ViewEditor extends MultiPageEditorPart {
     }
   }
 
-  private void initCollapseRendering(Collection<CollapseData> state) {
-    renderer.updateCollapseChanges(state, CollapseData.EMPTY_LIST);
+  private void initCollapseRendering(CollapseTreeModel treeModel) {
+    renderer.updateCollapseChanges(
+        treeModel.computeDepthFirst(), CollapseData.EMPTY_LIST);
   }
 
   /////////////////////////////////////

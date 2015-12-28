@@ -13,10 +13,9 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.google.devtools.depan.eclipse.trees.collapse_tree;
+package com.google.devtools.depan.eclipse.trees;
 
 import com.google.devtools.depan.eclipse.plugins.SourcePluginRegistry;
-import com.google.devtools.depan.eclipse.trees.collapse_tree.CollapseTreeView.CollapseDataWrapper;
 import com.google.devtools.depan.view.CollapseData;
 
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -25,7 +24,7 @@ import org.eclipse.ui.model.IWorkbenchAdapter;
 /**
  * Adapt {@link CollapseDataWrapper}s for tree display.
  */
-class CollapseTreeDataAdapter<E> implements IWorkbenchAdapter {
+class CollapseDataWrapperAdapter<E> implements IWorkbenchAdapter {
 
   @SuppressWarnings("unchecked")
   @Override
@@ -40,9 +39,7 @@ class CollapseTreeDataAdapter<E> implements IWorkbenchAdapter {
   @Override
   public ImageDescriptor getImageDescriptor(Object o) {
     if (o instanceof CollapseDataWrapper) {
-      CollapseData collapseData = ((CollapseDataWrapper<E>) o).getCollapseData();
-      return SourcePluginRegistry.getImageDescriptor(
-          collapseData.getMasterNode());
+      return getImageDescriptor((CollapseDataWrapper<E>) o);
     }
     return null;
   }
@@ -56,11 +53,6 @@ class CollapseTreeDataAdapter<E> implements IWorkbenchAdapter {
     return o.toString();
   }
 
-  private String getLabel(CollapseDataWrapper<E> wrapper) {
-    CollapseData data = wrapper.getCollapseData();
-    return data.getMasterNode().friendlyString();
-  }
-
   @Override
   public Object getParent(Object o) {
     if (o instanceof CollapseDataWrapper<?>) {
@@ -68,5 +60,18 @@ class CollapseTreeDataAdapter<E> implements IWorkbenchAdapter {
     }
 
     return null;
+  }
+
+  /////////////////////////////////////
+  // Type correct providers
+
+  private String getLabel(CollapseDataWrapper<E> wrapper) {
+    CollapseData data = wrapper.getCollapseData();
+    return data.getMasterNode().friendlyString();
+  }
+
+  private ImageDescriptor getImageDescriptor(CollapseDataWrapper<E> wrapper) {
+    CollapseData data = wrapper.getCollapseData();
+    return SourcePluginRegistry.getImageDescriptor(data.getMasterNode());
   }
 }

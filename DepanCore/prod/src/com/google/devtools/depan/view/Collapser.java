@@ -19,12 +19,14 @@ package com.google.devtools.depan.view;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.interfaces.GraphBuilder;
 
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -47,10 +49,6 @@ public class Collapser {
    * Provide a collapser to manage a set of collapsed nodes.
    */
   public Collapser() {
-  }
-
-  public CollapseTreeModel getTreeModel() {
-    return new CollapseTreeModel(this);
   }
 
   /**
@@ -241,6 +239,45 @@ public class Collapser {
             result, treeModel, exposedNodes, child);
       }
     }
+  }
+
+  /**
+   * Provide (a snapshot) of the {@link CollapseData} for the root
+   * nodes.
+   */
+  public Collection<CollapseData> computeRoots() {
+    return Sets.newHashSet(collapsedData.values());
+  }
+
+  /**
+   * Provide a complete set of nodes in this model.
+   */
+  public Collection<GraphNode> computeNodes() {
+    Collection<GraphNode> result = Sets.newHashSet();
+    Collection<GraphNode> seen = Sets.newHashSet();
+
+    LinkedList<CollapseData> queue = Lists.newLinkedList();
+    for (CollapseData master : collapsedData.values()) {
+      queue.add(master);
+    }
+
+    while (!queue.isEmpty()) {
+      CollapseData data = queue.removeFirst();
+      GraphNode node = data.getMasterNode();
+      seen.add(node);
+
+      result.add(node);
+      result.addAll(data.getChildrenNodes());
+
+      // Enqueue the masters for all children collapse groups.
+      for (CollapseData nest : data.getChildrenCollapse()) {
+        GraphNode child = nest.getMasterNode();
+        if (!seen.contains(child)) {
+          queue.add(nest);
+        }
+      }
+    }
+    return result;
   }
 
   /**

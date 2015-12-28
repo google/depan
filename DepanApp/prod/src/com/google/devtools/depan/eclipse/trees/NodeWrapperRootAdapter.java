@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 The Depan Project Authors
+ * Copyright 2007 The Depan Project Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -14,23 +14,18 @@
  * the License.
  */
 
-package com.google.devtools.depan.eclipse.trees.collapse_tree;
-
-import com.google.devtools.depan.eclipse.trees.collapse_tree.CollapseTreeView.CollapseDataWrapperRoot;
+package com.google.devtools.depan.eclipse.trees;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 
-/**
- * Adapt {@link CollapseDataWrapperRoot}s for tree display.
- */
-class CollapseTreeRootAdapter<E> implements IWorkbenchAdapter {
+class NodeWrapperRootAdapter<E> implements IWorkbenchAdapter {
 
-  @SuppressWarnings("unchecked")
   @Override
+  @SuppressWarnings("unchecked")
   public Object[] getChildren(Object o) {
-    if (o instanceof CollapseDataWrapperRoot) {
-      return (((CollapseDataWrapperRoot<E>) o).getRoots());
+    if (o instanceof NodeWrapperRoot) {
+      return (((NodeWrapperRoot<E>) o).getChildren());
     }
     return new Object[] {};
   }
@@ -42,7 +37,7 @@ class CollapseTreeRootAdapter<E> implements IWorkbenchAdapter {
 
   @Override
   public String getLabel(Object o) {
-    if (o instanceof CollapseDataWrapperRoot) {
+    if (o instanceof NodeWrapperRoot) {
       return "";
     }
     return o.toString();

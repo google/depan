@@ -104,4 +104,37 @@ public class CollapseData {
       data.addMemberNodes(result);
     }
   }
+
+  /////////////////////////////////////
+  // Factory methods
+
+  public static Collection<CollapseData> getChildrenData(CollapseData data) {
+
+    if (null == data) {
+      return CollapseData.EMPTY_LIST;
+    }
+
+    Collection<GraphNode> childrenNodes = data.getChildrenNodes();
+    int size = childrenNodes.size();
+    Collection<CollapseData> result =
+        Lists.newArrayListWithExpectedSize(size);
+    for (GraphNode node : childrenNodes) {
+      result.add(loadCollapseData(data, node));
+    }
+
+    return result;
+  }
+
+  private static CollapseData loadCollapseData(
+      CollapseData data, GraphNode node) {
+    CollapseData collapseNode = data.getCollapseData(node);
+    if (null != collapseNode) {
+      return collapseNode;
+    }
+    if (data.getChildrenNodes().contains(node)) {
+      return new CollapseData(
+          node, GraphNode.EMPTY_NODE_LIST, CollapseData.EMPTY_LIST);
+    }
+    return null;
+  }
 }

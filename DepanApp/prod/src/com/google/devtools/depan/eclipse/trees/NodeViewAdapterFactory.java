@@ -16,12 +16,14 @@
 
 package com.google.devtools.depan.eclipse.trees;
 
-import com.google.devtools.depan.eclipse.trees.NodeTreeView.NodeWrapper;
-import com.google.devtools.depan.eclipse.trees.NodeTreeView.NodeWrapperRoot;
+import com.google.common.collect.Lists;
 
 import org.eclipse.core.runtime.IAdapterFactory;
+import org.eclipse.core.runtime.IAdapterManager;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.model.IWorkbenchAdapter;
+
+import java.util.List;
 
 /**
  * @author ycoppel@google.com (Yohann Coppel)
@@ -30,24 +32,75 @@ import org.eclipse.ui.model.IWorkbenchAdapter;
  */
 public class NodeViewAdapterFactory<E> implements IAdapterFactory {
 
-  NodeTreeViewAdapter<E> treeAdapter = new NodeTreeViewAdapter<E>();
-
   // NodeViewAdapterFactory should be parameterized, but cannot make static
   // reference to the non-static type E
+  private static NodeViewAdapterFactory<?> instance = null;
+
   @SuppressWarnings("rawtypes")
-  private static NodeViewAdapterFactory instance = null;
+  private static class TypeAdapter {
+    private final Class fromType;
+    private final IWorkbenchAdapter adapter;
+
+    public TypeAdapter(Class fromType, IWorkbenchAdapter adapter) {
+      this.fromType = fromType;
+      this.adapter = adapter;
+    }
+
+    public IWorkbenchAdapter getAdapter(Object adaptableObject) {
+      if (adaptableObject.getClass().isAssignableFrom(fromType)) {
+        return adapter;
+      }
+      return null;
+    }
+
+    public Class getFromType() {
+      // TODO Auto-generated method stub
+      return fromType;
+    }
+  }
+
+  private static List<TypeAdapter> knownAdapters = buildKnownAdapters();
+  static { buildKnownAdapters(); }
+
+  /**
+   * Build the list of know adapter types at static initialization time.
+   * Registration with platform is deferred until an instance can be created.
+   */
+  private static <E> List<TypeAdapter> buildKnownAdapters() {
+    List<TypeAdapter> result = Lists.newArrayList();
+    result.add(new TypeAdapter(
+        CollapseDataWrapper.class, new CollapseDataWrapperAdapter<E>()));
+    result.add(new TypeAdapter(
+        CollapseTreeRoot.class, new CollapseTreeRootAdapter<E>()));
+    result.add(new TypeAdapter(
+        HierarchyRoot.class, new HierarchyRootAdapter()));
+    result.add(new TypeAdapter(
+        NodeWrapper.class, new NodeWrapperAdapter<E>()));
+    result.add(new TypeAdapter(
+        NodeWrapperRoot.class, new NodeWrapperRootAdapter<E>()));
+    result.add(new TypeAdapter(
+        SolitaryRoot.class, new SolitaryRootAdapter()));
+    result.add(new TypeAdapter(
+        ViewerRoot.class, new ViewerRootAdapter()));
+    return result;
+  }
 
   // suppressWarning, because getAdapter have a Class as parameter, but
   // Class should be parameterized. To update if the IAdapterFactory is updated.
   @Override
   @SuppressWarnings("rawtypes")
-  public Object getAdapter(Object adaptableObject, Class adapterType) {
+  public Object getAdapter(
+      Object adaptableObject,
+      Class adapterType) {
     if (adapterType != IWorkbenchAdapter.class) {
       return null;
     }
-    if (adaptableObject instanceof NodeWrapper
-        || adaptableObject instanceof NodeWrapperRoot) {
-      return treeAdapter;
+
+    for (TypeAdapter asso : knownAdapters) {
+      IWorkbenchAdapter result = asso.getAdapter(adaptableObject);
+      if (null != result) {
+        return result;
+      }
     }
     return null;
   }
@@ -57,14 +110,14 @@ public class NodeViewAdapterFactory<E> implements IAdapterFactory {
     return new Class[] {IWorkbenchAdapter.class};
   }
 
-  // suppressWarning: NodeViewAdapterFactory should be parameterized.
-  @SuppressWarnings("rawtypes")
-  protected static void register() {
+  public static <E> void register() {
     if (null == instance) {
-      instance = new NodeViewAdapterFactory();
+      instance = new NodeViewAdapterFactory<E>();
     }
-    Platform.getAdapterManager()
-        .registerAdapters(instance, NodeWrapperRoot.class);
-    Platform.getAdapterManager().registerAdapters(instance, NodeWrapper.class);
+
+    IAdapterManager manager = Platform.getAdapterManager();
+    for (TypeAdapter asso : knownAdapters) {
+      manager.registerAdapters(instance, asso.getFromType());
+    }
   }
 }

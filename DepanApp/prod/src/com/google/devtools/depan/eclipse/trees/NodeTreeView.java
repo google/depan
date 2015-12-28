@@ -18,7 +18,6 @@ package com.google.devtools.depan.eclipse.trees;
 
 import com.google.devtools.depan.model.GraphNode;
 
-import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Composite;
@@ -108,49 +107,5 @@ public class NodeTreeView<E> {
    */
   public NodeWrapper<E> getNodeWrapper(GraphNode node) {
     return data.getNodeWrapper(node);
-  }
-
-  /**
-   * @author ycoppel@google.com (Yohann Coppel)
-   *
-   * @param <E> Type of data associated to each Node<Element>.
-   */
-  public static class NodeWrapper<E> extends PlatformObject {
-    private final GraphNode node;
-    private final E content;
-    public NodeWrapper<E>[] childs;
-    public final NodeWrapper<E> parent;
-    public final GraphData<E> data;
-
-    public NodeWrapper(
-        GraphNode node,
-        E content,
-        NodeWrapper<E> parent,
-        GraphData<E> data) {
-      this.node = node;
-      this.content = content;
-      this.parent= parent;
-      this.data = data;
-    }
-
-    public GraphNode getNode() {
-      return node;
-    }
-
-    public E getContent() {
-      return content;
-    }
-
-    @Override
-    public String toString() {
-      return node.toString();
-    }
-  }
-
-  /**
-   * @param <E> Type of data associated to each Node<Element>.
-   */
-  public static class NodeWrapperRoot<E> extends PlatformObject {
-    public NodeWrapper<E>[] roots = null;
   }
 }

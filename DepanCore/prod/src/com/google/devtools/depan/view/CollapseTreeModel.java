@@ -20,66 +20,50 @@ import com.google.devtools.depan.model.GraphNode;
 import com.google.common.collect.Lists;
 
 import java.util.Collection;
-import java.util.Set;
+import java.util.List;
 
 /**
- * Use collapser start to represent a hierarchical tree of GraphNodes.
+ * Provide read-only access to the {@link Collapser}.  Any collapse changes
+ * should use the ViewPreferences accessor to ensure listeners are notified
+ * properly.
  * 
  * @author <a href='mailto:leeca@google.com'>Lee Carver</a>
  */
 public class CollapseTreeModel {
 
-  /**
-   * Index of interior nodes to their successors.
-   */
+  /** Source of data about collapsed nodes. */
   private final Collapser collapser;
 
   public CollapseTreeModel(Collapser collapser) {
     this.collapser = collapser;
   }
 
-
   public Collection<CollapseData> computeRoots() {
-    Set<GraphNode> masterNodes = collapser.getMasterNodeSet();
-    Collection<CollapseData> result =
-        Lists.newArrayListWithExpectedSize(masterNodes.size());
-
-    for (GraphNode node : masterNodes) {
-      result.add(collapser.getCollapseData(node));
-    }
-    return result ;
+    return collapser.computeRoots();
   }
 
-  /////////////////////////////////////
-  // Factory methods
+  /**
+   * Provide complete set of nodes in this model.
+   */
+  public Collection<GraphNode> computeNodes() {
+    return collapser.computeNodes();
+  }
 
-  public static Collection<CollapseData> getChildrenData(CollapseData data) {
-
-    if (null == data) {
-      return CollapseData.EMPTY_LIST;
+  /**
+   * Provide all {@link CollapseData} in depth first order.
+   */
+  public Collection<CollapseData> computeDepthFirst() {
+    List<CollapseData> result = Lists.newArrayList();
+    for (CollapseData root : computeRoots()) {
+      addChildCollapse(result, root);
     }
-
-    Collection<GraphNode> childrenNodes = data.getChildrenNodes();
-    int size = childrenNodes.size();
-    Collection<CollapseData> result =
-        Lists.newArrayListWithExpectedSize(size);
-    for (GraphNode node : childrenNodes) {
-      result.add(loadCollapseData(data, node));
-    }
-
     return result;
   }
 
-  private static CollapseData loadCollapseData(
-      CollapseData data, GraphNode node) {
-    CollapseData collapseNode = data.getCollapseData(node);
-    if (null != collapseNode) {
-      return collapseNode;
-    }
-    if (data.getChildrenNodes().contains(node)) {
-      return new CollapseData(
-          node, GraphNode.EMPTY_NODE_LIST, CollapseData.EMPTY_LIST);
-    }
-    return null;
+  private void addChildCollapse(List<CollapseData> result, CollapseData data) {
+    for (CollapseData nest : data.getChildrenCollapse()) {
+       addChildCollapse(result, nest);
+     }
+    result.add(data);
   }
 }
