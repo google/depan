@@ -8,45 +8,42 @@
     <relativePath>../depan-luna-parent</relativePath>
   </parent>
 
-  <artifactId>com.pnambic.depan.win64.feature</artifactId>
+  <artifactId>com.pnambic.depan.maven.feature</artifactId>
   <packaging>eclipse-feature</packaging>
   <version>1.0.0-SNAPSHOT</version>
 
-  <name>DepAn Packaging Feature</name>
-  <description>DepAn components bundled as a feature</description>
+  <name>DepAn Maven POM Feature</name>
+  <description>DepAn Maven POM Feature</description>
 
   <dependencies>
+    <!-- Third party dependencies -->
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+    </dependency>
 
+    <!-- DepAn repackaged libraries -->
     <dependency>
       <groupId>com.pnambic.depan</groupId>
-      <artifactId>com.pnambic.depan.filesystem.feature</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <artifactId>depan-jogl-library</artifactId>
     </dependency>
 
     <dependency>
       <groupId>com.pnambic.depan</groupId>
-      <artifactId>com.pnambic.depan.java.feature</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <artifactId>depan-xstream-library</artifactId>
+    </dependency>
+
+    <!-- DepAn plugin dependencies -->
+    <dependency>
+      <groupId>com.pnambic.depan</groupId>
+      <artifactId>com.google.devtools.depan.core</artifactId>
+      <version>1.0.5-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>com.pnambic.depan</groupId>
-      <artifactId>com.pnambic.depan.javascript.feature</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <artifactId>com.google.devtools.depan</artifactId>
+      <version>0.0.8-SNAPSHOT</version>
     </dependency>
-
-    <dependency>
-      <groupId>com.pnambic.depan</groupId>
-      <artifactId>com.pnambic.depan.maven.feature</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.pnambic.depan</groupId>
-      <artifactId>com.pnambic.depan.platform</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
-    </dependency>
-
   </dependencies>
 </project>
-

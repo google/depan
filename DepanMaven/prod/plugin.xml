@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="com.google.devtools.depan.eclipse.sourceplugin">
+      <languagespecific
+            class="com.google.devtools.depan.maven.MavenPlugin"
+            description="Graph elements for Maven POM dependency analysis."
+            id="com.google.devtools.depan.maven"
+            source="Maven POM">
+      </languagespecific>
+   </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <wizard
+            category="com.google.devtools.depan"
+            class="com.google.devtools.depan.maven.eclipse.NewMavenPomWizard"
+            finalPerspective="com.google.devtools.depan.eclipse.perspective"
+            icon="icons/eclipse/maven_icon.png"
+            id="com.google.devtools.depan.maven.eclipse.NewMavenWizard"
+            name="New Maven POM Analysis">
+      </wizard>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="com.google.devtools.depan.maven.eclipse.preferences.AnalysisPreferencesInitializer">
+      </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="com.google.devtools.depan.maven.eclipse.preferences.AnalysisPreferencesPage"
+            id="com.google.devtools.depan.maven.eclipse.preferences.analysis"
+            name="Maven POM Analysis">
+      </page>
+   </extension>
+</plugin>

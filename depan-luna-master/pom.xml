@@ -26,11 +26,13 @@
     <module>../DepanFileSystem/prod</module>
     <module>../DepanJava/prod</module>
     <module>../DepanJavaScript/prod</module>
+    <module>../DepanMaven/prod</module>
 
     <!-- Features -->
     <module>../depan-filesystem-feature</module>
     <module>../depan-java-feature</module>
     <module>../depan-javascript-feature</module>
+    <module>../depan-maven-feature</module>
     <module>../depan-platform-feature</module>
     <module>../depan-win64-feature</module>
 

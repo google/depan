@@ -18,6 +18,7 @@ package com.google.devtools.depan.eclipse.wizards;
 import com.google.common.collect.Lists;
 
 import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -281,8 +282,17 @@ public class PushDownXmlHandler extends DefaultHandler {
   public void parseDocument(InputStream source)
       throws ParserConfigurationException, SAXException, IOException {
 
+    buildParser().parse(source, this);
+  }
+
+  public void parseDocument(InputSource source)
+      throws ParserConfigurationException, SAXException, IOException {
+
+    buildParser().parse(source, this);
+  }
+
+  private SAXParser buildParser() throws ParserConfigurationException, SAXException {
     SAXParserFactory factory = SAXParserFactory.newInstance();
-    SAXParser parser = factory.newSAXParser();
-    parser.parse(source, this);
+    return factory.newSAXParser();
   }
 }

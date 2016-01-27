@@ -25,10 +25,10 @@
          point="org.eclipse.core.runtime.products">
       <product
             application="com.google.devtools.depan.application"
-            name="DepAn">
+            name="DepAn [Win64]">
          <property
                name="appName"
-               value="DepAn">
+               value="DepAn [Win64]">
          </property>
          <property
                name="startupForegroundColor"

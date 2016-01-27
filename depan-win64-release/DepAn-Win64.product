@@ -34,8 +34,10 @@
       </win>
    </launcher>
 
+
    <vm>
    </vm>
+
 
    <plugins>
    </plugins>
@@ -45,6 +47,7 @@
       <feature id="com.pnambic.depan.platform"/>
       <feature id="com.pnambic.depan.filesystem.feature"/>
       <feature id="com.pnambic.depan.java.feature"/>
+      <feature id="com.pnambic.depan.maven.feature"/>
       <feature id="com.pnambic.depan.javascript.feature"/>
       <feature id="org.eclipse.emf.ecore"/>
       <feature id="org.eclipse.e4.rcp"/>

@@ -44,9 +44,9 @@ public class PreferencesNodePainter extends JavaElementDispatcher<Color>
     implements ElementTransformer<Color> {
 
   IEclipsePreferences preferences =
-    new InstanceScope().getNode(JavaResources.PLUGIN_ID);
+      InstanceScope.INSTANCE.getNode(JavaResources.PLUGIN_ID);
   IEclipsePreferences defaultsPrefs =
-    new DefaultScope().getNode(JavaResources.PLUGIN_ID);
+      DefaultScope.INSTANCE.getNode(JavaResources.PLUGIN_ID);
 
   private static final PreferencesNodePainter instance =
       new PreferencesNodePainter();

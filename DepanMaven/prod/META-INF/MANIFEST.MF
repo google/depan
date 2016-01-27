@@ -1,0 +1,24 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: DepanMaven
+Bundle-SymbolicName: com.google.devtools.depan.maven;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Require-Bundle: com.google.devtools.depan,
+ com.google.devtools.depan.core,
+ org.eclipse.core.resources,
+ org.eclipse.core.runtime,
+ org.eclipse.jface.text,
+ org.eclipse.ui,
+ com.google.guava,
+ depan-jogl-library,
+ depan-xstream-library
+Export-Package: com.google.devtools.depan.maven,
+ com.google.devtools.depan.maven.builder,
+ com.google.devtools.depan.maven.eclipse,
+ com.google.devtools.depan.maven.editors,
+ com.google.devtools.depan.maven.graph,
+ com.google.devtools.depan.maven.integration
+Bundle-Vendor: Pnambic Computing
+Import-Package: com.google.devtools.depan.filesystem.integration
+Bundle-Activator: com.google.devtools.depan.maven.eclipse.MavenActivator
+Bundle-ActivationPolicy: lazy
