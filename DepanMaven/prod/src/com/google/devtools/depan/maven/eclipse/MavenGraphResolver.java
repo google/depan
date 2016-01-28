@@ -20,6 +20,8 @@ import com.google.devtools.depan.maven.graph.ArtifactElement;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
+import com.google.devtools.depan.model.builder.DependenciesDispatcher;
+import com.google.devtools.depan.model.builder.DependenciesListener;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -121,10 +123,12 @@ public class MavenGraphResolver {
 
   private GraphModel rewriteReferences(GraphModel analysisGraph) {
     GraphModel result = new GraphModel();
+    DependenciesListener builder =
+        new DependenciesDispatcher(result.getBuilder());
     for (GraphEdge edge : analysisGraph.getEdges()) {
       GraphNode mapHead = mapNode(edge.getHead());
       GraphNode mapTail = mapNode(edge.getTail());
-      result.addEdge(edge.getRelation(), mapHead, mapTail);
+      builder.newDep(mapHead, mapTail, edge.getRelation());
     }
     return result;
   }

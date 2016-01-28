@@ -23,14 +23,9 @@ import com.google.devtools.depan.eclipse.wizards.PushDownXmlHandler.DocumentHand
 import com.google.devtools.depan.maven.builder.MavenContext;
 import com.google.devtools.depan.maven.builder.MavenDocumentHandler;
 import com.google.devtools.depan.maven.builder.Tools;
-import com.google.devtools.depan.maven.graph.ArtifactElement;
-import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
-import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.builder.DependenciesDispatcher;
 import com.google.devtools.depan.model.builder.DependenciesListener;
-
-import com.google.common.collect.Maps;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -40,8 +35,6 @@ import org.xml.sax.InputSource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Map;
 
 /**
  * Wizard for converting a Maven POM file into a DepAn analysis graph.
