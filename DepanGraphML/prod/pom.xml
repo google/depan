@@ -1,0 +1,47 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.pnambic.depan</groupId>
+    <artifactId>depan-luna-parent</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <relativePath>../../depan-luna-parent</relativePath>
+  </parent>
+
+  <artifactId>com.google.devtools.depan.graphml</artifactId>
+  <packaging>eclipse-plugin</packaging>
+  <version>1.0.0-SNAPSHOT</version>
+
+  <name>DepAn GraphML Importer</name>
+  <description>GraphML import and analysis for DepAn</description>
+
+  <build>
+    <sourceDirectory>src</sourceDirectory>
+  </build>
+
+  <dependencies>
+    <!-- Third party dependencies -->
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.pnambic.depan</groupId>
+      <artifactId>depan-xstream-library</artifactId>
+    </dependency>
+
+    <!-- DepAn dependencies -->
+    <dependency>
+      <groupId>com.pnambic.depan</groupId>
+      <artifactId>com.google.devtools.depan</artifactId>
+      <version>0.0.8-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.pnambic.depan</groupId>
+      <artifactId>com.google.devtools.depan.core</artifactId>
+      <version>1.0.5-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
+</project>

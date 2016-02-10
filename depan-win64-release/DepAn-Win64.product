@@ -34,10 +34,8 @@
       </win>
    </launcher>
 
-
    <vm>
    </vm>
-
 
    <plugins>
    </plugins>
@@ -53,6 +51,7 @@
       <feature id="org.eclipse.e4.rcp"/>
       <feature id="org.eclipse.emf.common"/>
       <feature id="org.eclipse.rcp"/>
+      <feature id="com.pnambic.depan.graphml.feature"/>
    </features>
 
    <configurations>

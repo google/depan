@@ -1,0 +1,19 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: DepanGraphML
+Bundle-SymbolicName: com.google.devtools.depan.graphml;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Require-Bundle: com.google.devtools.depan,
+ com.google.devtools.depan.core,
+ org.eclipse.core.resources,
+ org.eclipse.core.runtime,
+ org.eclipse.jface.text,
+ org.eclipse.ui,
+ com.google.guava,
+ depan-jogl-library,
+ depan-xstream-library,
+ com.google.devtools.depan.maven
+Export-Package: com.google.devtools.depan.graphml.builder,
+ com.google.devtools.depan.graphml.eclipse
+Bundle-Vendor: Pnambic Computing
+Bundle-ActivationPolicy: lazy

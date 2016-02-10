@@ -22,6 +22,8 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -270,6 +272,33 @@ public class PushDownXmlHandler extends DefaultHandler {
 
     pop();
     super.endElement(uri, localName, qName);
+  }
+
+  /////////////////////////////////////
+  // Parsing and other XML helper methods
+
+  /**
+   * All nodes and dependencies from the supplied {@code docSource} are
+   * installed in the resulting graphs via the {@code builder}.
+   */
+  public static void parseDocument(
+      DocumentHandler docLoader, InputSource docSource)
+      throws ParserConfigurationException, SAXException, IOException {
+    PushDownXmlHandler loader = new PushDownXmlHandler(docLoader);
+    loader.parseDocument(docSource);
+  }
+
+  /**
+   * Provide an XML {@link InputSource} for the supplied {@code docFile}.
+   * 
+   * The result should be non-{@code null}, with the public id for the
+   * new instance set as the supplied {@code docFile}s path.
+   */
+  public static InputSource getInputSource(File docFile) throws IOException {
+    FileInputStream stream = new FileInputStream(docFile);
+    InputSource result = new InputSource(stream);
+    result.setPublicId(docFile.getPath());
+    return result;
   }
 
   /////////////////////////////////////
