@@ -10,5 +10,20 @@
             source="JavaScript">
       </languagespecific>
    </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="com.google.devtools.depan.eclipse.preferences.colors"
+            class="com.google.devtools.depan.javascript.eclipse.preferences.ColorPreferencesPage"
+            id="com.google.devtools.depan.javascript.eclipse.nodecolors"
+            name="JavaScript Node Colors">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="com.google.devtools.depan.javascript.eclipse.preferences.ColorPreferencesInitializer">
+      </initializer>
+   </extension>
 
 </plugin>

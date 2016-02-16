@@ -18,7 +18,6 @@ package com.google.devtools.depan.javascript.eclipse;
 
 import com.google.devtools.depan.eclipse.plugins.ElementTransformer;
 import com.google.devtools.depan.eclipse.utils.Tools;
-import com.google.devtools.depan.java.JavaResources;
 import com.google.devtools.depan.java.eclipse.ColorPreferencesIds;
 import com.google.devtools.depan.javascript.graph.JavaScriptBuiltinElement;
 import com.google.devtools.depan.javascript.graph.JavaScriptClassElement;
@@ -29,9 +28,9 @@ import com.google.devtools.depan.javascript.graph.JavaScriptVariableElement;
 import com.google.devtools.depan.javascript.integration.JavaScriptElementDispatcher;
 import com.google.devtools.depan.model.Element;
 
-import org.eclipse.core.runtime.preferences.DefaultScope;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
+import com.google.common.base.Strings;
+
+import org.eclipse.jface.preference.IPreferenceStore;
 
 import java.awt.Color;
 
@@ -45,44 +44,46 @@ import java.awt.Color;
 public class NodePainter extends JavaScriptElementDispatcher<Color>
     implements ElementTransformer<Color> {
 
-  // Steal the Java object preferences
-  private final IEclipsePreferences preferences =
-      new InstanceScope().getNode(JavaResources.PLUGIN_ID);
-  private final IEclipsePreferences defaultsPrefs =
-      new DefaultScope().getNode(JavaResources.PLUGIN_ID);
+  private static IPreferenceStore prefs =
+      JavaScriptActivator.getDefault().getPreferenceStore();
 
-  private Color getValue(String key) {
-    return Tools.getRgb(preferences.get(key, defaultsPrefs.get(key, "0,0,0")));
+  private Color getColor(String key) {
+    String colorTxt = prefs.getString(key);
+    if (Strings.isNullOrEmpty(colorTxt)) {
+      return Color.BLACK;
+    }
+
+    return Tools.getRgb(colorTxt);
   }
 
   @Override
   public Color match(JavaScriptBuiltinElement builtinElement) {
-    return getValue(ColorPreferencesIds.COLOR_FIELD);
+    return getColor(ColorPreferencesIds.COLOR_FIELD);
   }
 
   @Override
   public Color match(JavaScriptClassElement classElement) {
-    return getValue(ColorPreferencesIds.COLOR_TYPE);
+    return getColor(ColorPreferencesIds.COLOR_TYPE);
   }
 
   @Override
   public Color match(JavaScriptEnumElement enumElement) {
-    return getValue(ColorPreferencesIds.COLOR_FIELD);
+    return getColor(ColorPreferencesIds.COLOR_FIELD);
   }
 
   @Override
   public Color match(JavaScriptFieldElement fieldElement) {
-    return getValue(ColorPreferencesIds.COLOR_FIELD);
+    return getColor(ColorPreferencesIds.COLOR_FIELD);
   }
 
   @Override
   public Color match(JavaScriptFunctionElement functionElement) {
-    return getValue(ColorPreferencesIds.COLOR_METHOD);
+    return getColor(ColorPreferencesIds.COLOR_METHOD);
   }
 
   @Override
   public Color match(JavaScriptVariableElement variableElement) {
-    return getValue(ColorPreferencesIds.COLOR_FIELD);
+    return getColor(ColorPreferencesIds.COLOR_FIELD);
   }
 
   @Override

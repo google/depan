@@ -11,6 +11,9 @@ Require-Bundle: com.google.devtools.depan,
  org.eclipse.jface,
  org.eclipse.core.runtime,
  com.google.guava,
- depan-xstream-library
+ depan-xstream-library,
+ org.eclipse.ui.workbench
 Export-Package: com.google.devtools.depan.javascript,
  com.google.devtools.depan.javascript.graph
+Bundle-ActivationPolicy: lazy
+Bundle-Activator: com.google.devtools.depan.javascript.eclipse.JavaScriptActivator
