@@ -16,6 +16,8 @@
 
 package com.google.devtools.depan.maven.eclipse.preferences;
 
+import com.google.devtools.depan.maven.eclipse.MavenActivator;
+
 
 /**
  * A namespace class for Maven plugin preference IDs.
@@ -28,11 +30,11 @@ public class AnalysisPreferenceIds {
     // Prevent instantiation.
   }
   public static final String MVN_ANALYSIS_EXECUTABLE =
-      MavenPreferenceIds.MVN_PREF_PREFIX + "executable";
+      MavenActivator.MVN_PREF_PREFIX + "executable";
   public static final String MVN_ANALYSIS_SYSTEMJAVA =
-      MavenPreferenceIds.MVN_PREF_PREFIX + "system-java";
+      MavenActivator.MVN_PREF_PREFIX + "system-java";
   public static final String MVN_ANALYSIS_JAVAHOME =
-      MavenPreferenceIds.MVN_PREF_PREFIX + "java-home";
+      MavenActivator.MVN_PREF_PREFIX + "java-home";
   public static final String MVN_ANALYSIS_EFFECTIVEPOM =
-      MavenPreferenceIds.MVN_PREF_PREFIX + "effective-pom";
+      MavenActivator.MVN_PREF_PREFIX + "effective-pom";
 }

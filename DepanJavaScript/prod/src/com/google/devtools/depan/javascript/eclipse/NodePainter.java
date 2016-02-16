@@ -18,7 +18,7 @@ package com.google.devtools.depan.javascript.eclipse;
 
 import com.google.devtools.depan.eclipse.plugins.ElementTransformer;
 import com.google.devtools.depan.eclipse.utils.Tools;
-import com.google.devtools.depan.java.eclipse.preferences.ColorPreferencesIds;
+import com.google.devtools.depan.javascript.eclipse.preferences.ColorPreferencesIds;
 import com.google.devtools.depan.javascript.graph.JavaScriptBuiltinElement;
 import com.google.devtools.depan.javascript.graph.JavaScriptClassElement;
 import com.google.devtools.depan.javascript.graph.JavaScriptEnumElement;
@@ -63,12 +63,12 @@ public class NodePainter extends JavaScriptElementDispatcher<Color>
 
   @Override
   public Color match(JavaScriptClassElement classElement) {
-    return getColor(ColorPreferencesIds.COLOR_TYPE);
+    return getColor(ColorPreferencesIds.COLOR_CLASS);
   }
 
   @Override
   public Color match(JavaScriptEnumElement enumElement) {
-    return getColor(ColorPreferencesIds.COLOR_FIELD);
+    return getColor(ColorPreferencesIds.COLOR_ENUM);
   }
 
   @Override
@@ -78,7 +78,7 @@ public class NodePainter extends JavaScriptElementDispatcher<Color>
 
   @Override
   public Color match(JavaScriptFunctionElement functionElement) {
-    return getColor(ColorPreferencesIds.COLOR_METHOD);
+    return getColor(ColorPreferencesIds.COLOR_FUNCTION);
   }
 
   @Override

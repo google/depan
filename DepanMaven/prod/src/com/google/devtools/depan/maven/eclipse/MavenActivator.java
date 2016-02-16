@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.maven.eclipse;
 
+import com.google.devtools.depan.eclipse.preferences.PreferencesIds;
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.maven.graph.ArtifactElement;
 import com.google.devtools.depan.maven.graph.PropertyElement;
@@ -42,6 +43,12 @@ public class MavenActivator extends AbstractUIPlugin {
    * Bundle that is responsible for storing the resources for this plug-in.
    */
   public static final Bundle BUNDLE = Platform.getBundle(PLUGIN_ID);
+
+  /**
+   * Prefix to use for preferences.
+   */
+  public static final String MVN_PREF_PREFIX =
+      PreferencesIds.PREFIX + "maven_";
 
   // The shared instance
   private static MavenActivator plugin;

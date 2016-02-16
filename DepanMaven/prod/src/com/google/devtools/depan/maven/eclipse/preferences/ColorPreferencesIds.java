@@ -16,6 +16,8 @@
 
 package com.google.devtools.depan.maven.eclipse.preferences;
 
+import com.google.devtools.depan.maven.eclipse.MavenActivator;
+
 /**
  * An namespace class for Maven graph element color preferences IDs.
  *
@@ -28,7 +30,7 @@ public final class ColorPreferencesIds {
   }
 
   public static final String COLORS_PREFIX =
-      MavenPreferenceIds.MVN_PREF_PREFIX + "color_";
+      MavenActivator.MVN_PREF_PREFIX + "color_";
 
   public static final String COLOR_ARTIFACT = COLORS_PREFIX + "artifact";
   public static final String COLOR_PROPERTY = COLORS_PREFIX + "property";
