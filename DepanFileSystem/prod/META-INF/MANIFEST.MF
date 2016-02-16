@@ -19,3 +19,5 @@ Export-Package: com.google.devtools.depan.filesystem,
  com.google.devtools.depan.filesystem.graph,
  com.google.devtools.depan.filesystem.integration
 Bundle-Vendor: Pnambic Computing
+Bundle-ActivationPolicy: lazy
+Bundle-Activator: com.google.devtools.depan.filesystem.eclipse.FileSystemActivator

@@ -19,7 +19,6 @@ package com.google.devtools.depan.filesystem.eclipse;
 import com.google.devtools.depan.eclipse.editors.GraphDocument;
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.wizards.AbstractAnalysisWizard;
-import com.google.devtools.depan.filesystem.FileSystemResources;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.builder.DependenciesListener;
 
@@ -106,6 +105,6 @@ public class NewFileSystemWizard extends AbstractAnalysisWizard {
 
     // Done
     return createGraphDocument(result,
-      FileSystemResources.PLUGIN_ID, Resources.PLUGIN_ID);
+        FileSystemActivator.PLUGIN_ID, Resources.PLUGIN_ID);
   }
 }

@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.filesystem.editors;
 
-import com.google.devtools.depan.filesystem.FileSystemResources;
+import com.google.devtools.depan.filesystem.eclipse.FileSystemActivator;
 
 import org.eclipse.swt.widgets.Composite;
 
@@ -37,6 +37,6 @@ public class FileEditor extends DirectoryEditor {
    */
   public FileEditor(Composite parent, Integer style, Integer swtTextStyle) {
     super(parent, style, swtTextStyle);
-    icon.setImage(FileSystemResources.IMAGE_FILE);
+    icon.setImage(FileSystemActivator.IMAGE_FILE);
   }
 }

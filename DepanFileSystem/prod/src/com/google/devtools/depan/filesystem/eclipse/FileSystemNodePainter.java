@@ -17,10 +17,16 @@
 package com.google.devtools.depan.filesystem.eclipse;
 
 import com.google.devtools.depan.eclipse.plugins.ElementTransformer;
+import com.google.devtools.depan.eclipse.utils.Tools;
+import com.google.devtools.depan.filesystem.eclipse.preferences.ColorPreferencesIds;
 import com.google.devtools.depan.filesystem.graph.DirectoryElement;
 import com.google.devtools.depan.filesystem.graph.FileElement;
 import com.google.devtools.depan.filesystem.integration.FileSystemElementDispatcher;
 import com.google.devtools.depan.model.Element;
+
+import com.google.common.base.Strings;
+
+import org.eclipse.jface.preference.IPreferenceStore;
 
 import java.awt.Color;
 
@@ -32,6 +38,19 @@ import java.awt.Color;
  */
 public class FileSystemNodePainter extends FileSystemElementDispatcher<Color>
     implements ElementTransformer<Color> {
+
+  private static final IPreferenceStore prefs =
+      FileSystemActivator.getDefault().getPreferenceStore();
+
+  private static final Color getColor(String key) {
+    String colorTxt = prefs.getString(key);
+    if (Strings.isNullOrEmpty(colorTxt)) {
+      return Color.BLACK;
+    }
+
+    return Tools.getRgb(colorTxt);
+  }
+
   /**
    * An instance of this class used by other classes.
    */
@@ -61,8 +80,7 @@ public class FileSystemNodePainter extends FileSystemElementDispatcher<Color>
    */
   @Override
   public Color match(FileElement element) {
-    // TODO(tugrul) read from preferences
-    return Color.BLUE;
+    return getColor(ColorPreferencesIds.COLOR_FILE);
   }
 
   /**
@@ -74,8 +92,7 @@ public class FileSystemNodePainter extends FileSystemElementDispatcher<Color>
    */
   @Override
   public Color match(DirectoryElement element) {
-    // TODO(tugrul) read from preferences
-    return Color.WHITE;
+    return getColor(ColorPreferencesIds.COLOR_DIRECTORY);
   }
 
   /**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008 The Depan Project Authors
+ * Copyright 2016 The Depan Project Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -14,21 +14,24 @@
  * the License.
  */
 
-package com.google.devtools.depan.filesystem;
+package com.google.devtools.depan.filesystem.eclipse;
 
+import com.google.devtools.depan.eclipse.preferences.PreferencesIds;
 import com.google.devtools.depan.eclipse.utils.Resources;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 
 /**
- * Provides the resources for this plug-in such as images.
- *
- * @author tugrul@google.com (Tugrul Ince)
+ * The activator class controls the plug-in life cycle.
+ * 
+ * @author <a href="mailto:leeca@pnambic.com">Lee Carver</a>
  */
-public abstract class FileSystemResources {
+public class FileSystemActivator extends AbstractUIPlugin {
 
   /** Plug-in ID used to identify this plug-in. */
   public static final String PLUGIN_ID = "com.google.devtools.depan.filesystem";
@@ -36,7 +39,45 @@ public abstract class FileSystemResources {
   /**
    * Bundle that is responsible for storing the resources for this plug-in.
    */
-  private static final Bundle BUNDLE = Platform.getBundle(PLUGIN_ID);
+  public static final Bundle BUNDLE = Platform.getBundle(PLUGIN_ID);
+
+  /**
+   * Prefix to use for preferences.
+   */
+  public static final String FS_PREF_PREFIX = PreferencesIds.PREFIX + "fs_";
+
+  // The shared instance
+  private static FileSystemActivator plugin;
+
+  /**
+   * The constructor
+   */
+  public FileSystemActivator() {
+  }
+
+  @Override
+  public void start(BundleContext context) throws Exception {
+    super.start(context);
+    plugin = this;
+  }
+
+  @Override
+  public void stop(BundleContext context) throws Exception {
+    plugin = null;
+    super.stop(context);
+  }
+
+  /**
+   * Returns the shared instance
+   *
+   * @return the shared instance
+   */
+  public static FileSystemActivator getDefault() {
+    return plugin;
+  }
+
+  /////////////////////////////////////
+  // Plugin Images 
 
   /**
    * {@link ImageDescriptor} for <code>DirectoryElement</code>s.

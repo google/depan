@@ -17,7 +17,7 @@
 package com.google.devtools.depan.filesystem.editors;
 
 import com.google.devtools.depan.eclipse.utils.ElementEditor;
-import com.google.devtools.depan.filesystem.FileSystemResources;
+import com.google.devtools.depan.filesystem.eclipse.FileSystemActivator;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -66,7 +66,7 @@ public class DirectoryEditor extends ElementEditor {
         new GridData(SWT.FILL, SWT.FILL, true, false));
 
     // content
-    icon.setImage(FileSystemResources.IMAGE_DIRECTORY);
+    icon.setImage(FileSystemActivator.IMAGE_DIRECTORY);
     labelName.setText("Path");
   }
 }

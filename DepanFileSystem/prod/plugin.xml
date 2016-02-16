@@ -21,4 +21,19 @@
             name="New File System Analysis">
       </wizard>
    </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="com.google.devtools.depan.filesystem.eclipse.preferences.ColorPreferencesInitializer">
+      </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="com.google.devtools.depan.eclipse.preferences.colors"
+            class="com.google.devtools.depan.filesystem.eclipse.preferences.ColorPreferencesPage"
+            id="com.google.devtools.depan.filesystem.eclipse.nodecolors"
+            name="File System Node Colors">
+      </page>
+   </extension>
 </plugin>

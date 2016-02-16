@@ -17,7 +17,6 @@
 package com.google.devtools.depan.filesystem.eclipse;
 
 import com.google.devtools.depan.eclipse.plugins.ElementTransformer;
-import com.google.devtools.depan.filesystem.FileSystemResources;
 import com.google.devtools.depan.filesystem.graph.DirectoryElement;
 import com.google.devtools.depan.filesystem.graph.FileElement;
 import com.google.devtools.depan.filesystem.integration.FileSystemElementDispatcher;
@@ -60,7 +59,7 @@ public class FileSystemImageTransformer
    */
   @Override
   public Image match(FileElement element) {
-    return FileSystemResources.IMAGE_FILE;
+    return FileSystemActivator.IMAGE_FILE;
   }
 
   /**
@@ -71,7 +70,7 @@ public class FileSystemImageTransformer
    */
   @Override
   public Image match(DirectoryElement element) {
-    return FileSystemResources.IMAGE_DIRECTORY;
+    return FileSystemActivator.IMAGE_DIRECTORY;
   }
 
   /**

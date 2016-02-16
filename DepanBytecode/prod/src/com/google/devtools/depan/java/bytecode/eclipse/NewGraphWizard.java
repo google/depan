@@ -16,12 +16,11 @@
 
 package com.google.devtools.depan.java.bytecode.eclipse;
 
-import com.google.common.collect.Lists;
 import com.google.devtools.depan.eclipse.editors.GraphDocument;
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.wizards.AbstractAnalysisWizard;
 import com.google.devtools.depan.eclipse.wizards.ProgressListenerMonitor;
-import com.google.devtools.depan.filesystem.FileSystemResources;
+import com.google.devtools.depan.filesystem.eclipse.FileSystemActivator;
 import com.google.devtools.depan.filesystem.eclipse.TreeLoader;
 import com.google.devtools.depan.java.JavaResources;
 import com.google.devtools.depan.model.GraphModel;
@@ -30,6 +29,8 @@ import com.google.devtools.depan.model.builder.DependenciesListener;
 import com.google.devtools.depan.model.builder.ElementFilter;
 import com.google.devtools.depan.util.ProgressListener;
 import com.google.devtools.depan.util.QuickProgressListener;
+
+import com.google.common.collect.Lists;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -132,7 +133,7 @@ public class NewGraphWizard extends AbstractAnalysisWizard {
     monitor.worked(1);
 
     return createGraphDocument(resultGraph,
-      JavaResources.PLUGIN_ID, FileSystemResources.PLUGIN_ID,
+      JavaResources.PLUGIN_ID, FileSystemActivator.PLUGIN_ID,
       Resources.PLUGIN_ID);
   }
 
