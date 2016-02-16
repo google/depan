@@ -17,7 +17,6 @@
 package com.google.devtools.depan.java.eclipse;
 
 import com.google.devtools.depan.eclipse.plugins.ElementTransformer;
-import com.google.devtools.depan.java.JavaResources;
 import com.google.devtools.depan.java.graph.FieldElement;
 import com.google.devtools.depan.java.graph.InterfaceElement;
 import com.google.devtools.depan.java.graph.MethodElement;
@@ -42,32 +41,31 @@ public class NodeIconTransformer extends JavaElementDispatcher<ImageDescriptor>
 
   @Override
   public ImageDescriptor match(TypeElement e) {
-    return JavaResources.IMAGE_DESC_TYPE;
+    return JavaActivator.IMAGE_DESC_TYPE;
   }
 
   @Override
   public ImageDescriptor match(MethodElement e) {
-    return JavaResources.IMAGE_DESC_METHOD;
+    return JavaActivator.IMAGE_DESC_METHOD;
   }
 
   @Override
   public ImageDescriptor match(FieldElement e) {
-    return JavaResources.IMAGE_DESC_FIELD;
+    return JavaActivator.IMAGE_DESC_FIELD;
   }
 
   @Override
   public ImageDescriptor match(InterfaceElement e) {
-    return JavaResources.IMAGE_DESC_INTERFACE;
+    return JavaActivator.IMAGE_DESC_INTERFACE;
   }
 
   @Override
   public ImageDescriptor match(PackageElement e) {
-    return JavaResources.IMAGE_DESC_PACKAGE;
+    return JavaActivator.IMAGE_DESC_PACKAGE;
   }
 
   @Override
   public ImageDescriptor transform(Element element) {
     return this.match(element);
   }
-
 }

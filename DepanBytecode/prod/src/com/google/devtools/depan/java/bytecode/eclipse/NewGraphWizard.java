@@ -22,7 +22,7 @@ import com.google.devtools.depan.eclipse.wizards.AbstractAnalysisWizard;
 import com.google.devtools.depan.eclipse.wizards.ProgressListenerMonitor;
 import com.google.devtools.depan.filesystem.eclipse.FileSystemActivator;
 import com.google.devtools.depan.filesystem.eclipse.TreeLoader;
-import com.google.devtools.depan.java.JavaResources;
+import com.google.devtools.depan.java.eclipse.JavaActivator;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.builder.DependenciesDispatcher;
 import com.google.devtools.depan.model.builder.DependenciesListener;
@@ -133,7 +133,7 @@ public class NewGraphWizard extends AbstractAnalysisWizard {
     monitor.worked(1);
 
     return createGraphDocument(resultGraph,
-      JavaResources.PLUGIN_ID, FileSystemActivator.PLUGIN_ID,
+        JavaActivator.PLUGIN_ID, FileSystemActivator.PLUGIN_ID,
       Resources.PLUGIN_ID);
   }
 

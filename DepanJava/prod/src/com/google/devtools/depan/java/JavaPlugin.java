@@ -27,7 +27,7 @@ import com.google.devtools.depan.java.eclipse.JavaNodeComparator;
 import com.google.devtools.depan.java.eclipse.NodeIconTransformer;
 import com.google.devtools.depan.java.eclipse.NodeImageTransformer;
 import com.google.devtools.depan.java.eclipse.NodeShapeTransformer;
-import com.google.devtools.depan.java.eclipse.PreferencesNodePainter;
+import com.google.devtools.depan.java.eclipse.NodePainter;
 import com.google.devtools.depan.java.editors.ElementEditors;
 import com.google.devtools.depan.java.graph.FieldElement;
 import com.google.devtools.depan.java.graph.InterfaceElement;
@@ -53,7 +53,7 @@ public class JavaPlugin extends AbstractSourcePlugin {
 
   final static Collection<Class<? extends Element>> classes;
   final static Collection<Relation> relations;
-  final static PreferencesNodePainter nodeColors;
+  final static NodePainter nodeColors;
 
   private static final Collection<String> BUILD_ANALYSIS_WIZARD_IDS;
 
@@ -81,7 +81,7 @@ public class JavaPlugin extends AbstractSourcePlugin {
       relations.add(r);
     }
 
-    nodeColors = new PreferencesNodePainter();
+    nodeColors = new NodePainter();
   }
 
   public JavaPlugin() {
@@ -110,7 +110,7 @@ public class JavaPlugin extends AbstractSourcePlugin {
 
   @Override
   public ElementTransformer<Color> getElementColorProvider() {
-    return PreferencesNodePainter.getInstance();
+    return NodePainter.getInstance();
   }
 
   @Override

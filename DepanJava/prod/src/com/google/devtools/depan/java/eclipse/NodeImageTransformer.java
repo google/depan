@@ -17,7 +17,6 @@
 package com.google.devtools.depan.java.eclipse;
 
 import com.google.devtools.depan.eclipse.plugins.ElementTransformer;
-import com.google.devtools.depan.java.JavaResources;
 import com.google.devtools.depan.java.graph.FieldElement;
 import com.google.devtools.depan.java.graph.InterfaceElement;
 import com.google.devtools.depan.java.graph.MethodElement;
@@ -42,17 +41,17 @@ public class NodeImageTransformer extends JavaElementDispatcher<Image> implement
 
   @Override
   public Image match(TypeElement e) {
-    return JavaResources.IMAGE_TYPE;
+    return JavaActivator.IMAGE_TYPE;
   }
 
   @Override
   public Image match(MethodElement e) {
-    return JavaResources.IMAGE_METHOD;
+    return JavaActivator.IMAGE_METHOD;
   }
 
   @Override
   public Image match(FieldElement e) {
-    return JavaResources.IMAGE_FIELD;
+    return JavaActivator.IMAGE_FIELD;
   }
 
   @Override

@@ -18,7 +18,7 @@ package com.google.devtools.depan.java.eclipse;
 
 import com.google.devtools.depan.eclipse.plugins.ElementTransformer;
 import com.google.devtools.depan.eclipse.utils.Tools;
-import com.google.devtools.depan.java.JavaResources;
+import com.google.devtools.depan.java.eclipse.preferences.ColorPreferencesIds;
 import com.google.devtools.depan.java.graph.FieldElement;
 import com.google.devtools.depan.java.graph.InterfaceElement;
 import com.google.devtools.depan.java.graph.MethodElement;
@@ -27,9 +27,9 @@ import com.google.devtools.depan.java.graph.TypeElement;
 import com.google.devtools.depan.java.integration.JavaElementDispatcher;
 import com.google.devtools.depan.model.Element;
 
-import org.eclipse.core.runtime.preferences.DefaultScope;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
+import com.google.common.base.Strings;
+
+import org.eclipse.jface.preference.IPreferenceStore;
 
 import java.awt.Color;
 
@@ -38,81 +38,52 @@ import java.awt.Color;
  * preferences.
  *
  * @author ycoppel@google.com (Yohann Coppel)
- *
  */
-public class PreferencesNodePainter extends JavaElementDispatcher<Color>
+public class NodePainter extends JavaElementDispatcher<Color>
     implements ElementTransformer<Color> {
 
-  IEclipsePreferences preferences =
-      InstanceScope.INSTANCE.getNode(JavaResources.PLUGIN_ID);
-  IEclipsePreferences defaultsPrefs =
-      DefaultScope.INSTANCE.getNode(JavaResources.PLUGIN_ID);
+  private static IPreferenceStore prefs =
+      JavaActivator.getDefault().getPreferenceStore();
 
-  private static final PreferencesNodePainter instance =
-      new PreferencesNodePainter();
+  private Color getColor(String key) {
+    String colorTxt = prefs.getString(key);
+    if (Strings.isNullOrEmpty(colorTxt)) {
+      return Color.BLACK;
+    }
 
+    return Tools.getRgb(colorTxt);
+  }
 
-  public static PreferencesNodePainter getInstance() {
+  private static final NodePainter instance =
+      new NodePainter();
+
+  public static NodePainter getInstance() {
     return instance;
   }
 
-  private Color getValue(String key) {
-    return Tools.getRgb(preferences.get(key, defaultsPrefs.get(key, "0,0,0")));
-  }
-
-  /*
-   * (non-Javadoc)
-   *
-   * @see com.google.devtools.depan.bytecodevisitor.impl.ElementDispatcher
-   *      #match(TypeElement)
-   */
   @Override
   public Color match(TypeElement arg0) {
-    return getValue(ColorPreferencesIds.COLOR_TYPE);
+    return getColor(ColorPreferencesIds.COLOR_TYPE);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see com.google.devtools.depan.bytecodevisitor.impl.ElementDispatcher
-   *      #match(MethodElement)
-   */
   @Override
   public Color match(MethodElement arg0) {
-    return getValue(ColorPreferencesIds.COLOR_METHOD);
+    return getColor(ColorPreferencesIds.COLOR_METHOD);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see com.google.devtools.depan.bytecodevisitor.impl.ElementDispatcher
-   *      #match(FieldElement)
-   */
   @Override
   public Color match(FieldElement arg0) {
-    return getValue(ColorPreferencesIds.COLOR_FIELD);
+    return getColor(ColorPreferencesIds.COLOR_FIELD);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see com.google.devtools.depan.bytecodevisitor.impl.ElementDispatcher
-   *      #match(InterfaceElement)
-   */
   @Override
   public Color match(InterfaceElement arg0) {
-    return getValue(ColorPreferencesIds.COLOR_INTERFACE);
+    return getColor(ColorPreferencesIds.COLOR_INTERFACE);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see com.google.devtools.depan.bytecodevisitor.impl.ElementDispatcher
-   *      #match(PackageElement)
-   */
   @Override
   public Color match(PackageElement arg0) {
-    return getValue(ColorPreferencesIds.COLOR_PACKAGE);
+    return getColor(ColorPreferencesIds.COLOR_PACKAGE);
   }
 
   @Override

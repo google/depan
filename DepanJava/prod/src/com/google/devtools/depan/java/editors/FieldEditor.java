@@ -16,6 +16,9 @@
 
 package com.google.devtools.depan.java.editors;
 
+import com.google.devtools.depan.eclipse.utils.ElementEditor;
+import com.google.devtools.depan.java.eclipse.JavaActivator;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -23,9 +26,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Text;
-
-import com.google.devtools.depan.eclipse.utils.ElementEditor;
-import com.google.devtools.depan.java.JavaResources;
 
 /**
  * An editor for FieldElements
@@ -70,7 +70,7 @@ public class FieldEditor extends ElementEditor {
     container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
     // content
-    icon.setImage(JavaResources.IMAGE_FIELD);
+    icon.setImage(JavaActivator.IMAGE_FIELD);
     labelType.setText("Type");
     labelContainer.setText("Container");
   }

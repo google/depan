@@ -18,7 +18,7 @@ package com.google.devtools.depan.javascript.eclipse;
 
 import com.google.devtools.depan.eclipse.plugins.ElementTransformer;
 import com.google.devtools.depan.eclipse.utils.Tools;
-import com.google.devtools.depan.java.eclipse.ColorPreferencesIds;
+import com.google.devtools.depan.java.eclipse.preferences.ColorPreferencesIds;
 import com.google.devtools.depan.javascript.graph.JavaScriptBuiltinElement;
 import com.google.devtools.depan.javascript.graph.JavaScriptClassElement;
 import com.google.devtools.depan.javascript.graph.JavaScriptEnumElement;

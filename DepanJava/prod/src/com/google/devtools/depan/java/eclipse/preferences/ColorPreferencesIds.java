@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.google.devtools.depan.java.eclipse;
 
-import com.google.devtools.depan.eclipse.preferences.PreferencesIds;
+package com.google.devtools.depan.java.eclipse.preferences;
+
+import com.google.devtools.depan.java.eclipse.JavaActivator;
 
 /**
- * An namespace class for color preferences IDs.
+ * An namespace class for Java graph element color preferences IDs.
  *
  * @author ycoppel@google.com (Yohann Coppel)
  */
@@ -29,7 +30,7 @@ public final class ColorPreferencesIds {
   }
 
   public static final String COLORS_PREFIX =
-    PreferencesIds.VIEW_PREFIX + "color_";
+      JavaActivator.JAVA_PREF_PREFIX + "color_";
 
   public static final String COLOR_TYPE = COLORS_PREFIX + "type";
   public static final String COLOR_METHOD = COLORS_PREFIX + "method";

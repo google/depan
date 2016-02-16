@@ -16,15 +16,15 @@
 
 package com.google.devtools.depan.java.editors;
 
+import com.google.devtools.depan.eclipse.utils.ElementEditor;
+import com.google.devtools.depan.java.eclipse.JavaActivator;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
-
-import com.google.devtools.depan.eclipse.utils.ElementEditor;
-import com.google.devtools.depan.java.JavaResources;
 
 /**
  * An editor for a TypeElement.
@@ -62,7 +62,7 @@ public class TypeEditor extends ElementEditor {
         new GridData(SWT.FILL, SWT.FILL, true, false));
 
     // content
-    icon.setImage(JavaResources.IMAGE_TYPE);
+    icon.setImage(JavaActivator.IMAGE_TYPE);
     labelName.setText("Fully qualified Name");
   }
 }

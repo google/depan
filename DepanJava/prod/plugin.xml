@@ -14,13 +14,13 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            class="com.google.devtools.depan.java.eclipse.ColorPreferencesPage"
+            class="com.google.devtools.depan.java.eclipse.preferences.ColorPreferencesPage"
             id="com.google.devtools.depan.java.eclipse.nodecolors"
             name="Java Node Colors"
             category="com.google.devtools.depan.eclipse.preferences.colors"/>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
-      <initializer class="com.google.devtools.depan.java.eclipse.ColorPreferencesInitializer"/>
+      <initializer class="com.google.devtools.depan.java.eclipse.preferences.ColorPreferencesInitializer"/>
    </extension>
 </plugin>

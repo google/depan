@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.google.devtools.depan.java.eclipse;
+package com.google.devtools.depan.java.eclipse.preferences;
 
-import com.google.devtools.depan.eclipse.preferences.PreferencesIds;
 import com.google.devtools.depan.eclipse.utils.Tools;
+import com.google.devtools.depan.java.eclipse.JavaActivator;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.jface.preference.IPreferenceStore;
 
 import java.awt.Color;
 
 /**
- * Preferences default values for editor colors.
+ * Preferences default values for Java graph element colors.
  *
  * @author ycoppel@google.com (Yohann Coppel)
  */
@@ -32,7 +32,7 @@ public class ColorPreferencesInitializer extends AbstractPreferenceInitializer {
 
   @Override
   public void initializeDefaultPreferences() {
-    IEclipsePreferences defaults = PreferencesIds.getDefaultNode();
+    IPreferenceStore defaults = JavaActivator.getDefault().getPreferenceStore();
 
     setDefaultRGB(defaults, ColorPreferencesIds.COLOR_FIELD, Color.YELLOW);
     setDefaultRGB(defaults, ColorPreferencesIds.COLOR_INTERFACE, Color.GREEN);
@@ -43,7 +43,7 @@ public class ColorPreferencesInitializer extends AbstractPreferenceInitializer {
     setDefaultRGB(defaults, ColorPreferencesIds.COLOR_TYPE, Color.BLUE);
   }
 
-  private void setDefaultRGB(IEclipsePreferences p, String key, Color color) {
-    p.put(key, Tools.getRgb(color));
+  private void setDefaultRGB(IPreferenceStore prefs, String key, Color color) {
+    prefs.setDefault(key, Tools.getRgb(color));
   }
 }

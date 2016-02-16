@@ -13,19 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.google.devtools.depan.java.eclipse;
+package com.google.devtools.depan.java.eclipse.preferences;
 
-import com.google.devtools.depan.eclipse.preferences.PreferencesIds;
+import com.google.devtools.depan.java.eclipse.JavaActivator;
 
 import org.eclipse.jface.preference.ColorFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
-import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
 /**
- * Preference page for color selections.
+ * Preference page for Java node color selections.
  *
  * @author ycoppel@google.com (Yohann Coppel)
  *
@@ -33,12 +32,8 @@ import org.eclipse.ui.preferences.ScopedPreferenceStore;
 public class ColorPreferencesPage extends FieldEditorPreferencePage
     implements IWorkbenchPreferencePage {
 
-  private ScopedPreferenceStore preferences;
-
   public ColorPreferencesPage() {
     super(GRID);
-    preferences = PreferencesIds.getInstanceStore();
-    setPreferenceStore(preferences);
   }
 
   @Override
@@ -71,5 +66,7 @@ public class ColorPreferencesPage extends FieldEditorPreferencePage
 
   @Override
   public void init(IWorkbench workbench) {
+    setDescription("Define Java Node Color Preferences.");
+    setPreferenceStore(JavaActivator.getDefault().getPreferenceStore());
   }
 }
