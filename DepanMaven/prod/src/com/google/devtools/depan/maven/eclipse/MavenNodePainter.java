@@ -17,9 +17,15 @@
 package com.google.devtools.depan.maven.eclipse;
 
 import com.google.devtools.depan.eclipse.plugins.ElementTransformer;
+import com.google.devtools.depan.eclipse.utils.Tools;
+import com.google.devtools.depan.maven.eclipse.preferences.ColorPreferencesIds;
 import com.google.devtools.depan.maven.graph.ArtifactElement;
 import com.google.devtools.depan.maven.graph.PropertyElement;
 import com.google.devtools.depan.model.Element;
+
+import com.google.common.base.Strings;
+
+import org.eclipse.jface.preference.IPreferenceStore;
 
 import java.awt.Color;
 
@@ -31,6 +37,19 @@ import java.awt.Color;
  */
 public class MavenNodePainter extends MavenElementDispatcher<Color>
     implements ElementTransformer<Color> {
+
+  private static IPreferenceStore prefs =
+      MavenActivator.getDefault().getPreferenceStore();
+
+  private Color getColor(String key) {
+    String colorTxt = prefs.getString(key);
+    if (Strings.isNullOrEmpty(colorTxt)) {
+      return Color.BLACK;
+    }
+
+    return Tools.getRgb(colorTxt);
+  }
+
   /**
    * An instance of this class used by other classes.
    */
@@ -55,8 +74,7 @@ public class MavenNodePainter extends MavenElementDispatcher<Color>
    */
   @Override
   public Color match(ArtifactElement element) {
-    // TODO: read from preferences
-    return Color.BLUE;
+    return getColor(ColorPreferencesIds.COLOR_ARTIFACT);
   }
 
   /**
@@ -64,8 +82,7 @@ public class MavenNodePainter extends MavenElementDispatcher<Color>
    */
   @Override
   public Color match(PropertyElement element) {
-    // TODO: read from preferences
-    return Color.GREEN;
+    return getColor(ColorPreferencesIds.COLOR_PROPERTY);
   }
 
   /**

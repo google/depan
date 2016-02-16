@@ -1,10 +1,10 @@
 /*
  * Copyright 2016 The Depan Project Authors
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * 
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -16,23 +16,20 @@
 
 package com.google.devtools.depan.maven.eclipse.preferences;
 
-
 /**
- * A namespace class for Maven plugin preference IDs.
- * 
+ * An namespace class for Maven graph element color preferences IDs.
+ *
  * @author <a href="mailto:leeca@pnambic.com">Lee Carver</a>
  */
-public class AnalysisPreferenceIds {
+public final class ColorPreferencesIds {
 
-  private AnalysisPreferenceIds() {
+  private ColorPreferencesIds() {
     // Prevent instantiation.
   }
-  public static final String MVN_ANALYSIS_EXECUTABLE =
-      MavenPreferenceIds.MVN_PREF_PREFIX + "executable";
-  public static final String MVN_ANALYSIS_SYSTEMJAVA =
-      MavenPreferenceIds.MVN_PREF_PREFIX + "system-java";
-  public static final String MVN_ANALYSIS_JAVAHOME =
-      MavenPreferenceIds.MVN_PREF_PREFIX + "java-home";
-  public static final String MVN_ANALYSIS_EFFECTIVEPOM =
-      MavenPreferenceIds.MVN_PREF_PREFIX + "effective-pom";
+
+  public static final String COLORS_PREFIX =
+      MavenPreferenceIds.MVN_PREF_PREFIX + "color_";
+
+  public static final String COLOR_ARTIFACT = COLORS_PREFIX + "artifact";
+  public static final String COLOR_PROPERTY = COLORS_PREFIX + "property";
 }
