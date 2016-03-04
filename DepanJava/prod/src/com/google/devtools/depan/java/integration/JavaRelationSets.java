@@ -53,39 +53,6 @@ public class JavaRelationSets {
   public static final RelationSetDescriptor ALL;
 
   static {
-    // container relationships
-    Builder containerBuilder = RelationSetDescriptor.createBuilder(
-        "Java Containers");
-    containerBuilder.addRelation(FileSystemRelation.CONTAINS_DIR);
-    containerBuilder.addRelation(FileSystemRelation.CONTAINS_FILE);
-    containerBuilder.addRelation(JavaRelation.CLASS);
-    containerBuilder.addRelation(JavaRelation.CLASSFILE);
-    containerBuilder.addRelation(JavaRelation.PACKAGE);
-    containerBuilder.addRelation(JavaRelation.LOCAL_VARIABLE);
-    containerBuilder.addRelation(JavaRelation.INNER_TYPE);
-    containerBuilder.addRelation(JavaRelation.MEMBER_FIELD);
-    containerBuilder.addRelation(JavaRelation.MEMBER_METHOD);
-    containerBuilder.addRelation(JavaRelation.MEMBER_TYPE);
-    containerBuilder.addRelation(JavaRelation.STATIC_FIELD);
-    containerBuilder.addRelation(JavaRelation.STATIC_METHOD);
-    containerBuilder.addRelation(JavaRelation.STATIC_TYPE);
-    containerBuilder.addRelation(JavaRelation.ANONYMOUS_TYPE);
-    CONTAINER = containerBuilder.build();
-
-    // package + class member relationships
-    Builder pkgBuilder = RelationSetDescriptor.createBuilder(
-        "Package Members");
-    pkgBuilder.addRelation(JavaRelation.CLASS);
-    pkgBuilder.addRelation(JavaRelation.PACKAGE);
-    pkgBuilder.addRelation(JavaRelation.INNER_TYPE);
-    pkgBuilder.addRelation(JavaRelation.MEMBER_FIELD);
-    pkgBuilder.addRelation(JavaRelation.MEMBER_METHOD);
-    pkgBuilder.addRelation(JavaRelation.MEMBER_TYPE);
-    pkgBuilder.addRelation(JavaRelation.STATIC_FIELD);
-    pkgBuilder.addRelation(JavaRelation.STATIC_METHOD);
-    pkgBuilder.addRelation(JavaRelation.STATIC_TYPE);
-    PKG_MEMBER = pkgBuilder.build();
-
     // class member relationships only
     Builder classBuilder = RelationSetDescriptor.createBuilder(
         "Class Members");
@@ -96,7 +63,26 @@ public class JavaRelationSets {
     classBuilder.addRelation(JavaRelation.STATIC_FIELD);
     classBuilder.addRelation(JavaRelation.STATIC_METHOD);
     classBuilder.addRelation(JavaRelation.STATIC_TYPE);
+    classBuilder.addRelation(JavaRelation.ANONYMOUS_TYPE);
     CLASS_MEMBER = classBuilder.build();
+
+    // package + class member relationships
+    Builder pkgBuilder = RelationSetDescriptor.createBuilder(
+        "Package Members");
+    pkgBuilder.addRelation(JavaRelation.CLASS);
+    pkgBuilder.addRelation(JavaRelation.PACKAGE);
+    pkgBuilder.addBuilderSet(classBuilder);
+    PKG_MEMBER = pkgBuilder.build();
+
+    // container relationships
+    Builder containerBuilder = RelationSetDescriptor.createBuilder(
+        "Java Containers");
+    containerBuilder.addRelation(FileSystemRelation.CONTAINS_DIR);
+    containerBuilder.addRelation(FileSystemRelation.CONTAINS_FILE);
+    containerBuilder.addRelation(JavaRelation.CLASSFILE);
+    containerBuilder.addRelation(JavaRelation.LOCAL_VARIABLE);
+    containerBuilder.addBuilderSet(classBuilder);
+    CONTAINER = containerBuilder.build();
 
     // static class member relationships
     Builder staticBuilder = RelationSetDescriptor.createBuilder(

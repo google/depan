@@ -85,6 +85,14 @@ public class RelationSetDescriptor
       relations.add(relation);
     }
 
+    /**
+     * Allow builder sets to contribute to each other for consistency,
+     * without creating a dependency.
+     */
+    public void addBuilderSet(Builder builer) {
+      relations.addAll(builer.relations);
+    }
+
     public RelationSetDescriptor build() {
       // Make a defensive copy.
       Set<Relation> clone = Sets.newHashSet(relations);
