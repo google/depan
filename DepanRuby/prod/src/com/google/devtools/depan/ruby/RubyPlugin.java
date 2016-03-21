@@ -90,7 +90,7 @@ public class RubyPlugin extends AbstractSourcePlugin {
     classes.add(SingletonMethodElement.class);
 
     Builder dependentBuilder = RelationSetDescriptor.createBuilder(
-        "Extends");
+        "Ruby Extends");
     dependentBuilder.addRelation(RubyRelation.EXTENDS_TYPE);
     EXTENDS_TYPE = dependentBuilder.build();
     builtinSets.add(EXTENDS_TYPE);
@@ -116,7 +116,7 @@ public class RubyPlugin extends AbstractSourcePlugin {
   }
 
   /**
-   * Returns the collection of classes of element types in File System Plug-in.
+   * Returns the collection of classes of element types in Ruby Plug-in.
    *
    * @return Collection of classes of element types.
    */
@@ -126,7 +126,7 @@ public class RubyPlugin extends AbstractSourcePlugin {
   }
 
   /**
-   * Returns the collection of built-in relation types of File System Plug-in.
+   * Returns the collection of built-in relation types of Ruby Plug-in.
    *
    * @return Collection of built-in relation types.
    */

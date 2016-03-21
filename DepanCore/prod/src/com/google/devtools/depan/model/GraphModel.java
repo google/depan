@@ -401,6 +401,10 @@ public class GraphModel extends BasicGraph<String> {
 
     // Only include nodes that participate in the relations.
     for (GraphEdge edge : getEdges()) {
+      // No self-loops in a spanning tree.
+      if (edge.getHead() == edge.getTail()) {
+        continue;
+      }
 
       // On forward matches, include the link only
       // if the tail has not yet been visited.
@@ -409,17 +413,19 @@ public class GraphModel extends BasicGraph<String> {
           builder.addForwardEdge(edge);
           visited.add((edge.getTail()));
         }
+        continue;
       }
 
       // For spanning hierarchies, each edge gets added only once.
       // And the forward direction is preferred if both are allowed.
       // On reverse matches, include the link only
       // if the head has not yet been visited.
-      else if (edgeMatcher.edgeReverse(edge)) {
+      if (edgeMatcher.edgeReverse(edge)) {
         if (false == visited.contains((edge.getHead()))) {
           builder.addReverseEdge(edge);
           visited.add((edge.getHead()));
         }
+        continue;
       }
     }
     return builder.getSuccessorMap();

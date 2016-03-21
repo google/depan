@@ -20,6 +20,7 @@ import com.google.devtools.depan.eclipse.persist.XStreamFactory.Config;
 import com.google.devtools.depan.ruby.graph.ClassElement;
 import com.google.devtools.depan.ruby.graph.ClassMethodElement;
 import com.google.devtools.depan.ruby.graph.InstanceMethodElement;
+import com.google.devtools.depan.ruby.graph.RubyRelation;
 import com.google.devtools.depan.ruby.graph.SingletonMethodElement;
 
 import com.thoughtworks.xstream.XStream;
@@ -61,5 +62,6 @@ public class RubyDefinitions implements Config {
     xstream.alias("ruby-class_method", ClassMethodElement.class);
     xstream.alias("ruby-instance_method", InstanceMethodElement.class);
     xstream.alias("ruby-singleton_method", SingletonMethodElement.class);
+    xstream.alias("ruby-relation", RubyRelation.class);
   }
 }
