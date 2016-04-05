@@ -35,7 +35,7 @@ import org.osgi.framework.BundleContext;
 public class RubyActivator extends AbstractUIPlugin {
 
   /** Plug-in ID used to identify this plug-in. */
-  public static final String PLUGIN_ID = "com.google.devtools.depan.maven";
+  public static final String PLUGIN_ID = "com.google.devtools.depan.ruby";
 
   /**
    * Bundle that is responsible for storing the resources for this plug-in.
@@ -46,7 +46,7 @@ public class RubyActivator extends AbstractUIPlugin {
    * Prefix to use for preferences.
    */
   public static final String MVN_PREF_PREFIX =
-      PreferencesIds.PREFIX + "maven_";
+      PreferencesIds.PREFIX + "ruby_";
 
   // The shared instance
   private static RubyActivator plugin;
@@ -85,7 +85,7 @@ public class RubyActivator extends AbstractUIPlugin {
    * {@link ImageDescriptor} for {@link ArtifactElement}s.
    */
   public static final ImageDescriptor IMAGE_DESC_RUBY =
-      RubyActivator.getImageDescriptor("icons/eclipse/maven_icon.png");
+      RubyActivator.getImageDescriptor("icons/eclipse/ruby_icon_16x16.png");
 
   /**
    * {@link ImageDescriptor} for {@link ClassElement}s.

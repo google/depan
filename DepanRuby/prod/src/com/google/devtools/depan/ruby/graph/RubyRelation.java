@@ -32,7 +32,8 @@ public enum RubyRelation implements Relation {
   EXTENDS_TYPE("super", "derived"),
   CLASS_MEMBER("class member", "class element"),
   INSTANCE_MEMBER("instance member", "instance element"),
-  SINGLETON_MEMBER("singleton member", "singleton element")
+  SINGLETON_MEMBER("singleton member", "singleton element"),
+  STATIC_CALL("static call", "called from")
   ;
 
   /**
