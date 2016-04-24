@@ -24,6 +24,4 @@ package com.google.devtools.depan.graph.api;
 public interface Node<T> {
 
   T getId();
-
-  //Graph<? extends T> getGraph();
 }

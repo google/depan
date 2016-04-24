@@ -18,7 +18,7 @@ package com.google.devtools.depan.java.bytecode.eclipse;
 
 import com.google.devtools.depan.filesystem.graph.FileElement;
 import com.google.devtools.depan.java.bytecode.impl.ClassDepLister;
-import com.google.devtools.depan.model.builder.DependenciesListener;
+import com.google.devtools.depan.model.builder.chain.DependenciesListener;
 
 import org.objectweb.asm.ClassReader;
 

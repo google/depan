@@ -23,8 +23,9 @@ import com.google.common.collect.Sets;
 import com.google.devtools.depan.graph.api.EdgeMatcher;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.api.RelationSet;
+import com.google.devtools.depan.graph.basic.BasicEdge;
 import com.google.devtools.depan.graph.basic.BasicGraph;
-import com.google.devtools.depan.model.interfaces.GraphBuilder;
+import com.google.devtools.depan.graph.basic.BasicNode;
 import com.google.devtools.depan.view.SuccessorEdges;
 import com.google.devtools.depan.view.SuccessorsMap;
 
@@ -34,18 +35,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Main Graph implementation. Also implements GraphBuilder, so it takes care of
- * building the graph.
- *
- * This class handle all the operations related to the Graph itself. A graph is
- * like a transition matrix (even it is not stored like that). it stores a list
- * of nodes, and a list of edges.
- *
- * It also offers convenient methods to look for a node, an edge, successors
- * and predecessors of a node given a set of relations, roots of the graph.
- *
- * Finally, it maintains a list of views opened for this graph, so we can apply
- * binary operations on views easily.
+ * Main Graph implementation.
  *
  * Node that any inserted node in the graph should be involved in at least one
  * edge. Otherwise, it will not be saved by PersistentGraph.
@@ -58,7 +48,10 @@ public class GraphModel extends BasicGraph<String> {
   /**
    * Basic constructor for a view model.
    */
-  public GraphModel() {
+  public GraphModel(
+      Map<String, BasicNode<? extends String>> nodes,
+      Set<BasicEdge<? extends String>> edges) {
+    super(nodes, edges);
   }
 
   /**
@@ -115,60 +108,9 @@ public class GraphModel extends BasicGraph<String> {
     return Sets.newHashSet(getEdges());
   }
 
-  /**
-   * Build a graph given a collection of edges. Nodes are those involved in at
-   * least one relation.
-   *
-   * @param sourceEdges list of edges in the graph
-   * @return a GraphModel made from the given collection of Edge, and Node
-   *         involved in those relations.
-   */
-  public static GraphModel buildFromEdges(
-      Collection<GraphEdge> sourceEdges) {
-
-    GraphModel result = new GraphModel();
-
-    for (GraphEdge e : sourceEdges) {
-      GraphNode head = (GraphNode) result.mapNode(e.getHead());
-      GraphNode tail = (GraphNode) result.mapNode(e.getTail());
-      result.addEdge(e.getRelation(), head, tail);
-    }
-
-    return result;
-  }
-
-  public GraphEdge addEdge(
-      Relation relation,
-      GraphNode head,
-      GraphNode tail) {
-    GraphEdge result = new GraphEdge(head, tail, relation);
-    addEdge(result);
-    return result;
-  }
-
   /////////////////////////////////////
   // Expanded Graph methods.
   // These should probably be pushed up into the Graph interface.
-
-  public GraphModel newView() {
-    return new GraphModel();
-  }
-
-  /**
-   * Populate the subview with every edge in this Graph.
-   * @param subview subview GraphModel to populate.
-   */
-  public void populateRelations(GraphModel subview) {
-    Set<GraphNode> subviewNodes = subview.getNodesSet();
-    GraphBuilder builder = subview.getBuilder();
-
-    for (GraphEdge edge : getEdges()) {
-      if (subviewNodes.contains(edge.getHead()) &&
-          subviewNodes.contains(edge.getTail())) {
-        builder.addEdge(edge);
-      }
-    }
-  }
 
   public Collection<GraphNode> and(GraphModel that) {
     Collection<GraphNode> result = Sets.newHashSet(getNodesSet());
@@ -196,51 +138,6 @@ public class GraphModel extends BasicGraph<String> {
     result.addAll(that.getNodes());
 
     return result;
-  }
-
-  public Collection<GraphEdge> getEdges(
-      Collection<GraphNode> children) {
-    Set<GraphNode> lookup = Sets.newHashSet(children);
-    List<GraphEdge> result = Lists.newArrayList();
-
-    for (GraphEdge edge : getEdges()) {
-      if (lookup.contains(edge.getHead())) {
-        result.add(edge);
-      } else if (lookup.contains(edge.getTail())) {
-        result.add(edge);
-      }
-    }
-    return result;
-  }
-
-///////////////////////////////////////
-// Builder Interface
-
-  private class Builder extends GraphModelBuilder {
-
-    @Override
-    protected void addGraphEdge(GraphEdge edge) {
-      GraphModel.this.addBasicEdge(edge);
-    }
-
-    @Override
-    protected void addGraphNode(GraphNode node) {
-      GraphModel.this.addBasicNode(node);
-    }
-
-    @Override
-    protected GraphModel getGraphModel() {
-      return GraphModel.this;
-    }
-  }
-
-  /**
-   * Creates and returns a new <code>GraphBuilder</code> object.
-   *
-   * @return A new Builder object
-   */
-  public GraphBuilder getBuilder() {
-    return new Builder();
   }
 
   /////////////////////////////////////

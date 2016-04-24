@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.model.builder;
+package com.google.devtools.depan.model.builder.chain;
 
 import com.google.devtools.depan.model.GraphNode;
 

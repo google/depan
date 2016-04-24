@@ -16,8 +16,8 @@
 package com.google.devtools.depan.filesystem.eclipse;
 
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.model.builder.DependenciesDispatcher;
-import com.google.devtools.depan.model.interfaces.GraphBuilder;
+import com.google.devtools.depan.model.builder.api.GraphBuilder;
+import com.google.devtools.depan.model.builder.chain.DependenciesDispatcher;
 
 /**
  * A simple dependency dispatcher that accepts everything.

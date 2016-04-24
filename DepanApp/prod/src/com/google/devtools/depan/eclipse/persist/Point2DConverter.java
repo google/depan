@@ -55,13 +55,6 @@ public class Point2DConverter implements Converter {
     writer.addAttribute("y", Double.toString(posY));
   }
 
-  /**
-   * {@inheritDoc}
-   * <p>
-   * This implementation assumes that a {@code GraphModel}, used to find nodes,
-   * can be retrieved from the {@code UnmarshallingContext} with the key
-   * {@code GraphModel.class}.
-   */
   @Override
   public Object unmarshal(HierarchicalStreamReader reader,
       UnmarshallingContext context) {

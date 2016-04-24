@@ -16,19 +16,13 @@
 package com.google.devtools.depan.graph.api;
 
 /**
+ * Basic definitions of a graph.  A graph is an immutable set of nodes
+ * and edges.
+ * 
  * @author <a href="leeca@google.com">Lee Carver</a>
  * @param <T> Node content type.
  */
 public interface Graph<T> {
-  
-  /**
-   * Add a new node.  The id must be unique within this graph.
-   * 
-   * @param id identifier for new Node
-   * @return newly created Node
-   * @throws IllegalArgumentException if id exists
-   */
-   void addNode(Node<? extends T> node);
 
   /**
    * Find an existing Node.
@@ -37,14 +31,6 @@ public interface Graph<T> {
    * @return an existing Node, or <code>null</code> if not in Graph
    */
   Node<? extends T> findNode(T id);
-
-  /**
-   * @param relation
-   * @param head
-   * @param tail
-   * @return
-   */
-  void addEdge(Edge<? extends T> edge);
 
   /**
    * Find an edge given the relation, head, and tail.

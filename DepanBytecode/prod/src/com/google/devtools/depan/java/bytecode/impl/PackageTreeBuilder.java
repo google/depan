@@ -21,7 +21,7 @@ import com.google.devtools.depan.filesystem.graph.FileSystemRelation;
 import com.google.devtools.depan.java.graph.JavaRelation;
 import com.google.devtools.depan.java.graph.PackageElement;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.model.builder.DependenciesListener;
+import com.google.devtools.depan.model.builder.chain.DependenciesListener;
 
 import java.io.File;
 

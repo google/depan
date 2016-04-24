@@ -3,7 +3,7 @@
 package com.google.devtools.depan.filesystem.builder;
 
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.model.builder.DependenciesListener;
+import com.google.devtools.depan.model.builder.chain.DependenciesListener;
 
 /**
  * Install the {@link GraphNode}s obtained from hierarchical {@link PathInfo}

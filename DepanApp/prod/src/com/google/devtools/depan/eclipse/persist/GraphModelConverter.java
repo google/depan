@@ -19,8 +19,11 @@ package com.google.devtools.depan.eclipse.persist;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
+import com.google.devtools.depan.model.builder.api.GraphBuilder;
+import com.google.devtools.depan.model.builder.api.GraphBuilders;
 
 import com.thoughtworks.xstream.converters.Converter;
+import com.thoughtworks.xstream.converters.DataHolder;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
@@ -45,6 +48,10 @@ public class GraphModelConverter implements Converter {
 
   public GraphModelConverter(Mapper mapper) {
     this.mapper = mapper;
+  }
+
+  public static GraphBuilder contextGraphBuilder(DataHolder context) {
+    return (GraphBuilder) context.get(GraphBuilder.class);
   }
 
   @Override
@@ -83,9 +90,9 @@ public class GraphModelConverter implements Converter {
   /**
    * {@inheritDoc}
    * <p>
-   * This implementation temporarily injects the current {@code GraphModel}
+   * This implementation injects a newly synthesized {@code GraphBuilder}
    * instance into the {@code UnmarshallingContext} with the key
-   * {@code GraphModel.class}.  This allows the {@link EdgeConverter} to
+   * {@code GraphBuilder.class}.  This allows the {@link EdgeConverter} to
    * translate node ids directly into node references.
    * 
    * @see EdgeConverter#unmarshal(HierarchicalStreamReader, UnmarshallingContext)
@@ -95,11 +102,11 @@ public class GraphModelConverter implements Converter {
       HierarchicalStreamReader reader, UnmarshallingContext context) {
     // There should not be two graphs in the same serialization,
     // but just in case ....
-    Object prior = context.get(GraphModel.class);
+    GraphBuilder prior = contextGraphBuilder(context);
 
     try {
-      GraphModel result = new GraphModel();
-      context.put(GraphModel.class, result);
+      GraphBuilder builder = GraphBuilders.createGraphModelBuilder();
+      context.put(GraphBuilder.class, builder);
 
       while (reader.hasMoreChildren()) {
         reader.moveDown();
@@ -108,12 +115,12 @@ public class GraphModelConverter implements Converter {
 
         if (GraphNode.class.isAssignableFrom(childClass)) {
           GraphNode node = (GraphNode) context.convertAnother(null, childClass);
-          result.addNode(node);
+          builder.newNode(node);
         }
         else if (GraphEdge.class.isAssignableFrom(childClass)) {
           GraphEdge edge =
               (GraphEdge) context.convertAnother(null, childClass);
-          result.addEdge(edge);
+          builder.addEdge(edge);
         } else {
           logger.info("Skipped object with tag " + childName);
         }
@@ -121,13 +128,13 @@ public class GraphModelConverter implements Converter {
         reader.moveUp();
       }
 
-      return result;
+      return builder.createGraphModel();
     } catch (RuntimeException err) {
       // TODO Auto-generated catch block
       err.printStackTrace();
       throw err;
     } finally {
-      context.put(GraphModel.class, prior);
+      context.put(GraphBuilder.class, prior);
     }
   }
 }

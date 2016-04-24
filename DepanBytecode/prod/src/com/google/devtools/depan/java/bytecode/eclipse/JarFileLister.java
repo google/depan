@@ -20,7 +20,7 @@ import com.google.devtools.depan.filesystem.graph.DirectoryElement;
 import com.google.devtools.depan.filesystem.graph.FileElement;
 import com.google.devtools.depan.filesystem.graph.FileSystemRelation;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.model.builder.DependenciesListener;
+import com.google.devtools.depan.model.builder.chain.DependenciesListener;
 import com.google.devtools.depan.util.ProgressListener;
 
 import java.io.File;

@@ -20,7 +20,9 @@ import com.google.devtools.depan.eclipse.editors.GraphDocument;
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.wizards.AbstractAnalysisWizard;
 import com.google.devtools.depan.model.GraphModel;
-import com.google.devtools.depan.model.builder.DependenciesListener;
+import com.google.devtools.depan.model.builder.api.GraphBuilder;
+import com.google.devtools.depan.model.builder.api.GraphBuilders;
+import com.google.devtools.depan.model.builder.chain.DependenciesListener;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -89,9 +91,9 @@ public class NewFileSystemWizard extends AbstractAnalysisWizard {
     // TODO(leeca): Add filters, etc.
     // TODO(leeca): Extend UI to allow lists of directories.
 
-    GraphModel result = new GraphModel();
+    GraphBuilder graphBuilder = GraphBuilders.createGraphModelBuilder();
     DependenciesListener builder =
-        new FileSystemDependencyDispatcher(result.getBuilder());
+        new FileSystemDependencyDispatcher(graphBuilder);
 
     monitor.worked(1);
 
@@ -104,6 +106,7 @@ public class NewFileSystemWizard extends AbstractAnalysisWizard {
     monitor.worked(1);
 
     // Done
+    GraphModel result = graphBuilder.createGraphModel();
     return createGraphDocument(result,
         FileSystemActivator.PLUGIN_ID, Resources.PLUGIN_ID);
   }

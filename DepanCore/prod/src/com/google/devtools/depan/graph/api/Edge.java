@@ -20,11 +20,11 @@ package com.google.devtools.depan.graph.api;
  * @param <T> Node content type.
  */
 public interface Edge<T> {
-  
+
   Relation getRelation();
-  
+
   Node<? extends T> getHead();
-  
+
   Node<? extends T> getTail();
 
 }

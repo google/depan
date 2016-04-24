@@ -23,7 +23,7 @@ import org.objectweb.asm.Opcodes;
 import com.google.devtools.depan.java.graph.FieldElement;
 import com.google.devtools.depan.java.graph.JavaRelation;
 import com.google.devtools.depan.java.graph.MethodElement;
-import com.google.devtools.depan.model.builder.DependenciesListener;
+import com.google.devtools.depan.model.builder.chain.DependenciesListener;
 
 /**
  * Implements a visitor of the ASM package, to find the dependencies in a method

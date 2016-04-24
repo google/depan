@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.model.interfaces;
+package com.google.devtools.depan.model.builder.api;
 
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
@@ -26,14 +26,6 @@ import com.google.devtools.depan.model.GraphNode;
  * @author ycoppel@google.com (Yohann Coppel)
  */
 public interface GraphBuilder {
-
-  /**
-   * Method to get the Graph Object.
-   * 
-   * @return a Graph<Element> instance.
-   */
-  public GraphModel getGraph();
-
   /**
    * Add the given Edge to the list of edges in the graph.
    * 
@@ -43,7 +35,20 @@ public interface GraphBuilder {
   public GraphEdge addEdge(GraphEdge edge);
 
   /**
-   * Insert the given Node in the graph.
+   * Provide a {@link GraphNode} that a matches the supplied id.
+   * A {@code null} indicates that the supplied {@code node} is not part of the
+   * graph.
+   * 
+   * @param id Node to find
+   * @return a for the supplied id, or {@code null} if no {@link GraphNode}
+   *   for the id is present in the graph.
+   */
+  public GraphNode findNode(String id);
+
+  /**
+   * Insert the given Node in the graph.  The node must not exist in the graph
+   * prior to this call.  Use {@link #mapNode(GraphNode)} if an
+   * {@link GraphNode} for the supplied node is required to add an edge.
    * 
    * @param node new Node.
    * @return the newly inserted Node.
@@ -58,4 +63,11 @@ public interface GraphBuilder {
    *   Otherwise, newNode added to the graph and returned.
    */
   public GraphNode mapNode(GraphNode newNode);
+
+  /**
+   * Provide the complete GraphModel containing the added nodes and edges.
+   * Multiple calls have undefined results.  A {@link GraphBuilder} is expected
+   * to be used once, and return an immutable graph.
+   */
+  public GraphModel createGraphModel();
 }

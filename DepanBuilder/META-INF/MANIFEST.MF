@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: DepanBuilder
+Bundle-SymbolicName: com.google.devtools.depan.builder;singleton:=true
+Bundle-Version: 2.0.0.qualifier
+Bundle-Vendor: Pnambic Computing
+Require-Bundle: com.google.guava,
+ com.google.devtools.depan.core
+Export-Package: com.google.devtools.depan.model.builder.api,
+ com.google.devtools.depan.model.builder.chain
+Bundle-ClassPath: .

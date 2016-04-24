@@ -18,7 +18,7 @@ package com.google.devtools.depan.graphml.builder;
 
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.model.builder.DependenciesListener;
+import com.google.devtools.depan.model.builder.chain.DependenciesListener;
 
 import com.google.common.collect.Maps;
 

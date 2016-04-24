@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.model.builder;
+package com.google.devtools.depan.model.builder.chain;
 
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.model.interfaces.GraphBuilder;
+import com.google.devtools.depan.model.builder.api.GraphBuilder;
 
 /**
  * Extends a SimpleDependenciesListener to filter entities that are outside

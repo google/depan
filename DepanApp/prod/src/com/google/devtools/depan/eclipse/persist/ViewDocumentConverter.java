@@ -127,7 +127,7 @@ public class ViewDocumentConverter implements Converter {
    * <p>
    * This implementation temporarily injects the current {@code GraphModel}
    * instance into the {@code UnmarshallingContext} with the key
-   * {@code GraphModel.class}.  This allows the {@link EdgeConverter} to
+   * {@code GraphModel.class}.  This allows the {@link EdgeReferenceConverter} to
    * translate node ids directly into node references.
    * 
    * @see EdgeConverter#unmarshal(HierarchicalStreamReader, UnmarshallingContext)

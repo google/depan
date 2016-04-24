@@ -23,7 +23,6 @@ import com.google.common.collect.Sets;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.model.interfaces.GraphBuilder;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -304,15 +303,14 @@ public class Collapser {
     gizmo.addExposedEdges(edges, graph.getEdges());
 
     // Add the exposed components to the generated result
-    GraphModel result = new GraphModel();
-    GraphBuilder builder = result.getBuilder();
+    GraphBuilder builder = GraphModelBuilder.getBuilder();
     for (GraphNode node : nodes) {
       builder.newNode(node);
     }
     for (GraphEdge edge : edges) {
       builder.addEdge(edge);
     }
-    return result;
+    return builder.getGraph();
   }
 
   /**

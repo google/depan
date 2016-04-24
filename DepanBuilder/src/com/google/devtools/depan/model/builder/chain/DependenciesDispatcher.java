@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.model.builder;
+package com.google.devtools.depan.model.builder.chain;
 
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.model.interfaces.GraphBuilder;
+import com.google.devtools.depan.model.builder.api.GraphBuilder;
 
 /**
  * Implements a DependenciesListener, which means that this is the first class

@@ -12,7 +12,8 @@ Require-Bundle: com.google.devtools.depan,
  com.google.guava,
  depan-jogl-library,
  depan-xstream-library,
- com.google.devtools.depan.maven
+ com.google.devtools.depan.maven,
+ com.google.devtools.depan.builder
 Export-Package: com.google.devtools.depan.graphml.builder,
  com.google.devtools.depan.graphml.eclipse
 Bundle-Vendor: Pnambic Computing

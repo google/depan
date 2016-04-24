@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.model.builder;
+package com.google.devtools.depan.model.builder.chain;
 
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.model.builder.DependenciesListener;
-import com.google.devtools.depan.model.interfaces.GraphBuilder;
+import com.google.devtools.depan.model.builder.api.GraphBuilder;
+import com.google.devtools.depan.model.builder.chain.DependenciesListener;
 
 /**
  * Implements a simple form of DependenciesListener, primarily detection
@@ -74,6 +74,6 @@ public class SimpleDependencyListener
 
   @Override
   public GraphNode lookup(GraphNode target) {
-    return (GraphNode) graphBuilder.getGraph().findNode(target.getId());
+    return graphBuilder.findNode(target.getId());
   }
 }

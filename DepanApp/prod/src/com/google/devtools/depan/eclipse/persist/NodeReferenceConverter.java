@@ -27,8 +27,8 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
 /**
  * {@code XStream} converter to handle {@code GraphEdge}s.  This converter
- * assumes that the {@code UnmarshallingContext} has an {@code GraphModel}
- * entry that can be retrieved by the {@code GraphModel.class} key.
+ * assumes that a {@code GraphModel}, used to find nodes, can be retrieved
+ * from the {@code UnmarshallingContext}.
  * 
  * @author <a href="mailto:leeca@google.com">Lee Carver</a>
  */
@@ -57,6 +57,12 @@ public class NodeReferenceConverter implements Converter {
     context.convertAnother(((GraphNode) source).getId());
   }
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * This implementation assumes that a {@code GraphModel}, used to find nodes,
+   * can be retrieved from the {@code UnmarshallingContext}.
+   */
   @Override
   public Object unmarshal(HierarchicalStreamReader reader,
       UnmarshallingContext context) {

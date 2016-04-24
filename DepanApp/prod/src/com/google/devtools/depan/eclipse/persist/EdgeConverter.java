@@ -19,8 +19,8 @@ package com.google.devtools.depan.eclipse.persist;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.basic.BasicEdge;
 import com.google.devtools.depan.model.GraphEdge;
-import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
+import com.google.devtools.depan.model.builder.api.GraphBuilder;
 
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
@@ -31,8 +31,10 @@ import com.thoughtworks.xstream.mapper.Mapper;
 
 /**
  * {@code XStream} converter to handle {@code GraphEdge}s.  This converter
- * assumes that the {@code UnmarshallingContext} as an {@code GraphModel} entry
- * that can be retrieved by the {@code GraphModel.class} key.
+ * assumes that the {@code UnmarshallingContext} has a {@code GraphBuilder}
+ * entry be obtained using the
+ * {@link GraphModelConverter#contextGraphBuilder(com.thoughtworks.xstream.converters.DataHolder)}
+ * method.
  * 
  * @author Original lost in the mists of time
  */
@@ -86,26 +88,27 @@ public class EdgeConverter implements Converter {
   /**
    * {@inheritDoc}
    * <p>
-   * This implementation assumes that a {@code GraphModel}, used to find nodes,
-   * can be retrieved from the {@code UnmarshallingContext} with the key
-   * {@code GraphModel.class}.
+   * This implementation assumes the {@code GraphBuilder} entry be obtained
+   * from the {@code context} using the
+   * {@link GraphModelConverter#contextGraphBuilder(com.thoughtworks.xstream.converters.DataHolder)}
+   * method.
    */
   @Override
   public Object unmarshal(HierarchicalStreamReader reader,
       UnmarshallingContext context) {
     try {
-      GraphModel graph = (GraphModel) context.get(GraphModel.class);
+      GraphBuilder builder = GraphModelConverter.contextGraphBuilder(context);
 
       reader.moveDown();
       Relation relation = unmarshallRelation(reader, context);
       reader.moveUp();
 
       reader.moveDown();
-      GraphNode head = unmarshallGraphNode(reader, context, graph);
+      GraphNode head = unmarshallGraphNode(reader, context, builder);
       reader.moveUp();
 
       reader.moveDown();
-      GraphNode tail = unmarshallGraphNode(reader, context, graph);
+      GraphNode tail = unmarshallGraphNode(reader, context, builder);
       reader.moveUp();
 
       GraphEdge result = new GraphEdge(head, tail, relation);
@@ -127,9 +130,11 @@ public class EdgeConverter implements Converter {
   }
 
   private GraphNode unmarshallGraphNode(
-      HierarchicalStreamReader reader, UnmarshallingContext context, GraphModel graph) {
+      HierarchicalStreamReader reader,
+      UnmarshallingContext context,
+      GraphBuilder builder) {
     String nodeId = reader.getValue();
-    GraphNode result = (GraphNode) graph.findNode(nodeId);
+    GraphNode result = builder.findNode(nodeId);
     if (null == result) {
       throw new IllegalStateException(
           "Edge reference to undefined node " + nodeId);

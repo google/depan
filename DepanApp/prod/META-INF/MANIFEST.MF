@@ -19,7 +19,10 @@ Require-Bundle: org.eclipse.core.runtime,
  com.google.guava,
  depan-jogl-library,
  depan-jung-library,
- depan-xstream-library
+ depan-xstream-library,
+ com.google.devtools.depan.core,
+ com.google.devtools.depan.core,
+ com.google.devtools.depan.builder
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Export-Package: com.google.devtools.depan.eclipse.cm,

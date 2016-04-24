@@ -16,10 +16,6 @@
 
 package com.google.devtools.depan.graph.basic;
 
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-
-import com.google.devtools.depan.graph.api.Edge;
 import com.google.devtools.depan.graph.api.Graph;
 import com.google.devtools.depan.graph.api.Node;
 import com.google.devtools.depan.graph.api.Relation;
@@ -36,65 +32,27 @@ import java.util.Set;
  */
 public class BasicGraph<T> implements Graph<T> {
   
-  private final Map<T, BasicNode<? extends T>> nodes = Maps.newHashMap();
+  private final Map<T, BasicNode<? extends T>> nodes;
 
-  private final Set<BasicEdge<? extends T>> edges = Sets.newHashSet();
-
-  @SuppressWarnings("serial")
-  public static class DuplicateNodeException
-      extends IllegalArgumentException {
-
-    /**
-     * @param id
-     */
-    public DuplicateNodeException(String nodeId) {
-      super("duplicate node id " + nodeId);
-    }
-  }
-
-  @SuppressWarnings("serial")
-  public static class DuplicateEdgeException
-      extends IllegalArgumentException {
-
-    /**
-     * 
-     */
-    public DuplicateEdgeException(String relation, String head, String tail) {
-      super("edge already exists: "
-        + relation + " from " + head + " to " + tail + ".");
-    }
-  }
+  private final Set<BasicEdge<? extends T>> edges;
 
   /**
    * 
    */
-  public BasicGraph() {
+  public BasicGraph(
+      Map<T, BasicNode<? extends T>> nodes,
+      Set<BasicEdge<? extends T>> edges) {
+    this.nodes = nodes;
+    this.edges = edges;
   }
 
   /////////////////////////////////////
-  // Basic Graph<> methods for Nodes
-
-  @Override
-  public void addNode(Node<? extends T> node) {
-    if (nodes.containsKey(node.getId())) {
-      throw new DuplicateNodeException(node.getId().toString());
-    }
-
-    nodes.put(node.getId(), (BasicNode<? extends T>) node);
-  }
+  // Inherited Graph<> methods
 
   @Override
   public BasicNode<? extends T> findNode(T id) {
     final BasicNode<? extends T> result = nodes.get(id);
     return result;
-  }
-
-  /////////////////////////////////////
-  // Basic Graph<> methods for Edges
-
-  @Override
-  public void addEdge(Edge<? extends T> edge) {
-    edges.add((BasicEdge<? extends T>) edge);
   }
 
   @Override
@@ -113,51 +71,7 @@ public class BasicGraph<T> implements Graph<T> {
   }
 
   /////////////////////////////////////
-  // Factory methods
-
-  /**
-   * Basic Factory method for creating Edges.
-   * Extending classes should override this.
-   * 
-   * @param relation
-   * @param head
-   * @param tail
-   * @return A new {@link BasicEdge}.
-   */
-  protected BasicEdge<? extends T> createBasicEdge(
-      Relation relation, Node<? extends T> head, Node <? extends T>tail) {
-    return new BasicEdge<T>(relation, head, tail);
-  }
-
-  /////////////////////////////////////
-  // Node methods
-
-  /**
-   * Properly install the node into the node set.
-   * 
-   * @param result
-   * @return
-   */
-  protected void addBasicNode(BasicNode<? extends T> addNode) {
-    addNode(addNode);
-  }
-
-  /**
-   * Return an existing node if the newNode is already known to the graph.
-   * 
-   * @param newNode new Node.
-   * @return if newNode matches a known node, the known nodes is returned.
-   *   Otherwise newNode is returned.
-   */
-  public BasicNode<? extends T> mapNode(BasicNode<? extends T> newNode) {
-    BasicNode<? extends T> graphNode = findNode(newNode.getId());
-    if (graphNode != null) {
-      return graphNode;
-    }
-
-    addBasicNode(newNode);
-    return newNode;
-  }
+  // BasicGraph methods
 
   /**
    * Returns the collection of Nodes in this graph.
@@ -168,17 +82,6 @@ public class BasicGraph<T> implements Graph<T> {
     return Collections.unmodifiableCollection(nodes.values());
   }
 
-  /////////////////////////////////////
-  // Edge methods
-
-  /**
-   * @param result
-   * @return
-   */
-  protected void addBasicEdge(BasicEdge<? extends T> newEdge) {
-    addEdge(newEdge);
-  }
-
   /**
    * Returns the collection of Nodes in this graph.
    * 
@@ -187,43 +90,4 @@ public class BasicGraph<T> implements Graph<T> {
   public Collection<? extends BasicEdge<? extends T>> getEdges() {
     return Collections.unmodifiableCollection(edges);
   }
-
-  /**
-   * Basic Factory method for creating Edges.
-   * Extending classes should override this.
-   */
-  protected BasicEdge<? extends T> installEdge(Relation relation,
-      Node<? extends T> head, Node <? extends T>tail) {
-    BasicEdge<? extends T> result = createBasicEdge(relation, head, tail);
-    addBasicEdge(result);
-    return result;
-  }
-
-  /**
-   * @inheritDoc
-   */
-  public BasicEdge<? extends T> addEdge(Relation relation,
-      Node<? extends T> head, Node<? extends T> tail) {
-    if (null != findEdge(relation, head, tail)) {
-      throw new DuplicateEdgeException(
-        relation.toString(), head.toString(), tail.toString());
-    }
-
-    return installEdge(relation, head, tail);
-  }
-
-  /**
-   * @inheritDoc
-   */
-  public BasicEdge<? extends T> getEdge(Relation relation,
-      Node<? extends T> head, Node<? extends T> tail) {
-    BasicEdge<? extends T> result = findEdge(relation, head, tail);
-    if (null != result) {
-      return result;
-    }
-
-    // Return a new one
-    return installEdge(relation, head, tail);
-  }
-
 }

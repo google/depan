@@ -26,7 +26,7 @@ import com.google.devtools.depan.java.graph.TypeElement;
 import com.google.devtools.depan.java.integration.JavaElementDispatcher;
 import com.google.devtools.depan.model.Element;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.model.builder.ElementFilter;
+import com.google.devtools.depan.model.builder.chain.ElementFilter;
 
 import java.util.Collection;
 

@@ -10,8 +10,6 @@ Export-Package: com.google.devtools.depan.filters,
  com.google.devtools.depan.graph.api,
  com.google.devtools.depan.graph.basic,
  com.google.devtools.depan.model,
- com.google.devtools.depan.model.builder,
- com.google.devtools.depan.model.interfaces,
  com.google.devtools.depan.tasks,
  com.google.devtools.depan.util,
  com.google.devtools.depan.view

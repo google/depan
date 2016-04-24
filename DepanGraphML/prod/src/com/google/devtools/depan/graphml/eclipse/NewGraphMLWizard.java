@@ -25,8 +25,10 @@ import com.google.devtools.depan.graphml.builder.GraphMLContext;
 import com.google.devtools.depan.graphml.builder.GraphMLDocumentHandler;
 import com.google.devtools.depan.graphml.builder.Tools;
 import com.google.devtools.depan.model.GraphModel;
-import com.google.devtools.depan.model.builder.DependenciesDispatcher;
-import com.google.devtools.depan.model.builder.DependenciesListener;
+import com.google.devtools.depan.model.builder.api.GraphBuilder;
+import com.google.devtools.depan.model.builder.api.GraphBuilders;
+import com.google.devtools.depan.model.builder.chain.DependenciesDispatcher;
+import com.google.devtools.depan.model.builder.chain.DependenciesListener;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -97,9 +99,8 @@ public class NewGraphMLWizard extends AbstractAnalysisWizard {
     // TODO(leeca): Add filters, etc.
     // TODO(leeca): Extend UI to allow lists of directories.
 
-    GraphModel analysisGraph = new GraphModel();
-    DependenciesListener builder =
-        new DependenciesDispatcher(analysisGraph.getBuilder());
+    GraphBuilder graphBuilder = GraphBuilders.createGraphModelBuilder();
+    DependenciesListener builder = new DependenciesDispatcher(graphBuilder);
 
     GraphMLProcessing processing = page.getProcessing();
     GraphFactory graphFactory = processing.getGraphFactory();
@@ -120,6 +121,7 @@ public class NewGraphMLWizard extends AbstractAnalysisWizard {
     monitor.worked(1);
 
     // Done
+    GraphModel analysisGraph = graphBuilder.createGraphModel();
     return createGraphDocument(analysisGraph, graphFactory.getAnalysisPlugins());
   }
 

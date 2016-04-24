@@ -14,19 +14,21 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.model.builder;
+package com.google.devtools.depan.model.builder.chain;
 
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.model.GraphNode;
 
 /**
- * Listener used to add dependencies to a GraphModel, typically used while
- * analyzing a dependency source.  This allows filtering of dependencies
- * that refer to entities outside the scope of the analaysis, detection of
- * duplicate nodes, and avoidance of duplicate dependencies.
+ * Listener used to add dependencies to a {@link GraphBuilder}, typically used
+ * while analyzing a dependency source.  DependenciesListener implementation
+ * chain graph construction behaviors via derived types.
+ * 
+ * The standard hierarchy of Dependencies listeners includes filtering of
+ * dependencies that refer to entities outside the scope of the analysis,
+ * detection of duplicate nodes, and avoidance of duplicate dependencies.
  *
  * @author ycoppel@google.com (Yohann Coppel)
- *
  */
 public interface DependenciesListener {
   /**

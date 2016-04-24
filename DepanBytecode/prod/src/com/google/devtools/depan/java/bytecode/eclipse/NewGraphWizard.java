@@ -24,9 +24,11 @@ import com.google.devtools.depan.filesystem.eclipse.FileSystemActivator;
 import com.google.devtools.depan.filesystem.eclipse.TreeLoader;
 import com.google.devtools.depan.java.eclipse.JavaActivator;
 import com.google.devtools.depan.model.GraphModel;
-import com.google.devtools.depan.model.builder.DependenciesDispatcher;
-import com.google.devtools.depan.model.builder.DependenciesListener;
-import com.google.devtools.depan.model.builder.ElementFilter;
+import com.google.devtools.depan.model.builder.api.GraphBuilder;
+import com.google.devtools.depan.model.builder.api.GraphBuilders;
+import com.google.devtools.depan.model.builder.chain.DependenciesDispatcher;
+import com.google.devtools.depan.model.builder.chain.DependenciesListener;
+import com.google.devtools.depan.model.builder.chain.ElementFilter;
 import com.google.devtools.depan.util.ProgressListener;
 import com.google.devtools.depan.util.QuickProgressListener;
 
@@ -104,9 +106,9 @@ public class NewGraphWizard extends AbstractAnalysisWizard {
     Collection<String> packageWhitelist = splitFilter(packageFilter);
     ElementFilter filter = new DefaultElementFilter(packageWhitelist);
 
-    GraphModel resultGraph = new GraphModel();
+    GraphBuilder graphBuilder = GraphBuilders.createGraphModelBuilder();
     DependenciesListener builder =
-        new DependenciesDispatcher(filter, resultGraph.getBuilder());
+        new DependenciesDispatcher(filter, graphBuilder);
 
     // TODO(leeca): Extend UI to allow lists of directories.
     Collection<String> directoryWhitelist = splitFilter(directoryFilter);
@@ -132,6 +134,7 @@ public class NewGraphWizard extends AbstractAnalysisWizard {
 
     monitor.worked(1);
 
+    GraphModel resultGraph = graphBuilder.createGraphModel();
     return createGraphDocument(resultGraph,
         JavaActivator.PLUGIN_ID, FileSystemActivator.PLUGIN_ID,
       Resources.PLUGIN_ID);

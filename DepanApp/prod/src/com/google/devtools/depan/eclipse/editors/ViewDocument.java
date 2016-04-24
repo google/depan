@@ -25,7 +25,8 @@ import com.google.devtools.depan.model.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.RelationSetDescriptor;
-import com.google.devtools.depan.model.interfaces.GraphBuilder;
+import com.google.devtools.depan.model.builder.api.GraphBuilder;
+import com.google.devtools.depan.model.builder.api.GraphBuilders;
 import com.google.devtools.depan.view.CollapseData;
 import com.google.devtools.depan.view.CollapseTreeModel;
 import com.google.devtools.depan.view.TreeModel;
@@ -239,18 +240,23 @@ public class ViewDocument {
   /////////////////////////////////////
   // Factories for derived instances
 
+  /**
+   * Note that the returned GraphModel shares edges and nodes with the parent
+   * graph.  These are immutable, so it shouldn't be too dangerous.
+   * Normally, derived graphs have their own copies of the nodes and edges.
+   */
   public GraphModel buildGraphView() {
-    GraphModel parent = parentGraph.getGraph().getGraph();
-    GraphModel result = parent.newView();
+    GraphBuilder result = GraphBuilders.createGraphModelBuilder();
 
-    // add the nodes
-    GraphBuilder builder = result.getBuilder();
-    for (GraphNode node : viewNodes) {
-      builder.newNode(node);
+    GraphModel source = parentGraph.getGraph().getGraph();
+    for (GraphEdge edge : source.getEdges()) {
+      if (viewNodes.contains(edge.getHead()) &&
+          viewNodes.contains(edge.getTail())) {
+        result.addEdge(edge);
+      }
     }
 
-    parent.populateRelations(result);
-    return result;
+    return result.createGraphModel();
   }
 
   public ViewDocument newViewDocument(Collection<GraphNode> nodes) {
