@@ -16,7 +16,7 @@
 package com.google.devtools.depan.eclipse.utils;
 
 import com.google.devtools.depan.eclipse.editors.HierarchyCache;
-import com.google.devtools.depan.eclipse.trees.GraphData;
+import com.google.devtools.depan.eclipse.ui.nodes.trees.GraphData;
 import com.google.devtools.depan.model.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.view.TreeModel;

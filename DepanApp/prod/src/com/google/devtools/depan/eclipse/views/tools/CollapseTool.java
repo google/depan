@@ -20,14 +20,14 @@ import com.google.devtools.depan.eclipse.editors.HierarchyCache;
 import com.google.devtools.depan.eclipse.editors.NodeDisplayProperty;
 import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.editors.ViewPrefsListener;
-import com.google.devtools.depan.eclipse.trees.GraphData;
-import com.google.devtools.depan.eclipse.trees.GraphNodeViewer;
+import com.google.devtools.depan.eclipse.ui.nodes.trees.GraphData;
 import com.google.devtools.depan.eclipse.utils.HierarchyViewer;
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.utils.SelectedNodeChoicesControl;
 import com.google.devtools.depan.eclipse.views.ViewSelectionListenerTool;
 import com.google.devtools.depan.model.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphNode;
+import com.google.devtools.depan.ui.nodes.trees.GraphNodeViewer;
 import com.google.devtools.depan.view.CollapseData;
 
 import org.eclipse.swt.SWT;

@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: DepanCollapser
+Bundle-SymbolicName: com.google.devtools.depan.collapser;singleton:=true
+Bundle-Version: 2.0.0.qualifier
+Bundle-Vendor: Pnambic Computing
+Require-Bundle: org.eclipse.core.runtime,
+ com.google.guava,
+ com.google.devtools.depan.core,
+ com.google.devtools.depan.builder,
+ org.eclipse.jface,
+ org.eclipse.ui.ide,
+ com.google.devtools.depan.eclipse.ui.nodes
+Export-Package: com.google.devtools.depan.view
+Bundle-ClassPath: .
+Bundle-ActivationPolicy: lazy

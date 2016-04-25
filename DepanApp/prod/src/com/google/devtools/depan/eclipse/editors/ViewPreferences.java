@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.eclipse.editors;
 
-import com.google.devtools.depan.eclipse.trees.NodeTreeProvider;
+import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeTreeProvider;
 import com.google.devtools.depan.eclipse.utils.ListenerManager;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.api.RelationSet;

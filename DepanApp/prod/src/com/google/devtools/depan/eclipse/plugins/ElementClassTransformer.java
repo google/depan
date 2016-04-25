@@ -17,6 +17,7 @@
 package com.google.devtools.depan.eclipse.plugins;
 
 import com.google.devtools.depan.model.Element;
+import com.google.devtools.depan.model.ElementTransformer;
 
 /**
  * An {@link ElementTransformer} that uses the {@link Class} of the element

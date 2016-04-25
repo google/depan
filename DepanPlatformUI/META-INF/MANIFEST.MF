@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: DepanPlatformUI
+Bundle-SymbolicName: com.google.devtools.depan.platform.ui;singleton:=true
+Bundle-Version: 2.0.0.qualifier
+Bundle-Vendor: Pnambic Computing
+Require-Bundle: com.google.guava,
+ com.google.devtools.depan.core,
+ org.eclipse.ui.ide
+Bundle-ClassPath: .
+Export-Package: com.google.devtools.depan.platform

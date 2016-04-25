@@ -16,9 +16,9 @@
 
 package com.google.devtools.depan.ruby.eclipse;
 
-import com.google.devtools.depan.eclipse.plugins.ElementTransformer;
 import com.google.devtools.depan.eclipse.utils.Tools;
 import com.google.devtools.depan.model.Element;
+import com.google.devtools.depan.model.ElementTransformer;
 import com.google.devtools.depan.ruby.eclipse.preferences.ColorPreferencesIds;
 import com.google.devtools.depan.ruby.graph.ClassElement;
 import com.google.devtools.depan.ruby.graph.ClassMethodElement;

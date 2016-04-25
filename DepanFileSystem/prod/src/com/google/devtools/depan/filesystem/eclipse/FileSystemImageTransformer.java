@@ -16,11 +16,11 @@
 
 package com.google.devtools.depan.filesystem.eclipse;
 
-import com.google.devtools.depan.eclipse.plugins.ElementTransformer;
 import com.google.devtools.depan.filesystem.graph.DirectoryElement;
 import com.google.devtools.depan.filesystem.graph.FileElement;
 import com.google.devtools.depan.filesystem.integration.FileSystemElementDispatcher;
 import com.google.devtools.depan.model.Element;
+import com.google.devtools.depan.model.ElementTransformer;
 
 import org.eclipse.swt.graphics.Image;
 

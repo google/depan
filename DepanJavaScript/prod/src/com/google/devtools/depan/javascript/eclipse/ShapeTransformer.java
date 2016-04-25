@@ -16,7 +16,6 @@
 
 package com.google.devtools.depan.javascript.eclipse;
 
-import com.google.devtools.depan.eclipse.plugins.ElementTransformer;
 import com.google.devtools.depan.eclipse.visualization.ogl.GLEntity;
 import com.google.devtools.depan.eclipse.visualization.ogl.ShapeFactory;
 import com.google.devtools.depan.javascript.graph.JavaScriptBuiltinElement;
@@ -27,6 +26,7 @@ import com.google.devtools.depan.javascript.graph.JavaScriptFunctionElement;
 import com.google.devtools.depan.javascript.graph.JavaScriptVariableElement;
 import com.google.devtools.depan.javascript.integration.JavaScriptElementDispatcher;
 import com.google.devtools.depan.model.Element;
+import com.google.devtools.depan.model.ElementTransformer;
 
 /**
  * Responsible for providing the correct shape for a given element type.

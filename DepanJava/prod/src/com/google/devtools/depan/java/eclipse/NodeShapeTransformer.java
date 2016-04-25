@@ -16,7 +16,6 @@
 
 package com.google.devtools.depan.java.eclipse;
 
-import com.google.devtools.depan.eclipse.plugins.ElementTransformer;
 import com.google.devtools.depan.eclipse.visualization.ogl.GLEntity;
 import com.google.devtools.depan.eclipse.visualization.ogl.ShapeFactory;
 import com.google.devtools.depan.java.graph.FieldElement;
@@ -26,6 +25,7 @@ import com.google.devtools.depan.java.graph.PackageElement;
 import com.google.devtools.depan.java.graph.TypeElement;
 import com.google.devtools.depan.java.integration.JavaElementDispatcher;
 import com.google.devtools.depan.model.Element;
+import com.google.devtools.depan.model.ElementTransformer;
 
 public class NodeShapeTransformer extends JavaElementDispatcher<GLEntity>
     implements ElementTransformer<GLEntity> {

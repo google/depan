@@ -17,11 +17,11 @@
 package com.google.devtools.depan.eclipse.editors;
 
 import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
-import com.google.devtools.depan.eclipse.trees.CheckNodeTreeView;
-import com.google.devtools.depan.eclipse.trees.GraphData;
-import com.google.devtools.depan.eclipse.trees.NodeTreeProvider;
-import com.google.devtools.depan.eclipse.trees.NodeWrapper;
-import com.google.devtools.depan.eclipse.trees.NodeWrapperTreeSorter;
+import com.google.devtools.depan.eclipse.ui.nodes.trees.GraphData;
+import com.google.devtools.depan.eclipse.ui.nodes.trees.NodeWrapper;
+import com.google.devtools.depan.eclipse.ui.nodes.trees.NodeWrapperTreeSorter;
+import com.google.devtools.depan.eclipse.ui.nodes.viewers.CheckNodeTreeView;
+import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeTreeProvider;
 import com.google.devtools.depan.eclipse.utils.GraphEdgeMatcherDescriptors;
 import com.google.devtools.depan.eclipse.utils.HierarchyViewer;
 import com.google.devtools.depan.eclipse.utils.HierarchyViewer.HierarchyChangeListener;

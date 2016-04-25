@@ -16,8 +16,8 @@
 
 package com.google.devtools.depan.eclipse.editors;
 
-import com.google.devtools.depan.eclipse.trees.GraphData;
-import com.google.devtools.depan.eclipse.trees.NodeTreeProvider;
+import com.google.devtools.depan.eclipse.ui.nodes.trees.GraphData;
+import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeTreeProvider;
 import com.google.devtools.depan.model.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
