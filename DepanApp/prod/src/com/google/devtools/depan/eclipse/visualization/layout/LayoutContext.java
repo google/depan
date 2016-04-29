@@ -15,11 +15,11 @@
  */
 package com.google.devtools.depan.eclipse.visualization.layout;
 
-import com.google.devtools.depan.model.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 
 import com.google.common.collect.Maps;
+import com.google.devtools.edges.matchers.GraphEdgeMatcherDescriptor;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;

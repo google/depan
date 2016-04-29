@@ -22,8 +22,8 @@ import com.google.devtools.depan.eclipse.ui.nodes.trees.SolitaryRoot;
 import com.google.devtools.depan.eclipse.ui.nodes.trees.TreeDescr;
 import com.google.devtools.depan.eclipse.ui.nodes.trees.ViewerRoot;
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeViewerProvider;
+import com.google.devtools.depan.edges.trees.TreeModel;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.view.TreeModel;
 
 import com.google.common.collect.Lists;
 

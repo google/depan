@@ -18,23 +18,23 @@ package com.google.devtools.depan.eclipse.editors;
 
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeTreeProvider;
 import com.google.devtools.depan.eclipse.utils.ListenerManager;
+import com.google.devtools.depan.edges.trees.TreeModel;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.api.RelationSet;
 import com.google.devtools.depan.model.GraphEdge;
-import com.google.devtools.depan.model.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.model.RelationSetDescriptor;
 import com.google.devtools.depan.model.RelationSets;
+import com.google.devtools.depan.relations.RelationSetDescriptor;
 import com.google.devtools.depan.view.CollapseData;
 import com.google.devtools.depan.view.CollapseTreeModel;
 import com.google.devtools.depan.view.Collapser;
-import com.google.devtools.depan.view.TreeModel;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.devtools.edges.matchers.GraphEdgeMatcherDescriptor;
 
 import java.awt.geom.Point2D;
 import java.util.Collection;

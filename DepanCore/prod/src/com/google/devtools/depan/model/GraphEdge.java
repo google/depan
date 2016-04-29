@@ -43,25 +43,16 @@ public class GraphEdge extends BasicEdge<String> {
     return "" + getHead() + " --[" + getRelation() + "]--> " + getTail();
   }
 
-  /* (non-Javadoc)
-   * @see com.google.devtools.depan.graph.basic.BasicEdge#getHead()
-   */
   @Override
   public GraphNode getHead() {
     return (GraphNode) super.getHead();
   }
 
-  /* (non-Javadoc)
-   * @see com.google.devtools.depan.graph.basic.BasicEdge#getTail()
-   */
   @Override
   public GraphNode getTail() {
     return (GraphNode) super.getTail();
   }
 
-  /* (non-Javadoc)
-   * @see java.lang.Object#hashCode()
-   */
   @Override
   public int hashCode() {
     int hash = 17;
@@ -71,9 +62,6 @@ public class GraphEdge extends BasicEdge<String> {
     return hash;
   }
 
-  /* (non-Javadoc)
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof GraphEdge) {

@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.eclipse.ui.nodes.trees;
 
-import com.google.devtools.depan.model.GraphEdgeMatcherDescriptor;
+import com.google.devtools.depan.eclipse.ui.edges.matchers.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphNode;
 
 import java.util.Collection;

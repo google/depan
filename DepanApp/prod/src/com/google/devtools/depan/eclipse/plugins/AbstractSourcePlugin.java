@@ -17,10 +17,10 @@
 package com.google.devtools.depan.eclipse.plugins;
 
 import com.google.devtools.depan.eclipse.utils.GraphEdgeMatcherDescriptors;
-import com.google.devtools.depan.model.GraphEdgeMatcherDescriptor;
-import com.google.devtools.depan.model.RelationSetDescriptor;
+import com.google.devtools.depan.relations.RelationSetDescriptor;
 
 import com.google.common.collect.Lists;
+import com.google.devtools.edges.matchers.GraphEdgeMatcherDescriptor;
 
 import java.util.Collection;
 

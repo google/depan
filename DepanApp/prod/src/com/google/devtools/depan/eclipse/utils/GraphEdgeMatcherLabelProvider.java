@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.eclipse.utils;
 
-import com.google.devtools.depan.model.GraphEdgeMatcherDescriptor;
+import com.google.devtools.edges.matchers.GraphEdgeMatcherDescriptor;
 
 import org.eclipse.jface.viewers.BaseLabelProvider;
 import org.eclipse.jface.viewers.ILabelProvider;

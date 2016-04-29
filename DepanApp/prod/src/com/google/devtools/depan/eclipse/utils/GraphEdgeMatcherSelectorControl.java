@@ -16,10 +16,10 @@
 
 package com.google.devtools.depan.eclipse.utils;
 
-import com.google.devtools.depan.model.GraphEdgeMatcherDescriptor;
-import com.google.devtools.depan.model.RelationSetDescriptor;
+import com.google.devtools.depan.relations.RelationSetDescriptor;
 
 import com.google.common.collect.Lists;
+import com.google.devtools.edges.matchers.GraphEdgeMatcherDescriptor;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;

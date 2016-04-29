@@ -17,7 +17,7 @@
 package com.google.devtools.depan.eclipse.editors;
 
 import com.google.devtools.depan.eclipse.utils.Resources;
-import com.google.devtools.depan.util.BinaryOperators;
+import com.google.devtools.depan.platform.BinaryOperators;
 
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.core.runtime.Platform;

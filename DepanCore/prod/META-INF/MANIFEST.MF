@@ -6,11 +6,8 @@ Bundle-Version: 1.0.5.qualifier
 Bundle-Vendor: Pnambic Computing
 Require-Bundle: com.google.guava,
  joda-time
-Export-Package: com.google.devtools.depan.filters,
- com.google.devtools.depan.graph.api,
+Export-Package: com.google.devtools.depan.graph.api,
  com.google.devtools.depan.graph.basic,
  com.google.devtools.depan.model,
- com.google.devtools.depan.tasks,
- com.google.devtools.depan.util,
- com.google.devtools.depan.view
+ com.google.devtools.depan.model.testing
 Bundle-ClassPath: .

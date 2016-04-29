@@ -22,12 +22,12 @@ import com.google.devtools.depan.eclipse.utils.EditColTableDef;
 import com.google.devtools.depan.eclipse.utils.GraphEdgeMatcherEditorPart;
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.utils.TableContentProvider;
-import com.google.devtools.depan.filters.PathExpression;
-import com.google.devtools.depan.filters.PathMatcher;
-import com.google.devtools.depan.filters.PathMatcherTerm;
-import com.google.devtools.depan.model.GraphEdgeMatcherDescriptor;
+import com.google.devtools.depan.paths.filters.PathExpression;
+import com.google.devtools.depan.paths.filters.PathMatcher;
+import com.google.devtools.depan.paths.filters.PathMatcherTerm;
 
 import com.google.common.collect.Sets;
+import com.google.devtools.edges.matchers.GraphEdgeMatcherDescriptor;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;

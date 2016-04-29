@@ -31,11 +31,11 @@ import com.google.devtools.depan.eclipse.utils.HierarchyViewer.HierarchyChangeLi
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.utils.Tools;
 import com.google.devtools.depan.eclipse.views.ViewSelectionListenerTool;
-import com.google.devtools.depan.model.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.util.StringUtils;
 
 import com.google.common.collect.Lists;
+import com.google.devtools.edges.matchers.GraphEdgeMatcherDescriptor;
 
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CheckboxCellEditor;

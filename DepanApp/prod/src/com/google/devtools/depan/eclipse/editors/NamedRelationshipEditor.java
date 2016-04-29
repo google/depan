@@ -23,7 +23,8 @@ import com.google.devtools.depan.eclipse.utils.ModificationListener;
 import com.google.devtools.depan.eclipse.utils.TableContentProvider;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.model.GraphEdgeMatcher;
-import com.google.devtools.depan.model.GraphEdgeMatcherDescriptor;
+
+import com.google.devtools.edges.matchers.GraphEdgeMatcherDescriptor;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;

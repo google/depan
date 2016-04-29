@@ -22,9 +22,9 @@ import com.google.devtools.depan.eclipse.utils.RelationSetRelationTableEditor.Re
 import com.google.devtools.depan.eclipse.wizards.NewRelationSetWizard;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.api.RelationSet;
-import com.google.devtools.depan.model.RelationSetDescriptor;
-import com.google.devtools.depan.model.RelationSetDescriptors;
 import com.google.devtools.depan.model.RelationSets;
+import com.google.devtools.depan.relations.RelationSetDescriptor;
+import com.google.devtools.depan.relations.RelationSetDescriptors;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;

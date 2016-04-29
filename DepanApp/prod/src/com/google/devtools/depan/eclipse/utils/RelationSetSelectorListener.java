@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.eclipse.utils;
 
-import com.google.devtools.depan.model.RelationSetDescriptor;
+import com.google.devtools.depan.relations.RelationSetDescriptor;
 
 /**
  * An interface for applying a relationSet to an object.

@@ -35,20 +35,20 @@ import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerator;
 import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerators;
 import com.google.devtools.depan.eclipse.visualization.layout.LayoutScaler;
 import com.google.devtools.depan.eclipse.visualization.layout.LayoutUtil;
+import com.google.devtools.depan.edges.trees.TreeModel;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.api.RelationSet;
 import com.google.devtools.depan.model.GraphEdge;
-import com.google.devtools.depan.model.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.model.RelationSetDescriptor;
 import com.google.devtools.depan.model.RelationSets;
+import com.google.devtools.depan.relations.RelationSetDescriptor;
 import com.google.devtools.depan.view.CollapseData;
 import com.google.devtools.depan.view.CollapseTreeModel;
-import com.google.devtools.depan.view.TreeModel;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.devtools.edges.matchers.GraphEdgeMatcherDescriptor;
 import com.thoughtworks.xstream.XStream;
 
 import edu.uci.ics.jung.algorithms.importance.KStepMarkov;
@@ -540,7 +540,7 @@ public class ViewEditor extends MultiPageEditorPart {
     context.setGraphModel(getExposedGraph());
     context.setMovableNodes(viewGraph.getNodes());
     // TODO: Compute ranking based on selected edge matcher
-    context.setEdgeMatcher(com.google.devtools.depan.model.GraphEdgeMatcherDescriptors.FORWARD);
+    context.setEdgeMatcher(com.google.devtools.depan.eclipse.ui.edges.matchers.GraphEdgeMatcherDescriptors.FORWARD);
 
     return LayoutUtil.buildJungGraph(context);
   }

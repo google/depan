@@ -24,6 +24,8 @@ import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
+import com.google.devtools.depan.edges.trees.HierarchicalTreeModel;
+import com.google.devtools.depan.edges.trees.TreeModel;
 import com.google.devtools.depan.graph.basic.MultipleDirectedRelationFinder;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;

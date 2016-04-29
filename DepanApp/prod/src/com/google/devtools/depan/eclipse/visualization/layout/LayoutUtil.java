@@ -15,11 +15,12 @@
  */
 package com.google.devtools.depan.eclipse.visualization.layout;
 
+import com.google.devtools.depan.eclipse.ui.edges.matchers.GraphEdgeMatcherDescriptors;
 import com.google.devtools.depan.model.GraphEdge;
-import com.google.devtools.depan.model.GraphEdgeMatcherDescriptor;
-import com.google.devtools.depan.model.GraphEdgeMatcherDescriptors;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
+
+import com.google.devtools.edges.matchers.GraphEdgeMatcherDescriptor;
 
 import edu.uci.ics.jung.graph.DirectedGraph;
 

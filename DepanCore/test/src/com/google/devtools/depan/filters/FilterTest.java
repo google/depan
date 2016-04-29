@@ -18,6 +18,7 @@ package com.google.devtools.depan.filters;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.basic.MockElement;
 import com.google.devtools.depan.graph.basic.MockRelation;
@@ -26,6 +27,8 @@ import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.RelationshipSetAdapter;
 import com.google.devtools.depan.model.interfaces.GraphBuilder;
+import com.google.devtools.depan.paths.filters.PathExpression;
+import com.google.devtools.depan.paths.filters.PathMatcherTerm;
 
 import junit.framework.TestCase;
 

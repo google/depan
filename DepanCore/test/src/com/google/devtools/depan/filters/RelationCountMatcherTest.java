@@ -16,16 +16,18 @@
 
 package com.google.devtools.depan.filters;
 
-import com.google.devtools.depan.filters.RelationCountMatcher.EdgeCountPredicate;
-import com.google.devtools.depan.filters.RelationCountMatcher.IncludeAbove;
-import com.google.devtools.depan.filters.RelationCountMatcher.IncludeBelow;
-import com.google.devtools.depan.filters.RelationCountMatcher.IncludeEquals;
-import com.google.devtools.depan.filters.RelationCountMatcher.IncludeInRange;
-import com.google.devtools.depan.filters.RelationCountMatcher.IncludeOutside;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.RelationshipSetAdapter;
 import com.google.devtools.depan.model.testing.TestUtils;
+import com.google.devtools.depan.paths.filters.PathMatcher;
+import com.google.devtools.depan.paths.filters.RelationCountMatcher;
+import com.google.devtools.depan.paths.filters.RelationCountMatcher.EdgeCountPredicate;
+import com.google.devtools.depan.paths.filters.RelationCountMatcher.IncludeAbove;
+import com.google.devtools.depan.paths.filters.RelationCountMatcher.IncludeBelow;
+import com.google.devtools.depan.paths.filters.RelationCountMatcher.IncludeEquals;
+import com.google.devtools.depan.paths.filters.RelationCountMatcher.IncludeInRange;
+import com.google.devtools.depan.paths.filters.RelationCountMatcher.IncludeOutside;
 import com.google.devtools.depan.view.SampleRelation;
 
 import junit.framework.TestCase;

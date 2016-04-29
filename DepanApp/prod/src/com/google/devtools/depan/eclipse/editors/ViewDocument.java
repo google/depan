@@ -17,19 +17,17 @@
 package com.google.devtools.depan.eclipse.editors;
 
 import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
+import com.google.devtools.depan.eclipse.ui.edges.matchers.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeTreeProvider;
+import com.google.devtools.depan.edges.trees.TreeModel;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.api.RelationSet;
 import com.google.devtools.depan.model.GraphEdge;
-import com.google.devtools.depan.model.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.model.RelationSetDescriptor;
 import com.google.devtools.depan.model.builder.api.GraphBuilder;
 import com.google.devtools.depan.model.builder.api.GraphBuilders;
-import com.google.devtools.depan.view.CollapseData;
-import com.google.devtools.depan.view.CollapseTreeModel;
-import com.google.devtools.depan.view.TreeModel;
+import com.google.devtools.depan.relations.RelationSetDescriptor;
 
 import com.google.common.collect.ImmutableList;
 

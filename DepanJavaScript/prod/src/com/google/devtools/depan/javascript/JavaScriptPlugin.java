@@ -32,7 +32,7 @@ import com.google.devtools.depan.javascript.integration.JavaScriptDefinitions;
 import com.google.devtools.depan.javascript.integration.JavaScriptRelationSets;
 import com.google.devtools.depan.model.Element;
 import com.google.devtools.depan.model.ElementTransformer;
-import com.google.devtools.depan.model.RelationSetDescriptor;
+import com.google.devtools.depan.relations.RelationSetDescriptor;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;

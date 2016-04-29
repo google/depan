@@ -18,10 +18,10 @@ package com.google.devtools.depan.eclipse.utils;
 
 import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
 import com.google.devtools.depan.eclipse.plugins.SourcePlugins;
+import com.google.devtools.depan.edges.matchers.GraphEdgeMatchers;
 import com.google.devtools.depan.graph.api.EdgeMatcher;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.model.GraphEdgeMatcher;
-import com.google.devtools.depan.model.GraphEdgeMatchers;
 import com.google.devtools.depan.model.RelationSets;
 
 import com.google.common.collect.Lists;

@@ -20,9 +20,14 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import com.google.devtools.depan.edges.trees.SuccessorEdges;
+import com.google.devtools.depan.edges.trees.TopoSortState;
+import com.google.devtools.depan.edges.trees.TreeModel;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
+import com.google.devtools.depan.model.builder.api.GraphBuilder;
+import com.google.devtools.depan.model.builder.api.GraphBuilders;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -303,14 +308,14 @@ public class Collapser {
     gizmo.addExposedEdges(edges, graph.getEdges());
 
     // Add the exposed components to the generated result
-    GraphBuilder builder = GraphModelBuilder.getBuilder();
+    GraphBuilder builder = GraphBuilders.createGraphModelBuilder();
     for (GraphNode node : nodes) {
       builder.newNode(node);
     }
     for (GraphEdge edge : edges) {
       builder.addEdge(edge);
     }
-    return builder.getGraph();
+    return builder.createGraphModel();
   }
 
   /**

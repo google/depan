@@ -26,8 +26,8 @@ import com.google.devtools.depan.eclipse.visualization.ogl.ShapeFactory;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.model.Element;
 import com.google.devtools.depan.model.ElementTransformer;
-import com.google.devtools.depan.model.RelationSetDescriptor;
-import com.google.devtools.depan.model.RelationSetDescriptors;
+import com.google.devtools.depan.relations.RelationSetDescriptor;
+import com.google.devtools.depan.relations.RelationSetDescriptors;
 
 import com.google.common.collect.Lists;
 import com.thoughtworks.xstream.XStream;

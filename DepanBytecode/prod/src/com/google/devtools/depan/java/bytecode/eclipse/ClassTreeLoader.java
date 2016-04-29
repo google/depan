@@ -20,7 +20,7 @@ import com.google.devtools.depan.filesystem.eclipse.TreeLoader;
 import com.google.devtools.depan.filesystem.graph.DirectoryElement;
 import com.google.devtools.depan.filesystem.graph.FileElement;
 import com.google.devtools.depan.model.builder.chain.DependenciesListener;
-import com.google.devtools.depan.util.ProgressListener;
+import com.google.devtools.depan.platform.jobs.ProgressListener;
 
 import java.io.File;
 import java.io.FileInputStream;

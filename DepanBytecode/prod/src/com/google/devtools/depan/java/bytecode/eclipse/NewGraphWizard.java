@@ -29,8 +29,8 @@ import com.google.devtools.depan.model.builder.api.GraphBuilders;
 import com.google.devtools.depan.model.builder.chain.DependenciesDispatcher;
 import com.google.devtools.depan.model.builder.chain.DependenciesListener;
 import com.google.devtools.depan.model.builder.chain.ElementFilter;
-import com.google.devtools.depan.util.ProgressListener;
-import com.google.devtools.depan.util.QuickProgressListener;
+import com.google.devtools.depan.platform.jobs.ProgressListener;
+import com.google.devtools.depan.platform.jobs.QuickProgressListener;
 
 import com.google.common.collect.Lists;
 

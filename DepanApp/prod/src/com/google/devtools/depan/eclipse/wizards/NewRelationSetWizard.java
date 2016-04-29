@@ -19,7 +19,7 @@ package com.google.devtools.depan.eclipse.wizards;
 import com.google.devtools.depan.eclipse.persist.ObjectXmlPersist;
 import com.google.devtools.depan.eclipse.persist.XStreamFactory;
 import com.google.devtools.depan.graph.api.RelationSet;
-import com.google.devtools.depan.model.RelationSetDescriptor;
+import com.google.devtools.depan.relations.RelationSetDescriptor;
 
 import com.google.common.collect.Lists;
 

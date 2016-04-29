@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.eclipse.wizards;
 
-import com.google.devtools.depan.util.ProgressListener;
+import com.google.devtools.depan.platform.jobs.ProgressListener;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 

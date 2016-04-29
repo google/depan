@@ -35,8 +35,8 @@ import com.google.devtools.depan.maven.graph.PropertyElement;
 import com.google.devtools.depan.maven.integration.MavenDefinitions;
 import com.google.devtools.depan.model.Element;
 import com.google.devtools.depan.model.ElementTransformer;
-import com.google.devtools.depan.model.RelationSetDescriptor;
-import com.google.devtools.depan.model.RelationSetDescriptor.Builder;
+import com.google.devtools.depan.relations.RelationSetDescriptor;
+import com.google.devtools.depan.relations.RelationSetDescriptor.Builder;
 
 import com.google.common.collect.Lists;
 

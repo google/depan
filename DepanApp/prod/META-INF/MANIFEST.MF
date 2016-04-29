@@ -23,7 +23,8 @@ Require-Bundle: org.eclipse.core.runtime,
  com.google.devtools.depan.core,
  com.google.devtools.depan.core,
  com.google.devtools.depan.builder,
- com.google.devtools.depan.eclipse.ui.nodes
+ com.google.devtools.depan.eclipse.ui.nodes,
+ com.google.devtools.depan.edge
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Export-Package: com.google.devtools.depan.eclipse.cm,
@@ -31,7 +32,6 @@ Export-Package: com.google.devtools.depan.eclipse.cm,
  com.google.devtools.depan.eclipse.persist,
  com.google.devtools.depan.eclipse.plugins,
  com.google.devtools.depan.eclipse.preferences,
- com.google.devtools.depan.eclipse.trees,
  com.google.devtools.depan.eclipse.utils,
  com.google.devtools.depan.eclipse.visualization.ogl,
  com.google.devtools.depan.eclipse.wizards

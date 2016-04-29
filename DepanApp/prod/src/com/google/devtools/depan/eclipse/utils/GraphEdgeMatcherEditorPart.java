@@ -18,15 +18,15 @@ package com.google.devtools.depan.eclipse.utils;
 
 import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
 import com.google.devtools.depan.eclipse.wizards.NewEdgeMatcherWizard;
-import com.google.devtools.depan.filters.EdgeMatcherPathMatcher;
-import com.google.devtools.depan.filters.PathExpression;
-import com.google.devtools.depan.filters.PathMatcher;
-import com.google.devtools.depan.filters.PathMatcherTerm;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.model.GraphEdgeMatcher;
-import com.google.devtools.depan.model.GraphEdgeMatcherDescriptor;
+import com.google.devtools.depan.paths.filters.EdgeMatcherPathMatcher;
+import com.google.devtools.depan.paths.filters.PathExpression;
+import com.google.devtools.depan.paths.filters.PathMatcher;
+import com.google.devtools.depan.paths.filters.PathMatcherTerm;
 
 import com.google.common.collect.Lists;
+import com.google.devtools.edges.matchers.GraphEdgeMatcherDescriptor;
 
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.wizard.WizardDialog;

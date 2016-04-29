@@ -17,12 +17,12 @@
 package com.google.devtools.depan.eclipse.visualization.layout;
 
 import com.google.devtools.depan.eclipse.visualization.ogl.GLScene;
+import com.google.devtools.depan.edges.trees.HierarchicalTreeModel;
+import com.google.devtools.depan.edges.trees.SuccessorEdges;
+import com.google.devtools.depan.edges.trees.TreeModel;
 import com.google.devtools.depan.graph.api.EdgeMatcher;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.view.HierarchicalTreeModel;
-import com.google.devtools.depan.view.SuccessorEdges;
-import com.google.devtools.depan.view.TreeModel;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;

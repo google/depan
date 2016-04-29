@@ -22,11 +22,11 @@ import com.google.devtools.depan.eclipse.utils.RelationSetRelationTableEditor.Re
 import com.google.devtools.depan.eclipse.views.tools.RelationCount.RangeData;
 import com.google.devtools.depan.eclipse.views.tools.RelationCount.RangeOption;
 import com.google.devtools.depan.eclipse.views.tools.RelationCount.Settings;
-import com.google.devtools.depan.filters.PathMatcher;
-import com.google.devtools.depan.filters.RelationCountMatcher;
-import com.google.devtools.depan.filters.RelationCountMatcher.EdgeCountPredicate;
 import com.google.devtools.depan.graph.api.Relation;
-import com.google.devtools.depan.model.RelationSetDescriptor;
+import com.google.devtools.depan.paths.filters.PathMatcher;
+import com.google.devtools.depan.paths.filters.RelationCountMatcher;
+import com.google.devtools.depan.paths.filters.RelationCountMatcher.EdgeCountPredicate;
+import com.google.devtools.depan.relations.RelationSetDescriptor;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;

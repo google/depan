@@ -16,13 +16,18 @@
 
 package com.google.devtools.depan.model.testing;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
 import com.google.devtools.depan.graph.api.Relation;
+import com.google.devtools.depan.graph.basic.BasicEdge;
+import com.google.devtools.depan.graph.basic.BasicNode;
 import com.google.devtools.depan.model.ElementVisitor;
+import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.model.interfaces.GraphBuilder;
 
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -31,23 +36,19 @@ import java.util.Set;
 public class TestUtils {
 
   public static String getNodeId(int count) {
-    return "node " + Integer.toString(count);
+    return nameGen("node ", count);
   }
-  
-  public static class MethodElement extends GraphNode {
-    private final String name;
-    private final String args;
-    private final String type;
 
-    MethodElement(String name, String args, String type) {
-      this.name = name;
-      this.args = args;
-      this.type = type;
+  public static class TestNode extends GraphNode {
+    private final String label;
+
+    public TestNode(String label) {
+      this.label = label;
     }
 
     @Override
     public String friendlyString() {
-      return type + " " + name + "(" + args + ")";
+      return "TestNode - " + label;
     }
 
     @Override
@@ -56,27 +57,38 @@ public class TestUtils {
 
     @Override
     public String getId() {
-      return name + "(" + args + ")" + type;
+      return label;
     }
   }
 
-  public static GraphNode[] buildComplete(
+  public static GraphModel buildComplete(
       GraphModel graph, int degree, Relation relation) {
+
     GraphNode nodes[] = new GraphNode[degree];
-    GraphBuilder builder = graph.getBuilder();
     for (int nodeCnt = 0; nodeCnt < degree; nodeCnt++) {
-      GraphNode node = new MethodElement(
-          "FakeSig", nameGen("complete", nodeCnt), "boolean");
-      nodes[nodeCnt] = builder.newNode(node);
+      nodes[nodeCnt] = new TestNode(getNodeId(nodeCnt));;
     }
 
+    Set<BasicEdge<? extends String>> edges = Sets.newHashSet();
     for (int head = 0; head < (degree - 1); head++) {
       for (int tail = head + 1; tail < degree; tail++) {
-        graph.addEdge(relation, nodes[head], nodes[tail]);
+        GraphEdge edge = new GraphEdge(nodes[head], nodes[tail], relation);
+        edges.add((BasicEdge<? extends String>) edge);
       }
     }
-    
-    return nodes;
+
+    return buildGraphModel(nodes, edges);
+  }
+
+  private static GraphModel buildGraphModel(
+      GraphNode nodes[], Set<BasicEdge<? extends String>> edges) {
+    Map<String, BasicNode<? extends String>> graphNodes =
+        Maps.newHashMapWithExpectedSize(nodes.length);
+
+    for (GraphNode node : nodes) {
+      graphNodes.put(node.getId(), node);
+    }
+    return new GraphModel(graphNodes, edges);
   }
 
   public static Set<GraphNode> toSet(GraphNode[] nodes) {
@@ -88,11 +100,6 @@ public class TestUtils {
     return result;
   }
 
-  /**
-   * @param prefix
-   * @param nodeCnt
-   * @return
-   */
   private static String nameGen(String prefix, int nodeCnt) {
     return prefix + Integer.toString(nodeCnt);
   }

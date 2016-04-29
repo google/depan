@@ -17,7 +17,8 @@
 package com.google.devtools.depan.eclipse.persist;
 
 import com.google.common.collect.Lists;
-import com.google.devtools.depan.filters.PathMatcherTerm;
+
+import com.google.devtools.depan.paths.filters.PathMatcherTerm;
 
 import com.thoughtworks.xstream.XStream;
 

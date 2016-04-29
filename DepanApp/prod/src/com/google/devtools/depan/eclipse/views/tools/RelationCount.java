@@ -16,14 +16,14 @@
 
 package com.google.devtools.depan.eclipse.views.tools;
 
-import com.google.devtools.depan.filters.RelationCountMatcher.EdgeCountPredicate;
-import com.google.devtools.depan.filters.RelationCountMatcher.IncludeAbove;
-import com.google.devtools.depan.filters.RelationCountMatcher.IncludeBelow;
-import com.google.devtools.depan.filters.RelationCountMatcher.IncludeEquals;
-import com.google.devtools.depan.filters.RelationCountMatcher.IncludeInRange;
-import com.google.devtools.depan.filters.RelationCountMatcher.IncludeOutside;
 import com.google.devtools.depan.graph.api.RelationSet;
 import com.google.devtools.depan.model.RelationSets;
+import com.google.devtools.depan.paths.filters.RelationCountMatcher.EdgeCountPredicate;
+import com.google.devtools.depan.paths.filters.RelationCountMatcher.IncludeAbove;
+import com.google.devtools.depan.paths.filters.RelationCountMatcher.IncludeBelow;
+import com.google.devtools.depan.paths.filters.RelationCountMatcher.IncludeEquals;
+import com.google.devtools.depan.paths.filters.RelationCountMatcher.IncludeInRange;
+import com.google.devtools.depan.paths.filters.RelationCountMatcher.IncludeOutside;
 
 /**
  * Define the various UI options and data structures for a relation count
