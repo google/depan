@@ -21,6 +21,10 @@ import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
 import com.google.devtools.depan.eclipse.plugins.SourcePluginRegistry;
 import com.google.devtools.depan.eclipse.plugins.SourcePlugins;
 import com.google.devtools.depan.graph.api.Relation;
+import com.google.devtools.depan.platform.AlphabeticSorter;
+import com.google.devtools.depan.platform.InverseSorter;
+import com.google.devtools.depan.platform.LabelProviderToString;
+import com.google.devtools.depan.platform.tables.EditColTableDef;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;

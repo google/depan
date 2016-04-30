@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.eclipse.persist;
 
-import com.google.devtools.depan.eclipse.editors.GraphDocument;
+import com.google.devtools.depan.graph_doc.model.GraphDocument;
 
 import java.io.IOException;
 import java.net.URI;

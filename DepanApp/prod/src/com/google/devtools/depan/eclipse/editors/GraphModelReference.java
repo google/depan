@@ -16,6 +16,8 @@
 
 package com.google.devtools.depan.eclipse.editors;
 
+import com.google.devtools.depan.graph_doc.model.GraphDocument;
+
 import org.eclipse.core.resources.IResource;
 
 /**

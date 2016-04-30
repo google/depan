@@ -50,18 +50,18 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
  */
 public class GraphNodeViewer<T> {
 
-  NodeViewerProvider nvProvider;
+  private NodeViewerProvider provider;
 
   // UX Elements
   /** Provides a tree view of the collapseData. */
   private TreeViewer treeViewer;
 
   public void setNvProvider(NodeViewerProvider nvProvider) {
-    this.nvProvider = nvProvider;
+    this.provider = nvProvider;
   }
 
   public void refresh() {
-    ViewerRoot treeRoots = nvProvider.buildViewerRoots();
+    ViewerRoot treeRoots = provider.buildViewerRoots();
     treeViewer.setInput(treeRoots);
   }
 
@@ -76,7 +76,7 @@ public class GraphNodeViewer<T> {
     ToolBar rightOptions = createToolBar(optionsSection);
     rightOptions.setLayoutData(new GridData(SWT.END, SWT.FILL, true, false));
 
-    ViewerSorter sorter = nvProvider.getViewSorter();
+    ViewerSorter sorter = provider.getViewSorter();
     treeViewer = createTreeViewer(result, sorter);
     treeViewer.getControl().setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -129,11 +129,11 @@ public class GraphNodeViewer<T> {
   }
 
   private void addMultiActions(IMenuManager manager) {
-    nvProvider.addMultiActions(manager);
+    provider.addMultiActions(manager);
   }
 
   private void addItemActions(IMenuManager manager, Object menuElement) {
-    nvProvider.addItemActions(manager, menuElement);
+    provider.addItemActions(manager, menuElement);
   }
 
   // Tree View Toolbar

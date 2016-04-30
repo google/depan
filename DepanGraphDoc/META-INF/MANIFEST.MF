@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: DepanGraphDoc
+Bundle-SymbolicName: com.google.devtools.depan.graph_doc;singleton:=true
+Bundle-Version: 2.0.0.qualifier
+Bundle-Vendor: Pnambic Computing
+Require-Bundle: com.google.guava,
+ com.google.devtools.depan.core,
+ com.google.devtools.depan.edge,
+ com.google.devtools.depan.edges.ui
+Bundle-ClassPath: .
+Export-Package: com.google.devtools.depan.graph_doc.model

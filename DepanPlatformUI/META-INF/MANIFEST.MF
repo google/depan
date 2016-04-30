@@ -6,6 +6,12 @@ Bundle-Version: 2.0.0.qualifier
 Bundle-Vendor: Pnambic Computing
 Require-Bundle: com.google.guava,
  com.google.devtools.depan.core,
- org.eclipse.ui.ide
+ org.eclipse.ui.ide,
+ org.eclipse.jface,
+ org.eclipse.osgi,
+ org.eclipse.ui.workbench,
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources
 Bundle-ClassPath: .
-Export-Package: com.google.devtools.depan.platform
+Export-Package: com.google.devtools.depan.platform,
+ com.google.devtools.depan.platform.tables

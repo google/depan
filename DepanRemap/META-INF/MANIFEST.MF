@@ -6,6 +6,8 @@ Bundle-Version: 2.0.0.qualifier
 Bundle-Vendor: Pnambic Computing
 Require-Bundle: com.google.guava,
  com.google.devtools.depan.core,
- joda-time
+ joda-time,
+ org.eclipse.jface,
+ com.google.devtools.depan.platform.ui
 Bundle-ClassPath: .
-Export-Package: com.google.devtools.depan.tasks
+Export-Package: com.google.devtools.depan.remap_doc.model

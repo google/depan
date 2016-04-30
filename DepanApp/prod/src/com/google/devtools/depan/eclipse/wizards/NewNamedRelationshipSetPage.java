@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.eclipse.wizards;
 
-import com.google.devtools.depan.eclipse.utils.WorkspaceTools;
+import com.google.devtools.depan.platform.WorkspaceTools;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;

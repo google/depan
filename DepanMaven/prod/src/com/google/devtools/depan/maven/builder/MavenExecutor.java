@@ -16,9 +16,9 @@
 
 package com.google.devtools.depan.maven.builder;
 
-import com.google.devtools.depan.eclipse.utils.ProcessExecutor;
 import com.google.devtools.depan.maven.eclipse.MavenActivator;
 import com.google.devtools.depan.maven.eclipse.preferences.AnalysisPreferenceIds;
+import com.google.devtools.depan.platform.process.ProcessExecutor;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 

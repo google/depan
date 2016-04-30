@@ -17,9 +17,9 @@
 package com.google.devtools.depan.eclipse.views.tools;
 
 import com.google.devtools.depan.eclipse.editors.CameraPosPreference;
-import com.google.devtools.depan.eclipse.utils.ListenerManager;
-import com.google.devtools.depan.eclipse.utils.ListenerManager.Dispatcher;
 import com.google.devtools.depan.eclipse.visualization.ogl.GLScene;
+import com.google.devtools.depan.platform.ListenerManager;
+import com.google.devtools.depan.platform.ListenerManager.Dispatcher;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;

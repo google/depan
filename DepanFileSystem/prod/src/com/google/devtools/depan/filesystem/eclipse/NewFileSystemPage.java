@@ -17,7 +17,8 @@
 package com.google.devtools.depan.filesystem.eclipse;
 
 import com.google.common.collect.Lists;
-import com.google.devtools.depan.eclipse.wizards.AbstractAnalysisPage;
+
+import com.google.devtools.depan.platform.wizards.AbstractAnalysisPage;
 
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;

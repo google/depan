@@ -19,13 +19,7 @@ package com.google.devtools.depan.eclipse.utils;
 import com.google.devtools.depan.eclipse.plugins.SourcePluginRegistry;
 import com.google.devtools.depan.model.GraphNode;
 
-import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-
-import java.awt.Color;
 
 /**
  * this class is a "namespace" class with only static methods.
@@ -47,42 +41,6 @@ public abstract class Tools {
       s[i++] = lowercase ? o.toString().toLowerCase() : o.toString();
     }
     return s;
-  }
-
-  public static String getRgb(Color color) {
-    return "" + color.getRed() + "," + color.getGreen() + "," + color.getBlue();
-  }
-
-  /**
-   * Convert the given string to a color. The string must have the form "R,G,B".
-   * If the conversion fails, return a red color.
-   *
-   * @param key
-   * @return the Color corresponding to the given string R,G,B
-   */
-  public static Color getRgb(String key) {
-    RGB rgb = StringConverter.asRGB(key, new RGB(255, 0, 0));
-    return new Color(rgb.red, rgb.green, rgb.blue);
-  }
-
-  public static RGB rgbFromColor(Color color) {
-    RGB result = new RGB(color.getRed(), color.getGreen(), color.getBlue());
-    return result;
-  }
-
-  public static Color colorFromRgb(RGB rgb) {
-    Color result = new Color(rgb.red, rgb.green, rgb.blue);
-    return result;
-  }
-
-  public static void setBackgroundRecursively(
-      org.eclipse.swt.graphics.Color color, Control control) {
-    control.setBackground(color);
-    if (control instanceof Composite) {
-      for (Control child : ((Composite) control).getChildren()) {
-        setBackgroundRecursively(color, child);
-      }
-    }
   }
 
   /**

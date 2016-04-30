@@ -16,22 +16,23 @@
 
 package com.google.devtools.depan.eclipse.views.tools;
 
-import com.google.devtools.depan.eclipse.editors.HierarchyCache;
 import com.google.devtools.depan.eclipse.editors.NodeDisplayProperty;
 import com.google.devtools.depan.eclipse.editors.NodeDisplayProperty.Size;
 import com.google.devtools.depan.eclipse.editors.ViewEditor;
+import com.google.devtools.depan.eclipse.ui.nodes.cache.HierarchyCache;
 import com.google.devtools.depan.eclipse.ui.nodes.trees.GraphData;
 import com.google.devtools.depan.eclipse.ui.nodes.trees.NodeWrapper;
 import com.google.devtools.depan.eclipse.ui.nodes.trees.NodeWrapperTreeSorter;
+import com.google.devtools.depan.eclipse.ui.nodes.viewers.HierarchyViewer;
+import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeEditorLabelProvider;
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeTreeProvider;
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeTreeView;
-import com.google.devtools.depan.eclipse.utils.EditColTableDef;
-import com.google.devtools.depan.eclipse.utils.HierarchyViewer;
-import com.google.devtools.depan.eclipse.utils.HierarchyViewer.HierarchyChangeListener;
+import com.google.devtools.depan.eclipse.ui.nodes.viewers.HierarchyViewer.HierarchyChangeListener;
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.utils.Tools;
 import com.google.devtools.depan.eclipse.views.ViewSelectionListenerTool;
 import com.google.devtools.depan.model.GraphNode;
+import com.google.devtools.depan.platform.tables.EditColTableDef;
 import com.google.devtools.depan.util.StringUtils;
 
 import com.google.common.collect.Lists;

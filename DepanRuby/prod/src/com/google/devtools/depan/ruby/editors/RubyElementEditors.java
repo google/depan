@@ -17,8 +17,8 @@
 package com.google.devtools.depan.ruby.editors;
 
 import com.google.devtools.depan.eclipse.plugins.ElementClassTransformer;
-import com.google.devtools.depan.eclipse.utils.ElementEditor;
 import com.google.devtools.depan.model.Element;
+import com.google.devtools.depan.remap_doc.plugins.ElementEditor;
 
 /**
  * Responsible for providing the correct {@link ElementEditor}.

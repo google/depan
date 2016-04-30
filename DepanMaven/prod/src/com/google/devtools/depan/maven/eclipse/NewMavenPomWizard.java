@@ -16,10 +16,9 @@
 
 package com.google.devtools.depan.maven.eclipse;
 
-import com.google.devtools.depan.eclipse.editors.GraphDocument;
 import com.google.devtools.depan.eclipse.utils.Resources;
-import com.google.devtools.depan.eclipse.wizards.AbstractAnalysisWizard;
 import com.google.devtools.depan.eclipse.wizards.PushDownXmlHandler.DocumentHandler;
+import com.google.devtools.depan.graph_doc.model.GraphDocument;
 import com.google.devtools.depan.maven.builder.MavenContext;
 import com.google.devtools.depan.maven.builder.MavenDocumentHandler;
 import com.google.devtools.depan.maven.builder.Tools;
@@ -28,6 +27,7 @@ import com.google.devtools.depan.model.builder.api.GraphBuilder;
 import com.google.devtools.depan.model.builder.api.GraphBuilders;
 import com.google.devtools.depan.model.builder.chain.DependenciesDispatcher;
 import com.google.devtools.depan.model.builder.chain.DependenciesListener;
+import com.google.devtools.depan.platform.wizards.AbstractAnalysisWizard;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;

@@ -12,7 +12,8 @@ Require-Bundle: com.google.devtools.depan.filesystem,
  org.eclipse.ui,
  com.google.guava,
  depan-jogl-library,
- depan-xstream-library
+ depan-xstream-library,
+ com.google.devtools.depan.platform.ui
 Bundle-Vendor: Pnambic Computing
 Bundle-Activator: com.google.devtools.depan.ruby.eclipse.RubyActivator
 Bundle-ActivationPolicy: lazy

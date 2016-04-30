@@ -17,8 +17,9 @@
 package com.google.devtools.depan.eclipse.wizards;
 
 import com.google.devtools.depan.eclipse.Project;
-import com.google.devtools.depan.eclipse.editors.GraphDocument;
-import com.google.devtools.depan.eclipse.utils.TableContentProvider;
+import com.google.devtools.depan.graph_doc.model.GraphDocument;
+import com.google.devtools.depan.platform.TableContentProvider;
+import com.google.devtools.depan.platform.wizards.AbstractAnalysisPage;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.viewers.ISelection;

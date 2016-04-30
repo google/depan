@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.java.bytecode.eclipse;
 
-import com.google.devtools.depan.eclipse.wizards.AbstractAnalysisPage;
+import com.google.devtools.depan.platform.wizards.AbstractAnalysisPage;
 
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;

@@ -17,10 +17,10 @@
 package com.google.devtools.depan.eclipse.stats;
 
 import com.google.devtools.depan.eclipse.stats.ElementKindStats.Info;
-import com.google.devtools.depan.eclipse.utils.AlphabeticSorter;
-import com.google.devtools.depan.eclipse.utils.EditColTableDef;
-import com.google.devtools.depan.eclipse.utils.InverseSorter;
-import com.google.devtools.depan.eclipse.utils.LabelProviderToString;
+import com.google.devtools.depan.platform.AlphabeticSorter;
+import com.google.devtools.depan.platform.InverseSorter;
+import com.google.devtools.depan.platform.LabelProviderToString;
+import com.google.devtools.depan.platform.tables.EditColTableDef;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.BaseLabelProvider;

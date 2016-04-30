@@ -16,11 +16,11 @@
 
 package com.google.devtools.depan.eclipse.persist;
 
-import com.google.devtools.depan.eclipse.editors.GraphDocument;
 import com.google.devtools.depan.eclipse.editors.GraphModelReference;
 import com.google.devtools.depan.eclipse.editors.ViewDocument;
 import com.google.devtools.depan.eclipse.editors.ViewDocument.Components;
 import com.google.devtools.depan.eclipse.editors.ViewPreferences;
+import com.google.devtools.depan.graph_doc.model.GraphDocument;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 

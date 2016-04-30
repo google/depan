@@ -19,7 +19,6 @@ package com.google.devtools.depan.java;
 import com.google.devtools.depan.eclipse.persist.XStreamFactory.Config;
 import com.google.devtools.depan.eclipse.plugins.AbstractSourcePlugin;
 import com.google.devtools.depan.eclipse.plugins.ElementClassTransformer;
-import com.google.devtools.depan.eclipse.utils.ElementEditor;
 import com.google.devtools.depan.eclipse.visualization.ogl.GLEntity;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.java.eclipse.JavaNodeComparator;
@@ -39,6 +38,7 @@ import com.google.devtools.depan.java.integration.JavaRelationSets;
 import com.google.devtools.depan.model.Element;
 import com.google.devtools.depan.model.ElementTransformer;
 import com.google.devtools.depan.relations.RelationSetDescriptor;
+import com.google.devtools.depan.remap_doc.plugins.ElementEditor;
 
 import com.google.common.collect.Lists;
 

@@ -16,9 +16,9 @@
 
 package com.google.devtools.depan.eclipse.persist;
 
-import com.google.devtools.depan.eclipse.editors.GraphDocument;
 import com.google.devtools.depan.eclipse.editors.GraphModelReference;
 import com.google.devtools.depan.eclipse.editors.ResourceCache;
+import com.google.devtools.depan.graph_doc.model.GraphDocument;
 
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;

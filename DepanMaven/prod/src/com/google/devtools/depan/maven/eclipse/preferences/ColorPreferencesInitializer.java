@@ -15,8 +15,8 @@
  */
 package com.google.devtools.depan.maven.eclipse.preferences;
 
-import com.google.devtools.depan.eclipse.utils.Tools;
 import com.google.devtools.depan.maven.eclipse.MavenActivator;
+import com.google.devtools.depan.platform.Colors;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -39,6 +39,6 @@ public class ColorPreferencesInitializer extends AbstractPreferenceInitializer {
   }
 
   private void setDefaultRGB(IPreferenceStore prefs, String key, Color color) {
-    prefs.setDefault(key, Tools.getRgb(color));
+    prefs.setDefault(key, Colors.getRgb(color));
   }
 }

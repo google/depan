@@ -20,12 +20,12 @@ import com.google.devtools.depan.eclipse.views.tools.CollapseTool;
 import com.google.devtools.depan.eclipse.views.tools.EdgeEditorTool;
 import com.google.devtools.depan.eclipse.views.tools.InformationsTool;
 import com.google.devtools.depan.eclipse.views.tools.NodeEditorTool;
-import com.google.devtools.depan.eclipse.views.tools.RefactorTool;
 import com.google.devtools.depan.eclipse.views.tools.RelationPropertyTool;
 import com.google.devtools.depan.eclipse.views.tools.RelationVisibleTool;
 import com.google.devtools.depan.eclipse.views.tools.ScaleTool;
 import com.google.devtools.depan.eclipse.views.tools.SelectionEditorTool;
 import com.google.devtools.depan.eclipse.views.tools.SubLayoutTool;
+import com.google.devtools.depan.remap_doc.ui.editors.RefactorTool;
 
 /**
  * @author ycoppel@google.com (Yohann Coppel)

@@ -16,11 +16,11 @@
 
 package com.google.devtools.depan.eclipse.utils;
 
-import com.google.devtools.depan.eclipse.editors.GraphDocument;
 import com.google.devtools.depan.eclipse.editors.ViewDocument;
 import com.google.devtools.depan.eclipse.ui.edges.matchers.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.edges.matchers.GraphEdgeMatchers;
 import com.google.devtools.depan.graph.api.EdgeMatcher;
+import com.google.devtools.depan.graph_doc.model.GraphDocument;
 import com.google.devtools.depan.relations.RelationSetDescriptor;
 
 import com.google.common.collect.Lists;

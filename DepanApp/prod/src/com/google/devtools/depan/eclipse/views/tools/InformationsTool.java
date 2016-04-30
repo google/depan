@@ -18,6 +18,7 @@ package com.google.devtools.depan.eclipse.views.tools;
 
 import com.google.devtools.depan.eclipse.stats.ElementKindStats;
 import com.google.devtools.depan.eclipse.stats.ElementKindStatsViewer;
+import com.google.devtools.depan.eclipse.ui.nodes.api.NodeProperties;
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.utils.Tools;
 import com.google.devtools.depan.eclipse.views.ViewSelectionListenerTool;
@@ -136,7 +137,7 @@ public class InformationsTool extends ViewSelectionListenerTool
   }
 
   public void setNode(GraphNode node) {
-    icon.setImage(Tools.getIcon(node));
+    icon.setImage(NodeProperties.getImage(node));
     friendlyName.setText(node.friendlyString());
     name.setText(node.toString());
     description.setText("");

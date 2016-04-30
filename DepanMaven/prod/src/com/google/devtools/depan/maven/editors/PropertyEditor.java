@@ -16,8 +16,8 @@
 
 package com.google.devtools.depan.maven.editors;
 
-import com.google.devtools.depan.eclipse.utils.ElementEditor;
 import com.google.devtools.depan.maven.eclipse.MavenActivator;
+import com.google.devtools.depan.remap_doc.plugins.ElementEditor;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;

@@ -22,10 +22,10 @@ import java.util.Comparator;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 
-import com.google.devtools.depan.eclipse.utils.ElementEditor;
 import com.google.devtools.depan.eclipse.visualization.ogl.GLEntity;
 import com.google.devtools.depan.model.Element;
 import com.google.devtools.depan.model.ElementTransformer;
+import com.google.devtools.depan.remap_doc.plugins.ElementEditor;
 
 /**
  * Contains a list of {@link ElementTransformer} and

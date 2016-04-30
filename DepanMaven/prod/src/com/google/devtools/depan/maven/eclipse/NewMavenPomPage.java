@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.maven.eclipse;
 
-import com.google.devtools.depan.eclipse.wizards.AbstractAnalysisPage;
+import com.google.devtools.depan.platform.wizards.AbstractAnalysisPage;
 
 import com.google.common.base.Strings;
 

@@ -16,12 +16,11 @@
 
 package com.google.devtools.depan.java.bytecode.eclipse;
 
-import com.google.devtools.depan.eclipse.editors.GraphDocument;
 import com.google.devtools.depan.eclipse.utils.Resources;
-import com.google.devtools.depan.eclipse.wizards.AbstractAnalysisWizard;
 import com.google.devtools.depan.eclipse.wizards.ProgressListenerMonitor;
 import com.google.devtools.depan.filesystem.eclipse.FileSystemActivator;
 import com.google.devtools.depan.filesystem.eclipse.TreeLoader;
+import com.google.devtools.depan.graph_doc.model.GraphDocument;
 import com.google.devtools.depan.java.eclipse.JavaActivator;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.builder.api.GraphBuilder;
@@ -31,6 +30,7 @@ import com.google.devtools.depan.model.builder.chain.DependenciesListener;
 import com.google.devtools.depan.model.builder.chain.ElementFilter;
 import com.google.devtools.depan.platform.jobs.ProgressListener;
 import com.google.devtools.depan.platform.jobs.QuickProgressListener;
+import com.google.devtools.depan.platform.wizards.AbstractAnalysisWizard;
 
 import com.google.common.collect.Lists;
 

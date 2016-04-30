@@ -12,7 +12,8 @@ Require-Bundle: com.google.devtools.depan,
  org.eclipse.core.runtime,
  com.google.guava,
  depan-xstream-library,
- org.eclipse.ui.workbench
+ org.eclipse.ui.workbench,
+ com.google.devtools.depan.platform.ui
 Export-Package: com.google.devtools.depan.javascript,
  com.google.devtools.depan.javascript.graph
 Bundle-ActivationPolicy: lazy

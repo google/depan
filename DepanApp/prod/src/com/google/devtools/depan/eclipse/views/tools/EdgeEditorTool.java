@@ -16,19 +16,19 @@
 
 package com.google.devtools.depan.eclipse.views.tools;
 
-import com.google.common.collect.Maps;
-
 import com.google.devtools.depan.eclipse.editors.EdgeDisplayProperty;
-import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.editors.EdgeDisplayProperty.ArrowheadStyle;
 import com.google.devtools.depan.eclipse.editors.EdgeDisplayProperty.LineStyle;
-import com.google.devtools.depan.eclipse.utils.EditColTableDef;
+import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.utils.Resources;
-import com.google.devtools.depan.eclipse.utils.TableContentProvider;
 import com.google.devtools.depan.eclipse.utils.Tools;
 import com.google.devtools.depan.eclipse.views.ViewEditorTool;
 import com.google.devtools.depan.model.GraphEdge;
-import com.google.devtools.depan.util.StringUtils;
+import com.google.devtools.depan.platform.Colors;
+import com.google.devtools.depan.platform.TableContentProvider;
+import com.google.devtools.depan.platform.tables.EditColTableDef;
+
+import com.google.common.collect.Maps;
 
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
@@ -174,7 +174,7 @@ public class EdgeEditorTool extends ViewEditorTool implements ICellModifier {
     } else if (property.equals(COL_ARROWHEAD) && (value instanceof Integer)) {
       edgeProps.setArrowhead(ArrowheadStyle.values()[(Integer) value]);
     } else if (property.equals(COL_LINE_COLOR) && (value instanceof String)) {
-      Color newColor = StringUtils.stringToColor((String) value);
+      Color newColor = Colors.stringToColor((String) value);
       edgeProps.setColor(newColor);
     }
 
@@ -312,7 +312,7 @@ public class EdgeEditorTool extends ViewEditorTool implements ICellModifier {
           return edgeProps.getArrowhead().getDisplayName().toLowerCase();
         case 5:
           if (edgeProps.getColor() != null) {
-            return Tools.getRgb(edgeProps.getColor());
+            return Colors.getRgb(edgeProps.getColor());
           }
         }
       }

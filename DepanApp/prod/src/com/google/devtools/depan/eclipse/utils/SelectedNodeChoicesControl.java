@@ -17,6 +17,7 @@
 package com.google.devtools.depan.eclipse.utils;
 
 import com.google.devtools.depan.model.GraphNode;
+import com.google.devtools.depan.platform.TableContentProvider;
 
 import com.google.common.collect.Lists;
 

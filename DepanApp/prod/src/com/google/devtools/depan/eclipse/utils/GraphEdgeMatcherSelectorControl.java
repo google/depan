@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.eclipse.utils;
 
+import com.google.devtools.depan.platform.AlphabeticSorter;
 import com.google.devtools.depan.relations.RelationSetDescriptor;
 
 import com.google.common.collect.Lists;

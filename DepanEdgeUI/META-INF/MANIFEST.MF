@@ -8,4 +8,5 @@ Require-Bundle: com.google.guava,
  com.google.devtools.depan.core,
  com.google.devtools.depan.edge
 Bundle-ClassPath: .
-Export-Package: com.google.devtools.depan.eclipse.ui.edges.matchers
+Export-Package: com.google.devtools.depan.eclipse.ui.edges.matchers,
+ com.google.devtools.depan.relations

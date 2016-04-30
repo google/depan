@@ -23,6 +23,9 @@ import com.google.devtools.depan.graph.api.EdgeMatcher;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.model.GraphEdgeMatcher;
 import com.google.devtools.depan.model.RelationSets;
+import com.google.devtools.depan.platform.AlphabeticSorter;
+import com.google.devtools.depan.platform.TableContentProvider;
+import com.google.devtools.depan.platform.tables.EditColTableDef;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;

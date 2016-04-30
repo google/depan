@@ -18,8 +18,13 @@ package com.google.devtools.depan.eclipse.utils;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+
 import com.google.devtools.depan.eclipse.utils.elementkinds.ElementKindDescriptor;
 import com.google.devtools.depan.model.Element;
+import com.google.devtools.depan.platform.AlphabeticSorter;
+import com.google.devtools.depan.platform.InverseSorter;
+import com.google.devtools.depan.platform.LabelProviderToString;
+import com.google.devtools.depan.platform.tables.EditColTableDef;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.BaseLabelProvider;

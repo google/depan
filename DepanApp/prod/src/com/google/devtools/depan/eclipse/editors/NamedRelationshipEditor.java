@@ -20,9 +20,9 @@ import com.google.devtools.depan.eclipse.persist.ObjectXmlPersist;
 import com.google.devtools.depan.eclipse.persist.XStreamFactory;
 import com.google.devtools.depan.eclipse.utils.GraphEdgeMatcherEditorPart;
 import com.google.devtools.depan.eclipse.utils.ModificationListener;
-import com.google.devtools.depan.eclipse.utils.TableContentProvider;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.model.GraphEdgeMatcher;
+import com.google.devtools.depan.platform.TableContentProvider;
 
 import com.google.devtools.edges.matchers.GraphEdgeMatcherDescriptor;
 

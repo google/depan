@@ -18,6 +18,7 @@ package com.google.devtools.depan.eclipse.views.tools;
 
 import com.google.devtools.depan.eclipse.editors.NodeDisplayProperty;
 import com.google.devtools.depan.eclipse.editors.ViewEditor;
+import com.google.devtools.depan.eclipse.ui.nodes.api.NodeProperties;
 import com.google.devtools.depan.eclipse.ui.nodes.trees.NodeWrapper;
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.utils.Tools;
@@ -66,7 +67,7 @@ public class NodeEditorLabelProvider extends LabelProvider implements
 
     switch (columnIndex) {
     case NodeEditorTool.INDEX_NAME:
-      return Tools.getIcon(node);
+      return NodeProperties.getImage(node);
     case NodeEditorTool.INDEX_VISIBLE:
       return Resources.getOnOff(property.isVisible());
     case NodeEditorTool.INDEX_SELECTED:

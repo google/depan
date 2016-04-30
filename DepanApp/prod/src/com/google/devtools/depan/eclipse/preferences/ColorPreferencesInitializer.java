@@ -15,7 +15,7 @@
  */
 package com.google.devtools.depan.eclipse.preferences;
 
-import com.google.devtools.depan.eclipse.utils.Tools;
+import com.google.devtools.depan.platform.Colors;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
@@ -38,7 +38,6 @@ public class ColorPreferencesInitializer extends AbstractPreferenceInitializer {
   }
 
   private void setDefaultRGB(IEclipsePreferences p, String key, Color color) {
-    p.put(key, Tools.getRgb(color));
+    p.put(key, Colors.getRgb(color));
   }
-
 }

@@ -16,8 +16,9 @@
 
 package com.google.devtools.depan.eclipse.wizards;
 
-import com.google.devtools.depan.eclipse.editors.GraphDocument;
 import com.google.devtools.depan.eclipse.editors.ResourceCache;
+import com.google.devtools.depan.graph_doc.model.GraphDocument;
+import com.google.devtools.depan.platform.wizards.AbstractAnalysisWizard;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -69,7 +70,7 @@ public class NewMergedGraphWizard extends AbstractAnalysisWizard {
    * 
    * Count 1 step for creating the graph model, plus a load and a merge step
    * for each dependency graph (1 +2n). 
-   * @see com.google.devtools.depan.eclipse.wizards.AbstractAnalysisWizard#countAnalysisWork()
+   * @see com.google.devtools.depan.platform.wizards.AbstractAnalysisWizard#countAnalysisWork()
    */
   @Override
   protected int countAnalysisWork() {

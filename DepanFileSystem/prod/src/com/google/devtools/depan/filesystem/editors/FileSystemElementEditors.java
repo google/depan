@@ -17,10 +17,10 @@
 package com.google.devtools.depan.filesystem.editors;
 
 import com.google.devtools.depan.eclipse.plugins.ElementClassTransformer;
-import com.google.devtools.depan.eclipse.utils.ElementEditor;
 import com.google.devtools.depan.filesystem.graph.DirectoryElement;
 import com.google.devtools.depan.filesystem.graph.FileElement;
 import com.google.devtools.depan.model.Element;
+import com.google.devtools.depan.remap_doc.plugins.ElementEditor;
 
 /**
  * Responsible for providing the correct {@link ElementEditor}.
