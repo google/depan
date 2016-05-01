@@ -16,8 +16,8 @@
 
 package com.google.devtools.depan.eclipse.wizards;
 
-import com.google.devtools.depan.eclipse.editors.ResourceCache;
 import com.google.devtools.depan.graph_doc.model.GraphDocument;
+import com.google.devtools.depan.platform.ResourceCache;
 import com.google.devtools.depan.platform.wizards.AbstractAnalysisWizard;
 
 import org.eclipse.core.resources.IFile;

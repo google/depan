@@ -16,14 +16,14 @@
 
 package com.google.devtools.depan.eclipse.views.tools;
 
-import com.google.devtools.depan.eclipse.editors.EdgeDisplayProperty;
-import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.utils.RelationPropertyEditorPart;
 import com.google.devtools.depan.eclipse.utils.RelationPropertyRelationTableEditor.RelPropRepository;
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.views.ViewEditorTool;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.relations.RelationSetDescriptor;
+import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
+import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty;
 
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;

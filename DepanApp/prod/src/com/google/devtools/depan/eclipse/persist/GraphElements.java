@@ -16,14 +16,23 @@
 
 package com.google.devtools.depan.eclipse.persist;
 
-import com.google.devtools.depan.eclipse.editors.GraphModelReference;
-import com.google.devtools.depan.eclipse.editors.ViewDocument;
-import com.google.devtools.depan.eclipse.editors.ViewPreferences;
-import com.google.devtools.depan.eclipse.persist.XStreamFactory.Config;
+import com.google.devtools.depan.eclipse.persist.GraphModelConverter;
 import com.google.devtools.depan.graph_doc.model.GraphDocument;
+import com.google.devtools.depan.graph_doc.persistence.EdgeConverter;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
+import com.google.devtools.depan.relations.persistence.RelationSetConverters;
+import com.google.devtools.depan.view_doc.model.GraphModelReference;
+import com.google.devtools.depan.view_doc.model.ViewDocument;
+import com.google.devtools.depan.view_doc.model.ViewPreferences;
+import com.google.devtools.depan.view_doc.persistence.CameraDirConverter;
+import com.google.devtools.depan.view_doc.persistence.CameraPosConverter;
+import com.google.devtools.depan.view_doc.persistence.EdgeReferenceConverter;
+import com.google.devtools.depan.view_doc.persistence.GraphModelReferenceConverter;
+import com.google.devtools.depan.view_doc.persistence.NodeReferenceConverter;
+import com.google.devtools.depan.view_doc.persistence.Point2DConverter;
+import com.google.devtools.depan.view_doc.persistence.ViewDocumentConverter;
 
 import com.thoughtworks.xstream.XStream;
 

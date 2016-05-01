@@ -28,11 +28,8 @@ Require-Bundle: org.eclipse.core.runtime,
  com.google.devtools.depan.platform.ui
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
-Export-Package: com.google.devtools.depan.eclipse.cm,
- com.google.devtools.depan.eclipse.editors,
+Export-Package: com.google.devtools.depan.eclipse.editors,
  com.google.devtools.depan.eclipse.persist,
  com.google.devtools.depan.eclipse.plugins,
- com.google.devtools.depan.eclipse.preferences,
  com.google.devtools.depan.eclipse.utils,
- com.google.devtools.depan.eclipse.visualization.ogl,
  com.google.devtools.depan.eclipse.wizards

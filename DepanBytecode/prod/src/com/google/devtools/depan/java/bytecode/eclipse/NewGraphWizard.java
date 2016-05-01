@@ -18,8 +18,8 @@ package com.google.devtools.depan.java.bytecode.eclipse;
 
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.wizards.ProgressListenerMonitor;
+import com.google.devtools.depan.filesystem.builder.TreeLoader;
 import com.google.devtools.depan.filesystem.eclipse.FileSystemActivator;
-import com.google.devtools.depan.filesystem.eclipse.TreeLoader;
 import com.google.devtools.depan.graph_doc.model.GraphDocument;
 import com.google.devtools.depan.java.eclipse.JavaActivator;
 import com.google.devtools.depan.model.GraphModel;

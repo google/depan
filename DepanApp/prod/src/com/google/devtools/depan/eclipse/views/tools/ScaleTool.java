@@ -16,14 +16,16 @@
 
 package com.google.devtools.depan.eclipse.views.tools;
 
-import com.google.devtools.depan.eclipse.editors.CameraDirPreference;
-import com.google.devtools.depan.eclipse.editors.CameraPosPreference;
-import com.google.devtools.depan.eclipse.editors.DrawingListener;
-import com.google.devtools.depan.eclipse.editors.ScenePreferences;
-import com.google.devtools.depan.eclipse.editors.ScenePreferences.Listener;
-import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.views.ViewEditorTool;
+import com.google.devtools.depan.view_doc.eclipse.ui.editor.DrawingListener;
+import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
+import com.google.devtools.depan.view_doc.eclipse.ui.widgets.CameraDirectionGroup;
+import com.google.devtools.depan.view_doc.eclipse.ui.widgets.CameraPositionGroup;
+import com.google.devtools.depan.view_doc.model.CameraDirPreference;
+import com.google.devtools.depan.view_doc.model.CameraPosPreference;
+import com.google.devtools.depan.view_doc.model.ScenePreferences;
+import com.google.devtools.depan.view_doc.model.ScenePreferences.Listener;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;

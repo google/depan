@@ -18,8 +18,8 @@ package com.google.devtools.depan.eclipse.views;
 
 import static java.util.logging.Level.SEVERE;
 
-import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.utils.ListeningViewViewPart;
+import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
 
 import com.google.common.collect.Maps;
 

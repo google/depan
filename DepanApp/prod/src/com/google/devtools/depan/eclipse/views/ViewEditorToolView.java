@@ -16,8 +16,8 @@
 
 package com.google.devtools.depan.eclipse.views;
 
-import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.utils.ListeningViewViewPart;
+import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
 
 import org.eclipse.swt.widgets.Composite;
 

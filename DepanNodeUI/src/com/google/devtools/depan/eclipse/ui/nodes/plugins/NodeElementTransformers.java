@@ -27,7 +27,7 @@ import java.util.Comparator;
 
 /**
  * Contains a list of {@link ElementTransformer} and
- * {@link ElementClassTransformer} associated to a {@link SourcePluginEntry}.
+ * {@link ElementClassTransformer} associated to a {@link Contribution}.
  *
  * @author Yohann Coppel
  */

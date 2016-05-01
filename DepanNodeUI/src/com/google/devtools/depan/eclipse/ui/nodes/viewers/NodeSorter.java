@@ -36,7 +36,7 @@ public class NodeSorter extends ViewerSorter {
     return super.compare(viewer, e1, e2);
   }
 
-  // TODO(leeca): add category determination to NodeElementPluginRegistry
+  // TODO(leeca): add category determination to ContributionRegistry
   @Override
   public int category(Object element) {
     Integer result = NodeElementPluginRegistry.getCategory((Element) element);

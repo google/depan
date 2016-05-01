@@ -16,7 +16,6 @@
 
 package com.google.devtools.depan.eclipse.utils;
 
-import com.google.devtools.depan.eclipse.editors.EdgeDisplayProperty;
 import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
 import com.google.devtools.depan.eclipse.plugins.SourcePluginRegistry;
 import com.google.devtools.depan.eclipse.plugins.SourcePlugins;
@@ -25,6 +24,7 @@ import com.google.devtools.depan.platform.AlphabeticSorter;
 import com.google.devtools.depan.platform.InverseSorter;
 import com.google.devtools.depan.platform.LabelProviderToString;
 import com.google.devtools.depan.platform.tables.EditColTableDef;
+import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;

@@ -16,13 +16,13 @@
 
 package com.google.devtools.depan.eclipse.views.tools;
 
-import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.utils.RelationSetEditorPart;
 import com.google.devtools.depan.eclipse.utils.RelationSetRelationTableEditor.RelationCheckedRepository;
 import com.google.devtools.depan.eclipse.utils.Resources;
 import com.google.devtools.depan.eclipse.views.ViewEditorTool;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.relations.RelationSetDescriptor;
+import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
 
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;

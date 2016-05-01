@@ -17,9 +17,10 @@
 package com.google.devtools.depan.eclipse.utils.elementkinds;
 
 import com.google.common.collect.Lists;
-import com.google.devtools.depan.eclipse.editors.ViewDocument;
+
 import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
 import com.google.devtools.depan.model.Element;
+import com.google.devtools.depan.view_doc.model.ViewDocument;
 
 import java.util.Collection;
 

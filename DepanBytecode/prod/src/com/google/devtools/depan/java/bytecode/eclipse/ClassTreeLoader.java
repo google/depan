@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.java.bytecode.eclipse;
 
-import com.google.devtools.depan.filesystem.eclipse.TreeLoader;
+import com.google.devtools.depan.filesystem.builder.TreeLoader;
 import com.google.devtools.depan.filesystem.graph.DirectoryElement;
 import com.google.devtools.depan.filesystem.graph.FileElement;
 import com.google.devtools.depan.model.builder.chain.DependenciesListener;

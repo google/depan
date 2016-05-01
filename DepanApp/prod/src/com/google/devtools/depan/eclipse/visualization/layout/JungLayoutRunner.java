@@ -15,9 +15,9 @@
  */
 package com.google.devtools.depan.eclipse.visualization.layout;
 
-import com.google.devtools.depan.eclipse.editors.Point2dUtils;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphNode;
+import com.google.devtools.depan.view_doc.model.Point2dUtils;
 
 import com.google.common.collect.Maps;
 

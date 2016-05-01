@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="com.pnambic.depan.analyzers.feature"
+      label="DepAn Analyzers Feature"
+      version="2.0.0.qualifier"
+      provider-name="Pnambic Computing">
+
+   <description url="http://www.example.com/description">
+      Packaging of DepAn dependency analyzers without any UI components.
+   </description>
+
+   <copyright url="http://www.example.com/copyright">
+      [Enter Copyright Description here.]
+   </copyright>
+
+   <license url="http://www.example.com/license">
+      [Enter License Description here.]
+   </license>
+
+   <requires>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="com.google.devtools.depan.core"/>
+      <import plugin="com.google.devtools.depan.builder"/>
+      <import plugin="com.google.devtools.depan.persistence"/>
+      <import plugin="depan-xstream-library"/>
+      <import plugin="com.google.devtools.depan.graph_doc"/>
+      <import plugin="com.google.guava"/>
+   </requires>
+
+   <plugin
+         id="com.google.devtools.depan.filesystem"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>

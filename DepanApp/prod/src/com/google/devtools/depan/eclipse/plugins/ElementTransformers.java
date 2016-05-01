@@ -29,7 +29,7 @@ import com.google.devtools.depan.remap_doc.plugins.ElementEditor;
 
 /**
  * Contains a list of {@link ElementTransformer} and
- * {@link ElementClassTransformer} associated to a {@link SourcePluginEntry}.
+ * {@link ElementClassTransformer} associated to a {@link Contribution}.
  *
  * @author Yohann Coppel
  *

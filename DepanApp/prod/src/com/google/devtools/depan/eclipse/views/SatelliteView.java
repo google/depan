@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.eclipse.views;
 
-import com.google.devtools.depan.eclipse.editors.ViewEditor;
+import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;

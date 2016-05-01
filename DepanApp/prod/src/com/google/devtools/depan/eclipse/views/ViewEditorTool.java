@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.eclipse.views;
 
-import com.google.devtools.depan.eclipse.editors.ViewEditor;
+import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
 
 /**
  * Provide an abstract Tool implementation for tools that operate

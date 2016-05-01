@@ -24,36 +24,46 @@
 
     <dependency>
       <groupId>com.pnambic.depan</groupId>
-      <artifactId>depan-jogl-library</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.pnambic.depan</groupId>
-      <artifactId>depan-jung-library</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.pnambic.depan</groupId>
       <artifactId>depan-xstream-library</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>joda-time</groupId>
-      <artifactId>joda-time</artifactId>
     </dependency>
 
     <!-- DepAn plugin dependencies -->
     <dependency>
       <groupId>com.pnambic.depan</groupId>
-      <artifactId>com.google.devtools.depan.core</artifactId>
-      <version>1.0.5-SNAPSHOT</version>
+      <artifactId>com.google.devtools.depan.builder</artifactId>
+      <version>2.0.0-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>com.pnambic.depan</groupId>
-      <artifactId>com.google.devtools.depan</artifactId>
-      <version>0.0.8-SNAPSHOT</version>
+      <artifactId>com.google.devtools.depan.core</artifactId>
+      <version>2.0.0-SNAPSHOT</version>
     </dependency>
+
+    <dependency>
+      <groupId>com.pnambic.depan</groupId>
+      <artifactId>com.google.devtools.depan.edges</artifactId>
+      <version>2.0.0-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.pnambic.depan</groupId>
+      <artifactId>com.google.devtools.depan.graph_doc</artifactId>
+      <version>2.0.0-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.pnambic.depan</groupId>
+      <artifactId>com.google.devtools.depan.nodes</artifactId>
+      <version>2.0.0-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.pnambic.depan</groupId>
+      <artifactId>com.google.devtools.depan.persistence</artifactId>
+      <version>2.0.0-SNAPSHOT</version>
+    </dependency>
+
   </dependencies>
 
 </project>

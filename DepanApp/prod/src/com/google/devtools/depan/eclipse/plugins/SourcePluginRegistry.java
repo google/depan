@@ -22,6 +22,7 @@ import com.google.common.collect.Maps;
 import com.google.devtools.depan.eclipse.visualization.ogl.GLEntity;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.model.Element;
+import com.google.devtools.depan.platform.plugin.PluginClassLoader;
 import com.google.devtools.depan.remap_doc.plugins.ElementEditor;
 
 import com.thoughtworks.xstream.XStream;
@@ -108,7 +109,7 @@ public class SourcePluginRegistry {
   }
 
   /**
-   * @return a list of {@link SourcePluginEntry}es containing informations on
+   * @return a list of {@link Contribution}es containing informations on
    * the registered plugins.
    */
   public static Collection<SourcePluginEntry> getEntries() {
@@ -116,9 +117,9 @@ public class SourcePluginRegistry {
   }
 
   /**
-   * Get the SourcePluginEntry with the given ID from the singleton.
-   * @param id a SourcePluginEntry ID.
-   * @return the corresponding SourcePluginEntry, or <code>null</code> if no
+   * Get the Contribution with the given ID from the singleton.
+   * @param id a Contribution ID.
+   * @return the corresponding Contribution, or <code>null</code> if no
    * plugins has the given ID.
    */
   public static SourcePluginEntry getEntry(String id) {
@@ -126,9 +127,9 @@ public class SourcePluginRegistry {
   }
 
   /**
-   * Get the SourcePluginEntry with the given ID.
-   * @param id a SourcePluginEntry ID.
-   * @return the corresponding SourcePluginEntry, or <code>null</code> if no
+   * Get the Contribution with the given ID.
+   * @param id a Contribution ID.
+   * @return the corresponding Contribution, or <code>null</code> if no
    * plugins has the given ID.
    */
   public SourcePluginEntry getSourcePluginEntry(String id) {

@@ -16,7 +16,6 @@
 
 package com.google.devtools.depan.eclipse.views.tools;
 
-import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.persist.XmlPersistentPathExpression;
 import com.google.devtools.depan.eclipse.utils.GraphEdgeMatcherEditorPart;
 import com.google.devtools.depan.eclipse.utils.Resources;
@@ -25,6 +24,7 @@ import com.google.devtools.depan.paths.filters.PathMatcher;
 import com.google.devtools.depan.paths.filters.PathMatcherTerm;
 import com.google.devtools.depan.platform.TableContentProvider;
 import com.google.devtools.depan.platform.tables.EditColTableDef;
+import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
 
 import com.google.common.collect.Sets;
 import com.google.devtools.edges.matchers.GraphEdgeMatcherDescriptor;

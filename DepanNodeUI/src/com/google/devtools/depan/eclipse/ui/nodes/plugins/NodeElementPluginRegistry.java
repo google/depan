@@ -18,20 +18,16 @@ package com.google.devtools.depan.eclipse.ui.nodes.plugins;
 
 import com.google.devtools.depan.eclipse.ui.nodes.NodesLogger;
 import com.google.devtools.depan.model.Element;
+import com.google.devtools.depan.platform.plugin.ContributionEntry;
+import com.google.devtools.depan.platform.plugin.ContributionRegistry;
 
 import com.google.common.collect.Maps;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IExtension;
-import org.eclipse.core.runtime.IExtensionPoint;
-import org.eclipse.core.runtime.IExtensionRegistry;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 
 import java.awt.Color;
-import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -48,10 +44,10 @@ import java.util.Map;
  *
  * @author Yohann Coppel
  */
-public class NodeElementPluginRegistry {
-  /**
-   * Extension point name for sourceplugins
-   */
+public class NodeElementPluginRegistry
+    extends ContributionRegistry<NodeElementPlugin> {
+
+  /** Extension point name for node element behaviors. */
   public final static String EXTENTION_POINT =
       "com.google.devtools.depan.eclipse.ui.nodes.node_element";
 
@@ -62,70 +58,46 @@ public class NodeElementPluginRegistry {
   private static NodeElementPluginRegistry INSTANCE = null;
 
   /**
-   * A list of all registered plugins entries. The key is the plugin id.
-   */
-  private final Map<String, NodeElementPluginEntry> entries = Maps.newHashMap();
-
-  /**
    * A map to find the right {@link NodeElementTransformers} given a element's
    * class.
    */
-  private final Map<Class<? extends Element>, NodeElementTransformers> transformers =
-      Maps.newHashMap();
+  private final Map<Class<? extends Element>, NodeElementTransformers>
+      transformers = Maps.newHashMap();
 
   /**
    * Singleton class: private constructor to prevent instantiation.
    */
   private NodeElementPluginRegistry() {
+    super();
   }
 
-  /**
-   * Get the SourcePluginEntry with the given ID.
-   * @param id a SourcePluginEntry ID.
-   * @return the corresponding SourcePluginEntry, or <code>null</code> if no
-   * plugins has the given ID.
-   */
-  public NodeElementPluginEntry getNodeElementEntry(String id) {
-    return entries.get(id);
-  }
+  /////////////////////////////////////
+  // Hook method implementations
 
-  /**
-   * Load the plugins from the extension point, and fill the lists of entries.
-   */
-  private void load() {
-    IExtensionRegistry registry = Platform.getExtensionRegistry();
-    IExtensionPoint point = registry.getExtensionPoint(EXTENTION_POINT);
-    // for each extension
-    for (IExtension extension: point.getExtensions()) {
-      // ... and for each elements
-      for (IConfigurationElement element :
-          extension.getConfigurationElements()) {
-        // obtain an object on the entry
-        NodeElementPluginEntry entry = new NodeElementPluginEntry(element);
-        String entryId = entry.getId();
-        entries.put(entryId, entry);
-        try {
-          // try to instantiate the plugin
-          NodeElementPlugin plugin = entry.getInstance();
-
-          // create the ElementTransformer for this plugin
-          NodeElementTransformers xform = new NodeElementTransformers(
-              entryId,
-              plugin.getElementImageProvider(),
-              plugin.getElementImageDescriptorProvider(),
-              plugin.getElementColorProvider(),
-              plugin.getElementCategoryProvider(),
-              plugin.getElementSorter());
-          for (Class<? extends Element> type : plugin.getNodeElementClasses()) {
-            transformers.put(type, xform);
-          }
-        } catch (CoreException err) {
-          NodesLogger.logException(
-              "NodeElement load failure for " + entryId, err);
-          throw new RuntimeException(err);
-        }
-      }
+  @Override
+  protected void installContribution(String entryId, NodeElementPlugin plugin) {
+    NodeElementTransformers xform = new NodeElementTransformers(
+        entryId,
+        plugin.getElementImageProvider(),
+        plugin.getElementImageDescriptorProvider(),
+        plugin.getElementColorProvider(),
+        plugin.getElementCategoryProvider(),
+        plugin.getElementSorter());
+    for (Class<? extends Element> type : plugin.getElementClasses()) {
+      transformers.put(type, xform);
     }
+  }
+
+  @Override
+  protected ContributionEntry<NodeElementPlugin> buildEntry(
+      IConfigurationElement element) {
+    return new NodeElementPlugin.Entry(element);
+  }
+
+  @Override
+  protected void reportException(String entryId, Exception err) {
+    NodesLogger.logException(
+        "NodeElement load failure for " + entryId, err);
   }
 
   /////////////////////////////////////
@@ -135,30 +107,12 @@ public class NodeElementPluginRegistry {
    * Provide the {@code SourcePluginRegistry} singleton.
    * It is created lazily when needed.
    */
-  public static synchronized NodeElementPluginRegistry getInstance() {
+  private static synchronized NodeElementPluginRegistry getInstance() {
     if (null == INSTANCE) {
       INSTANCE = new NodeElementPluginRegistry();
-      INSTANCE.load();
+      INSTANCE.load(EXTENTION_POINT);
     }
     return INSTANCE;
-  }
-
-  /**
-   * @return a list of {@link NodeElementPluginEntry}es containing informations on
-   * the registered plugins.
-   */
-  public static Collection<NodeElementPluginEntry> getEntries() {
-    return getInstance().entries.values();
-  }
-
-  /**
-   * Get the SourcePluginEntry with the given ID from the singleton.
-   * @param id a SourcePluginEntry ID.
-   * @return the corresponding SourcePluginEntry, or <code>null</code> if no
-   * plugins has the given ID.
-   */
-  public static NodeElementPluginEntry getEntry(String id) {
-    return getInstance().getNodeElementEntry(id);
   }
 
   /////////////////////////////////////

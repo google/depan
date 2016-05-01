@@ -16,9 +16,6 @@
 
 package com.google.devtools.depan.eclipse.views.tools;
 
-import com.google.devtools.depan.eclipse.editors.NodeDisplayProperty;
-import com.google.devtools.depan.eclipse.editors.NodeDisplayProperty.Size;
-import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.ui.nodes.cache.HierarchyCache;
 import com.google.devtools.depan.eclipse.ui.nodes.trees.GraphData;
 import com.google.devtools.depan.eclipse.ui.nodes.trees.NodeWrapper;
@@ -34,6 +31,9 @@ import com.google.devtools.depan.eclipse.views.ViewSelectionListenerTool;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.platform.tables.EditColTableDef;
 import com.google.devtools.depan.util.StringUtils;
+import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
+import com.google.devtools.depan.view_doc.model.NodeDisplayProperty;
+import com.google.devtools.depan.view_doc.model.NodeDisplayProperty.Size;
 
 import com.google.common.collect.Lists;
 import com.google.devtools.edges.matchers.GraphEdgeMatcherDescriptor;

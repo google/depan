@@ -16,7 +16,6 @@
 
 package com.google.devtools.depan.eclipse.views.tools;
 
-import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.utils.RelationSetEditorPart;
 import com.google.devtools.depan.eclipse.utils.RelationSetRelationTableEditor.RelationCheckedRepository;
 import com.google.devtools.depan.eclipse.views.tools.RelationCount.RangeData;
@@ -27,6 +26,7 @@ import com.google.devtools.depan.paths.filters.PathMatcher;
 import com.google.devtools.depan.paths.filters.RelationCountMatcher;
 import com.google.devtools.depan.paths.filters.RelationCountMatcher.EdgeCountPredicate;
 import com.google.devtools.depan.relations.RelationSetDescriptor;
+import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;

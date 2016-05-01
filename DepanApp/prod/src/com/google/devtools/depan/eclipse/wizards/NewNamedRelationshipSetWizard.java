@@ -16,8 +16,8 @@
 
 package com.google.devtools.depan.eclipse.wizards;
 
-import com.google.devtools.depan.eclipse.persist.ObjectXmlPersist;
 import com.google.devtools.depan.eclipse.persist.XStreamFactory;
+import com.google.devtools.depan.persistence.ObjectXmlPersist;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;

@@ -36,11 +36,6 @@
       <artifactId>depan-jung-library</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>com.pnambic.depan</groupId>
-      <artifactId>depan-xstream-library</artifactId>
-    </dependency>
-
     <!-- DepAn dependencies -->
     <dependency>
       <groupId>com.pnambic.depan</groupId>

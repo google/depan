@@ -1,0 +1,23 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: DepanViewDoc
+Bundle-SymbolicName: com.google.devtools.depan.view_doc;singleton:=true
+Bundle-Version: 2.0.0.qualifier
+Bundle-Vendor: Pnambic Computing
+Require-Bundle: com.google.guava,
+ com.google.devtools.depan.core,
+ com.google.devtools.depan.graph_doc,
+ org.eclipse.core.resources,
+ com.google.devtools.depan.edges.ui,
+ org.eclipse.ui.ide,
+ depan-xstream-library,
+ org.eclipse.core.runtime,
+ com.google.devtools.depan.platform.ui,
+ org.eclipse.swt,
+ org.eclipse.jface,
+ com.google.devtools.depan.persistence
+Bundle-ClassPath: .
+Export-Package: com.google.devtools.depan.eclipse.cm,
+ com.google.devtools.depan.eclipse.preferences,
+ com.google.devtools.depan.eclipse.visualization.ogl
+Bundle-Activator: com.google.devtools.depan.view_doc.eclipse.ViewDocActivator

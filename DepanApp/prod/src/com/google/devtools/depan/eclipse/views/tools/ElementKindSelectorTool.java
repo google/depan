@@ -16,10 +16,10 @@
 
 package com.google.devtools.depan.eclipse.views.tools;
 
-import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.utils.ElementKindPicker;
 import com.google.devtools.depan.paths.filters.NodeKindMatcher;
 import com.google.devtools.depan.paths.filters.PathMatcher;
+import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;

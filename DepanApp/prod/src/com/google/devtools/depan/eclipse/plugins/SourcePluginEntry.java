@@ -20,7 +20,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 
 /**
- * A {@link SourcePluginEntry} represent an entry in a plugin.xml file,
+ * A {@link Contribution} represent an entry in a plugin.xml file,
  * describing a source plugin.
  *
  * @author Yohann Coppel

@@ -16,9 +16,6 @@
 
 package com.google.devtools.depan.eclipse.views.tools;
 
-import com.google.devtools.depan.eclipse.editors.NewEditorHelper;
-import com.google.devtools.depan.eclipse.editors.ViewDocument;
-import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeLabelProvider;
 import com.google.devtools.depan.eclipse.utils.LayoutChoicesControl;
 import com.google.devtools.depan.eclipse.utils.Resources;
@@ -27,8 +24,11 @@ import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerators;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.paths.filters.PathMatcher;
+import com.google.devtools.depan.platform.NewEditorHelper;
 import com.google.devtools.depan.platform.TableContentProvider;
 import com.google.devtools.depan.platform.widgets.Sasher;
+import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
+import com.google.devtools.depan.view_doc.model.ViewDocument;
 
 import com.google.common.collect.Lists;
 import com.google.devtools.edges.matchers.GraphEdgeMatcherDescriptor;

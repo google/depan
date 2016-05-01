@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: DepanPersistence
+Bundle-SymbolicName: com.google.devtools.depan.persistence;singleton:=true
+Bundle-Version: 2.0.0.qualifier
+Bundle-Vendor: Pnambic Computing
+Require-Bundle: com.google.guava,
+ com.google.devtools.depan.core,
+ depan-xstream-library,
+ org.eclipse.core.runtime
+Bundle-ClassPath: .
+Export-Package: com.google.devtools.depan.persistence,
+ com.google.devtools.depan.persistence.plugins,
+ com.google.devtools.depan.platform.plugin

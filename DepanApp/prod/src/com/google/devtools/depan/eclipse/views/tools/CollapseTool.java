@@ -16,9 +16,6 @@
 
 package com.google.devtools.depan.eclipse.views.tools;
 
-import com.google.devtools.depan.eclipse.editors.NodeDisplayProperty;
-import com.google.devtools.depan.eclipse.editors.ViewEditor;
-import com.google.devtools.depan.eclipse.editors.ViewPrefsListener;
 import com.google.devtools.depan.eclipse.ui.nodes.cache.HierarchyCache;
 import com.google.devtools.depan.eclipse.ui.nodes.trees.GraphData;
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.HierarchyViewer;
@@ -28,6 +25,9 @@ import com.google.devtools.depan.eclipse.views.ViewSelectionListenerTool;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.ui.nodes.trees.GraphNodeViewer;
 import com.google.devtools.depan.view.CollapseData;
+import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
+import com.google.devtools.depan.view_doc.model.NodeDisplayProperty;
+import com.google.devtools.depan.view_doc.model.ViewPrefsListener;
 
 import com.google.devtools.edges.matchers.GraphEdgeMatcherDescriptor;
 
