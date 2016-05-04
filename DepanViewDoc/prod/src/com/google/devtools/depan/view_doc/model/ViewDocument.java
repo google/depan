@@ -18,17 +18,17 @@ package com.google.devtools.depan.view_doc.model;
 
 import com.google.devtools.depan.eclipse.editors.ViewPreferences;
 import com.google.devtools.depan.eclipse.editors.ViewPrefsListener;
-import com.google.devtools.depan.eclipse.ui.edges.matchers.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeTreeProvider;
 import com.google.devtools.depan.edges.trees.TreeModel;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.api.RelationSet;
+import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.builder.api.GraphBuilder;
 import com.google.devtools.depan.model.builder.api.GraphBuilders;
-import com.google.devtools.depan.relations.RelationSetDescriptor;
+import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 import com.google.devtools.depan.view_doc.eclipse.ui.plugins.JoglPlugin;
 
 import com.google.common.collect.ImmutableList;

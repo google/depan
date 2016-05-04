@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="com.google.devtools.depan.eclipse.sourceplugin">
+      <languagespecific
+            class="com.google.devtools.depan.filesystem.FileSystemPlugin"
+            description="Graph elements for File System dependency analysis."
+            id="com.google.devtools.depan.filesystem"
+            source="File System">
+      </languagespecific>
+   </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <wizard
+            category="com.google.devtools.depan"
+            class="com.google.devtools.depan.filesystem.eclipse.NewFileSystemWizard"
+            finalPerspective="com.google.devtools.depan.eclipse.perspective"
+            icon="icons/eclipse/folder_obj.png"
+            id="com.google.devtools.depan.filesystem.eclipse.NewFileSystemWizard"
+            name="New File System Analysis">
+      </wizard>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="com.google.devtools.depan.filesystem.eclipse.preferences.ColorPreferencesInitializer">
+      </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="com.google.devtools.depan.eclipse.preferences.colors"
+            class="com.google.devtools.depan.filesystem.eclipse.preferences.ColorPreferencesPage"
+            id="com.google.devtools.depan.filesystem.eclipse.nodecolors"
+            name="File System Node Colors">
+      </page>
+   </extension>
+</plugin>

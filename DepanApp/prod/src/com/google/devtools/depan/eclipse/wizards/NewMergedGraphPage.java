@@ -19,7 +19,7 @@ package com.google.devtools.depan.eclipse.wizards;
 import com.google.devtools.depan.eclipse.Project;
 import com.google.devtools.depan.graph_doc.model.GraphDocument;
 import com.google.devtools.depan.platform.TableContentProvider;
-import com.google.devtools.depan.platform.wizards.AbstractAnalysisPage;
+import com.google.devtools.depan.resource_doc.eclipse.ui.wizards.AbstractResouceWizardPage;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.viewers.ISelection;
@@ -48,7 +48,7 @@ import java.util.List;
  * 
  * @author <a href="leeca@google.com">Lee Carver</a>
  */
-public class NewMergedGraphPage extends AbstractAnalysisPage {
+public class NewMergedGraphPage extends AbstractResouceWizardPage {
 
   private static final String PAGE_LABEL = "Merge Dependency Graphs";
 

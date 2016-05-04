@@ -1,0 +1,26 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: DepanFileSystemUI
+Bundle-SymbolicName: com.google.devtools.depan.filesystem.ui;singleton:=true
+Bundle-Version: 2.0.0.qualifier
+Require-Bundle: org.eclipse.core.resources,
+ org.eclipse.core.runtime,
+ org.eclipse.jface.text,
+ org.eclipse.ui,
+ com.google.guava,
+ depan-jogl-library,
+ depan-xstream-library,
+ com.google.devtools.depan.core,
+ com.google.devtools.depan.builder,
+ com.google.devtools.depan.platform.ui,
+ com.google.devtools.depan.edges.ui,
+ com.google.devtools.depan.persistence
+Export-Package: com.google.devtools.depan.filesystem,
+ com.google.devtools.depan.filesystem.builder,
+ com.google.devtools.depan.filesystem.eclipse,
+ com.google.devtools.depan.filesystem.editors,
+ com.google.devtools.depan.filesystem.graph,
+ com.google.devtools.depan.filesystem.integration
+Bundle-Vendor: Pnambic Computing
+Bundle-ActivationPolicy: lazy
+Bundle-Activator: com.google.devtools.depan.filesystem.eclipse.FileSystemActivator

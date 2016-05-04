@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: DepanGraphDocUI
+Bundle-SymbolicName: com.google.devtools.depan.graph_doc.ui;singleton:=true
+Bundle-Version: 2.0.0.qualifier
+Bundle-Vendor: Pnambic Computing
+Require-Bundle: com.google.guava,
+ com.google.devtools.depan.core,
+ org.eclipse.core.resources,
+ com.google.devtools.depan.eclipse.ui.nodes,
+ org.eclipse.ui.ide,
+ org.eclipse.jface,
+ org.eclipse.swt,
+ org.eclipse.core.runtime,
+ com.google.devtools.depan.graph_doc,
+ com.google.devtools.depan.platform.ui
+Bundle-ClassPath: .
+Export-Package: com.google.devtools.depan.graph_doc.eclipse.ui.wizards

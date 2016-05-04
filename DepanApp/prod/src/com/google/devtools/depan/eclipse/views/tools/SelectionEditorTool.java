@@ -26,7 +26,7 @@ import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.paths.filters.PathMatcher;
 import com.google.devtools.depan.platform.NewEditorHelper;
 import com.google.devtools.depan.platform.TableContentProvider;
-import com.google.devtools.depan.platform.widgets.Sasher;
+import com.google.devtools.depan.platform.eclipse.ui.widgets.Sasher;
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
 import com.google.devtools.depan.view_doc.model.ViewDocument;
 

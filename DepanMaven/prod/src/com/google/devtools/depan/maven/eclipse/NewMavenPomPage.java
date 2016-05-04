@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.maven.eclipse;
 
-import com.google.devtools.depan.platform.wizards.AbstractAnalysisPage;
+import com.google.devtools.depan.resource_doc.eclipse.ui.wizards.AbstractResouceWizardPage;
 
 import com.google.common.base.Strings;
 
@@ -45,7 +45,7 @@ import java.io.File;
  * 
  * @author <a href="mailto:leeca@pnambic.com">Lee Carver</a>
  */
-public class NewMavenPomPage extends AbstractAnalysisPage {
+public class NewMavenPomPage extends AbstractResouceWizardPage {
 
   public static final String PAGE_LABEL = "New Maven POM Analysis";
   private static final String[] POM_FILTER = new String[] { "*.xml" };

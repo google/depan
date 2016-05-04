@@ -34,7 +34,7 @@ import java.util.Set;
  *
  * @author <a href="mailto:leeca@google.com">Lee Carver</a>
  */
-abstract class AbstractCollectionConverter<T> extends AbstractTypeConverter {
+public abstract class AbstractCollectionConverter<T> extends AbstractTypeConverter {
   private final Class<?> collectType;
   private final Class<?> elementType;
   private final Mapper mapper;
@@ -47,7 +47,7 @@ abstract class AbstractCollectionConverter<T> extends AbstractTypeConverter {
   }
 
   @Override
-  protected Class<?> getType() {
+  public Class<?> getType() {
     return collectType;
   }
 

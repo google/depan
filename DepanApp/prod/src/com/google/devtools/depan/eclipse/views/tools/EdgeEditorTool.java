@@ -22,7 +22,7 @@ import com.google.devtools.depan.eclipse.views.ViewEditorTool;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.platform.Colors;
 import com.google.devtools.depan.platform.TableContentProvider;
-import com.google.devtools.depan.platform.tables.EditColTableDef;
+import com.google.devtools.depan.platform.eclipse.ui.tables.EditColTableDef;
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
 import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty;
 import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty.ArrowheadStyle;

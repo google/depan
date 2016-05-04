@@ -25,12 +25,12 @@ import com.thoughtworks.xstream.converters.Converter;
  *
  * @author <a href="mailto:leeca@google.com">Lee Carver</a>
  */
-abstract class AbstractTypeConverter implements Converter {
+public abstract class AbstractTypeConverter implements Converter {
 
   /**
-   * Hook method to provide type the converter processes.
+   * Hook method to provide type the registration and converter processeses.
    */
-  protected abstract Class<?> getType();
+  public abstract Class<?> getType();
 
   @Override
   @SuppressWarnings("rawtypes")  // Parent type uses raw type Class

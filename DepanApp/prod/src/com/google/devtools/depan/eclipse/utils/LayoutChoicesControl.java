@@ -16,6 +16,7 @@
 package com.google.devtools.depan.eclipse.utils;
 
 import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerator;
+import com.google.devtools.depan.matchers.eclipse.ui.widgets.GraphEdgeMatcherSelectorControl;
 
 import com.google.devtools.edges.matchers.GraphEdgeMatcherDescriptor;
 

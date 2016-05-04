@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="com.pnambic.depan.app.feature"
+      label="DepAn App Feature"
+      version="2.0.0.qualifier"
+      provider-name="Pnambic Computing">
+
+   <description url="http://www.example.com/description">
+      DepAn UI based on the Eclipse RCP.
+   </description>
+
+   <copyright url="http://www.example.com/copyright">
+      [Enter Copyright Description here.]
+   </copyright>
+
+   <license url="http://www.example.com/license">
+      [Enter License Description here.]
+   </license>
+
+   <requires>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.jface"/>
+      <import plugin="org.eclipse.ui.ide"/>
+      <import plugin="org.eclipse.ui.workbench"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="org.eclipse.swt"/>
+      <import plugin="org.eclipse.osgi"/>
+      <import plugin="org.eclipse.equinox.app"/>
+      <import plugin="com.google.devtools.depan.core"/>
+      <import plugin="com.google.devtools.depan.persistence"/>
+      <import plugin="com.google.devtools.depan.graph_doc"/>
+      <import plugin="com.google.devtools.depan.edges"/>
+      <import plugin="com.google.devtools.depan.nodes"/>
+      <import plugin="com.google.guava"/>
+      <import plugin="depan-xstream-library"/>
+   </requires>
+
+<!-- 
+   <plugin
+         id="com.google.devtools.depan.eclipse.ui.nodes"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.google.devtools.depan.edges.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.google.devtools.depan.graph_doc.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.google.devtools.depan.view_doc"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+ -->
+
+   <plugin
+         id="com.google.devtools.depan.platform.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.google.devtools.depan_min"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>

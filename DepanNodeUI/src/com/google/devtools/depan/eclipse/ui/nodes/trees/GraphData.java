@@ -16,13 +16,13 @@
 
 package com.google.devtools.depan.eclipse.ui.nodes.trees;
 
-import com.google.devtools.depan.eclipse.ui.edges.matchers.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.eclipse.ui.nodes.trees.NodeWrapper;
 import com.google.devtools.depan.eclipse.ui.nodes.trees.NodeWrapperRoot;
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeTreeProvider;
 import com.google.devtools.depan.edges.matchers.Graphs;
 import com.google.devtools.depan.edges.trees.HierarchicalTreeModel;
 import com.google.devtools.depan.edges.trees.TreeModel;
+import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 

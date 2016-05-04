@@ -20,7 +20,7 @@ import com.google.devtools.depan.eclipse.stats.ElementKindStats.Info;
 import com.google.devtools.depan.platform.AlphabeticSorter;
 import com.google.devtools.depan.platform.InverseSorter;
 import com.google.devtools.depan.platform.LabelProviderToString;
-import com.google.devtools.depan.platform.tables.EditColTableDef;
+import com.google.devtools.depan.platform.eclipse.ui.tables.EditColTableDef;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.BaseLabelProvider;

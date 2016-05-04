@@ -50,7 +50,7 @@ import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.RelationSets;
 import com.google.devtools.depan.platform.ListenerManager;
-import com.google.devtools.depan.relations.RelationSetDescriptor;
+import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 import com.google.devtools.depan.view.CollapseData;
 import com.google.devtools.depan.view.CollapseTreeModel;
 import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty;
@@ -552,7 +552,7 @@ public class ViewEditor extends MultiPageEditorPart {
     context.setGraphModel(getExposedGraph());
     context.setMovableNodes(viewGraph.getNodes());
     // TODO: Compute ranking based on selected edge matcher
-    context.setEdgeMatcher(com.google.devtools.depan.eclipse.ui.edges.matchers.GraphEdgeMatcherDescriptors.FORWARD);
+    context.setEdgeMatcher(com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptors.FORWARD);
 
     return LayoutUtil.buildJungGraph(context);
   }

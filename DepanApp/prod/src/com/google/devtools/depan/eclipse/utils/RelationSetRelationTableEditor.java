@@ -23,7 +23,7 @@ import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.platform.AlphabeticSorter;
 import com.google.devtools.depan.platform.InverseSorter;
 import com.google.devtools.depan.platform.LabelProviderToString;
-import com.google.devtools.depan.platform.tables.EditColTableDef;
+import com.google.devtools.depan.platform.eclipse.ui.tables.EditColTableDef;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
