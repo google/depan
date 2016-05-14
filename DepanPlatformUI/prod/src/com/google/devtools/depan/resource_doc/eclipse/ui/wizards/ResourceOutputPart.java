@@ -28,7 +28,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -51,9 +50,12 @@ import org.eclipse.swt.widgets.Text;
 public class ResourceOutputPart {
 
   /**
-   * Provides the shell for dialog and dymanic input validation
+   * Provides the shell for dialog and dymanic input validation.
+   * 
+   * Integration with WizardPage depends on {@code updateStatus}
+   * method introduced by {@link AbstractResouceWizardPage}.
    */
-  private final WizardPage containingPage;
+  private final AbstractResouceWizardPage containingPage;
 
   /**
    * Initial content for user control {@code fileText}.
@@ -72,7 +74,7 @@ public class ResourceOutputPart {
   private String errorMsg;
 
   public ResourceOutputPart(
-      WizardPage containingPage, IContainer outputContainer,
+      AbstractResouceWizardPage containingPage, IContainer outputContainer,
       String defaultFilename) {
     this.containingPage = containingPage;
     this.outputContainer = outputContainer;
@@ -163,7 +165,7 @@ public class ResourceOutputPart {
     return containerText.getText();
   }
 
-  public String getFileName() {
+  public String getFilename() {
     return fileText.getText();
   }
 
@@ -182,7 +184,7 @@ public class ResourceOutputPart {
     }
 
     IContainer container = (IContainer) resource;
-    final IFile file = container.getFile(new Path(getFileName()));
+    final IFile file = container.getFile(new Path(getFilename()));
     return file;
   }
 
@@ -191,8 +193,7 @@ public class ResourceOutputPart {
    */
   private void dialogChanged() {
     errorMsg = validateInputs();
-
-    containingPage.setPageComplete(containingPage.isPageComplete());
+    containingPage.updateStatus(errorMsg);
   }
 
   /**
@@ -203,7 +204,7 @@ public class ResourceOutputPart {
   private String validateInputs() {
     IResource container = ResourcesPlugin.getWorkspace().getRoot().findMember(
         new Path(getContainerName()));
-    String fileName = getFileName();
+    String filename = getFilename();
 
     if (getContainerName().length() == 0) {
       return "File container must be specified";
@@ -216,15 +217,15 @@ public class ResourceOutputPart {
     if (!container.isAccessible()) {
       return "Project must be writable";
     }
-    if (fileName.length() == 0) {
+    if (filename.length() == 0) {
       return "File name must be specified";
     }
-    if (fileName.replace('\\', '/').indexOf('/', 1) > 0) {
+    if (filename.replace('\\', '/').indexOf('/', 1) > 0) {
       return "File name must be valid";
     }
-    int dotLoc = fileName.lastIndexOf('.');
+    int dotLoc = filename.lastIndexOf('.');
     if (dotLoc != -1) {
-      String ext = fileName.substring(dotLoc + 1);
+      String ext = filename.substring(dotLoc + 1);
       if (!ext.equalsIgnoreCase(GraphDocument.EXTENSION)) {
         return "File extension must be \"." + GraphDocument.EXTENSION + "\"";
       }

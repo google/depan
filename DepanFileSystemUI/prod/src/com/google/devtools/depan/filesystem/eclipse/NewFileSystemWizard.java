@@ -64,7 +64,7 @@ public class NewFileSystemWizard extends AbstractNewResourceWizard {
 
   @Override
   protected String getOutputFileName() {
-    return page.getOutputFileName();
+    return page.getOutputFilename();
   }
 
   @Override

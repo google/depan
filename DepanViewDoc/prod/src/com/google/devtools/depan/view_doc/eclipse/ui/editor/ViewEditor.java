@@ -50,6 +50,7 @@ import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.RelationSets;
 import com.google.devtools.depan.platform.ListenerManager;
+import com.google.devtools.depan.platform.WorkspaceTools;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 import com.google.devtools.depan.view.CollapseData;
 import com.google.devtools.depan.view.CollapseTreeModel;
@@ -791,10 +792,7 @@ public class ViewEditor extends MultiPageEditorPart {
    * @return valid IFile with an extension.
    */
   private IFile calcViewFile(IPath savePath) {
-    if (null == savePath.getFileExtension()) {
-      savePath = savePath.addFileExtension(ViewDocument.EXTENSION);
-    }
-    return ResourcesPlugin.getWorkspace().getRoot().getFile(savePath);
+    return WorkspaceTools.calcViewFile(savePath, ViewDocument.EXTENSION);
   }
 
   /////////////////////////////////////

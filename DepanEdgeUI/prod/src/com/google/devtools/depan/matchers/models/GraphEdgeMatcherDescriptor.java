@@ -30,6 +30,11 @@ import com.google.devtools.depan.graph.api.Relation;
 public class GraphEdgeMatcherDescriptor
     implements EdgeMatcher<String> {
 
+  /**
+   * Preferred file extension for documents.
+   */
+  public static final String EXTENSION = "emxml";
+
   private final String name;
   private final EdgeMatcher<String> matcher;
 

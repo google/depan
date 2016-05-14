@@ -15,8 +15,6 @@
  */
 package com.google.devtools.depan.relations.persistence;
 
-import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
-import com.google.devtools.depan.eclipse.plugins.SourcePluginRegistry;
 import com.google.devtools.depan.graph.api.RelationSet;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 
@@ -63,12 +61,6 @@ public class RelationSetDescrConverter implements Converter {
   public void marshal(Object source, HierarchicalStreamWriter writer,
       MarshallingContext context) {
     RelationSetDescriptor setDescr = (RelationSetDescriptor) source;
-    SourcePlugin plugin = findBuiltIn(setDescr);
-    if (null != plugin) {
-      String entryId = SourcePluginRegistry.getInstance().getPluginId(plugin);
-      writer.addAttribute(PLUGIN_ID, entryId);
-      writer.addAttribute(REL_SET, setDescr.getName());
-    }
   }
 
   @Override
@@ -77,33 +69,11 @@ public class RelationSetDescrConverter implements Converter {
     try {
       String pluginId = reader.getAttribute(PLUGIN_ID);
       String relSetName = reader.getAttribute(REL_SET);
-      if ((null != pluginId) && (null != relSetName)) {
-        SourcePlugin plugin = SourcePluginRegistry.getSourcePlugin(pluginId);
-        if (null == plugin) {
-          return null;
-        }
-        for (RelationSetDescriptor builtIn : plugin.getBuiltinRelationshipSets()) {
-          if (relSetName.equals(builtIn.getName())) {
-            return builtIn;
-          }
-        }
-      }
+      
       return null;
     } catch (RuntimeException err) {
       err.printStackTrace();
       throw err;
     }
-  }
-
-  private SourcePlugin findBuiltIn(RelationSetDescriptor relSet) {
-    // Populate the list viewer with all known relations.
-    for (SourcePlugin plugin : SourcePluginRegistry.getInstances()) {
-      for (RelationSetDescriptor builtIn : plugin.getBuiltinRelationshipSets()) {
-        if (builtIn == relSet) {
-          return plugin;
-        }
-      }
-    }
-    return null;
   }
 }

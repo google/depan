@@ -22,6 +22,7 @@ import com.google.devtools.depan.persistence.AbstractDocXmlPersist;
 import com.google.devtools.depan.resource_doc.eclipse.ui.wizards.AbstractNewResourceWizard;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 /**
@@ -85,13 +86,12 @@ public class NewEdgeMatcherWizard
 
   @Override
   protected String getOutputFilename() {
-    return page.getFilename();
+    return page.getOutputFilename();
   }
 
   @Override
-  protected IFile getOutputFile() {
-    final String filename = page.getFilename();
-    return buildRootIFile(filename);
+  protected IFile getOutputFile() throws CoreException {
+    return page.getOutputFile();
   }
 
   @Override

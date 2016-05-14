@@ -17,14 +17,9 @@
 package com.google.devtools.depan.matchers.eclipse.ui.widgets;
 
 import com.google.devtools.depan.graph.api.Relation;
-import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
-import com.google.devtools.depan.model.GraphEdgeMatcher;
 import com.google.devtools.depan.platform.PlatformResources;
 
-import com.google.common.collect.Lists;
-
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -34,9 +29,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -55,39 +48,9 @@ public class GraphEdgeMatcherEditorPart {
   /////////////////////////////////////
   // UX Elements
 
-  /**
-   * The actual table.
-   */
-  private TableViewer tableViewer = null;
-
   private GraphEdgeMatcherRelationTableEditor editor;
 
-  /**
-   * The quick selector on top of this widget applying a selection to the list
-   * of relationships.
-   */
-  private GraphEdgeMatcherSelectorControl edgeMatcherSelector = null;
-
-  /**
-   * A shell necessary to open dialogs.
-   */
-  private Shell shell = null;
-
   /////////////////////////////////////
-  // Listeners
-
-  /**
-   * Listeners for changes in the model.
-   */
-  private Collection<ModificationListener<Relation, Boolean>>
-      listeners = Lists.newArrayList();
-
-  /////////////////////////////////////
-
-  /**
-   * the currently selected {@link GraphEdgeMatcherDescriptor}.
-   */
-  private GraphEdgeMatcherDescriptor selectedEdgeMatcher = null;
 
   /**
    * return a {@link Control} for this widget, containing every useful buttons,
@@ -97,31 +60,17 @@ public class GraphEdgeMatcherEditorPart {
    * @return a {@link Control} containing this widget.
    */
   public Control getControl(Composite parent) {
-    this.shell = parent.getShell();
-
     // component
     Composite panel = new Composite(parent, SWT.BORDER);
     panel.setLayout(new GridLayout());
 
     // components inside the panel
-    Composite pickerRegion = setupEdgeMatcherSelector(panel);
-    pickerRegion.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false));
-
     Composite allRels = setupAllRelsButtons(panel);
     allRels.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, false));
 
-    editor = new GraphEdgeMatcherRelationTableEditor(
-        new ModificationListener<Relation, Boolean>() {
-
-          @Override
-          public void modify(Relation relation, String property, Boolean value) {
-            handleRelationModify(relation, property, value);
-          }
-        });
-
-    tableViewer = editor.setupTableViewer(panel);
+    editor = new GraphEdgeMatcherRelationTableEditor();
+    TableViewer tableViewer = editor.setupTableViewer(panel);
     tableViewer.getTable().setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, true));
 
@@ -132,39 +81,14 @@ public class GraphEdgeMatcherEditorPart {
     return panel;
   }
 
-  private Composite setupEdgeMatcherSelector(Composite parent) {
-    Composite region = new Composite(parent, SWT.NONE);
-    region.setLayout(new GridLayout(3, false));
+  public void registerModificationListener(
+      ModificationListener<Relation, Boolean> listener) {
+    editor.registerModificationListener(listener);
+  }
 
-    Label edgeMatcherLabel = GraphEdgeMatcherSelectorControl.createEdgeMatcherLabel(region);
-    edgeMatcherLabel.setLayoutData(
-        new GridData(SWT.FILL, SWT.CENTER, false, false));
-
-    edgeMatcherSelector = new GraphEdgeMatcherSelectorControl(region);
-    edgeMatcherSelector.addChangeListener(
-        new GraphEdgeMatcherSelectorControl.SelectorListener() {
-
-          @Override
-          public void selectedEdgeMatcherChanged(GraphEdgeMatcherDescriptor edgeMatcher) {
-            handleEdgeMatcherChanged(edgeMatcher);
-          }
-        });
-    edgeMatcherSelector.setLayoutData(
-        new GridData(SWT.FILL, SWT.CENTER, true, false));
-
-    Button save = new Button(region, SWT.PUSH);
-    save.setText("Save selection as");
-    save.setLayoutData(
-        new GridData(SWT.FILL, SWT.CENTER, false, false));
-
-    save.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        saveAsAction();
-      }
-    });
-
-    return region;
+  public void unregisterModificationListener(
+      ModificationListener<Relation, Boolean> listener) {
+    editor.unregisterModificationListener(listener);
   }
 
   private Composite setupAllRelsButtons(Composite parent) {
@@ -321,96 +245,7 @@ public class GraphEdgeMatcherEditorPart {
   /**
    * Fill the list with {@link Relation}s.
    */
-  public void updateTable(List<Relation> plugins) {
-    editor.updateTableRows(plugins);
-    tableViewer.refresh(false);
-  }
-
-  /**
-   * Update the RelSetPicker with the current set of choices.
-   */
-  public void updateEdgeMatcherSelector(
-      GraphEdgeMatcherDescriptor edgeMatcher,
-      List<GraphEdgeMatcherDescriptor> choices) {
-    edgeMatcherSelector.setInput(edgeMatcher, choices);
-  }
-
-  /**
-   * @return a {@link MultipleDirectedRelationFinder} representing the selected
-   *         relationships and their direction.
-   */
-  public GraphEdgeMatcherDescriptor getGraphEdgeMatcherDescriptor() {
-    // TODO: If using named edge matcher, just return that.
-    // TODO: If there was a named edge matcher, try to use that for name prefix
-
-    String name = "ad hoc";
-    GraphEdgeMatcher edgeMatcher = editor.createEdgeMatcher();
-
-    return new GraphEdgeMatcherDescriptor(name, edgeMatcher);
-  }
-
-  /**
-   * register a {@link ModificationListener}.
-   * @param listener the new listener
-   */
-  public void registerListener(
-      ModificationListener<Relation, Boolean> listener) {
-    if (!listeners.contains(listener)) {
-      listeners.add(listener);
-    }
-  }
-
-  /**
-   * Unregister the listener.
-   * @param listener to un-register
-   */
-  public void unRegisterListener(
-      ModificationListener<Relation, Boolean> listener) {
-    if (listeners.contains(listener)) {
-      listeners.remove(listener);
-    }
-  }
-
-  /**
-   * Select the given {@link RelationshipSet}. Its definition will be reflected
-   * on the view: only its enabled directions will be selected.
-   * @param set the new set.
-   */
-  public void selectEdgeMatcher(GraphEdgeMatcherDescriptor edgeMatcher, boolean notify) {
-    editor.updateEdgeMatcher(edgeMatcher);
-    selectedEdgeMatcher = edgeMatcher;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * If the selected set is the instanceSet, this method doesn't notify
-   * of the changes.
-   */
-  private void handleEdgeMatcherChanged(GraphEdgeMatcherDescriptor edgeMatcher) {
-    boolean notify = (edgeMatcher != selectedEdgeMatcher);
-    selectEdgeMatcher(edgeMatcher, notify);
-  }
-
-  public void handleRelationModify(Relation relation, String property, Boolean value) {
-    notifyListeners(relation, property, value);
-
-    // If the matching has changed, it's no longer the matches shown in
-    // the edge matcher selector.
-    edgeMatcherSelector.setSelection(null);
-  }
-
-  /**
-   * Notify the listener when a change is made in the selection.
-   *
-   * @param element the element which changed
-   * @param property the property involved
-   * @param value the new value
-   */
-  private void notifyListeners(
-      Relation element, String property, Boolean value) {
-    for (ModificationListener<Relation, Boolean> listener : listeners) {
-      listener.modify(element, property, value);
-    }
+  public void updateTable(List<Relation> relations) {
+    editor.updateTableRows(relations);
   }
 }

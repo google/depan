@@ -19,8 +19,6 @@ package com.google.devtools.depan.matchers.eclipse.ui.wizards;
 import com.google.devtools.depan.resource_doc.eclipse.ui.wizards.AbstractResouceWizardPage;
 import com.google.devtools.depan.resource_doc.eclipse.ui.wizards.ResourceOptionWizard;
 
-import org.eclipse.swt.widgets.Text;
-
 /**
  * A wizard page to create a new named edge matcher.
  *
@@ -33,12 +31,7 @@ import org.eclipse.swt.widgets.Text;
 public class NewEdgeMatcherPage extends AbstractResouceWizardPage {
 
   /**
-   * The file where we want to add the new relationship set (can be a new file)
-   */
-  private Text file = null;
-
-  /**
-   * Construct the new Wizard page.
+   * Configure a basic Resource Wizard Page.
    */
   protected NewEdgeMatcherPage() {
     super(null,
@@ -47,12 +40,5 @@ public class NewEdgeMatcherPage extends AbstractResouceWizardPage {
         "Edge matcher location",
         "matcher.emxml",
         ResourceOptionWizard.NO_OPTIONS);
-  }
-
-  /**
-   * @return the filename chosen by the user.
-   */
-  public String getFilename() {
-    return file.getText();
   }
 }

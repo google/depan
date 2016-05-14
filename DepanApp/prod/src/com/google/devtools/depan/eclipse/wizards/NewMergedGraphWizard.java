@@ -117,6 +117,6 @@ public class NewMergedGraphWizard extends AbstractNewResourceWizard {
 
   @Override
   protected String getOutputFileName() {
-    return page.getOutputFileName();
+    return page.getOutputFilename();
   }
 }

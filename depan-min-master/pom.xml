@@ -1,0 +1,53 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.pnambic.depan</groupId>
+    <artifactId>depan-parent</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <relativePath>../depan-parent</relativePath>
+  </parent>
+
+  <artifactId>depan-luna-master</artifactId>
+  <packaging>pom</packaging>
+
+  <name>DepAn Luna Master [min]</name>
+  <description>Master project for DepAn Luna builds</description>
+
+  <modules>
+    <module>../depan-parent</module>
+    <module>../depan-luna-parent</module>
+
+    <!-- Plugins -->
+    <module>../DepanBuilder/prod</module>
+    <module>../DepanCore/prod</module>
+    <module>../DepanEdge/prod</module>
+    <module>../DepanGraphDoc/prod</module>
+    <module>../DepanNode/prod</module>
+    <module>../DepanPersistence/prod</module>
+
+    <module>../DepanEdgeUI/prod</module>
+
+    <module>../DepanFileSystem/prod</module>
+
+<!-- 
+    <module>../DepanNodeUI/prod</module>
+    <module>../DepanGraphDocUI/prod</module>
+    <module>../DepanViewDoc/prod</module>
+ -->
+    <module>../DepanPlatformUI/prod</module>
+
+    <module>../DepanAppMin/prod</module>
+
+    <!-- Features -->
+    <module>../depan-graph-feature</module>
+    <module>../depan-analyzers-feature</module>
+    <module>../depan-app-feature</module>
+
+    <!-- Release -->
+    <!-- 
+     -->
+    <module>../depan-min-win64-release</module>
+  </modules>
+</project>
+

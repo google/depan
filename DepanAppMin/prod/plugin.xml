@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         id="application_min"
+         name="DepAn [min]"
+         point="org.eclipse.core.runtime.applications">
+      <application>
+         <run
+               class="com.google.devtools.depan.eclipse.Application">
+         </run>
+      </application>
+   </extension>
+   <extension
+         id="DepAn_min"
+         name="DepAn_min"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="com.google.devtools.depan_min.application_min"
+            description="Testing subset of DepAn features"
+            name="DepAn [Win64-min]">
+         <property
+               name="appName"
+               value="DepAn [Win64-min]">
+         </property>
+         <property
+               name="aboutImage"
+               value="platform:/plugin/com.google.devtools.depan/icons/branding/depan-icon-250x250.gif">
+         </property>
+         <property
+               name="aboutText"
+               value="DepAn - A direct manipulation tool for the visualization, analysis, and refactoring of dependencies in large applications.">
+         </property>
+         <property
+               name="windowImages"
+               value="icons/branding/depan-icon-16x16.gif,icons/branding/depan-icon-32x32.gif,icons/branding/depan-icon-48x48.gif,icons/branding/depan-icon-64x64.gif">
+         </property>
+         <property
+               name="startupForegroundColor"
+               value="000000">
+         </property>
+         <property
+               name="startupMessageRect"
+               value="7,252,445,20">
+         </property>
+         <property
+               name="startupProgressRect"
+               value="5,275,445,15">
+         </property>
+         <property
+               name="preferenceCustomization"
+               value="plugin_customization.ini">
+         </property>
+      </product>
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="com.google.devtools.depan.eclipse.Perspective"
+            icon="icons/branding/depan-icon-16x16.gif"
+            id="com.google.devtools.depan.eclipse.perspective"
+            name="DepAn Perspective">
+      </perspective>
+   </extension>
+
+</plugin>

@@ -17,6 +17,7 @@
 package com.google.devtools.depan.platform;
 
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
@@ -30,7 +31,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.dialogs.ContainerSelectionDialog;
 
 /**
- * A namespace class that provides utilities for manipulating Eclipse
+ * A utility class that provides static methods for manipulating Eclipse
  * workspaces and related entities.
  *
  * @author ycoppel@google.com (Yohann Coppel)
@@ -42,6 +43,24 @@ public final class WorkspaceTools {
    * Prevent instantiation of this namespace class.
    */
   private WorkspaceTools() { }
+
+
+  /**
+   * Ensure that we have a file extension on the file name.
+   * 
+   * @param savePath Initial save path from user
+   * @return valid IFile with an extension.
+   */
+  public static IFile calcViewFile(IPath savePath, String ext) {
+    String saveExt = savePath.getFileExtension();
+    if (null == saveExt) {
+      savePath = savePath.addFileExtension(ext);
+    } else if (!saveExt.equals(ext)) {
+      savePath = savePath.addFileExtension(ext);
+    }
+    return ResourcesPlugin.getWorkspace().getRoot().getFile(savePath);
+  }
+
 
   /**
    * Open a dialog box asking the user to select an existing project under the

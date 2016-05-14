@@ -18,39 +18,30 @@ package com.google.devtools.depan.matchers.eclipse.ui.editors;
 
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.matchers.eclipse.ui.widgets.GraphEdgeMatcherEditorPart;
+import com.google.devtools.depan.matchers.eclipse.ui.widgets.ModificationListener;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.matchers.persistence.EdgeMatcherDocXmlPersist;
-import com.google.devtools.depan.model.GraphEdgeMatcher;
-import com.google.devtools.depan.persistence.ObjectXmlPersist;
 import com.google.devtools.depan.persistence.PersistenceLogger;
 import com.google.devtools.depan.platform.TableContentProvider;
+import com.google.devtools.depan.platform.WorkspaceTools;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.ListViewer;
-import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.dialogs.SaveAsDialog;
 import org.eclipse.ui.part.EditorPart;
 
-import java.io.IOException;
 import java.net.URI;
-import java.util.Collection;
 
 /**
  * Based on a legacy version of {@code NamedRelationshipEditor}.
@@ -69,19 +60,9 @@ public class GraphEdgeMatcherEditor extends EditorPart {
   private GraphEdgeMatcherDescriptor matcherInfo;
 
   /**
-   * Content provider for setsList.
-   */
-  private TableContentProvider<GraphEdgeMatcherDescriptor> edgeMatcherContentProvider;
-
-  /**
    * Relation editing table for EdgeMatcher.
    */
   private GraphEdgeMatcherEditorPart edgeMatcherEditor;
-
-  /**
-   * Selected set.
-   */
-  private GraphEdgeMatcherDescriptor selectedSet = null;
 
   /**
    * Dirty state.
@@ -97,6 +78,36 @@ public class GraphEdgeMatcherEditor extends EditorPart {
   public void doSave(IProgressMonitor monitor) {
 
     URI location = file.getRawLocationURI();
+    persistDocument(location, monitor);
+  }
+
+  @Override
+  public void doSaveAs() {
+    SaveAsDialog saveas = new SaveAsDialog(getSite().getShell());
+    saveas.setOriginalFile(file);
+    saveas.setOriginalName(matcherInfo.getName());
+    if (saveas.open() != SaveAsDialog.OK) {
+      return;
+    }
+
+    // get the file relatively to the workspace.
+    IFile saveFile = WorkspaceTools.calcViewFile(
+        saveas.getResult(), GraphEdgeMatcherDescriptor.EXTENSION);
+    // TODO: set up a progress monitor
+    persistDocument(saveFile.getRawLocationURI(), null);
+    setPartName(saveFile.getName());
+  }
+
+
+  /**
+   * Save the current {@link GraphEdgeMatcherDescriptor} at the supplied
+   * location.
+   * 
+   * @param location
+   * @param monitor
+   */
+  private void persistDocument(
+      URI location, IProgressMonitor monitor) {
     try {
       EdgeMatcherDocXmlPersist persist = EdgeMatcherDocXmlPersist.build(false);
       persist.save(location, matcherInfo);
@@ -111,20 +122,6 @@ public class GraphEdgeMatcherEditor extends EditorPart {
           "Unable to save named relationship to " + location,
           err);
     }
-  }
-
-  @Override
-  public void doSaveAs() {
-    // no ways to save as right now.
-    // see #isSaveAsAllowed()
-  }
-
-
-  public void saveAsAction() {
-    GraphEdgeMatcher edgeMatcher = editor.createEdgeMatcher();
-    NewEdgeMatcherWizard wizard = new NewEdgeMatcherWizard(edgeMatcher);
-    WizardDialog dialog = new WizardDialog(shell, wizard);
-    dialog.open();
   }
 
   @Override
@@ -187,11 +184,8 @@ public class GraphEdgeMatcherEditor extends EditorPart {
     Control picker = edgeMatcherEditor.getControl(container);
     picker.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-    // content for the list
-    picker.a
-
     // listening for changes, so we can set dirtyState.
-    edgeMatcherEditor.registerListener(
+    edgeMatcherEditor.registerModificationListener(
         new ModificationListener<Relation, Boolean>() {
 
           @Override
@@ -202,9 +196,6 @@ public class GraphEdgeMatcherEditor extends EditorPart {
   }
 
   private void handleModify(Relation element, String property, Boolean value) {
-    if (null == selectedSet) {
-      return;
-    }
     setDirtyState(true);
   }
 

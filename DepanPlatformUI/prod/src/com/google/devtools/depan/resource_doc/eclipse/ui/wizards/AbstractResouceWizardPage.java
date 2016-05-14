@@ -76,6 +76,11 @@ public abstract class AbstractResouceWizardPage extends WizardPage {
   }
 
   @Override
+  public boolean isPageComplete() {
+    return outputPart.isComplete() && options.isComplete();
+  }
+
+  @Override
   public void createControl(Composite parent) {
     Composite container = new Composite(parent, SWT.NONE);
 
@@ -92,7 +97,7 @@ public abstract class AbstractResouceWizardPage extends WizardPage {
         container, outputGroupText);
     outputGroup.setLayoutData(createHorzFillData());
 
-    // Many document wizard pages only need container and name.
+    // Many resource document wizard pages only need container and name.
     Composite sourceGroup = options.createOptionsControl(container);
     if (null != sourceGroup) {
       sourceGroup.setLayoutData(createHorzFillData());
@@ -101,6 +106,9 @@ public abstract class AbstractResouceWizardPage extends WizardPage {
     updateStatus(getPageErrorMsg());
     setControl(container);
   }
+
+  /////////////////////////////////////
+  // Utility methods for derived types
 
   /**
    * Provide a GridData instance that should expand to fill any available
@@ -128,17 +136,15 @@ public abstract class AbstractResouceWizardPage extends WizardPage {
     return new Label(parent, SWT.NONE);
   }
 
+  /////////////////////////////////////
+  // Public API for container and file location
+
   public IFile getOutputFile() throws CoreException {
     return outputPart.getOutputFile();
   }
 
-  public String getOutputFileName () {
-    return outputPart.getFileName();
-  }
-
-  @Override
-  public boolean isPageComplete() {
-    return outputPart.isComplete() && options.isComplete();
+  public String getOutputFilename () {
+    return outputPart.getFilename();
   }
 
   protected String getPageErrorMsg() {
@@ -153,15 +159,4 @@ public abstract class AbstractResouceWizardPage extends WizardPage {
     setErrorMessage(message);
     setPageComplete(isPageComplete());
   }
-
-  /**
-   * @param container
-   */
-  // protected abstract Composite createSourceControl(Composite container);
-
-  // protected abstract String getAnalysisSourceErrorMsg();
-
-  // protected boolean hasCompleteAnalysisSource() {
-    // return (null == getAnalysisSourceErrorMsg());
-  // }
 }

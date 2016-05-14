@@ -72,7 +72,7 @@ public class NewMavenPomWizard extends AbstractAnalysisWizard {
 
   @Override
   protected String getOutputFileName() {
-    return page.getOutputFileName();
+    return page.getOutputFilename();
   }
 
   @Override

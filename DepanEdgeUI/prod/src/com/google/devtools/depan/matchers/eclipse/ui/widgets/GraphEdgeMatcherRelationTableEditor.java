@@ -22,9 +22,10 @@ import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.model.GraphEdgeMatcher;
 import com.google.devtools.depan.model.RelationSets;
 import com.google.devtools.depan.platform.AlphabeticSorter;
+import com.google.devtools.depan.platform.ListenerManager;
+import com.google.devtools.depan.platform.PlatformResources;
 import com.google.devtools.depan.platform.TableContentProvider;
 import com.google.devtools.depan.platform.ViewerObjectToString;
-import com.google.devtools.depan.platform.PlatformResources;
 import com.google.devtools.depan.platform.eclipse.ui.tables.EditColTableDef;
 
 import com.google.common.collect.Lists;
@@ -85,12 +86,35 @@ public class GraphEdgeMatcherRelationTableEditor {
   private final Set<Relation> forwardMatchers = Sets.newHashSet();
   private final Set<Relation> reverseMatchers = Sets.newHashSet();
 
-  private ModificationListener<Relation, Boolean> changeListener;
+  // private ModificationListener<Relation, Boolean> changeListener;
 
-  protected GraphEdgeMatcherRelationTableEditor(
-      ModificationListener<Relation, Boolean> changeListener) {
-    this.changeListener = changeListener;
-  }
+  private ListenerManager<ModificationListener<Relation, Boolean>>
+      changeListener = new ListenerManager<ModificationListener<Relation, Boolean>>();
+
+  private static class SimpleDispatcher
+      implements ListenerManager.Dispatcher<ModificationListener<Relation, Boolean>> {
+
+    // Retain these values just long enough to dispatch the event
+    private final Relation relation;
+    private final String property;
+    private final boolean change;
+
+    public SimpleDispatcher(Relation relation, String property, boolean change) {
+      this.relation = relation;
+      this.property = property;
+      this.change = change;
+    }
+
+    @Override
+    public void dispatch(ModificationListener<Relation, Boolean> listener) {
+      listener.modify(relation, property, change);
+    }
+
+    @Override
+    public void captureException(RuntimeException errAny) {
+      EdgeGraphMatcherLogger.logException("Listener dispatch failure", errAny);
+    }
+  };
 
   public TableViewer setupTableViewer(Composite parent) {
     viewer = new TableViewer(
@@ -129,6 +153,17 @@ public class GraphEdgeMatcherRelationTableEditor {
     content.initViewer(viewer);
 
     return viewer;
+  }
+
+  /////////////////////////////////////
+  // Provide modification listener API
+
+  public void registerModificationListener(ModificationListener<Relation, Boolean> listener ) {
+    changeListener.addListener(listener);
+  }
+
+  public void unregisterModificationListener(ModificationListener<Relation, Boolean> listener ) {
+    changeListener.addListener(listener);
   }
 
   /////////////////////////////////////
@@ -386,9 +421,8 @@ public class GraphEdgeMatcherRelationTableEditor {
 
       Relation relation = ((Relation) o);
 
-      if (null != changeListener) {
-        changeListener.modify(relation, property, (Boolean) value);
-      }
+      changeListener.fireEvent(new SimpleDispatcher(
+              relation, property, ((Boolean) value).booleanValue()));
 
       if (property.equals(COL_BACKWARD)) {
         setMatcher(reverseMatchers, relation, (Boolean) value);
