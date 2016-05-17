@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.eclipse;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import org.eclipse.core.resources.IProject;
@@ -69,7 +70,7 @@ public final class Project {
    * @return a collection of {@link Project} in the current Workspace.
    */
   public static Collection<Project> getProjects() {
-    Collection<Project> list = new ArrayList<Project>();
+    Collection<Project> list = Lists.newArrayList();
     for (IProject project : myWorkspaceRoot.getProjects()) {
       if (!project.isOpen()) {
         continue;

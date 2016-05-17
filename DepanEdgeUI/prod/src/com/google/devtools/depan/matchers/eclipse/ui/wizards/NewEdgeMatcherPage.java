@@ -16,8 +16,24 @@
 
 package com.google.devtools.depan.matchers.eclipse.ui.wizards;
 
+import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
+import com.google.devtools.depan.platform.WorkspaceTools;
 import com.google.devtools.depan.resource_doc.eclipse.ui.wizards.AbstractResouceWizardPage;
 import com.google.devtools.depan.resource_doc.eclipse.ui.wizards.ResourceOptionWizard;
+import com.google.devtools.depan.resource_doc.eclipse.ui.wizards.ResourceOutputPart;
+
+import com.google.common.base.Strings;
+
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 
 /**
  * A wizard page to create a new named edge matcher.
@@ -30,15 +46,92 @@ import com.google.devtools.depan.resource_doc.eclipse.ui.wizards.ResourceOptionW
  */
 public class NewEdgeMatcherPage extends AbstractResouceWizardPage {
 
+  public static final String DEFAULT_FILENAME =
+      "matcher." + GraphEdgeMatcherDescriptor.EXTENSION;
+
+  /**
+   * Name for new Edge Matcher.  Populated by the internal type
+   * {@link EdgeMatcherOptionWizard}.
+   */
+  private Text nameText;
+
   /**
    * Configure a basic Resource Wizard Page.
    */
   protected NewEdgeMatcherPage() {
     super(null,
         "New Named Edge Matcher",
-        "Create a new edge matcher resource",
-        "Edge matcher location",
-        "matcher.emxml",
-        ResourceOptionWizard.NO_OPTIONS);
+        "Create a new edge matcher resource");
+  }
+
+  public String getEdgeMatcherName() {
+    return nameText.getText();
+  }
+
+  @Override
+  protected ResourceOutputPart createOutputPart(
+      AbstractResouceWizardPage containingPage) {
+    IContainer outputContainer = guessContainer();
+    String outputFilename = WorkspaceTools.guessNewFilename(
+        outputContainer, DEFAULT_FILENAME, 1, 10);
+
+    return new ResourceOutputPart(
+        this, "Edge matcher location",
+        outputContainer, outputFilename,
+        GraphEdgeMatcherDescriptor.EXTENSION);
+  }
+
+  @Override
+  protected ResourceOptionWizard createOptionPart(
+      AbstractResouceWizardPage containingPage) {
+    return new EdgeMatcherOptionWizard();
+  }
+
+  private class EdgeMatcherOptionWizard implements ResourceOptionWizard {
+
+    @Override
+    public Composite createOptionsControl(Composite container) {
+      Group result = new Group(container, SWT.NONE);
+      result.setText("Edge Matcher Options");
+
+      GridLayout grid = new GridLayout();
+      grid.numColumns = 2;
+      grid.verticalSpacing = 9;
+      result.setLayout(grid);
+
+      GridData fillHorz = new GridData(SWT.FILL, SWT.BEGINNING, true, false);
+
+      // Row 1) Container selection
+      Label label = new Label(result, SWT.NULL);
+      label.setText("&Name:");
+
+      nameText = new Text(result, SWT.BORDER | SWT.SINGLE);
+      nameText.setLayoutData(fillHorz);
+      nameText.addModifyListener(new ModifyListener() {
+
+        @Override
+        public void modifyText(ModifyEvent e) {
+          updatePageStatus();
+        }
+      });
+
+      return result;
+    }
+
+    @Override
+    public String getErrorMsg() {
+      String name = getEdgeMatcherName();
+      if (Strings.isNullOrEmpty(name)) {
+        return "Name must not be empty";
+      }
+
+      // Everything is fine.
+      return null;
+    }
+
+    @Override
+    public boolean isComplete() {
+      return null == getErrorMessage();
+    }
   }
 }

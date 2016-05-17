@@ -16,7 +16,6 @@
 
 package com.google.devtools.depan.resource_doc.eclipse.ui.wizards;
 
-import com.google.devtools.depan.graph_doc.model.GraphDocument;
 import com.google.devtools.depan.platform.WorkspaceTools;
 
 import org.eclipse.core.resources.IContainer;
@@ -50,7 +49,7 @@ import org.eclipse.swt.widgets.Text;
 public class ResourceOutputPart {
 
   /**
-   * Provides the shell for dialog and dymanic input validation.
+   * Provides the shell for dialog and dynamic input validation.
    * 
    * Integration with WizardPage depends on {@code updateStatus}
    * method introduced by {@link AbstractResouceWizardPage}.
@@ -58,9 +57,19 @@ public class ResourceOutputPart {
   private final AbstractResouceWizardPage containingPage;
 
   /**
+   * Label to use for grouped input widgets.
+   */
+  private final String groupName;
+
+  /**
    * Initial content for user control {@code fileText}.
    */
   private final String defaultFilename;
+
+  /**
+   * Extension to use for resource.
+   */
+  private final String requiredExt;
 
   /**
    * Container for output file.  Edited by user control {@code containerText}.
@@ -71,14 +80,16 @@ public class ResourceOutputPart {
   private Text containerText;
   private Text fileText;
   private Group output;
-  private String errorMsg;
 
   public ResourceOutputPart(
-      AbstractResouceWizardPage containingPage, IContainer outputContainer,
-      String defaultFilename) {
+      AbstractResouceWizardPage containingPage, String groupName,
+      IContainer outputContainer,
+      String defaultFilename, String requiredExt) {
     this.containingPage = containingPage;
+    this.groupName = groupName;
     this.outputContainer = outputContainer;
     this.defaultFilename = defaultFilename;
+    this.requiredExt = requiredExt;
   }
 
   /**
@@ -89,7 +100,7 @@ public class ResourceOutputPart {
    * 
    * @param container window context for the UI
    */
-  public Composite createControl(Composite container, String groupName) {
+  public Composite createControl(Composite container) {
     output = new Group(container, SWT.NONE);
     output.setText(groupName);
 
@@ -120,9 +131,6 @@ public class ResourceOutputPart {
     fileText.setLayoutData(fillHorz);
     fileText.setText(defaultFilename);
 
-    // Cross-check inputs
-    errorMsg = validateInputs();
-
     // Install listeners after initial value assignments
     containerText.addModifyListener(new ModifyListener() {
 
@@ -149,8 +157,52 @@ public class ResourceOutputPart {
     return output;
   }
 
+  /**
+   * Uses the standard container selection dialog to choose the new value for
+   * the container field.
+   */
+  private void handleBrowse() {
+    containerText.setText(WorkspaceTools.selectProject(
+        containingPage.getShell(), getContainerName()));
+  }
+
+  private void dialogChanged() {
+    containingPage.updatePageStatus();
+  }
+
+  /////////////////////////////////////
+  // Error management methods
+
   public String getErrorMsg() {
-    return errorMsg;
+    IResource container = ResourcesPlugin.getWorkspace().getRoot().findMember(
+        new Path(getContainerName()));
+    String filename = getFilename();
+    
+    if (getContainerName().length() == 0) {
+      return "File container must be specified";
+    }
+    if (container == null
+        || (container.getType()
+            & (IResource.PROJECT | IResource.FOLDER)) == 0) {
+      return "File container must exist";
+    }
+    if (!container.isAccessible()) {
+      return "Project must be writable";
+    }
+    if (filename.length() == 0) {
+      return "File name must be specified";
+    }
+    if (filename.replace('\\', '/').indexOf('/', 1) > 0) {
+      return "File name cannot include path";
+    }
+    int dotLoc = filename.lastIndexOf('.');
+    if (dotLoc != -1) {
+      String ext = filename.substring(dotLoc + 1);
+      if (!ext.equalsIgnoreCase(requiredExt)) {
+        return "File extension must be \"." + requiredExt + "\"";
+      }
+    }
+    return null;
   }
 
   /**
@@ -160,6 +212,9 @@ public class ResourceOutputPart {
   public boolean isComplete() {
     return (null == getErrorMsg());
   }
+
+  /////////////////////////////////////
+  // Public API for container and file location
 
   public String getContainerName() {
     return containerText.getText();
@@ -186,60 +241,6 @@ public class ResourceOutputPart {
     IContainer container = (IContainer) resource;
     final IFile file = container.getFile(new Path(getFilename()));
     return file;
-  }
-
-  /**
-   * Ensure that all inputs are valid.
-   */
-  private void dialogChanged() {
-    errorMsg = validateInputs();
-    containingPage.updateStatus(errorMsg);
-  }
-
-  /**
-   * Determine if the inputs are consistent.
-   * 
-   * @return error string if problems exist, or null if inputs are valid
-   */
-  private String validateInputs() {
-    IResource container = ResourcesPlugin.getWorkspace().getRoot().findMember(
-        new Path(getContainerName()));
-    String filename = getFilename();
-
-    if (getContainerName().length() == 0) {
-      return "File container must be specified";
-    }
-    if (container == null
-        || (container.getType()
-            & (IResource.PROJECT | IResource.FOLDER)) == 0) {
-      return "File container must exist";
-    }
-    if (!container.isAccessible()) {
-      return "Project must be writable";
-    }
-    if (filename.length() == 0) {
-      return "File name must be specified";
-    }
-    if (filename.replace('\\', '/').indexOf('/', 1) > 0) {
-      return "File name must be valid";
-    }
-    int dotLoc = filename.lastIndexOf('.');
-    if (dotLoc != -1) {
-      String ext = filename.substring(dotLoc + 1);
-      if (!ext.equalsIgnoreCase(GraphDocument.EXTENSION)) {
-        return "File extension must be \"." + GraphDocument.EXTENSION + "\"";
-      }
-    }
-    return null;
-  }
-
-  /**
-   * Uses the standard container selection dialog to choose the new value for
-   * the container field.
-   */
-  private void handleBrowse() {
-    containerText.setText(WorkspaceTools.selectProject(
-        containingPage.getShell(), getContainerName()));
   }
 
   private void throwCoreException(String message) throws CoreException {

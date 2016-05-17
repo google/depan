@@ -22,7 +22,6 @@ import com.google.devtools.depan.matchers.eclipse.ui.widgets.ModificationListene
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.matchers.persistence.EdgeMatcherDocXmlPersist;
 import com.google.devtools.depan.persistence.PersistenceLogger;
-import com.google.devtools.depan.platform.TableContentProvider;
 import com.google.devtools.depan.platform.WorkspaceTools;
 
 import org.eclipse.core.resources.IFile;

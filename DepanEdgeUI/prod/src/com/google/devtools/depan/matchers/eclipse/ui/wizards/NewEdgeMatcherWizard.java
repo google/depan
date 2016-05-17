@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.matchers.eclipse.ui.wizards;
 
+import com.google.devtools.depan.edges.matchers.GraphEdgeMatchers;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.matchers.persistence.EdgeMatcherDocXmlPersist;
 import com.google.devtools.depan.persistence.AbstractDocXmlPersist;
@@ -51,7 +52,7 @@ public class NewEdgeMatcherWizard
   /**
    * {@link GraphEdgeMatcherDescriptor} to be saved.
    */
-  private final GraphEdgeMatcherDescriptor matcherInfo;
+  // private final GraphEdgeMatcherDescriptor matcherInfo;
 
   /**
    * Constructor for a new wizard, for the creation of a new named
@@ -59,8 +60,7 @@ public class NewEdgeMatcherWizard
    *
    * @param finder A {@link DirectedRelationFinder} describing the new set.
    */
-  public NewEdgeMatcherWizard(GraphEdgeMatcherDescriptor matcherInfo) {
-    this.matcherInfo = matcherInfo;
+  public NewEdgeMatcherWizard() {
   }
 
   /////////////////////////////////////
@@ -76,11 +76,14 @@ public class NewEdgeMatcherWizard
   // AbstractNewResourceWizard hook methods
 
   protected int countBuildWork() {
-    return 0;
+    return 1;
   }
 
   protected GraphEdgeMatcherDescriptor buildDocument(IProgressMonitor monitor) {
-    // No monitor work to report: monitor.worked(0);
+    monitor.beginTask("Preparing edge matcher", 1);
+    GraphEdgeMatcherDescriptor matcherInfo =
+        new GraphEdgeMatcherDescriptor("Sample", GraphEdgeMatchers.EMPTY);
+    monitor.worked(0);
     return matcherInfo;
   }
 

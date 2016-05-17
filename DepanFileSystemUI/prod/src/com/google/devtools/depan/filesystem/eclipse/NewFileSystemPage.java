@@ -16,9 +16,9 @@
 
 package com.google.devtools.depan.filesystem.eclipse;
 
-import com.google.common.collect.Lists;
+import com.google.devtools.depan.graph_doc.eclipse.ui.wizards.AbstractAnalysisPage;
 
-import com.google.devtools.depan.resource_doc.eclipse.ui.wizards.AbstractResouceWizardPage;
+import com.google.common.collect.Lists;
 
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
@@ -44,7 +44,7 @@ import java.util.List;
  * OR with the extension that matches the expected one (dgi).
  */
 
-public class NewFileSystemPage extends AbstractResouceWizardPage {
+public class NewFileSystemPage extends AbstractAnalysisPage {
 
   public static final String PAGE_LABEL = "New File System Analysis";
 

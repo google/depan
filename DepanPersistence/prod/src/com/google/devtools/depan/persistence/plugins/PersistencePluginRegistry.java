@@ -73,6 +73,10 @@ public class PersistencePluginRegistry {
   private void load() {
     IExtensionRegistry registry = Platform.getExtensionRegistry();
     IExtensionPoint point = registry.getExtensionPoint(EXTENTION_POINT);
+    if (null == point) {
+      PersistenceLogger.LOG.warning("No contributions for " + EXTENTION_POINT);
+      return;
+    }
 
     // for each extension
     for (IExtension extension: point.getExtensions()) {

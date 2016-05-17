@@ -33,7 +33,7 @@ public class GraphEdgeMatcherDescriptor
   /**
    * Preferred file extension for documents.
    */
-  public static final String EXTENSION = "emxml";
+  public static final String EXTENSION = "gemxml";
 
   private final String name;
   private final EdgeMatcher<String> matcher;

@@ -43,26 +43,17 @@ public abstract class AbstractResouceWizardPage extends WizardPage {
 
   private final ISelection selection;
 
-  private String outputGroupText;
-
-  private final String defaultFilename;
-
   private ResourceOutputPart outputPart;
 
-  private ResourceOptionWizard options;
+  private ResourceOptionWizard optionPart;
 
   /**
    * @param selection
    */
   public AbstractResouceWizardPage(
-      ISelection selection, String pageLabel, String pageDescription,
-      String outputGroupText, String defaultFilename,
-      ResourceOptionWizard options) {
+      ISelection selection, String pageLabel, String pageDescription) {
     super(pageLabel);
     this.selection = selection;
-    this.defaultFilename =  defaultFilename;
-    this.outputGroupText = outputGroupText;
-    this.options = options;
 
     setTitle(pageLabel);
     setDescription(pageDescription);
@@ -77,7 +68,7 @@ public abstract class AbstractResouceWizardPage extends WizardPage {
 
   @Override
   public boolean isPageComplete() {
-    return outputPart.isComplete() && options.isComplete();
+    return outputPart.isComplete() && optionPart.isComplete();
   }
 
   @Override
@@ -89,22 +80,73 @@ public abstract class AbstractResouceWizardPage extends WizardPage {
     layout.verticalSpacing = 9;
     container.setLayout(layout);
 
-    IContainer outputContainer = WorkspaceTools.guessContainer(selection);
-    String outputFilename = WorkspaceTools.guessNewFilename(
-        outputContainer, defaultFilename, 1, 10);
-    outputPart = new ResourceOutputPart(this, outputContainer, outputFilename);
-    Composite outputGroup = outputPart.createControl(
-        container, outputGroupText);
-    outputGroup.setLayoutData(createHorzFillData());
+    outputPart = createOutputPart(this);
+    if (null != outputPart) {
+      Composite outputGroup = outputPart.createControl(container);
+      outputGroup.setLayoutData(createHorzFillData());
+    }
 
     // Many resource document wizard pages only need container and name.
-    Composite sourceGroup = options.createOptionsControl(container);
-    if (null != sourceGroup) {
+    optionPart = createOptionPart(this);
+    if (null != optionPart) {
+      Composite sourceGroup = optionPart.createOptionsControl(container);
       sourceGroup.setLayoutData(createHorzFillData());
     }
 
     updateStatus(getPageErrorMsg());
     setControl(container);
+  }
+
+  /**
+   * Hook method for defining the output part.
+   * 
+   * Most resource pages should {@code @Override} this method to define
+   * permissible extensions and containers.
+   * 
+   * @param containingPage Access to page attributes,
+   *     such as the shell for dialog inputs.
+   */
+  protected ResourceOutputPart createOutputPart(
+      AbstractResouceWizardPage containingPage) {
+    return null;
+  }
+
+  /**
+   * Hook method for derived types to add an option dialog.
+   * 
+   * Most resource pages should {@code @Override} this method.
+   * 
+   * @param containingPage Access to page attributes, such as shell for
+   *     dialog inputs.
+   */
+  protected ResourceOptionWizard createOptionPart(
+      AbstractResouceWizardPage containingPage) {
+    return null;
+  }
+
+  /////////////////////////////////////
+  // Error management methods
+
+  private String getPageErrorMsg() {
+    if (null != outputPart) {
+      String result = outputPart.getErrorMsg();
+      if (null != result) {
+        return result;
+      }
+    }
+    if (null != optionPart) {
+      return optionPart.getErrorMsg();
+    }
+    return null;
+  }
+
+  private void updateStatus(String message) {
+    setErrorMessage(message);
+    setPageComplete(isPageComplete());
+  }
+
+  protected void updatePageStatus() {
+    updateStatus(getPageErrorMsg());
   }
 
   /////////////////////////////////////
@@ -136,6 +178,10 @@ public abstract class AbstractResouceWizardPage extends WizardPage {
     return new Label(parent, SWT.NONE);
   }
 
+  protected IContainer guessContainer() {
+    return  WorkspaceTools.guessContainer(selection);
+  }
+
   /////////////////////////////////////
   // Public API for container and file location
 
@@ -145,18 +191,5 @@ public abstract class AbstractResouceWizardPage extends WizardPage {
 
   public String getOutputFilename () {
     return outputPart.getFilename();
-  }
-
-  protected String getPageErrorMsg() {
-    String result = outputPart.getErrorMsg();
-    if (null != result) {
-      return result;
-    }
-    return options.getErrorMsg();
-  }
-
-  protected void updateStatus(String message) {
-    setErrorMessage(message);
-    setPageComplete(isPageComplete());
   }
 }
