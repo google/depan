@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.persistence;
 
-import com.google.devtools.depan.persistence.plugins.PersistencePluginRegistry;
+import com.google.devtools.depan.persistence.plugins.XStreamConfigRegistry;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
@@ -78,6 +78,6 @@ public class XStreamFactory {
    * @param xstream instance to configure
    */
   public static void configureXStream(XStream xstream) {
-    PersistencePluginRegistry.config(xstream);
+    XStreamConfigRegistry.config(xstream);
   }
 }

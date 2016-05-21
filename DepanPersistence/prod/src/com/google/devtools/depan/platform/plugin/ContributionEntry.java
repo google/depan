@@ -20,7 +20,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 
 /**
- * Common manager for information about a contribution.
+ * Basic contribution with a unique identifier bound to a contributed class.
  * 
  * Many components have a plugin registry for contributions of a simple type.
  *
@@ -30,29 +30,17 @@ import org.eclipse.core.runtime.IConfigurationElement;
 public abstract class ContributionEntry<T> {
 
   public final static String ATTR_ID = "id";
-  public final static String ATTR_SOURCE = "source";
-  public final static String ATTR_DESCRIPTION = "description";
   public final static String ATTR_CLASS = "class";
+
+  /**
+   * The OSGi bundle providing the contribution.
+   */
+  private final String bundleId;
 
   /**
    * {@link IConfigurationElement} found in the xml file.
    */
   private final IConfigurationElement element;
-
-  /**
-   * ContributionEntry ID.
-   */
-  private final String id;
-
-  /**
-   * Sources handled by the plugin. For instance, "Java".
-   */
-  private final String source;
-
-  /**
-   * A short description of the plugin.
-   */
-  private final String description;
 
   /**
    * An instance of the plugin.
@@ -66,33 +54,24 @@ public abstract class ContributionEntry<T> {
    * A derived type might collect additional attributes from the
    * {@link IConfigurationElement}
    */
-  public ContributionEntry(IConfigurationElement element) {
+  public ContributionEntry(String bundleId, IConfigurationElement element) {
+    this.bundleId = bundleId;
     this.element = element;
-    this.id = element.getAttribute(ATTR_ID);
-    this.source = element.getAttribute(ATTR_SOURCE);
-    this.description = element.getAttribute(ATTR_DESCRIPTION);
   }
 
   /**
    * @return the ID for this plugin.
    */
   public String getId() {
-    return id;
+    return element.getAttribute(ATTR_ID);
   }
 
-  /**
-   * @return a {@link String} describing the type of dependencies handled by
-   * this plugin.
-   */
-  public String getSource() {
-    return source;
-  }
 
   /**
-   * @return a short description of this plugin.
+   * @return the ID for the contributing OSGi bundle.
    */
-  public String getDescription() {
-    return description;
+  public String getBundleId() {
+    return bundleId;
   }
 
   /////////////////////////////////////
@@ -126,10 +105,19 @@ public abstract class ContributionEntry<T> {
    * it if the loading is successful and the class instantiated.
    * @throws CoreException if the instantiation failed
    */
-  public T getInstance() throws CoreException {
+  public T prepareInstance() throws CoreException {
     if (null == instance) {
       instance = createInstance();
     }
+    return instance;
+  }
+
+  /**
+   * Provide the plugin's instance.  Assumes the instance has already been
+   * created, which is common when used with the collaborating 
+   * {@link ContributionRegistry} type.
+   */
+  public T getInstance() {
     return instance;
   }
 }

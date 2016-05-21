@@ -18,10 +18,10 @@ public class GraphEdgeMatchers {
   }
 
   // Only need one
-  public static GraphEdgeMatcher EMPTY = new GraphEdgeMatcher();
+  public static final GraphEdgeMatcher EMPTY = new GraphEdgeMatcher();
 
   // Only need one
-  public static GraphEdgeMatcher FORWARD = new GraphEdgeMatcher() {
+  public static final GraphEdgeMatcher FORWARD = new GraphEdgeMatcher() {
 
     @Override
     public boolean relationForward(Relation relation) {

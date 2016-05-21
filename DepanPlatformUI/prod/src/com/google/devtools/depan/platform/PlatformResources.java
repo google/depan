@@ -31,7 +31,7 @@ public final class PlatformResources {
 
   public static final String APP_ID = "com.google.devtools.depan";
 
-  public static final String PLUGIN_ID = APP_ID + ".platform";
+  public static final String PLUGIN_ID = "com.google.devtools.depan.platform.ui";
 
   // icons
   public static final Image IMAGE_HANDTOOL =

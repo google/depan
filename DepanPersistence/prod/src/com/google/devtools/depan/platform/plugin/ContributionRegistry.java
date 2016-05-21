@@ -20,9 +20,11 @@ import com.google.devtools.depan.model.Element;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IContributor;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
@@ -60,11 +62,20 @@ public abstract class ContributionRegistry<T> {
   }
 
   // Hook methods
-  protected abstract void installContribution(String entryId, T plugin);
-
-  protected abstract ContributionEntry<T> buildEntry(IConfigurationElement element);
+  protected abstract ContributionEntry<T> buildEntry(
+      String bundleId, IConfigurationElement element);
 
   protected abstract void reportException(String entryId, Exception err);
+
+  /**
+   * Derived classes should override if their are additional
+   * installation needs beyond their retention in then {@link #entries}
+   * field.
+   */
+  protected void installContribution(String entryId, T plugin) {
+    // Since a ContributionEntry contains a callable instance
+    // no further installation is necessary.
+  }
 
   /**
    * Load the plugins from the extension point, and fill the lists of entries.
@@ -73,18 +84,20 @@ public abstract class ContributionRegistry<T> {
     IExtensionRegistry registry = Platform.getExtensionRegistry();
     IExtensionPoint point = registry.getExtensionPoint(extensionId);
     for (IExtension extension: point.getExtensions()) {
+      IContributor contrib = extension.getContributor();
+      String bundleId = contrib.getName();
       // ... and for each elements
       for (IConfigurationElement element :
           extension.getConfigurationElements()) {
 
         // obtain an object on the entry
-        ContributionEntry<T> entry = buildEntry(element);
+        ContributionEntry<T> entry = buildEntry(bundleId, element);
         String entryId = entry.getId();
         entries.put(entryId, entry);
 
         // try to instantiate the contribution and install it
         try {
-          T plugin = entry.getInstance();
+          T plugin = entry.prepareInstance();
           installContribution(entryId, plugin);
         } catch (CoreException err) {
           reportException(entryId, err);
@@ -94,11 +107,15 @@ public abstract class ContributionRegistry<T> {
     }
   }
 
+  protected Collection<ContributionEntry<T>> getContributions() {
+    return entries.values();
+  }
+
   // Keep this private for now.
   private Collection<Bundle> getPluginBundles() {
-    Collection<Bundle> result = Lists.newArrayList();
-    for (String bundleId: entries.keySet()) {
-      result.add(Platform.getBundle(bundleId));
+    Collection<Bundle> result = Sets.newHashSet();
+    for (ContributionEntry<T> entry: getContributions()) {
+      result.add(Platform.getBundle(entry.getBundleId()));
     }
     return result;
   }

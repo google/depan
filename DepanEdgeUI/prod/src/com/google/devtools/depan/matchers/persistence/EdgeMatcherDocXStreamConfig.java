@@ -13,6 +13,5 @@ public class EdgeMatcherDocXStreamConfig implements XStreamConfig {
   public void config(XStream xstream) {
     xstream.setMode(XStream.NO_REFERENCES);
     xstream.alias(EDGE_MATCHER_INFO_TAG, GraphEdgeMatcherDescriptor.class);
-
   }
 }
