@@ -83,6 +83,9 @@ public abstract class ContributionRegistry<T> {
   protected void load(String extensionId) {
     IExtensionRegistry registry = Platform.getExtensionRegistry();
     IExtensionPoint point = registry.getExtensionPoint(extensionId);
+    if (null == point) {
+      return;
+    }
     for (IExtension extension: point.getExtensions()) {
       IContributor contrib = extension.getContributor();
       String bundleId = contrib.getName();
@@ -109,6 +112,20 @@ public abstract class ContributionRegistry<T> {
 
   protected Collection<ContributionEntry<T>> getContributions() {
     return entries.values();
+  }
+
+  protected ContributionEntry<T> getContribution(String contribId) {
+    return entries.get(contribId);
+  }
+
+  protected Collection<ContributionEntry<T>>
+      getContributions(Collection<String> contribIds) {
+    Collection<ContributionEntry<T>> result =
+        Lists.newArrayListWithExpectedSize(contribIds.size());
+    for (String contribId : contribIds) {
+      result.add(getContribution(contribId));
+    }
+    return result;
   }
 
   // Keep this private for now.

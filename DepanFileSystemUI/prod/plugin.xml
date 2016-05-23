@@ -2,15 +2,6 @@
 <?eclipse version="3.2"?>
 <plugin>
    <extension
-         point="com.google.devtools.depan.eclipse.sourceplugin">
-      <languagespecific
-            class="com.google.devtools.depan.filesystem.FileSystemPlugin"
-            description="Graph elements for File System dependency analysis."
-            id="com.google.devtools.depan.filesystem"
-            source="File System">
-      </languagespecific>
-   </extension>
-   <extension
          point="org.eclipse.ui.newWizards">
       <wizard
             category="com.google.devtools.depan"
@@ -35,5 +26,12 @@
             id="com.google.devtools.depan.filesystem.eclipse.nodecolors"
             name="File System Node Colors">
       </page>
+   </extension>
+   <extension
+         point="com.google.devtools.depan.graph.registry.relation">
+      <relation_supplier
+            class="com.google.devtools.depan.filesystem.FileSystemRelationContributor"
+            id="com.google.devtools.depan.filesystem.FileSystemRelationContributor">
+      </relation_supplier>
    </extension>
 </plugin>

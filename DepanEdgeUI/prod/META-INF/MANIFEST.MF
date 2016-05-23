@@ -14,7 +14,8 @@ Require-Bundle: com.google.guava,
  com.google.devtools.depan.persistence,
  com.google.devtools.depan.platform.ui,
  depan-xstream-library,
- org.eclipse.ui
+ org.eclipse.ui,
+ com.google.devtools.depan.platform
 Bundle-ClassPath: .
 Export-Package: com.google.devtools.depan.matchers.models,
  com.google.devtools.depan.relations.models

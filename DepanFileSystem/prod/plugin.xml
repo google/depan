@@ -1,4 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.2"?>
 <plugin>
+   <extension
+         point="com.google.devtools.depan.persistence.xstream.config">
+      <xstream_config
+            class="com.google.devtools.depan.filesystem.FileSystemXStreamConfig"
+            id="com.google.devtools.depan.filesystem.FileSystemXStreamConfig">
+      </xstream_config>
+   </extension>
+   <extension
+         point="com.google.devtools.depan.graph.registry.relation">
+      <relation_contibutor
+            class="com.google.devtools.depan.filesystem.FileSystemRelationContributor"
+            id="com.google.devtools.depan.filesystem.FileSystemRelationContributor">
+      </relation_contibutor>
+   </extension>
 </plugin>

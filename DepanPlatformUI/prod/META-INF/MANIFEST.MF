@@ -11,7 +11,8 @@ Require-Bundle: com.google.guava,
  org.eclipse.ui.workbench,
  com.google.devtools.depan.graph_doc,
  org.eclipse.ui.ide,
- com.google.devtools.depan.persistence
+ com.google.devtools.depan.persistence,
+ com.google.devtools.depan.core
 Bundle-ClassPath: .
 Export-Package: com.google.devtools.depan.platform,
  com.google.devtools.depan.platform.eclipse.ui.tables,

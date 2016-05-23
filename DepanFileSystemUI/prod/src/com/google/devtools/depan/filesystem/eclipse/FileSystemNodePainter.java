@@ -16,13 +16,13 @@
 
 package com.google.devtools.depan.filesystem.eclipse;
 
-import com.google.devtools.depan.eclipse.utils.Tools;
 import com.google.devtools.depan.filesystem.eclipse.preferences.ColorPreferencesIds;
 import com.google.devtools.depan.filesystem.graph.DirectoryElement;
 import com.google.devtools.depan.filesystem.graph.FileElement;
-import com.google.devtools.depan.filesystem.integration.FileSystemElementDispatcher;
+import com.google.devtools.depan.filesystem.graph.FileSystemElementDispatcher;
 import com.google.devtools.depan.model.Element;
 import com.google.devtools.depan.model.ElementTransformer;
+import com.google.devtools.depan.platform.Colors;
 
 import com.google.common.base.Strings;
 
@@ -48,7 +48,7 @@ public class FileSystemNodePainter extends FileSystemElementDispatcher<Color>
       return Color.BLACK;
     }
 
-    return Tools.getRgb(colorTxt);
+    return Colors.getRgb(colorTxt);
   }
 
   /**

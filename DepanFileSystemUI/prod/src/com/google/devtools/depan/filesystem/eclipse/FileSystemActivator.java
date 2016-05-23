@@ -16,14 +16,9 @@
 
 package com.google.devtools.depan.filesystem.eclipse;
 
-import com.google.devtools.depan.eclipse.preferences.PreferencesIds;
-import com.google.devtools.depan.eclipse.utils.Resources;
-
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -37,14 +32,10 @@ public class FileSystemActivator extends AbstractUIPlugin {
   public static final String PLUGIN_ID = "com.google.devtools.depan.filesystem";
 
   /**
-   * Bundle that is responsible for storing the resources for this plug-in.
-   */
-  public static final Bundle BUNDLE = Platform.getBundle(PLUGIN_ID);
-
-  /**
    * Prefix to use for preferences.
    */
-  public static final String FS_PREF_PREFIX = PreferencesIds.PREFIX + "fs_";
+  // public static final String FS_PREF_PREFIX = PreferencesIds.PREFIX + "fs_";
+  public static final String FS_PREF_PREFIX = "fs_";
 
   // The shared instance
   private static FileSystemActivator plugin;
@@ -102,7 +93,7 @@ public class FileSystemActivator extends AbstractUIPlugin {
   public static final Image IMAGE_FILE = getImage(IMAGE_DESC_FILE);
 
   private static ImageDescriptor getImageDescriptor(String path) {
-    return Resources.getImageDescriptor(BUNDLE, path);
+    return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
   }
 
   private static Image getImage(ImageDescriptor descriptor) {

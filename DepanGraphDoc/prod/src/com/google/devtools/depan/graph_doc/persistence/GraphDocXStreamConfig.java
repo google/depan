@@ -16,6 +16,5 @@ public class GraphDocXStreamConfig implements XStreamConfig {
 
     GraphModelConverter.configXStream(xstream);
     EdgeConverter.configXStream(xstream);
-    DependencyModelConverter.configXStream(xstream);
   }
 }

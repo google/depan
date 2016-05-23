@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.filesystem.integration;
+package com.google.devtools.depan.filesystem.builder;
 
-import com.google.devtools.depan.filesystem.FileSystemPluginActivator;
-import com.google.devtools.depan.filesystem.builder.FileSystemDependencyDispatcher;
-import com.google.devtools.depan.filesystem.builder.TreeLoader;
+import com.google.devtools.depan.filesystem.FileSystemRelationContributor;
 import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.graph_doc.model.GraphDocument;
 import com.google.devtools.depan.model.GraphModel;
@@ -26,12 +24,10 @@ import com.google.devtools.depan.model.builder.api.GraphBuilder;
 import com.google.devtools.depan.model.builder.api.GraphBuilders;
 import com.google.devtools.depan.model.builder.chain.DependenciesListener;
 
-import com.google.common.collect.Lists;
-
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  * Wizard for converting a file system tree into a DepAn analysis graph.
@@ -39,11 +35,6 @@ import java.util.List;
  * @author <a href="leeca@google.com">Lee Carver</a>
  */
 public class FileSystemAnalyzer {
-
-  private static List<DependencyModel> analyzers = 
-      Lists.newArrayList(
-          new DependencyModel(FileSystemPluginActivator.PLUGIN_ID)
-          );
 
   private final String treePrefix;
   private final String pathText;
@@ -59,7 +50,7 @@ public class FileSystemAnalyzer {
    *
    * Note that this generates two (2) monitor.worked() calls.
    */
-  protected GraphDocument generateAnalysisDocument(IProgressMonitor monitor)
+  public GraphDocument generateAnalysisDocument(IProgressMonitor monitor)
       throws IOException {
 
     // Step 1) Create the GraphModel to hold the analysis results
@@ -81,7 +72,10 @@ public class FileSystemAnalyzer {
     monitor.worked(1);
 
     // Done
-    GraphModel result = graphBuilder.createGraphModel();
-    return new GraphDocument(result, analyzers);
+    GraphModel graph = graphBuilder.createGraphModel();
+    DependencyModel.Builder modelBuilder = new DependencyModel.Builder();
+    modelBuilder.addRelationContrib(FileSystemRelationContributor.ID);
+
+    return new GraphDocument(modelBuilder.build(), graph);
   }
 }

@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.graph_doc.eclipse.ui.wizards;
 
+import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.graph_doc.model.GraphDocument;
 import com.google.devtools.depan.model.GraphModel;
 
@@ -118,16 +119,6 @@ public abstract class AbstractAnalysisWizard extends Wizard
     } finally {
       monitor.done();
     }
-  }
-
-  /**
-   * Create a new {@link GraphDocument} with the list of analysis plugins.
-   * The first listed plugin becomes the UI default for the document.
-   */
-  protected GraphDocument createGraphDocument(
-      GraphModel graph, String... pluginIds) {
-    return new GraphDocument(graph, 
-      SourcePluginRegistry.buildPluginList(pluginIds));
   }
 
   /**

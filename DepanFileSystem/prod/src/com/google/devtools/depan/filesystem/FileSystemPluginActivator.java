@@ -15,8 +15,6 @@
  */
 
 package com.google.devtools.depan.filesystem;
-import org.eclipse.core.runtime.Platform;
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
@@ -24,11 +22,6 @@ public class FileSystemPluginActivator implements BundleActivator {
 
   /** Plug-in ID used to identify this plug-in. */
   public static final String PLUGIN_ID = "com.google.devtools.depan.filesystem";
-
-  /**
-   * Bundle that is responsible for storing the resources for this plug-in.
-   */
-  public static final Bundle BUNDLE = Platform.getBundle(PLUGIN_ID);
 
   public FileSystemPluginActivator() {
   }

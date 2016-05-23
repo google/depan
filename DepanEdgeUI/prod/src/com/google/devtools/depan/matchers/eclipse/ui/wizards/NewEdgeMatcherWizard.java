@@ -82,7 +82,8 @@ public class NewEdgeMatcherWizard
   protected GraphEdgeMatcherDescriptor buildDocument(IProgressMonitor monitor) {
     monitor.beginTask("Preparing edge matcher", 1);
     GraphEdgeMatcherDescriptor matcherInfo =
-        new GraphEdgeMatcherDescriptor("Sample", GraphEdgeMatchers.EMPTY);
+        new GraphEdgeMatcherDescriptor(
+            page.getEdgeMatcherName(), GraphEdgeMatchers.EMPTY);
     monitor.worked(0);
     return matcherInfo;
   }

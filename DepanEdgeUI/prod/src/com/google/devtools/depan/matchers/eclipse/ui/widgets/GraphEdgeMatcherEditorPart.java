@@ -16,7 +16,9 @@
 
 package com.google.devtools.depan.matchers.eclipse.ui.widgets;
 
+import com.google.devtools.depan.graph.api.EdgeMatcher;
 import com.google.devtools.depan.graph.api.Relation;
+import com.google.devtools.depan.model.GraphEdgeMatcher;
 import com.google.devtools.depan.platform.PlatformResources;
 
 import org.eclipse.jface.viewers.TableViewer;
@@ -247,5 +249,13 @@ public class GraphEdgeMatcherEditorPart {
    */
   public void updateTable(List<Relation> relations) {
     editor.updateTableRows(relations);
+  }
+
+  public void updateEdgeMatcher(EdgeMatcher<String> edgeMatcher) {
+    editor.updateEdgeMatcher(edgeMatcher);
+  }
+
+  public GraphEdgeMatcher createEdgeMatcher() {
+    return editor.createEdgeMatcher();
   }
 }

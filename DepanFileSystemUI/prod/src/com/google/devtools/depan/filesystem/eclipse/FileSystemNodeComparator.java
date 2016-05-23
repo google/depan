@@ -19,7 +19,7 @@ package com.google.devtools.depan.filesystem.eclipse;
 import com.google.devtools.depan.filesystem.graph.DirectoryElement;
 import com.google.devtools.depan.filesystem.graph.FileElement;
 import com.google.devtools.depan.filesystem.graph.FileSystemElement;
-import com.google.devtools.depan.filesystem.integration.FileSystemElementDispatcher;
+import com.google.devtools.depan.filesystem.graph.FileSystemElementDispatcher;
 import com.google.devtools.depan.model.Element;
 
 import java.util.Comparator;

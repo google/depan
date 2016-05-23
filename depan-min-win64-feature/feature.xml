@@ -21,8 +21,4 @@
          id="com.pnambic.depan.app.feature"
          version="0.0.0"/>
 
-   <includes
-         id="com.pnambic.depan.app.feature"
-         version="0.0.0"/>
-
 </feature>

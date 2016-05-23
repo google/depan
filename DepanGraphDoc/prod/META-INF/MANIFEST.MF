@@ -8,7 +8,9 @@ Require-Bundle: com.google.guava,
  com.google.devtools.depan.core,
  depan-xstream-library,
  com.google.devtools.depan.builder,
- com.google.devtools.depan.persistence
+ com.google.devtools.depan.persistence,
+ org.eclipse.core.runtime,
+ com.google.devtools.depan.platform
 Bundle-ClassPath: .
 Export-Package: com.google.devtools.depan.graph_doc.model,
  com.google.devtools.depan.graph_doc.persistence

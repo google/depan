@@ -16,13 +16,9 @@
 
 package com.google.devtools.depan.filesystem.eclipse;
 
-import com.google.devtools.depan.eclipse.utils.Resources;
+import com.google.devtools.depan.filesystem.builder.FileSystemAnalyzer;
+import com.google.devtools.depan.graph_doc.eclipse.ui.wizards.AbstractAnalysisWizard;
 import com.google.devtools.depan.graph_doc.model.GraphDocument;
-import com.google.devtools.depan.model.GraphModel;
-import com.google.devtools.depan.model.builder.api.GraphBuilder;
-import com.google.devtools.depan.model.builder.api.GraphBuilders;
-import com.google.devtools.depan.model.builder.chain.DependenciesListener;
-import com.google.devtools.depan.resource_doc.eclipse.ui.wizards.AbstractNewResourceWizard;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -35,7 +31,7 @@ import java.io.IOException;
  * 
  * @author <a href="leeca@google.com">Lee Carver</a>
  */
-public class NewFileSystemWizard extends AbstractNewResourceWizard {
+public class NewFileSystemWizard extends AbstractAnalysisWizard {
 
   /**
    * Eclipse extension identifier for this wizard.
@@ -64,7 +60,7 @@ public class NewFileSystemWizard extends AbstractNewResourceWizard {
 
   @Override
   protected String getOutputFileName() {
-    return page.getOutputFilename();
+    return page.getOutputFileName();
   }
 
   @Override
@@ -87,27 +83,10 @@ public class NewFileSystemWizard extends AbstractNewResourceWizard {
   protected GraphDocument generateAnalysisDocument(IProgressMonitor monitor)
       throws IOException {
 
-    // Step 1) Create the GraphModel to hold the analysis results
     // TODO(leeca): Add filters, etc.
     // TODO(leeca): Extend UI to allow lists of directories.
-
-    GraphBuilder graphBuilder = GraphBuilders.createGraphModelBuilder();
-    DependenciesListener builder =
-        new FileSystemDependencyDispatcher(graphBuilder);
-
-    monitor.worked(1);
-
-    // Step 2) Read through the file system to build the analysis graph
-    monitor.setTaskName("Loading file tree...");
-
-    TreeLoader loader = new TreeLoader(builder, page.getTreePrefix());
-    loader.analyzeTree(page.getPathText());
-
-    monitor.worked(1);
-
-    // Done
-    GraphModel result = graphBuilder.createGraphModel();
-    return createGraphDocument(result,
-        FileSystemActivator.PLUGIN_ID, Resources.PLUGIN_ID);
+    FileSystemAnalyzer analyzer = new FileSystemAnalyzer(
+        page.getTreePrefix(), page.getPathText());
+    return analyzer.generateAnalysisDocument(monitor);
   }
 }

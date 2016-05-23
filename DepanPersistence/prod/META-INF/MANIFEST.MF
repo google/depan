@@ -7,8 +7,8 @@ Bundle-Vendor: Pnambic Computing
 Require-Bundle: com.google.guava,
  com.google.devtools.depan.core,
  depan-xstream-library,
- org.eclipse.core.runtime
+ org.eclipse.core.runtime,
+ com.google.devtools.depan.platform
 Bundle-ClassPath: .
 Export-Package: com.google.devtools.depan.persistence,
- com.google.devtools.depan.persistence.plugins,
- com.google.devtools.depan.platform.plugin
+ com.google.devtools.depan.persistence.plugins

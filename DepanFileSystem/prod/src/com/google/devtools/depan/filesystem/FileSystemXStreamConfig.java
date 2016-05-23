@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.filesystem.integration;
+package com.google.devtools.depan.filesystem;
 
 import com.google.devtools.depan.filesystem.graph.DirectoryElement;
 import com.google.devtools.depan.filesystem.graph.FileElement;
 import com.google.devtools.depan.filesystem.graph.FileSystemRelation;
-import com.google.devtools.depan.persistence.plugins.PersistencePlugin;
+import com.google.devtools.depan.persistence.XStreamConfig;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -30,7 +30,7 @@ import com.thoughtworks.xstream.XStream;
  *
  * @author tugrul@google.com (Tugrul Ince)
  */
-public class FileSystemPersistencePlugin implements PersistencePlugin {
+public class FileSystemXStreamConfig implements XStreamConfig {
 
   @Override
   public void config(XStream xstream) {

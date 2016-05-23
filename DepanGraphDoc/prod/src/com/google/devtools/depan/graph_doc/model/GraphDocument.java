@@ -18,10 +18,6 @@ package com.google.devtools.depan.graph_doc.model;
 
 import com.google.devtools.depan.model.GraphModel;
 
-import com.google.common.collect.ImmutableList;
-
-import java.util.List;
-
 /**
  * A document that provides information about a dependency graph.  In addition
  * to the basic nodes and edges of the dependency graph is supplemented with
@@ -42,13 +38,9 @@ public class GraphDocument {
   public static final String EXTENSION = "dgi";
 
   /**
-   * The group of dependency models that are associated with this
-   * {@link GraphModel}.  The first model ({@code get(0)}) is assumed to be
-   * the default/preferred dependency model.
-   * 
-   * Don't change the field name due to standard serialization.
+   * Collected relation and node type providers.
    */
-  private final List<DependencyModel> graphAnalyzers;
+  private final DependencyModel graphModel;
 
   /**
    * The dependency graph provided by this document.
@@ -61,8 +53,8 @@ public class GraphDocument {
    * @param defaultAnalyzer
    * @param graph
    */
-  public GraphDocument(GraphModel graph, List<DependencyModel> analyzers) {
-    this.graphAnalyzers = analyzers;
+  public GraphDocument( DependencyModel graphModel, GraphModel graph) {
+    this.graphModel = graphModel;
     this.graph = graph;
   }
 
@@ -72,8 +64,8 @@ public class GraphDocument {
    * @return list of dependency analyzers for the UI to use when manipulating
    *     this graph model
    */
-  public List<DependencyModel> getAnalyzers() {
-    return ImmutableList.copyOf(graphAnalyzers);
+  public DependencyModel getDependencyModel() {
+    return graphModel;
   }
 
   /**
