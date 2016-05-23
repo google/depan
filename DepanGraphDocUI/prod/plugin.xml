@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="com.google.devtools.depan.graph_doc.eclipse.ui.editor.GraphEditor"
+            default="false"
+            extensions="dgi"
+            icon="icons/graph_file-16x16.png"
+            id="com.google.devtools.depan.graph_doc.eclipse.ui.editor.GraphEditor"
+            name="Graph Tree">
+      </editor>
+   </extension>
+
+</plugin>

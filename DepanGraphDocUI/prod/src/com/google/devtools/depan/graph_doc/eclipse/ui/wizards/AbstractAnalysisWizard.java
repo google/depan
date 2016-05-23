@@ -16,9 +16,9 @@
 
 package com.google.devtools.depan.graph_doc.eclipse.ui.wizards;
 
-import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.graph_doc.model.GraphDocument;
-import com.google.devtools.depan.model.GraphModel;
+import com.google.devtools.depan.platform.ResourceCache;
+import com.google.devtools.depan.resource_doc.eclipse.ui.wizards.AbstractResouceWizardPage;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;

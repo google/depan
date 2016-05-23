@@ -29,7 +29,8 @@ import org.osgi.framework.BundleContext;
 public class FileSystemActivator extends AbstractUIPlugin {
 
   /** Plug-in ID used to identify this plug-in. */
-  public static final String PLUGIN_ID = "com.google.devtools.depan.filesystem";
+  public static final String PLUGIN_ID =
+      "com.google.devtools.depan.filesystem.ui";
 
   /**
    * Prefix to use for preferences.

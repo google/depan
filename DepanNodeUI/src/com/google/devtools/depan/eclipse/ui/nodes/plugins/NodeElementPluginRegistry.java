@@ -23,6 +23,7 @@ import com.google.devtools.depan.platform.plugin.ContributionRegistry;
 
 import com.google.common.collect.Maps;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
@@ -57,6 +58,21 @@ public class NodeElementPluginRegistry
    */
   private static NodeElementPluginRegistry INSTANCE = null;
 
+  /////////////////////////////////////
+  // Handle configuration elements for contribution
+
+  static class Entry extends ContributionEntry<NodeElementPlugin>{
+
+    public Entry(String bundleId, IConfigurationElement element) {
+      super(bundleId, element);
+    }
+
+    @Override
+    protected NodeElementPlugin createInstance() throws CoreException {
+      return (NodeElementPlugin) buildInstance(ATTR_CLASS);
+    }
+  }
+
   /**
    * A map to find the right {@link NodeElementTransformers} given a element's
    * class.
@@ -69,6 +85,19 @@ public class NodeElementPluginRegistry
    */
   private NodeElementPluginRegistry() {
     super();
+  }
+
+
+  @Override
+  protected ContributionEntry<NodeElementPlugin> buildEntry(
+      String bundleId, IConfigurationElement element) {
+    return new Entry(bundleId, element);
+  }
+
+  @Override
+  protected void reportException(String entryId, Exception err) {
+    NodesLogger.logException(
+        "NodeElement registry load failure for " + entryId, err);
   }
 
   /////////////////////////////////////
@@ -86,18 +115,6 @@ public class NodeElementPluginRegistry
     for (Class<? extends Element> type : plugin.getElementClasses()) {
       transformers.put(type, xform);
     }
-  }
-
-  @Override
-  protected ContributionEntry<NodeElementPlugin> buildEntry(
-      IConfigurationElement element) {
-    return new NodeElementPlugin.Entry(element);
-  }
-
-  @Override
-  protected void reportException(String entryId, Exception err) {
-    NodesLogger.logException(
-        "NodeElement load failure for " + entryId, err);
   }
 
   /////////////////////////////////////

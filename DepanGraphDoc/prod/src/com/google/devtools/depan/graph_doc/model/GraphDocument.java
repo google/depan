@@ -53,7 +53,7 @@ public class GraphDocument {
    * @param defaultAnalyzer
    * @param graph
    */
-  public GraphDocument( DependencyModel graphModel, GraphModel graph) {
+  public GraphDocument(DependencyModel graphModel, GraphModel graph) {
     this.graphModel = graphModel;
     this.graph = graph;
   }

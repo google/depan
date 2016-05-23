@@ -22,9 +22,10 @@
       <import plugin="com.google.devtools.depan.core"/>
       <import plugin="com.google.devtools.depan.builder"/>
       <import plugin="com.google.devtools.depan.persistence"/>
-      <import plugin="depan-xstream-library"/>
       <import plugin="com.google.devtools.depan.graph_doc"/>
+      <import plugin="depan-xstream-library"/>
       <import plugin="com.google.guava"/>
+      <import plugin="com.google.devtools.depan.platform"/>
    </requires>
 
    <plugin

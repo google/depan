@@ -17,13 +17,16 @@
 package com.google.devtools.depan.graph_doc.eclipse.ui.editor;
 
 import com.google.devtools.depan.eclipse.ui.nodes.cache.HierarchyCache;
+import com.google.devtools.depan.eclipse.ui.nodes.trees.GraphData;
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.CheckNodeTreeView;
+import com.google.devtools.depan.eclipse.ui.nodes.viewers.HierarchyViewer;
+import com.google.devtools.depan.eclipse.ui.nodes.viewers.HierarchyViewer.HierarchyChangeListener;
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeTreeProvider;
-import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph_doc.model.GraphDocument;
+import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
+import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptors;
 import com.google.devtools.depan.model.GraphNode;
-
-import com.google.common.collect.Sets;
+import com.google.devtools.depan.platform.ResourceCache;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -45,8 +48,8 @@ import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.MultiPageEditorPart;
 
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -71,7 +74,8 @@ public class GraphEditor
   // TODO(leeca): Figure out how to turn this back on
   // private Binop<GraphModel> binop = null;
 
-  private LayoutChoicesControl layoutChoices;
+  // TODO: Launch installable sub-editors
+  // private LayoutChoicesControl layoutChoices;
   
   private HierarchyViewer<GraphNode> hierarchyView = null;
 
@@ -124,8 +128,9 @@ public class GraphEditor
       }
     });
 
+    // TODO: Launch installable sub-editors
     // Composite layoutRegion = setupLayoutChoice(top);
-    layoutChoices = setupLayoutChoices(top);
+    // layoutChoices = setupLayoutChoices(top);
 
     Button create = new Button(top, SWT.PUSH);
     create.setText("Create view");
@@ -151,7 +156,6 @@ public class GraphEditor
 
     tree = checkNodeTreeView.getCheckboxTreeViewer();
     tree.getTree().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-    tree.setSorter(new NodeWrapperTreeSorter());
     tree.addCheckStateListener(new ICheckStateListener() {
       @Override
       public void checkStateChanged(CheckStateChangedEvent event) {
@@ -165,25 +169,24 @@ public class GraphEditor
     setPageText(index, "New View");
   }
 
-  private LayoutChoicesControl setupLayoutChoices(Composite parent) {
-    LayoutChoicesControl result = new LayoutChoicesControl(
-        parent, LayoutChoicesControl.Style.LINEAR);
-    result.setLayoutChoices(LayoutGenerators.getLayoutNames(false));
-
-    GraphEdgeMatcherDescriptor edgeMatcher = getDefaultEdgeMatcher();
-    java.util.List<GraphEdgeMatcherDescriptor> choices =
-        GraphEdgeMatcherDescriptors.buildGraphChoices(graph);
-    result.setEdgeMatcherInput(edgeMatcher, choices);
-
-    return result;
-  }
+//  private LayoutChoicesControl setupLayoutChoices(Composite parent) {
+//    LayoutChoicesControl result = new LayoutChoicesControl(
+//        parent, LayoutChoicesControl.Style.LINEAR);
+//    result.setLayoutChoices(LayoutGenerators.getLayoutNames(false));
+//
+//    GraphEdgeMatcherDescriptor edgeMatcher = getDefaultEdgeMatcher();
+//    java.util.List<GraphEdgeMatcherDescriptor> choices =
+//        GraphEdgeMatcherDescriptors.buildGraphChoices(graph);
+//    result.setEdgeMatcherInput(edgeMatcher, choices);
+//
+//    return result;
+//  }
 
   private void setupHierarchyViewer(Composite parent) {
     hierarchyView = new HierarchyViewer<GraphNode>(parent, false);
 
     GraphEdgeMatcherDescriptor selectedRelSet = getDefaultEdgeMatcher();
-    java.util.List<GraphEdgeMatcherDescriptor> choices =
-        GraphEdgeMatcherDescriptors.buildGraphChoices(graph);
+    java.util.List<GraphEdgeMatcherDescriptor> choices = getEdgeMatcherChoices();
     hierarchyView.setInput(hierarchies, selectedRelSet, choices);
 
     hierarchyView.addChangeListener(this);
@@ -196,7 +199,13 @@ public class GraphEditor
    * TODO: Separate hierarchy edge matcher from display relation set.
    */
   private GraphEdgeMatcherDescriptor getDefaultEdgeMatcher() {
-    return graph.getDefaultAnalysis().getDefaultEdgeMatcherDescriptor();
+    return GraphEdgeMatcherDescriptors.FORWARD;
+  }
+
+  private java.util.List<GraphEdgeMatcherDescriptor> getEdgeMatcherChoices() {
+    return Arrays.asList(
+        GraphEdgeMatcherDescriptors.FORWARD,
+        GraphEdgeMatcherDescriptors.EMPTY);
   }
 
   private void createPage1() {
@@ -282,82 +291,21 @@ public class GraphEditor
    * and other {@code GraphEditor} settings.
    */
   protected void createViewEditor() {
-    CheckboxTreeViewer treeView = checkNodeTreeView.getCheckboxTreeViewer();
-    GraphNode topNode = getFirstNode(treeView);
+    GraphNode topNode = checkNodeTreeView.getFirstNode();
     if (null == topNode) {
       logger.info("no topNode");
       return;
     }
 
-    Collection<GraphNode> nodes = getSelectedNodes(treeView);
+    Collection<GraphNode> nodes = checkNodeTreeView.getSelectedNodes();
     if (nodes.isEmpty()) {
       logger.info("empty nodes");
       return;
     }
 
-    String baseName = NewEditorHelper.newEditorLabel(getBaseName(topNode));
-
-    // Create ViewDocument elements
-    GraphModelReference graphRef = new GraphModelReference(file, graph);
-    ViewPreferences userPrefs = buildViewPreferences();
-
-    ViewDocument viewInfo = new ViewDocument(graphRef, nodes, userPrefs);
-    ViewEditor.startViewEditor(viewInfo, baseName);
-  }
-
-  private ViewPreferences buildViewPreferences() {
-    ViewPreferences result = new ViewPreferences();
-
-    // No locations, so initial layout occurs in ViewEditor once viewport
-    // is constructed.
-    String layoutName = layoutChoices.getLayoutName();
-    result.setSelectedLayout(layoutName);
-    result.setLayoutFinder(layoutChoices.getEdgeMatcher());
-
-    SourcePlugin toolkit = graph.getDefaultAnalysis();
-    result.setDisplayRelationSet(toolkit.getDefaultRelationSetDescriptor());
-    for (Relation relation : toolkit.getRelations()) {
-      EdgeDisplayProperty edgeProp = new EdgeDisplayProperty();
-      result.setRelationProperty(relation, edgeProp);
-    }
-    return result;
-  }
-
-  /**
-   * @param nodes
-   * @param treeView
-   */
-  private GraphNode getFirstNode(CheckboxTreeViewer treeView) {
-    for (Object item : treeView.getCheckedElements()) {
-      if (item instanceof NodeWrapper) {
-        return ((NodeWrapper<?>) item).getNode();
-      }
-    }
-    return null;
-  }
-
-  private Collection<GraphNode> getSelectedNodes(CheckboxTreeViewer treeView) {
-    Set<GraphNode> result = Sets.newHashSet();
-    for (Object item : treeView.getCheckedElements()) {
-      if (item instanceof NodeWrapper) {
-        GraphNode node = ((NodeWrapper<?>) item).getNode();
-        result.add(node);
-      }
-    }
-    return result;
-  }
-
-  private String getBaseName(GraphNode node) {
-    String baseName = node.friendlyString();
-    int period = baseName.lastIndexOf('.');
-    if (period > 0) {
-      String segment = baseName.substring(period + 1);
-      if (segment.length() > 3) {
-        return segment;
-      }
-    }
-
-    return baseName;
+    ViewEditorBuilder builder = new ViewEditorBuilder();
+    builder.createViewEditor(topNode, nodes);
+    builder.startEditor();
   }
 
   @Override

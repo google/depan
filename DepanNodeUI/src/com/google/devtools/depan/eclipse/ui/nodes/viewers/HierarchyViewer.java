@@ -18,6 +18,8 @@ package com.google.devtools.depan.eclipse.ui.nodes.viewers;
 import com.google.devtools.depan.eclipse.ui.nodes.cache.HierarchyCache;
 import com.google.devtools.depan.eclipse.ui.nodes.trees.GraphData;
 import com.google.devtools.depan.edges.trees.TreeModel;
+import com.google.devtools.depan.matchers.eclipse.ui.widgets.GraphEdgeMatcherSelectorControl;
+import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.platform.ListenerManager;
 
@@ -176,7 +178,8 @@ public class HierarchyViewer<T> extends Composite {
     if (null == selectedEdgeMatcher) {
       return new GraphData<T>(null, TreeModel.EMPTY);
     }
-    GraphData<T> baseData = hierarchies.getHierarchy(selectedEdgeMatcher);
+    GraphData<T> baseData =
+        hierarchies.getHierarchy(selectedEdgeMatcher.getEdgeMatcher());
 
     // Synthesize a inverse tree if requested.
     // These are not cached.  The inverted hierarchies are often small,

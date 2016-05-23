@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.ui.newWizards">
       <wizard
-            category="com.google.devtools.depan"
+            category="com.google.devtools.depan.eclipse.ui.wizards"
             class="com.google.devtools.depan.filesystem.eclipse.NewFileSystemWizard"
             finalPerspective="com.google.devtools.depan.eclipse.perspective"
             icon="icons/eclipse/folder_obj.png"
@@ -26,12 +26,5 @@
             id="com.google.devtools.depan.filesystem.eclipse.nodecolors"
             name="File System Node Colors">
       </page>
-   </extension>
-   <extension
-         point="com.google.devtools.depan.graph.registry.relation">
-      <relation_supplier
-            class="com.google.devtools.depan.filesystem.FileSystemRelationContributor"
-            id="com.google.devtools.depan.filesystem.FileSystemRelationContributor">
-      </relation_supplier>
    </extension>
 </plugin>

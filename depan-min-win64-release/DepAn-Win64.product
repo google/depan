@@ -34,10 +34,8 @@
       </win>
    </launcher>
 
-
    <vm>
    </vm>
-
 
    <plugins>
    </plugins>
@@ -46,6 +44,7 @@
       <feature id="com.pnambic.depan.graph.feature"/>
       <feature id="com.pnambic.depan.app.feature"/>
       <feature id="com.pnambic.depan.analyzers.feature"/>
+      <feature id="com.pnambic.depan.filesystem.feature"/>
    </features>
 
    <configurations>

@@ -16,10 +16,19 @@
 
 package com.google.devtools.depan.eclipse.ui.nodes.viewers;
 
+import com.google.devtools.depan.eclipse.ui.nodes.trees.NodeWrapper;
+import com.google.devtools.depan.eclipse.ui.nodes.trees.NodeWrapperTreeSorter;
+import com.google.devtools.depan.model.GraphNode;
+
+import com.google.common.collect.Sets;
+
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
+
+import java.util.Collection;
+import java.util.Set;
 
 /**
  * @author ycoppel@google.com (Yohann Coppel)
@@ -37,9 +46,35 @@ public class CheckNodeTreeView<E> extends NodeTreeView<E> {
     tree = new CheckboxTreeViewer(parent, style);
     tree.setLabelProvider(new WorkbenchLabelProvider());
     tree.setContentProvider(new BaseWorkbenchContentProvider());
+    tree.setSorter(new NodeWrapperTreeSorter());
   }
 
   public CheckboxTreeViewer getCheckboxTreeViewer() {
     return (CheckboxTreeViewer) tree;
   }
+
+
+  private Object[] getCheckedElements() {
+    return getCheckboxTreeViewer().getCheckedElements();
+  }
+
+  public GraphNode getFirstNode() {
+    for (Object item : getCheckedElements()) {
+      if (item instanceof NodeWrapper) {
+        return ((NodeWrapper<?>) item).getNode();
+      }
+    }
+    return null;
+  }
+
+  public Collection<GraphNode> getSelectedNodes() {
+    Set<GraphNode> result = Sets.newHashSet();
+    for (Object item : getCheckedElements()) {
+      if (item instanceof NodeWrapper) {
+        GraphNode node = ((NodeWrapper<?>) item).getNode();
+        result.add(node);
+      }
+    }
+    return result;
+  };
 }

@@ -16,9 +16,6 @@
 
 package com.google.devtools.depan.filesystem;
 
-import com.google.devtools.depan.eclipse.persist.XStreamFactory.Config;
-import com.google.devtools.depan.eclipse.plugins.ElementClassTransformer;
-import com.google.devtools.depan.eclipse.plugins.AbstractSourcePlugin;
 import com.google.devtools.depan.eclipse.visualization.ogl.GLEntity;
 import com.google.devtools.depan.filesystem.eclipse.FileSystemIconTransformer;
 import com.google.devtools.depan.filesystem.eclipse.FileSystemImageTransformer;
@@ -30,18 +27,18 @@ import com.google.devtools.depan.filesystem.editors.FileSystemElementEditors;
 import com.google.devtools.depan.filesystem.graph.DirectoryElement;
 import com.google.devtools.depan.filesystem.graph.FileElement;
 import com.google.devtools.depan.filesystem.graph.FileSystemRelation;
-import com.google.devtools.depan.filesystem.integration.FileSystemDefinitions;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.model.Element;
 import com.google.devtools.depan.model.ElementTransformer;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor.Builder;
-import com.google.devtools.depan.remap_doc.plugins.ElementEditor;
 
 import com.google.common.collect.Lists;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
+
+import sun.security.krb5.Config;
 
 import java.awt.Color;
 import java.util.Collection;

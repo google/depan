@@ -19,7 +19,7 @@ package com.google.devtools.depan.eclipse.ui.nodes.cache;
 import com.google.devtools.depan.eclipse.ui.nodes.trees.GraphData;
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeTreeProvider;
 import com.google.devtools.depan.edges.trees.TreeModel;
-import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
+import com.google.devtools.depan.graph.api.EdgeMatcher;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 
@@ -45,7 +45,7 @@ public class HierarchyCache<T> {
    * from one view to another. If it's too memory consuming, we could change
    * that easily.
    */
-  private Map<GraphEdgeMatcherDescriptor, GraphData<T>> hierarchies =
+  private Map<EdgeMatcher<String>, GraphData<T>> hierarchies =
       Maps.newHashMap();
 
   /**
@@ -68,7 +68,7 @@ public class HierarchyCache<T> {
    * @param edgeMatcher Edge matcher to use for hierarchy construction
    * @return description of hierarchy
    */
-  public GraphData<T> getHierarchy(GraphEdgeMatcherDescriptor edgeMatcher) {
+  public GraphData<T> getHierarchy(EdgeMatcher<String> edgeMatcher) {
     if (!hierarchies.containsKey(edgeMatcher)) {
       GraphData<T> result =
           GraphData.createGraphData(provider, graph, edgeMatcher);

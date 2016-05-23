@@ -16,7 +16,8 @@
 
 package com.google.devtools.depan.graphml.eclipse;
 
-import com.google.devtools.depan.platform.wizards.AbstractAnalysisPage;
+
+import com.google.devtools.depan.graph_doc.eclipse.ui.wizards.AbstractAnalysisPage;
 
 import com.google.common.base.Strings;
 

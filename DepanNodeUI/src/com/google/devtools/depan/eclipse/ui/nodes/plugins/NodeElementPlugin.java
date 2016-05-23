@@ -73,18 +73,4 @@ public interface NodeElementPlugin {
    */
   Collection<Class<? extends Element>> getElementClasses();
 
-  /////////////////////////////////////
-  // Handle configuration elements for contribution
-
-  static class Entry extends ContributionEntry<NodeElementPlugin>{
-
-    public Entry(IConfigurationElement element) {
-      super(element);
-    }
-
-    @Override
-    protected NodeElementPlugin createInstance() throws CoreException {
-      return (NodeElementPlugin) buildInstance(ATTR_CLASS);
-    }
-  }
 }

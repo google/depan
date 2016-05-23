@@ -17,8 +17,7 @@ package com.google.devtools.depan.eclipse.utils;
 
 import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerator;
 import com.google.devtools.depan.matchers.eclipse.ui.widgets.GraphEdgeMatcherSelectorControl;
-
-import com.google.devtools.edges.matchers.GraphEdgeMatcherDescriptor;
+import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;

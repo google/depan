@@ -9,8 +9,7 @@ Require-Bundle: org.eclipse.core.runtime,
  com.google.devtools.depan.core,
  com.google.devtools.depan.builder,
  org.eclipse.jface,
- org.eclipse.ui.ide,
- com.google.devtools.depan.eclipse.ui.nodes
+ org.eclipse.ui.ide
 Export-Package: com.google.devtools.depan.view
 Bundle-ClassPath: .
 Bundle-ActivationPolicy: lazy
