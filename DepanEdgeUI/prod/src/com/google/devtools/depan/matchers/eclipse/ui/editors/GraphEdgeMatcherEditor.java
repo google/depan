@@ -252,10 +252,11 @@ public class GraphEdgeMatcherEditor extends EditorPart {
     matcherName.addFocusListener(new FocusAdapter() {
       @Override
       public void focusLost(FocusEvent e) {
-        if (!matcherInfo.getName().equals(matcherName.getText())) {
-          setDirtyState(true);
-          handleDocumentChange();
+        if (matcherInfo.getName().equals(matcherName.getText())) {
+          return;
         }
+        setDirtyState(true);
+        handleDocumentChange();
       }
     });
 
@@ -265,7 +266,7 @@ public class GraphEdgeMatcherEditor extends EditorPart {
     edgeMatcherControl.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
     edgeMatcherEditor.updateTable(RelationRegistry.getRegistryRelations());
-    edgeMatcherEditor.updateEdgeMatcher(matcherInfo);
+    edgeMatcherEditor.updateEdgeMatcher(matcherInfo.getEdgeMatcher());
 
     // listening for changes, so we can set dirtyState.
     edgeMatcherEditor.registerModificationListener(

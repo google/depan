@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.ui.newWizards">
       <wizard
-            category="com.google.devtools.depan"
+            category="com.google.devtools.depan.eclipse.ui.wizards"
             class="com.google.devtools.depan.matchers.eclipse.ui.wizards.NewEdgeMatcherWizard"
             icon="icons/matcher_16x16.png"
             id="com.google.devtools.depan.matchers.eclipse.ui.wizards.NewEdgeMatcherWizard"

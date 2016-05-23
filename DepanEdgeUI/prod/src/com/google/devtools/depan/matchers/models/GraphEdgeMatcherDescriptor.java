@@ -16,19 +16,17 @@
 
 package com.google.devtools.depan.matchers.models;
 
-import com.google.devtools.depan.graph.api.Edge;
 import com.google.devtools.depan.graph.api.EdgeMatcher;
-import com.google.devtools.depan.graph.api.Relation;
 
 /**
- * Adds a name to a {@link EdgeMatcher}.
+ * Document type for named {@link EdgeMatcher}s.
  * 
  * @since 2015 Based on legacy {@code RelationshipSet}.
  *
  * @author ycoppel@google.com (Yohann Coppel)
  */
-public class GraphEdgeMatcherDescriptor
-    implements EdgeMatcher<String> {
+public class GraphEdgeMatcherDescriptor {
+    // implements EdgeMatcher<String> {
 
   /**
    * Preferred file extension for documents.
@@ -53,23 +51,7 @@ public class GraphEdgeMatcherDescriptor
     return name;
   }
 
-  @Override
-  public boolean relationForward(Relation relation) {
-    return matcher.relationForward(relation);
-  }
-
-  @Override
-  public boolean relationReverse(Relation relation) {
-    return matcher.relationReverse(relation);
-  }
-
-  @Override
-  public boolean edgeForward(Edge<String> edge) {
-    return matcher.edgeForward(edge);
-  }
-
-  @Override
-  public boolean edgeReverse(Edge<String> edge) {
-    return matcher.edgeReverse(edge);
+  public EdgeMatcher<String> getEdgeMatcher() {
+    return matcher;
   }
 }
