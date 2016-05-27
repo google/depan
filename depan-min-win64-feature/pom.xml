@@ -8,11 +8,11 @@
     <relativePath>../depan-luna-parent</relativePath>
   </parent>
 
-  <artifactId>com.pnambic.depan.win64-min.feature</artifactId>
+  <artifactId>com.pnambic.depan_min.win64.feature</artifactId>
   <packaging>eclipse-feature</packaging>
   <version>2.0.0-SNAPSHOT</version>
 
-  <name>DepAn Packaging Feature</name>
+  <name>DepAn Win64 Release Feature [min]</name>
   <description>DepAn application components</description>
 
   <dependencies>
@@ -51,10 +51,21 @@
 
     <dependency>
       <groupId>com.pnambic.depan</groupId>
+      <artifactId>com.pnambic.depan.analyzers.feature</artifactId>
+      <version>2.0.0-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.pnambic.depan</groupId>
       <artifactId>com.pnambic.depan.app.feature</artifactId>
       <version>2.0.0-SNAPSHOT</version>
     </dependency>
 
+    <dependency>
+      <groupId>com.pnambic.depan</groupId>
+      <artifactId>com.pnambic.depan.filesystem.feature</artifactId>
+      <version>2.0.0-SNAPSHOT</version>
+    </dependency>
 
     <dependency>
       <groupId>com.pnambic.depan</groupId>

@@ -8,7 +8,7 @@
     <relativePath>../depan-parent</relativePath>
   </parent>
 
-  <artifactId>depan-luna-master</artifactId>
+  <artifactId>depan-min-master</artifactId>
   <packaging>pom</packaging>
 
   <name>DepAn Luna Master [min]</name>
@@ -19,34 +19,42 @@
     <module>../depan-luna-parent</module>
 
     <!-- Plugins -->
+    <!-- Platform components -->
     <module>../DepanBuilder/prod</module>
     <module>../DepanCore/prod</module>
     <module>../DepanEdge/prod</module>
     <module>../DepanGraphDoc/prod</module>
     <module>../DepanNode/prod</module>
     <module>../DepanPersistence/prod</module>
+    <module>../DepanPlatform/prod</module>
 
+    <!-- App/UI components -->
+    <module>../DepanAppMin/prod</module>
     <module>../DepanEdgeUI/prod</module>
+    <module>../DepanGraphDocUI/prod</module>
+    <module>../DepanNodeUI/prod</module>
+    <module>../DepanPlatformUI/prod</module>
+    <module>../DepanViewDoc/prod</module>
 
+    <!-- Dependency modeling components-->
     <module>../DepanFileSystem/prod</module>
+    <module>../DepanFileSystemUI/prod</module>
 
 <!-- 
     <module>../DepanNodeUI/prod</module>
     <module>../DepanGraphDocUI/prod</module>
     <module>../DepanViewDoc/prod</module>
- -->
     <module>../DepanPlatformUI/prod</module>
-
-    <module>../DepanAppMin/prod</module>
+ -->
 
     <!-- Features -->
-    <module>../depan-graph-feature</module>
-    <module>../depan-analyzers-feature</module>
     <module>../depan-app-feature</module>
+    <module>../depan-analyzers-feature</module>
+    <module>../depan-graph-feature</module>
+    <module>../depan-filesystem-feature</module>
 
     <!-- Release -->
-    <!-- 
-     -->
+    <module>../depan-min-win64-feature</module>
     <module>../depan-min-win64-release</module>
   </modules>
 </project>

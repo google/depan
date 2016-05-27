@@ -16,6 +16,7 @@
 package com.google.devtools.depan.view_doc.layout;
 
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
+import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptors;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 
@@ -24,6 +25,7 @@ import com.google.common.collect.Maps;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 
 
@@ -34,54 +36,82 @@ import java.util.Map;
  * @author <a href='mailto:lee.carver@servicenow.com'>Lee Carver</a>
  */
 public class LayoutContext {
+  public final static Rectangle2D DEFAULT_REGION =
+      new Rectangle2D.Double(0, 0, 1000.0, 1000.0);
 
   private GraphModel graphModel;
 
-  private Collection<GraphNode> movableNodes;
+  /**
+   * Assume forward traversal on all edges present in the {@code #graphModel}.
+   */
+  private GraphEdgeMatcherDescriptor edgeMatcher =
+      GraphEdgeMatcherDescriptors.FORWARD;
 
-  private Collection<GraphNode> fixedNodes;
+  private Rectangle2D viewport = DEFAULT_REGION;
 
-  private GraphEdgeMatcherDescriptor edgeMatcher;
+  private Collection<GraphNode> movableNodes = GraphNode.EMPTY_NODE_LIST;
 
-  private Rectangle2D viewport;
+  private Collection<GraphNode> fixedNodes = GraphNode.EMPTY_NODE_LIST;
+
+  private Map<GraphNode, Point2D> nodeLocations = Collections.emptyMap();
+
+  public GraphModel getGraphModel() {
+    return graphModel;
+  }
 
   public void setGraphModel(GraphModel graphModel) {
     this.graphModel = graphModel;
+  }
+
+  public Collection<GraphNode> getFixedNodes() {
+    return fixedNodes;
   }
 
   public void setFixedNodes(Collection<GraphNode> fixedNodes) {
     this.fixedNodes = fixedNodes;
   }
 
+  public Collection<GraphNode> getMovableNodes() {
+    return movableNodes;
+  }
+
   public void setMovableNodes(Collection<GraphNode> movableNodes) {
     this.movableNodes = movableNodes;
+  }
+
+  public GraphEdgeMatcherDescriptor getEdgeMatcher() {
+    return edgeMatcher;
   }
 
   public void setEdgeMatcher(GraphEdgeMatcherDescriptor edgeMatcher) {
     this.edgeMatcher = edgeMatcher;
   }
 
-  public void setNodeLocations(Map<GraphNode, Point2D> nodeLocations) {
+  public void setViewport(Rectangle2D viewport) {
+    this.viewport = viewport;
+  }
+
+  /**
+   * Populate internal table of node locations from supplied positions.
+   * Only positions for moveable and fixed nodes are used.
+   */
+  public void setNodeLocations(Map<GraphNode, Point2D> currPositions) {
     nodeLocations = Maps.newHashMapWithExpectedSize(
         movableNodes.size() + fixedNodes.size());
 
     for (GraphNode node : movableNodes) {
-      Point2D point = nodeLocations.get(node);
+      Point2D point = currPositions.get(node);
       if (null != point) {
         nodeLocations.put(node, point);
       }
     }
 
     for (GraphNode node : fixedNodes) {
-      Point2D point = nodeLocations.get(node);
+      Point2D point = currPositions.get(node);
       if (null != point) {
         nodeLocations.put(node, point);
       }
     }
-  }
-
-  public void setViewport(Rectangle2D viewport) {
-    this.viewport = viewport;
   }
 
 }

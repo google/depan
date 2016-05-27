@@ -18,10 +18,7 @@ package com.google.devtools.depan.eclipse.ui.nodes.plugins;
 
 import com.google.devtools.depan.model.Element;
 import com.google.devtools.depan.model.ElementTransformer;
-import com.google.devtools.depan.platform.plugin.ContributionEntry;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 

@@ -31,7 +31,6 @@ import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.model.Element;
 import com.google.devtools.depan.model.ElementTransformer;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
-import com.google.devtools.depan.relations.models.RelationSetDescriptor.Builder;
 
 import com.google.common.collect.Lists;
 

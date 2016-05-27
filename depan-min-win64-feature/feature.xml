@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="com.pnambic.depan.win64-min.feature"
+      id="com.pnambic.depan_min.win64.feature"
       label="DepAn Win64 Release Feature [min]"
       version="2.0.0.qualifier"
       provider-name="Pnambic Computing">
@@ -18,7 +18,19 @@
    </license>
 
    <includes
+         id="com.pnambic.depan.analyzers.feature"
+         version="0.0.0"/>
+
+   <includes
          id="com.pnambic.depan.app.feature"
+         version="0.0.0"/>
+
+   <includes
+         id="com.pnambic.depan.filesystem.feature"
+         version="0.0.0"/>
+
+   <includes
+         id="com.pnambic.depan.graph.feature"
          version="0.0.0"/>
 
 </feature>

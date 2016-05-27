@@ -24,7 +24,6 @@ import com.google.devtools.depan.model.builder.api.GraphBuilder;
 import com.google.devtools.depan.model.builder.api.GraphBuilders;
 import com.google.devtools.depan.model.builder.chain.DependenciesListener;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import java.io.IOException;

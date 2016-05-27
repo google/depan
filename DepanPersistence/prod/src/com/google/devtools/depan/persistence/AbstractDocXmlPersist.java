@@ -16,9 +16,6 @@
 
 package com.google.devtools.depan.persistence;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.IProgressMonitor;
-
 import java.io.IOException;
 import java.net.URI;
 import java.text.MessageFormat;

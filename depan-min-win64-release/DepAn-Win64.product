@@ -41,10 +41,7 @@
    </plugins>
 
    <features>
-      <feature id="com.pnambic.depan.graph.feature"/>
-      <feature id="com.pnambic.depan.app.feature"/>
-      <feature id="com.pnambic.depan.analyzers.feature"/>
-      <feature id="com.pnambic.depan.filesystem.feature"/>
+      <feature id="com.pnambic.depan_min.win64.feature" version="2.0.0.qualifier"/>
    </features>
 
    <configurations>

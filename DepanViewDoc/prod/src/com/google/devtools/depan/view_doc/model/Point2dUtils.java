@@ -16,8 +16,8 @@
 
 package com.google.devtools.depan.view_doc.model;
 
-import com.google.devtools.depan.eclipse.visualization.layout.LayoutScaler;
 import com.google.devtools.depan.model.GraphNode;
+import com.google.devtools.depan.view_doc.layout.LayoutScaler;
 
 import com.google.common.collect.Maps;
 
