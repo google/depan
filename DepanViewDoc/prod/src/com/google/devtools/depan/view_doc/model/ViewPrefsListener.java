@@ -20,7 +20,6 @@ import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.api.RelationSet;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.view.CollapseData;
 
 import java.awt.geom.Point2D;
 import java.util.Collection;
@@ -61,10 +60,12 @@ public interface ViewPrefsListener {
         GraphNode node, NodeDisplayProperty newProperty) {
     }
 
+/* TODO
     @Override
     public void collapseChanged(Collection<CollapseData> created,
         Collection<CollapseData> removed, Object author) {
     }
+*/
 
     @Override
     public void nodeLocationsChanged(
@@ -82,6 +83,10 @@ public interface ViewPrefsListener {
 
     @Override
     public void nodeLocationsSet(Map<GraphNode, Point2D> newLocations) {
+    }
+
+    @Override
+    public void optionChanged(String option, String value) {
     }
   }
 
@@ -133,10 +138,13 @@ public interface ViewPrefsListener {
    * @param removed Collection of now un-collapsed nodes
    * @param author the initiator of the change
    */
+
+/* TODO
   void collapseChanged(
       Collection<CollapseData> created,
       Collection<CollapseData> removed,
       Object author);
+*/
 
   /**
    * Callback for changes to the selected nodes.
@@ -150,5 +158,8 @@ public interface ViewPrefsListener {
       Collection<GraphNode> current,
       Object author);
 
-  void descriptionChanged(String description);
+  /**
+   * An option changed.
+   */
+  void optionChanged(String optionId, String value);
 }

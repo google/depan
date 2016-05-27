@@ -16,12 +16,10 @@
 
 package com.google.devtools.depan.view_doc.model;
 
-import com.google.devtools.depan.eclipse.editors.ViewPreferences;
-import com.google.devtools.depan.eclipse.editors.ViewPrefsListener;
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeTreeProvider;
-import com.google.devtools.depan.edges.trees.TreeModel;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.api.RelationSet;
+import com.google.devtools.depan.graph_doc.eclipse.ui.resources.GraphResources;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
@@ -105,20 +103,10 @@ public class ViewDocument {
     return parentGraph.getLocation();
   }
 
-  public RelationSetDescriptor getDefaultRelationSet() {
-    return parentGraph.getGraph().getDefaultAnalysis().getDefaultRelationSetDescriptor();
-  }
-
-  public List<JoglPlugin> getBuiltinAnalysisPlugins() {
-    return parentGraph.getGraph().getAnalyzers();
-  }
-
-  public Collection<RelationSetDescriptor> getBuiltinRelationSets() {
-    return parentGraph.getGraph().getBuiltinRelationSets();
-  }
-
-  public Collection<GraphEdgeMatcherDescriptor> getBuiltinEdgeMatchers() {
-    return parentGraph.getGraph().getBuiltinEdgeMatchers();
+  public GraphResources getGraphResources() {
+    // TODO: Lookup known resources
+    // and save reference as transient member.
+    return new GraphResources(parentGraph.getGraph().getDependencyModel());
   }
 
   public Collection<GraphNode> getViewNodes() {
@@ -237,6 +225,14 @@ public class ViewDocument {
     userPrefs.setDescription(newDescription);
   }
 
+  public String getOption(String optionId) {
+    return userPrefs.getDescription();
+  }
+
+  public void setOption(String optionId, String value) {
+    userPrefs.setOption(optionId, value);
+  }
+
   /////////////////////////////////////
   // Factories for derived instances
 
@@ -265,37 +261,6 @@ public class ViewDocument {
         ViewPreferences.buildFilteredNodes(userPrefs, newView);
     return new ViewDocument(parentGraph, newView, newPrefs);
   }
-
-  /////////////////////////////////////
-  // Manage collapse state
-
-  public GraphModel buildExposedGraph(GraphModel graph) {
-    return userPrefs.getExposedGraph(graph);
-  }
-
-  public CollapseTreeModel getCollapseTreeModel() {
-    return userPrefs.getCollapseTreeModel();
-  }
-
-  public Collection<CollapseData> getCollapseState() {
-    return userPrefs.getCollapseState();
-  }
-
-  public void collapseTree(
-      GraphModel graph, TreeModel treeData, Object author) {
-    userPrefs.collapseTree(graph, treeData, author);
-  }
-
-  public void collapse(
-      GraphNode master, Collection<GraphNode> picked,
-      boolean erase, Object author) {
-    userPrefs.collapse(master, picked, erase, author);
-  }
-
-  public void uncollapse(GraphNode master, Object author) {
-    userPrefs.uncollapse(master, author);
-  }
-
 
   /////////////////////////////////////
   // Manage scene preference

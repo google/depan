@@ -17,13 +17,10 @@
 package com.google.devtools.depan.graph_doc.persistence;
 
 import com.google.devtools.depan.graph_doc.model.GraphDocument;
+import com.google.devtools.depan.persistence.AbstractDocXmlPersist;
 import com.google.devtools.depan.persistence.ObjectXmlPersist;
-import com.google.devtools.depan.persistence.PersistenceLogger;
 import com.google.devtools.depan.persistence.XStreamFactory;
 
-import com.thoughtworks.xstream.XStream;
-
-import java.io.IOException;
 import java.net.URI;
 
 /**
@@ -31,42 +28,35 @@ import java.net.URI;
  * 
  * @author <a href="mailto:leeca@google.com">Lee Carver</a>
  */
-public class GraphModelXmlPersist {
+public class GraphModelXmlPersist extends AbstractDocXmlPersist<GraphDocument> {
 
-  protected final ObjectXmlPersist xmlPersist;
-
-  private final static GraphDocXStreamConfig docConfig =
+  private final static GraphDocXStreamConfig GRAPH_DOC_CONFIG =
       new GraphDocXStreamConfig();
 
   public GraphModelXmlPersist(ObjectXmlPersist xmlPersist) {
-    this.xmlPersist = xmlPersist;
-  }
-
-  public GraphDocument load(URI uri) {
-    try {
-      return (GraphDocument) xmlPersist.load(uri);
-    } catch (IOException errIo) {
-      String msg = "Unable to load GraphModel from " + uri;
-      PersistenceLogger.logException(msg, errIo);
-      throw new RuntimeException(msg, errIo);
-    }
-  }
-
-  public void save(URI uri, GraphDocument graph) {
-    try {
-      xmlPersist.save(uri, graph);
-    } catch (IOException errIo) {
-      String msg = "Unable to save GraphModel to " + uri;
-      PersistenceLogger.logException(msg, errIo);
-      throw new RuntimeException(msg, errIo);
-    }
+    super(xmlPersist);
   }
 
   public static GraphModelXmlPersist build(boolean readable) {
-    XStream xstream = XStreamFactory.newXStream(readable);
-    XStreamFactory.configureXStream(xstream);
-    docConfig.config(xstream);
-    ObjectXmlPersist persist = new ObjectXmlPersist(xstream);
+    ObjectXmlPersist persist = XStreamFactory.build(readable, GRAPH_DOC_CONFIG);
     return new GraphModelXmlPersist(persist);
+  }
+
+  /////////////////////////////////////
+  // Hook method implementations for AbstractDocXmlPersist
+
+  @Override
+  protected GraphDocument coerceLoad(Object load) {
+    return (GraphDocument) load;
+  }
+
+  @Override
+  protected String logLoadException(URI uri, Exception err) {
+    return logException("Unable to load GraphModel from {0}", uri, err);
+  }
+
+  @Override
+  public String logSaveException(URI uri, Exception err) {
+    return logException("Unable to save GraphModel to {0}", uri, err);
   }
 }

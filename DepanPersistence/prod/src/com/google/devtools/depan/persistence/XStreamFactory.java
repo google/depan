@@ -80,4 +80,12 @@ public class XStreamFactory {
   public static void configureXStream(XStream xstream) {
     XStreamConfigRegistry.config(xstream);
   }
+
+  public static ObjectXmlPersist build(
+      boolean readable, XStreamConfig docConfig) {
+    XStream xstream = XStreamFactory.newXStream(readable);
+    XStreamFactory.configureXStream(xstream);
+    docConfig.config(xstream);
+    return new ObjectXmlPersist(xstream);
+  }
 }

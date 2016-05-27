@@ -15,7 +15,12 @@ Require-Bundle: com.google.guava,
  com.google.devtools.depan.platform.ui,
  org.eclipse.swt,
  org.eclipse.jface,
- com.google.devtools.depan.persistence
+ com.google.devtools.depan.persistence,
+ com.google.devtools.depan.nodes.ui,
+ depan-jung-library,
+ depan-jogl-library,
+ com.google.devtools.depan.builder,
+ com.google.devtools.depan.graph_doc.ui
 Bundle-ClassPath: .
 Export-Package: com.google.devtools.depan.eclipse.cm,
  com.google.devtools.depan.eclipse.preferences,

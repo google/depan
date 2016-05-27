@@ -16,65 +16,59 @@
 
 package com.google.devtools.depan.view_doc.eclipse.ui.editor;
 
-import com.google.devtools.depan.eclipse.editors.DrawingListener;
-import com.google.devtools.depan.eclipse.editors.NewEditorHelper;
-import com.google.devtools.depan.eclipse.editors.Point2dUtils;
-import com.google.devtools.depan.eclipse.editors.SelectionChangeListener;
-import com.google.devtools.depan.eclipse.editors.ViewEditorInput;
-import com.google.devtools.depan.eclipse.editors.ViewPrefsListener;
-import com.google.devtools.depan.eclipse.editors.Point2dUtils.Translater;
-import com.google.devtools.depan.eclipse.persist.ObjectXmlPersist;
-import com.google.devtools.depan.eclipse.persist.XStreamFactory;
-import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
-import com.google.devtools.depan.eclipse.stats.ElementKindStats;
+import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds;
+import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeShape;
+import com.google.devtools.depan.eclipse.preferences.PreferencesIds;
 import com.google.devtools.depan.eclipse.ui.nodes.cache.HierarchyCache;
 import com.google.devtools.depan.eclipse.ui.nodes.trees.GraphData;
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeTreeProvider;
-import com.google.devtools.depan.eclipse.utils.GraphEdgeMatcherDescriptors;
-import com.google.devtools.depan.eclipse.utils.RelationPropertyRelationTableEditor.RelPropRepository;
-import com.google.devtools.depan.eclipse.utils.RelationSetRelationTableEditor.RelationCheckedRepository;
-import com.google.devtools.depan.eclipse.utils.elementkinds.ElementKindDescriptor;
-import com.google.devtools.depan.eclipse.utils.elementkinds.ElementKindDescriptors;
-import com.google.devtools.depan.eclipse.views.tools.RelationCount;
 import com.google.devtools.depan.eclipse.visualization.View;
-import com.google.devtools.depan.eclipse.visualization.layout.LayoutContext;
-import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerator;
-import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerators;
-import com.google.devtools.depan.eclipse.visualization.layout.LayoutScaler;
-import com.google.devtools.depan.eclipse.visualization.layout.LayoutUtil;
-import com.google.devtools.depan.edges.trees.TreeModel;
+import com.google.devtools.depan.eclipse.visualization.ogl.NodeColorSupplier;
+import com.google.devtools.depan.eclipse.visualization.ogl.NodeColorSupplier.Monochrome;
+import com.google.devtools.depan.eclipse.visualization.ogl.NodeRatioSupplier;
+import com.google.devtools.depan.eclipse.visualization.ogl.NodeShapeSupplier;
+import com.google.devtools.depan.eclipse.visualization.ogl.NodeSizeSupplier;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.api.RelationSet;
+import com.google.devtools.depan.graph_doc.eclipse.ui.resources.GraphResources;
+import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.RelationSets;
+import com.google.devtools.depan.persistence.PersistenceLogger;
 import com.google.devtools.depan.platform.ListenerManager;
+import com.google.devtools.depan.platform.NewEditorHelper;
 import com.google.devtools.depan.platform.WorkspaceTools;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
-import com.google.devtools.depan.view.CollapseData;
-import com.google.devtools.depan.view.CollapseTreeModel;
+import com.google.devtools.depan.view_doc.layout.LayoutContext;
+import com.google.devtools.depan.view_doc.layout.LayoutGenerator;
+import com.google.devtools.depan.view_doc.layout.LayoutGenerators;
+import com.google.devtools.depan.view_doc.layout.LayoutScaler;
+import com.google.devtools.depan.view_doc.layout.LayoutUtil;
 import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty;
 import com.google.devtools.depan.view_doc.model.NodeDisplayProperty;
+import com.google.devtools.depan.view_doc.model.OptionPreferences;
+import com.google.devtools.depan.view_doc.model.Point2dUtils;
 import com.google.devtools.depan.view_doc.model.ScenePreferences;
 import com.google.devtools.depan.view_doc.model.ViewDocument;
+import com.google.devtools.depan.view_doc.model.ViewPrefsListener;
+import com.google.devtools.depan.view_doc.persistence.ViewDocXmlPersist;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.devtools.edges.matchers.GraphEdgeMatcherDescriptor;
 import com.thoughtworks.xstream.XStream;
-
-import edu.uci.ics.jung.algorithms.importance.KStepMarkov;
-import edu.uci.ics.jung.graph.DirectedGraph;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -96,6 +90,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.SaveAsDialog;
 import org.eclipse.ui.part.MultiPageEditorPart;
 
+import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -145,6 +140,12 @@ public class ViewEditor extends MultiPageEditorPart {
   private IFile viewFile;
 
   /**
+   * Standard resources for manipulating this graphs and its set of nodes
+   * and relations.
+   */
+  private GraphResources viewResources;
+
+  /**
    * Base name to use for created files. Typically set through the
    * ViewEditorInput supplied at editor startup.
    */
@@ -185,21 +186,7 @@ public class ViewEditor extends MultiPageEditorPart {
 
   private GraphModel exposedGraph;
 
-  /** Used for rendering and ranking in the rending pipe. */
-  private DirectedGraph<GraphNode, GraphEdge> jungGraph;
-
-  private Map<GraphNode, Double> ranking;
-
-  private RelationCount.Settings relationCountData =
-    new RelationCount.Settings();
-
-  private List<RelationSetDescriptor> relationSetChoices;
-
-  private Collection<ElementKindDescriptor> elementKindChoices;
-
-  private Collection<ElementKindStats.Info> elementKindStats;
-
-  private List<GraphEdgeMatcherDescriptor> edgeMatcherChoices;
+  private NodeColorFactory nodeColorFactory;
 
   /////////////////////////////////////
   // Dispatch errors to go our logger
@@ -232,28 +219,16 @@ public class ViewEditor extends MultiPageEditorPart {
     return viewInfo.getParentGraph();
   }
 
-  public List<JoglPlugin> getBuiltinAnalysisPlugins() {
-    return viewInfo.getBuiltinAnalysisPlugins();
-  }
-
-  public Collection<RelationSetDescriptor> getBuiltinRelationSets() {
-    return viewInfo.getBuiltinRelationSets();
-  }
-
-  public List<RelationSetDescriptor> getRelationSetChoices() {
-    return relationSetChoices;
+  public Collection<RelationSetDescriptor> getRelationSetsChoices() {
+    return viewResources.getRelationSetsChoices();
   }
 
   public RelationSetDescriptor getDefaultRelationSet() {
-    return viewInfo.getDefaultRelationSet();
+    return viewResources.getDefaultRelationSet();
   }
 
   public GraphEdgeMatcherDescriptor getTreeEdgeMatcher() {
     return viewInfo.getLayoutFinder();
-  }
-
-  public List<GraphEdgeMatcherDescriptor> getTreeEdgeMatcherChoices() {
-    return edgeMatcherChoices;
   }
 
   public RelationSetDescriptor getDisplayRelationSet() {
@@ -266,25 +241,6 @@ public class ViewEditor extends MultiPageEditorPart {
 
   public ScenePreferences getScenePrefs() {
     return viewInfo.getScenePrefs();
-  }
-
-  /**
-   * @return
-   */
-  public Collection<ElementKindDescriptor> getElementKinds() {
-    return elementKindChoices;
-  }
-
-  public Collection<ElementKindStats.Info> getElementKindStats() {
-    return elementKindStats;
-  }
-
-  public DirectedGraph<GraphNode, GraphEdge> getJungGraph() {
-    return jungGraph;
-  }
-
-  public Map<GraphNode, Double> getNodeRanking() {
-    return ranking;
   }
 
   /////////////////////////////////////
@@ -361,15 +317,21 @@ public class ViewEditor extends MultiPageEditorPart {
               "Unable to create View pages", err);
       throw err;
     }
-}
+  }
 
+  /**
+   * Everything that should happen before the dry-run and the start.
+   * Since {@link #setGraphModel} is invoked early, all display property
+   * entities should be defined.
+   */
   private void prepareView() {
-    renderer.setGraphModel(getViewGraph(), getJungGraph(), getNodeRanking());
+    renderer.setGraphModel(getViewGraph());
     renderer.initializeScenePrefs(getScenePrefs());
     renderer.initializeNodeLocations(viewInfo.getNodeLocations());
-    initCollapseRendering(viewInfo.getCollapseTreeModel());
+    renderer.setNodeNeighbors(nodeColorFactory.getJungGraph());
     initSelectedNodes(getSelectedNodes());
     initEdgeRendering();
+    prepareRenderOptions();
   }
 
   protected String edgeToolTip(GraphEdge edge) {
@@ -469,7 +431,7 @@ public class ViewEditor extends MultiPageEditorPart {
         viewInfo = loadViewDocument(viewFile);
         setPartName(calcPartName());
         setDirtyState(false);
-      } catch (IOException e) {
+      } catch (RuntimeException e) {
         viewFile = null;
         viewInfo = null;
         throw new PartInitException(
@@ -488,74 +450,27 @@ public class ViewEditor extends MultiPageEditorPart {
   private void deriveDetails() {
     // Synthesize derived graph perspectives
     viewGraph = viewInfo.buildGraphView();
-    updateExposedGraph();
 
     hierarchies = new HierarchyCache<NodeDisplayProperty>(
         getNodeDisplayPropertyProvider(),
         getViewGraph());
 
-    relationSetChoices = buildViewChoices(viewInfo);
-    elementKindChoices = ElementKindDescriptors.buildViewChoices(viewInfo);
-    edgeMatcherChoices = GraphEdgeMatcherDescriptors.buildViewChoices(viewInfo);
+    viewResources = viewInfo.getGraphResources();
 
-    ElementKindStats stats = new ElementKindStats(elementKindChoices);
-    stats.incrStats(viewInfo.getViewNodes());
-    elementKindStats = stats.createStats();
+    exposedGraph = buildExposedGraph();
 
-    jungGraph = buildJungGraph();
-    ranking = rankGraph(jungGraph);
+    nodeColorFactory = new NodeColorFactory(
+        exposedGraph, exposedGraph.getNodes());
+    nodeColorFactory.buildJungGraph();
   }
 
-  public List<RelationSetDescriptor> buildViewChoices(
-      ViewDocument viewInfo) {
-    // TODO: Better strategy for setting order of built-in relation sets.
-    return Lists.newArrayList(getBuiltinRelationSets());
-    // TODO: add project and temporary relation set descriptors, too.
+  private GraphModel buildExposedGraph() {
+    // TODO : refit with collapser
+    return viewGraph;
   }
 
-  /**
-   * Associate to each node a value based on it's "importance" in the graph.
-   * The selected algorithm is a Page Rank algorithm.
-   *
-   * The result is stored in the map {@link #ranking}.
-   */
-  @SuppressWarnings("unused") // Retained legacy code
-  private Map<GraphNode, Double> rankGraphX(
-          DirectedGraph<GraphNode, GraphEdge> graph) {
-
-    KStepMarkov<GraphNode, GraphEdge> ranker =
-        new KStepMarkov<GraphNode, GraphEdge>(graph, null, 6, null);
-    ranker.setRemoveRankScoresOnFinalize(false);
-    ranker.evaluate();
-
-    Map<GraphNode, Double> result = Maps.newHashMap();
-    for (GraphNode node : exposedGraph.getNodes()) {
-      result.put(node, ranker.getVertexRankScore(node));
-    }
-
-    return result;
-  }
-
-  private Map<GraphNode, Double> rankGraph(
-      DirectedGraph<GraphNode, GraphEdge> graph) {
-
-    Double unit = 1.0;
-    Map<GraphNode, Double> result = Maps.newHashMap();
-    for (GraphNode node : exposedGraph.getNodes()) {
-      result.put(node, unit);
-    }
-
-    return result;
-  }
-
-  private DirectedGraph<GraphNode, GraphEdge> buildJungGraph( ) {
-    LayoutContext context = new LayoutContext();
-    context.setGraphModel(getExposedGraph());
-    context.setMovableNodes(viewGraph.getNodes());
-    // TODO: Compute ranking based on selected edge matcher
-    context.setEdgeMatcher(com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptors.FORWARD);
-
-    return LayoutUtil.buildJungGraph(context);
+  private GraphModel getExposedGraph() {
+    return exposedGraph;
   }
 
   /**
@@ -588,6 +503,15 @@ public class ViewEditor extends MultiPageEditorPart {
 
   /////////////////////////////////////
   // Actions on the rendering system
+
+  public boolean isOptionChecked(String optionId) {
+    String value = viewInfo.getOption(optionId);
+    return OptionPreferences.isOptionChecked(optionId, value);
+  }
+
+  public void setOption(String optionId, String value) {
+    viewInfo.setOption(optionId, value);
+  }
 
   /**
    * Take a screenshot of the given view. Ask the user a filename, and use
@@ -647,22 +571,9 @@ public class ViewEditor extends MultiPageEditorPart {
   /**
    * Load a view document from a file.
    */
-  private static ViewDocument loadViewDocument(IFile viewFile)
-      throws IOException {
-    ObjectXmlPersist persist =
-        new ObjectXmlPersist(XStreamFactory.getSharedRefXStream());
-    return (ViewDocument) persist.load(viewFile.getRawLocationURI());
-  }
-
-  /**
-   * Save a view document to a file.
-   */
-  private static void saveViewDocument(IFile viewFile, ViewDocument viewInfo)
-      throws IOException {
-    XStream xstream = XStreamFactory.newStaxXStream();
-    XStreamFactory.configureRefXStream(xstream);
-    ObjectXmlPersist persist = new ObjectXmlPersist(xstream);
-    persist.save(viewFile.getRawLocationURI(), viewInfo);
+  private static ViewDocument loadViewDocument(IFile viewFile) {
+    ViewDocXmlPersist loader = ViewDocXmlPersist.build(true, "load");
+    return loader.load(viewFile.getLocationURI());
   }
 
   @Override
@@ -759,28 +670,8 @@ public class ViewEditor extends MultiPageEditorPart {
    * @throws IOException if the save is unsuccessful
    */
   private void saveFile(IFile file, IProgressMonitor monitor, String opLabel) {
-    if (null != monitor)
-      monitor.setTaskName("Writing file " + file.getName());
-
-    try {
-      saveViewDocument(file, viewInfo);
-    } catch (IOException err) {
-      logger.log(Level.SEVERE,
-          "Unable to " + opLabel + " " + file.getName(), err);
-      if (null != monitor)
-        monitor.setCanceled(true);
-    }
-
-    try {
-      // WEIRD:  refreshLocal() directly on the resource often works,
-      // but here we sometimes get a conflict.
-      file.refreshLocal(1, monitor);
-    } catch (CoreException errCore) {
-      logger.log(Level.WARNING,
-          "Failed resource refresh after " + opLabel + " to "
-              + file.getFullPath().toString(),
-          errCore);
-    }
+    ViewDocXmlPersist persist = ViewDocXmlPersist.build(false, opLabel);
+    WorkspaceTools.saveDocument(file, viewInfo, persist, monitor);
 
     setDirtyState(false);
   }
@@ -824,25 +715,6 @@ public class ViewEditor extends MultiPageEditorPart {
   // Provide standardized access to this view's
   // relation visibility
 
-  private final RelationCheckedRepository RELATION_VISIBLE_REPO =
-      new RelationCheckedRepository() {
-
-        @Override
-        public boolean getRelationChecked(Relation relation) {
-          return viewInfo.isVisibleRelation(relation);
-        }
-
-        @Override
-        public void setRelationChecked(Relation relation, boolean isChecked) {
-          viewInfo.setVisibleRelation(relation, isChecked);
-        }
-      
-  };
-
-  public RelationCheckedRepository getRelationVisibleRepo() {
-    return RELATION_VISIBLE_REPO;
-  }
-
   public boolean isVisibleRelation(Relation relation) {
     return viewInfo.isVisibleRelation(relation);
   }
@@ -854,25 +726,6 @@ public class ViewEditor extends MultiPageEditorPart {
   /////////////////////////////////////
   // Provide standardized access to this view's
   // edge property repository
-
-  // Only need one prop repo for this view editor
-  private final RelPropRepository EDGE_DISPLAY_PROP_REPO =
-      new RelPropRepository() {
-
-        @Override
-        public EdgeDisplayProperty getDisplayProperty(Relation rel) {
-          return getRelationProperty(rel);
-        }
-
-        @Override
-        public void setDisplayProperty(Relation rel, EdgeDisplayProperty prop) {
-          setRelationProperty(rel, prop);
-        }
-      };
-
-  public RelPropRepository getEdgeDisplayPropRepo() {
-    return EDGE_DISPLAY_PROP_REPO;
-  }
 
   /**
    * Provide an {@code EdgeDisplayProperty} for any {@code GraphEdge}.
@@ -958,64 +811,6 @@ public class ViewEditor extends MultiPageEditorPart {
       renderer.updateEdgeProperty(edge, relationProp);
 
     }
-  }
-
-  /////////////////////////////////////
-  // Collapsed presentations
-
-  public GraphModel getExposedGraph() {
-    return exposedGraph;
-  }
-
-  public CollapseTreeModel getCollapseTreeModel() {
-    return viewInfo.getCollapseTreeModel();
-  }
-
-  public void autoCollapse(
-      GraphEdgeMatcherDescriptor edgeMatcher, Object author) {
-    GraphData<NodeDisplayProperty> tree = hierarchies.getHierarchy(edgeMatcher);
-    TreeModel treeData = tree.getTreeModel();
-    collapseTree(treeData, author);
-  }
-
-  public void collapseTree(TreeModel treeData, Object author) {
-    viewInfo.collapseTree(getViewGraph(), treeData, author);
-  }
-
-  public void collapse(
-      GraphNode master, Collection<GraphNode> picked,
-      boolean erase, Object author) {
-    viewInfo.collapse(master, picked, erase, author);
-  }
-
-  public void uncollapse(
-      GraphNode master, Object author) {
-    viewInfo.uncollapse(master, author);
-  }
-
-  private void updateExposedGraph() {
-    exposedGraph = viewInfo.buildExposedGraph(viewGraph);
-  }
-
-  /**
-   * When a collapse node is removed
-   * (c.f. {@link #uncollapse(GraphNode, Object), above),
-   * propagate any collapse state to the children.
-   */
-  private void updateSelectedNodes(
-      Collection<CollapseData> removed, Object author) {
-    for (CollapseData data : removed) {
-      if (isSelected(data.getMasterNode())) {
-        Collection<GraphNode> childrenNodes = data.getChildrenNodes();
-        viewInfo.editSelectedNodes(
-            GraphNode.EMPTY_NODE_LIST, childrenNodes, author);
-      }
-    }
-  }
-
-  private void initCollapseRendering(CollapseTreeModel treeModel) {
-    renderer.updateCollapseChanges(
-        treeModel.computeDepthFirst(), CollapseData.EMPTY_LIST);
   }
 
   /////////////////////////////////////
@@ -1421,11 +1216,7 @@ public class ViewEditor extends MultiPageEditorPart {
 
   public GraphData<NodeDisplayProperty> getHierarchy(
       GraphEdgeMatcherDescriptor edgeMatcher) {
-    return hierarchies.getHierarchy(edgeMatcher);
-  }
-
-  public RelationCount.Settings getRelationCountData() {
-    return relationCountData;
+    return hierarchies.getHierarchy(edgeMatcher.getEdgeMatcher());
   }
 
   /**
@@ -1453,6 +1244,124 @@ public class ViewEditor extends MultiPageEditorPart {
 
   public ViewDocument buildNewViewDocument(Collection<GraphNode> nodes) {
     return viewInfo.newViewDocument(nodes);
+  }
+
+  /////////////////////////////////////
+  // Handle configuration and changes from options
+
+  private boolean getBooleanOption(String optionId) {
+    return Boolean.parseBoolean(viewInfo.getOption(optionId));
+  }
+
+  private void prepareRenderOptions() {
+    updateRootHighlight(
+        getBooleanOption(OptionPreferences.ROOTHIGHLIGHT_ID));
+    updateNodeStretchRatio(
+        getBooleanOption(OptionPreferences.STRETCHRATIO_ID));
+    updateNodeSize(
+        getBooleanOption(OptionPreferences.SIZE_ID));
+    updateNodeStrokeHighlight(
+        getBooleanOption(OptionPreferences.STROKEHIGHLIGHT_ID));
+    updateNodeShape(
+        getBooleanOption(OptionPreferences.SHAPE_ID));
+  }
+
+  private void handleOptionChange(String optionId, String value) {
+    markDirty();
+    if (OptionPreferences.ROOTHIGHLIGHT_ID.equals(optionId)) {
+      updateRootHighlight(Boolean.parseBoolean(value));
+      return;
+    }
+    if (OptionPreferences.STRETCHRATIO_ID.equals(optionId)) {
+      updateNodeStretchRatio(Boolean.parseBoolean(value));
+      return;
+    }
+    if (OptionPreferences.SIZE_ID.equals(optionId)) {
+      updateNodeSize(Boolean.parseBoolean(value));
+      return;
+    }
+    if (OptionPreferences.STROKEHIGHLIGHT_ID.equals(optionId)) {
+      updateNodeStrokeHighlight(Boolean.parseBoolean(value));
+      return;
+    }
+    if (OptionPreferences.SHAPE_ID.equals(optionId)) {
+      updateNodeShape(Boolean.parseBoolean(value));
+      return;
+    }
+    if (OptionPreferences.OPTION_DESCRIPTION.equals(optionId)) {
+      updateOptionDescription(value);
+      return;
+    }
+  }
+
+  private void updateRootHighlight(boolean enable) {
+    List<GraphNode> roots = nodeColorFactory.getRoots();
+    if (enable) {
+      Monochrome seedColor = new NodeColorSupplier.Monochrome(Color.GREEN);
+      for (GraphNode root : roots) {
+        renderer.setNodeColorSupplier(root, seedColor);
+      }
+      return;
+    }
+
+    for (GraphNode root : roots) {
+      renderer.setNodeColorSupplier(root, nodeColorFactory.getColorSupplier(root));
+    }
+    return;
+  }
+
+  private void updateNodeStretchRatio(boolean enable) {
+    if (enable) {
+      for (GraphNode node : getExposedGraph().getNodes()) {
+        renderer.setNodeRatioSupplier(node, nodeColorFactory.getRatioSupplier(node));
+      }
+      return;
+    }
+
+    for (GraphNode node : getExposedGraph().getNodes()) {
+      renderer.setNodeRatioSupplier(node, NodeRatioSupplier.FULL);
+    }
+  }
+
+  private void updateNodeSize(boolean enable) {
+    if (enable) {
+      for (GraphNode node : getExposedGraph().getNodes()) {
+        NodeSizeSupplier size = nodeColorFactory.getSizeSupplier(node);
+        renderer.setNodeSizeSupplier(node, size);
+      }
+      return;
+    }
+
+    for (GraphNode node : getExposedGraph().getNodes()) {
+      renderer.setNodeSizeSupplier(node, NodeSizeSupplier.STANDARD);
+    }
+  }
+
+  private void updateNodeShape(boolean enable) {
+    if (enable) {
+      for (GraphNode node : getExposedGraph().getNodes()) {
+        NodeShape mode;
+        NodeShapeSupplier nodeShape =
+            nodeColorFactory.getShapeSupplier(node, mode);
+        renderer.setNodeShapeSupplier(node, nodeShape);
+      }
+      return;
+    }
+
+    for (GraphNode node : getExposedGraph().getNodes()) {
+      renderer.setNodeShapeSupplier(node, NodeShapeSupplier.STANDARD);
+    }
+  }
+
+
+  private void updateNodeStrokeHighlight(boolean enable) {
+    renderer.setNodeStrokeHighlight(enable);
+  }
+
+  private void updateOptionDescription(String value) {
+    // No need to update name member.
+    // That might cause an update loop.
+    // Just the markDirty() from the main handler method.
   }
 
   /////////////////////////////////////
@@ -1513,6 +1422,7 @@ public class ViewEditor extends MultiPageEditorPart {
       markDirty();
     }
 
+/* TODO
     @Override
     public void collapseChanged(
         Collection<CollapseData> created,
@@ -1523,6 +1433,7 @@ public class ViewEditor extends MultiPageEditorPart {
       renderer.updateCollapseChanges(created, removed);
       markDirty();
     }
+*/
 
     @Override
     public void nodeLocationsSet(Map<GraphNode, Point2D> newLocations) {
@@ -1551,10 +1462,8 @@ public class ViewEditor extends MultiPageEditorPart {
     }
 
     @Override
-    public void descriptionChanged(String description) {
-      // TODO(leeca): update description widget, if it is not the source
-      // of the change.
-      markDirty();
+    public void optionChanged(String optionId, String value) {
+      handleOptionChange(optionId, value);
     }
   }
 

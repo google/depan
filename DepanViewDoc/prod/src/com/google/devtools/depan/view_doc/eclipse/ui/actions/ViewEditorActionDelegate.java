@@ -17,10 +17,8 @@ package com.google.devtools.depan.view_doc.eclipse.ui.actions;
 
 import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds;
 import com.google.devtools.depan.eclipse.preferences.PreferencesIds;
-import com.google.devtools.depan.eclipse.visualization.layout.JungLayoutGenerator;
-import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerator;
-import com.google.devtools.depan.eclipse.visualization.layout.TreeLayoutGenerator;
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
+import com.google.devtools.depan.view_doc.model.OptionPreferences;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.action.IAction;
@@ -42,18 +40,6 @@ public class ViewEditorActionDelegate implements IEditorActionDelegate {
       "com.google.devtools.depan.eclipse.actions.view.SetTreeLayout";
   public static final String RADIALLAYOUT_ID =
       "com.google.devtools.depan.eclipse.actions.view.SetRadialLayout";
-
-  // rendering options
-  public static final String ROOTHIGHLIGHT_ID =
-      "com.google.devtools.depan.eclipse.actions.view.RootHighlight";
-  public static final String SHAPE_ID =
-      "com.google.devtools.depan.eclipse.actions.view.Shape";
-  public static final String STRETCHRATIO_ID =
-      "com.google.devtools.depan.eclipse.actions.view.StretchRatio";
-  public static final String SIZE_ID =
-      "com.google.devtools.depan.eclipse.actions.view.Size";
-  public static final String STROKEHIGHLIGHT_ID =
-      "com.google.devtools.depan.eclipse.actions.view.StrokeHighlight";
 
   // selections
   public static final String SUBLAYOUT_ID =
@@ -103,16 +89,16 @@ public class ViewEditorActionDelegate implements IEditorActionDelegate {
       applyLayout(TreeLayoutGenerator.NewRadialLayoutBuilder);
 
     // visualization options
-    } else if (id.equals(ROOTHIGHLIGHT_ID)) {
-      action.setChecked(togglePref(NodePreferencesIds.NODE_ROOT_HIGHLIGHT_ON, false));
-    } else if (id.equals(STRETCHRATIO_ID)) {
-      action.setChecked(togglePref(NodePreferencesIds.NODE_RATIO_ON, false));
-    } else if (id.equals(SIZE_ID)) {
-      action.setChecked(togglePref(NodePreferencesIds.NODE_SIZE_ON, false));
-    } else if (id.equals(STROKEHIGHLIGHT_ID)) {
-      action.setChecked(togglePref(NodePreferencesIds.NODE_STROKE_HIGHLIGHT_ON, true));
-    } else if (id.equals(SHAPE_ID)) {
-      action.setChecked(togglePref(NodePreferencesIds.NODE_SHAPE_ON, true));
+    } else if (id.equals(OptionPreferences.ROOTHIGHLIGHT_ID)) {
+      toggleOptions(action, OptionPreferences.ROOTHIGHLIGHT_ID);
+    } else if (id.equals(OptionPreferences.STRETCHRATIO_ID)) {
+      toggleOptions(action, OptionPreferences.STRETCHRATIO_ID);
+    } else if (id.equals(OptionPreferences.SIZE_ID)) {
+      toggleOptions(action, OptionPreferences.SIZE_ID);
+    } else if (id.equals(OptionPreferences.STROKEHIGHLIGHT_ID)) {
+      toggleOptions(action, OptionPreferences.STROKEHIGHLIGHT_ID);
+    } else if (id.equals(OptionPreferences.SHAPE_ID)) {
+      toggleOptions(action, OptionPreferences.SHAPE_ID);
 
     // others
     } else if (id.equals(SCREENSHOT_ID)) {
@@ -129,36 +115,18 @@ public class ViewEditorActionDelegate implements IEditorActionDelegate {
   /////////////////////////////////////
 
   private void updateState(IAction action) {
-    String id = action.getId();
-    boolean checked = false;
-    if (id.equals(ROOTHIGHLIGHT_ID)) {
-      checked = isChecked(NodePreferencesIds.NODE_ROOT_HIGHLIGHT_ON, false);
-    } else if (id.equals(STRETCHRATIO_ID)) {
-      checked = isChecked(NodePreferencesIds.NODE_RATIO_ON, false);
-    } else if (id.equals(SIZE_ID)) {
-      checked = isChecked(NodePreferencesIds.NODE_SIZE_ON, false);
-    } else if (id.equals(STROKEHIGHLIGHT_ID)) {
-      checked = isChecked(NodePreferencesIds.NODE_STROKE_HIGHLIGHT_ON, true);
-    } else if (id.equals(SHAPE_ID)) {
-      checked = isChecked(NodePreferencesIds.NODE_SHAPE_ON, true);
-    }
+    String optionId = action.getId();
+    boolean checked = targetEditor.isOptionChecked(optionId);
     action.setChecked(checked);
+  }
+
+  private void toggleOptions(IAction action, String optionId) {
+    boolean checked = targetEditor.isOptionChecked(optionId);
+    targetEditor.setOption(optionId, OptionPreferences.notValue(checked));
+    action.setChecked(!checked);
   }
 
   private void applyLayout(LayoutGenerator layout) {
     targetEditor.applyLayout(layout);
-  }
-
-  private boolean isChecked(String prefId, boolean defaultValue) {
-    IEclipsePreferences node = PreferencesIds.getInstanceNode();
-    boolean result = node.getBoolean(prefId, defaultValue);
-    return result;
-  }
-
-  private boolean togglePref(String prefId, boolean defaultValue) {
-    IEclipsePreferences node = PreferencesIds.getInstanceNode();
-    boolean result = !node.getBoolean(prefId, defaultValue);
-    node.putBoolean(prefId, result);
-    return result;
   }
 }

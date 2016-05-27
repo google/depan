@@ -27,6 +27,7 @@ import com.google.devtools.depan.eclipse.visualization.plugins.impl.LayoutShortc
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeColorPlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeLabelPlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeShapePlugin;
+import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeRatioPlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeSizePlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeStrokePlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.SteperPlugin;
@@ -69,31 +70,31 @@ public class RenderingPipe {
   private LayoutShortcutsPlugin shortcuts;
   private LayoutPlugin layout;
   private CollapsePlugin collapse;
-  private NodeColorPlugin<GraphEdge> nodeColors;
+  private NodeColorPlugin nodeColors;
   private EdgeColorPlugin edgeColors;
   private SteperPlugin stepper;
   private DrawingPlugin drawing;
   private FactorPlugin factor;
-  private NodeSizePlugin<GraphEdge> nodeSize;
-  private NodeStrokePlugin<GraphEdge> nodeStroke;
-  private NodeShapePlugin<GraphEdge> nodeShape;
+  private NodeRatioPlugin nodeRatio;
+  private NodeSizePlugin nodeSize;
+  private NodeStrokePlugin nodeStroke;
+  private NodeShapePlugin nodeShape;
   private NodeLabelPlugin nodeLabel;
   private EdgeLabelPlugin edgeLabel;
 
-  public RenderingPipe(GLPanel panel,
-      Graph<GraphNode, GraphEdge> jungGraph, 
-      Map<GraphNode, Double> nodeRanking) {
+  public RenderingPipe(GLPanel panel) {
 
     shortcuts = new LayoutShortcutsPlugin(panel);
     layout = new LayoutPlugin();
-    nodeColors = new NodeColorPlugin<GraphEdge>(jungGraph, nodeRanking);
+    nodeColors = new NodeColorPlugin();
     edgeColors = new EdgeColorPlugin();
     stepper = new SteperPlugin();
     drawing = new DrawingPlugin(panel);
     factor = new FactorPlugin(panel);
-    nodeSize = new NodeSizePlugin<GraphEdge>(jungGraph, nodeRanking);
-    nodeStroke = new NodeStrokePlugin<GraphEdge>(panel, jungGraph);
-    nodeShape = new NodeShapePlugin<GraphEdge>(jungGraph);
+    nodeRatio = new NodeRatioPlugin();
+    nodeSize = new NodeSizePlugin();
+    nodeStroke = new NodeStrokePlugin(panel);
+    nodeShape = new NodeShapePlugin();
     nodeLabel = new NodeLabelPlugin();
     edgeLabel = new EdgeLabelPlugin();
     collapse = new CollapsePlugin();
@@ -108,6 +109,7 @@ public class RenderingPipe {
     nodesP.add(collapse);
     nodesP.add(nodeColors);
     nodesP.add(nodeSize);
+    nodesP.add(nodeRatio);
     nodesP.add(nodeStroke);
     nodesP.add(nodeShape);
     nodesP.add(nodeLabel);
@@ -199,7 +201,7 @@ public class RenderingPipe {
     return layout;
   }
 
-  public NodeColorPlugin<GraphEdge> getNodeColors() {
+  public NodeColorPlugin getNodeColors() {
     return nodeColors;
   }
 
@@ -219,15 +221,19 @@ public class RenderingPipe {
     return factor;
   }
 
-  public NodeSizePlugin<GraphEdge> getNodeSize() {
+  public NodeSizePlugin getNodeSize() {
     return nodeSize;
   }
 
-  public NodeStrokePlugin<GraphEdge> getNodeStroke() {
+  public NodeRatioPlugin getNodeRatio() {
+    return nodeRatio;
+  }
+
+  public NodeStrokePlugin getNodeStroke() {
     return nodeStroke;
   }
 
-  public NodeShapePlugin<GraphEdge> getNodeShape() {
+  public NodeShapePlugin getNodeShape() {
     return nodeShape;
   }
 

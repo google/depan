@@ -29,7 +29,7 @@ import com.google.devtools.depan.eclipse.visualization.ogl.RenderingPipe;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeColorPlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeLabelPlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeShapePlugin;
-import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeSizePlugin;
+import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeRatioPlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeStrokePlugin;
 import com.google.devtools.depan.model.GraphEdge;
 
@@ -74,7 +74,7 @@ public class RendererPreferences implements IPreferenceChangeListener {
     return getRenderingPipe().getNodeStroke();
   }
 
-  private NodeSizePlugin<GraphEdge> getNodeSize() {
+  private NodeRatioPlugin<GraphEdge> getNodeSize() {
     return getRenderingPipe().getNodeSize();
   }
 
@@ -118,7 +118,7 @@ public class RendererPreferences implements IPreferenceChangeListener {
     boolean rootHighlight = node.getBoolean(
         NodePreferencesIds.NODE_ROOT_HIGHLIGHT_ON, false);
 
-    NodeSizePlugin<GraphEdge> nodeSize = getNodeSize();
+    NodeRatioPlugin<GraphEdge> nodeSize = getNodeSize();
     NodeColorPlugin<GraphEdge> nodeColor = getNodeColor();
     NodeShapePlugin<GraphEdge> nodeShape = getNodeShape();
     NodeStrokePlugin<GraphEdge> nodeStroke = getNodeStroke();

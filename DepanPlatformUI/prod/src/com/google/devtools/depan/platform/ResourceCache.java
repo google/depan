@@ -74,11 +74,9 @@ public class ResourceCache implements IResourceChangeListener {
     return loader.load(file.getRawLocationURI());
   }
 
-  public static void saveGraphDocument(IFile file, GraphDocument graph)
-      throws CoreException {
-    GraphModelXmlPersist loader = GraphModelXmlPersist.build(false);
-    loader.save(file.getRawLocationURI(), graph);
-    file.refreshLocal(IResource.DEPTH_ZERO, null);
+  public static void saveGraphDocument(IFile file, GraphDocument graph) {
+    GraphModelXmlPersist persist = GraphModelXmlPersist.build(false);
+    WorkspaceTools.saveDocument(file, graph, persist, null);
   }
 
   /**

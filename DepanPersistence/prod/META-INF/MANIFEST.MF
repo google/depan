@@ -8,7 +8,8 @@ Require-Bundle: com.google.guava,
  com.google.devtools.depan.core,
  depan-xstream-library,
  org.eclipse.core.runtime,
- com.google.devtools.depan.platform
+ com.google.devtools.depan.platform,
+ org.eclipse.core.resources
 Bundle-ClassPath: .
 Export-Package: com.google.devtools.depan.persistence,
  com.google.devtools.depan.persistence.plugins

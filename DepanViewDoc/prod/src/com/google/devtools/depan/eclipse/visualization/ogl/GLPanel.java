@@ -17,7 +17,6 @@
 package com.google.devtools.depan.eclipse.visualization.ogl;
 
 import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds;
-import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerator;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
@@ -136,16 +135,22 @@ public class GLPanel extends GLScene {
     refresher.setName("OGL " + threadLabel);
   }
 
+  /**
+   * As part of establishing the {@link GraphModel} for the {@link GLPanel},
+   * this method allocates all of the node and edge rendering properties
+   * that will be used once the canvas rendering is active.
+   * 
+   * This method should be called first after the constructor is invoked
+   * to ensure that all rendering data structures are in place.
+   */
   public void setGraphModel(
-      GraphModel viewGraph,
-      Graph<GraphNode, GraphEdge> jungGraph,
-      Map<GraphNode, Double> nodeRanking) {
+      GraphModel viewGraph) {
 
     this.viewGraph = viewGraph;
     prepareResources();
 
     selectBuffer = allocSelectBuffer();
-    renderer = new RenderingPipe(this, jungGraph, nodeRanking);
+    renderer = new RenderingPipe(this);
   }
 
   /**
@@ -500,6 +505,39 @@ public class GLPanel extends GLScene {
   }
 
   /**
+   * Sets the color of the given node.
+   *
+   * @param node Node whose color is updated on graph.
+   * @param newNodeColor The new color of this node.
+   */
+  public void setNodeColorSupplier(GraphNode node, NodeColorSupplier supplier) {
+    NodeRenderingProperty nodeProperty = node2property(node);
+    renderer.getNodeColors().setColorSupplier(nodeProperty, supplier);
+  }
+
+  /**
+   * Sets the color of the given node.
+   *
+   * @param node Node whose color is updated on graph.
+   * @param newNodeColor The new color of this node.
+   */
+  public void setNodeRatioSupplier(GraphNode node, NodeRatioSupplier supplier) {
+    NodeRenderingProperty nodeProperty = node2property(node);
+    renderer.getNodeRatio().setRatioSupplier(nodeProperty, supplier);
+  }
+
+  /**
+   * Sets the color of the given node.
+   *
+   * @param node Node whose color is updated on graph.
+   * @param newNodeColor The new color of this node.
+   */
+  public void setNodeShapeSupplier(GraphNode node, NodeShapeSupplier supplier) {
+    NodeRenderingProperty nodeProperty = node2property(node);
+    renderer.getNodeShape().setShapeSupplier(nodeProperty, supplier);
+  }
+
+  /**
    * Sets how the size of this node is determined with the given size model.
    *
    * @param node Node whose size model is modified.
@@ -513,6 +551,17 @@ public class GLPanel extends GLScene {
   }
 
   /**
+   * Sets the color of the given node.
+   *
+   * @param node Node whose color is updated on graph.
+   * @param newNodeColor The new color of this node.
+   */
+  public void setNodeSizeSupplier(GraphNode node, NodeSizeSupplier supplier) {
+    NodeRenderingProperty nodeProperty = node2property(node);
+    renderer.getNodeSize().setNodeSizeSupplier(nodeProperty, supplier);
+  }
+
+  /**
    * Sets if a node is visible.
    *
    * @param node Node whose visibility is modified.
@@ -521,6 +570,15 @@ public class GLPanel extends GLScene {
   public void setNodeVisible(GraphNode node, boolean isVisible) {
     node2property(node).isVisible = isVisible;
   }
+
+  public void setNodeNeighbors(Graph<GraphNode, GraphEdge> jungGraph) {
+    renderer.getNodeStroke().setNodeNeighbors(jungGraph);
+  }
+
+  public void activateNodeStroke(boolean value) {
+    renderer.getNodeStroke().activate(value);
+  }
+
 
   ///////////////////////
   // Modifying selection

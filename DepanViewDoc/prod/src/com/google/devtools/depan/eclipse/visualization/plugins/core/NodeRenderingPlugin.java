@@ -46,4 +46,30 @@ public interface NodeRenderingPlugin extends Plugin {
    * the pipe, <code>false</code> otherwise.
    */
   void dryRun(NodeRenderingProperty p);
+
+  /**
+   * Provide default, do nothing, implementation for most
+   * {@link NodeRenderingPlugin} methods.  Simple plugins only need to
+   * implement the {@link #apply(NodeRenderingProperty)} method.
+   */
+  public static abstract class Simple implements NodeRenderingPlugin {
+
+    @Override
+    public void preFrame(float elapsedTime) {
+    }
+
+    @Override
+    public void postFrame() {
+    }
+
+    @Override
+    public boolean keyPressed(int keycode, char character, boolean ctrl,
+        boolean alt, boolean shift) {
+      return false;
+    }
+
+    @Override
+    public void dryRun(NodeRenderingProperty p) {
+    }
+  }
 }

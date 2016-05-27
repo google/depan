@@ -16,24 +16,27 @@
 
 package com.google.devtools.depan.eclipse.visualization;
 
-import com.google.devtools.depan.eclipse.editors.CameraDirPreference;
-import com.google.devtools.depan.eclipse.editors.CameraPosPreference;
-import com.google.devtools.depan.eclipse.editors.EdgeDisplayProperty;
-import com.google.devtools.depan.eclipse.editors.EdgeDisplayProperty.LineStyle;
-import com.google.devtools.depan.eclipse.editors.NodeDisplayProperty;
-import com.google.devtools.depan.eclipse.editors.NodeDisplayProperty.Size;
-import com.google.devtools.depan.eclipse.editors.ScenePreferences;
-import com.google.devtools.depan.eclipse.editors.ViewEditor;
 import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds;
-import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerator;
 import com.google.devtools.depan.eclipse.visualization.ogl.ArrowHead;
 import com.google.devtools.depan.eclipse.visualization.ogl.GLPanel;
+import com.google.devtools.depan.eclipse.visualization.ogl.NodeColorSupplier;
+import com.google.devtools.depan.eclipse.visualization.ogl.NodeColorSupplier.Monochrome;
+import com.google.devtools.depan.eclipse.visualization.ogl.NodeRatioSupplier;
+import com.google.devtools.depan.eclipse.visualization.ogl.NodeShapeSupplier;
+import com.google.devtools.depan.eclipse.visualization.ogl.NodeSizeSupplier;
 import com.google.devtools.depan.eclipse.visualization.ogl.RendererChangeListener;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.CollapsePlugin;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.view.CollapseData;
+import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
+import com.google.devtools.depan.view_doc.model.CameraDirPreference;
+import com.google.devtools.depan.view_doc.model.CameraPosPreference;
+import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty;
+import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty.LineStyle;
+import com.google.devtools.depan.view_doc.model.NodeDisplayProperty;
+import com.google.devtools.depan.view_doc.model.NodeDisplayProperty.Size;
+import com.google.devtools.depan.view_doc.model.ScenePreferences;
 
 import edu.uci.ics.jung.graph.Graph;
 
@@ -107,13 +110,10 @@ public class View {
     }
   }
 
-  public void setGraphModel(
-      GraphModel viewGraph,
-      Graph<GraphNode, GraphEdge> jungGraph,
-      Map<GraphNode, Double> nodeRanking) {
+  public void setGraphModel(GraphModel viewGraph) {
 
     // Creates the rendering pipe
-    glPanel.setGraphModel(viewGraph, jungGraph, nodeRanking);
+    glPanel.setGraphModel(viewGraph);
 
     prefUpdater = RendererPreferences.preparePreferences(glPanel);
   }
@@ -197,31 +197,6 @@ public class View {
 
   /////////////////////////////////////
   // Rendering support
-
-  public void updateCollapseChanges(
-      Collection<CollapseData> created,
-      Collection<CollapseData> removed) {
-    CollapsePlugin collapsePlugin =
-        glPanel.getRenderingPipe().getCollapsePlugin();
-
-    for (CollapseData data : removed) {
-      // uncollapse every children
-      for (GraphNode child : data.getChildrenNodes()) {
-        collapsePlugin.unCollapse(
-            glPanel.node2property(child),
-            glPanel.node2property(data.getMasterNode()));
-      }
-    }
-
-    for (CollapseData data : created) {
-      // collapse each child under the parent
-      for (GraphNode child : data.getChildrenNodes()) {
-        collapsePlugin.collapseUnder(
-            glPanel.node2property(child),
-            glPanel.node2property(data.getMasterNode()));
-      }
-    }
-  }
 
   public void initializeNodeLocations(Map<GraphNode, Point2D> locations) {
     glPanel.initializeNodeLocations(locations);
@@ -373,6 +348,30 @@ public class View {
     setCameraPosition(prefs.getCameraPos());
     setCameraDirection(prefs.getCameraDir());
     glPanel.clearChanges();
+  }
+
+  public void setNodeColorSupplier(GraphNode node, NodeColorSupplier supplier) {
+    glPanel.setNodeColorSupplier(node, supplier);
+  }
+
+  public void setNodeRatioSupplier(GraphNode node, NodeRatioSupplier supplier) {
+    glPanel.setNodeRatioSupplier(node, supplier);
+  }
+
+  public void setNodeSizeSupplier(GraphNode node, NodeSizeSupplier supplier) {
+    glPanel.setNodeSizeSupplier(node, supplier);
+  }
+
+  public void setNodeShapeSupplier(GraphNode node, NodeShapeSupplier supplier) {
+    glPanel.setNodeShapeSupplier(node, supplier);
+  }
+
+  public void setNodeStrokeHighlight(boolean enable) {
+    glPanel.setNodeStrokeHighlight(enable);
+  }
+
+  public void setNodeNeighbors(Graph<GraphNode, GraphEdge> jungGraph) {
+    glPanel.setNodeNeighbors(jungGraph);
   }
 
   /////////////////////////////////////

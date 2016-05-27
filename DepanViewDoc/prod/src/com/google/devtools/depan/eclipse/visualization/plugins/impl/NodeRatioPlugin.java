@@ -16,36 +16,31 @@
 
 package com.google.devtools.depan.eclipse.visualization.plugins.impl;
 
+import com.google.devtools.depan.eclipse.visualization.ogl.NodeRatioSupplier;
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeRenderingProperty;
-import com.google.devtools.depan.eclipse.visualization.ogl.NodeSizeSupplier;
 import com.google.devtools.depan.eclipse.visualization.plugins.core.NodeRenderingPlugin;
 
 /**
  * A plugin that modifies node size and ratio.
  *
  * @author Yohann Coppel
- *
  */
-public class NodeSizePlugin extends NodeRenderingPlugin.Simple {
+public class NodeRatioPlugin extends NodeRenderingPlugin.Simple {
 
   @Override
   public boolean apply(NodeRenderingProperty p) {
-    NodeSizeSupplier supplier = (NodeSizeSupplier) p.pluginStore.get(this);
+    NodeRatioSupplier supplier = (NodeRatioSupplier) p.pluginStore.get(this);
 
-    // size
-    if (p.overriddenSize != null) {
-      p.targetSize = supplier.getOverridenSize(p.overriddenSize);
-    } else {
-      p.targetSize = supplier.getSize();
-    }
+    // ratio
+    p.targetRatio = supplier.getRatio();
     return true;
   }
 
   /////////////////////////////////////
   // size
 
-  public void setNodeSizeSupplier(
-      NodeRenderingProperty p, NodeSizeSupplier supplier) {
+  public void setRatioSupplier(
+      NodeRenderingProperty p, NodeRatioSupplier supplier) {
     p.pluginStore.put(this, supplier);
   }
 }

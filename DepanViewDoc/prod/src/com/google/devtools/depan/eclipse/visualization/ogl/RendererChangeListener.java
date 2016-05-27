@@ -16,9 +16,8 @@
 
 package com.google.devtools.depan.eclipse.visualization.ogl;
 
-import com.google.devtools.depan.eclipse.editors.ViewEditor;
-import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerator;
 import com.google.devtools.depan.model.GraphNode;
+import com.google.devtools.depan.view_doc.layout.LayoutGenerator;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;

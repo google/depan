@@ -40,7 +40,7 @@ import com.google.devtools.depan.eclipse.visualization.plugins.core.NodeRenderin
  * the screen</li>
  * </ul>
  */
-public class FactorPlugin implements NodeRenderingPlugin {
+public class FactorPlugin extends NodeRenderingPlugin.Simple {
 
   private final GLPanel panel;
 
@@ -73,20 +73,5 @@ public class FactorPlugin implements NodeRenderingPlugin {
       return true;
     }
     return false;
-  }
-
-  @Override
-  public void postFrame() {
-    // nothing to do
-  }
-
-  @Override
-  public void preFrame(float elapsedTime) {
-    // nothing to do
-  }
-
-  @Override
-  public void dryRun(NodeRenderingProperty p) {
-    // nothing to do
   }
 }

@@ -23,11 +23,9 @@ import com.google.devtools.depan.matchers.eclipse.ui.widgets.ModificationListene
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.matchers.persistence.EdgeMatcherDocXmlPersist;
 import com.google.devtools.depan.model.GraphEdgeMatcher;
-import com.google.devtools.depan.persistence.PersistenceLogger;
 import com.google.devtools.depan.platform.WorkspaceTools;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
@@ -45,8 +43,6 @@ import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.dialogs.SaveAsDialog;
 import org.eclipse.ui.part.EditorPart;
-
-import java.net.URI;
 
 /**
  * Based on a legacy version of {@code NamedRelationshipEditor}.
@@ -131,23 +127,10 @@ public class GraphEdgeMatcherEditor extends EditorPart {
    * @param monitor
    */
   private void persistDocument(IProgressMonitor monitor) {
-    URI location = file.getRawLocationURI();
-    try {
-      EdgeMatcherDocXmlPersist persist = EdgeMatcherDocXmlPersist.build(false);
-      persist.save(location, matcherInfo);
+    EdgeMatcherDocXmlPersist persist = EdgeMatcherDocXmlPersist.build(false);
+    WorkspaceTools.saveDocument(file, matcherInfo, persist, monitor);
 
-      setDirtyState(false);
-
-      // touch the file, to notify listeners about the changes
-      file.touch(monitor);
-    } catch (CoreException err) {
-      if (null != monitor) {
-        monitor.setCanceled(true);
-      }
-      PersistenceLogger.logException(
-          "Unable to save named relationship to " + location,
-          err);
-    }
+    setDirtyState(false);
   }
 
   private String buildPartName() {

@@ -17,9 +17,11 @@
 package com.google.devtools.depan.eclipse.visualization.plugins.impl;
 
 import com.google.common.collect.Lists;
+
 import com.google.devtools.depan.eclipse.visualization.ogl.GLPanel;
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeRenderingProperty;
 import com.google.devtools.depan.eclipse.visualization.plugins.core.NodeRenderingPlugin;
+import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphNode;
 
 import edu.uci.ics.jung.graph.Graph;
@@ -32,30 +34,30 @@ import java.util.List;
  * @author Yohann Coppel
  *
  */
-public class NodeStrokePlugin<E> implements NodeRenderingPlugin {
+public class NodeStrokePlugin extends NodeRenderingPlugin.Simple {
+
+  protected static final float HEAVY = 3.0f;
+  protected static final float MEDIUM = 2.0f;
+  protected static final float LIGHT = 1.0f;
+
+  protected final GLPanel view;
+
+  protected Graph<GraphNode, GraphEdge> jungGraph;
 
   /**
    * Say if node stroke should highlight the selection state.
    */
   protected boolean highlight = true;
 
-  protected final Graph<GraphNode, E> graph;
-  protected final GLPanel view;
-
-  protected static final float HEAVY = 3.0f;
-  protected static final float MEDIUM = 2.0f;
-  protected static final float LIGHT = 1.0f;
-
-  public NodeStrokePlugin(GLPanel view, Graph<GraphNode, E> graph) {
+  public NodeStrokePlugin(GLPanel view) {
     this.view = view;
-    this.graph = graph;
   }
 
   @Override
   public void dryRun(NodeRenderingProperty p) {
     // during the dry run, store a list of neighbors in the node properties.
     List<NodeRenderingProperty> props = Lists.newArrayList();
-    for (GraphNode node : graph.getNeighbors(p.node)) {
+    for (GraphNode node : jungGraph.getNeighbors(p.node)) {
       props.add(view.node2property(node));
     }
     p.pluginStore.put(this, props);
@@ -63,47 +65,29 @@ public class NodeStrokePlugin<E> implements NodeRenderingPlugin {
 
   @Override
   public boolean apply(NodeRenderingProperty p) {
-    if (!highlight) {
-      p.targetStrokeWidth = LIGHT;
-      return true;
-    }
-
-    if (p.isSelected()) {
-      p.targetStrokeWidth = HEAVY;
-    } else {
-      boolean neighborIsSelected = false;
-
-      @SuppressWarnings("unchecked")
-      List<NodeRenderingProperty> neighbors =
-        (List<NodeRenderingProperty>) p.pluginStore.get(this);
-      for (NodeRenderingProperty n : neighbors) {
-        if (n.isSelected()) {
-          neighborIsSelected = true;
-          break;
-        }
-      }
-
-      if (neighborIsSelected) {
-        p.targetStrokeWidth = MEDIUM;
-      } else {
-        p.targetStrokeWidth = LIGHT;
-      }
-    }
+    p.targetStrokeWidth = getStrokeWidth(p);
     return true;
   }
 
-  @Override
-  public boolean keyPressed(int keycode, char character, boolean ctrl,
-      boolean alt, boolean shift) {
-    return false;
-  }
+  private float getStrokeWidth(NodeRenderingProperty p) {
+    if (!highlight) {
+      return LIGHT;
+    }
 
-  @Override
-  public void postFrame() {
-  }
+    if (p.isSelected()) {
+      return HEAVY;
+    }
 
-  @Override
-  public void preFrame(float elapsedTime) {
+    @SuppressWarnings("unchecked")
+    List<NodeRenderingProperty> neighbors =
+        (List<NodeRenderingProperty>) p.pluginStore.get(this);
+    for (NodeRenderingProperty n : neighbors) {
+      if (n.isSelected()) {
+        return MEDIUM;
+      }
+    }
+
+    return LIGHT;
   }
 
   //////////////////////
@@ -113,12 +97,7 @@ public class NodeStrokePlugin<E> implements NodeRenderingPlugin {
     highlight = on;
   }
 
-  public boolean isActivated() {
-    return highlight;
-  }
-
-  public boolean toggle() {
-    highlight = !highlight;
-    return highlight;
+  public void setNodeNeighbors(Graph<GraphNode, GraphEdge> jungGraph) {
+    this.jungGraph = jungGraph;
   }
 }

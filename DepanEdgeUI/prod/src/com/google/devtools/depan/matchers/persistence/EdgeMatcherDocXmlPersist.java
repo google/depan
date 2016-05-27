@@ -21,7 +21,7 @@ import com.google.devtools.depan.persistence.AbstractDocXmlPersist;
 import com.google.devtools.depan.persistence.ObjectXmlPersist;
 import com.google.devtools.depan.persistence.XStreamFactory;
 
-import com.thoughtworks.xstream.XStream;
+import java.net.URI;
 
 /**
  * Provide easy to use load and save methods for {@link GraphEdgeMatcherDescriptor}s.
@@ -38,16 +38,26 @@ public class EdgeMatcherDocXmlPersist
     super(xmlPersist);
   }
 
+  public static EdgeMatcherDocXmlPersist build(boolean readable) {
+    ObjectXmlPersist persist = XStreamFactory.build(readable, docConfig);
+    return new EdgeMatcherDocXmlPersist(persist);
+  }
+
+  /////////////////////////////////////
+  // Hook method implementations for AbstractDocXmlPersist
+
   @Override
   protected GraphEdgeMatcherDescriptor coerceLoad(Object load) {
       return (GraphEdgeMatcherDescriptor) load;
   }
 
-  public static EdgeMatcherDocXmlPersist build(boolean readable) {
-    XStream xstream = XStreamFactory.newXStream(readable);
-    XStreamFactory.configureXStream(xstream);
-    docConfig.config(xstream);
-    ObjectXmlPersist persist = new ObjectXmlPersist(xstream);
-    return new EdgeMatcherDocXmlPersist(persist);
+  @Override
+  protected String logLoadException(URI uri, Exception err) {
+    return logException("Unable to load EdgeMatcher from {0}", uri, err);
+  }
+
+  @Override
+  public String logSaveException(URI uri, Exception err) {
+    return logException("Unable to save EdgeMatcher to {0}", uri, err);
   }
 }

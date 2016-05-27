@@ -16,6 +16,8 @@
 
 package com.google.devtools.depan.platform;
 
+import com.google.devtools.depan.persistence.AbstractDocXmlPersist;
+
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -24,11 +26,14 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.dialogs.ContainerSelectionDialog;
+
+import java.net.URI;
 
 /**
  * A utility class that provides static methods for manipulating Eclipse
@@ -208,4 +213,23 @@ public final class WorkspaceTools {
     // Fall back to the bare filename
     return newFilename;
   }
-}
+
+  /**
+   * Can't be part of {@link AbstractDocXmlPersist}, due to UI elements
+   * {@code monitor} and {@code file.touch()}.
+   */
+  public static <T> void saveDocument(
+      IFile file, T docInfo,
+      AbstractDocXmlPersist<T> persist,
+      IProgressMonitor monitor) {
+    URI location = file.getLocationURI();
+    try {
+      persist.save(location, docInfo);
+      file.touch(monitor);
+    } catch (Exception err) {
+      if (null != monitor) {
+        monitor.setCanceled(true);
+      }
+      persist.logSaveException(location, err);
+    }
+  }}

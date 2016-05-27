@@ -16,12 +16,16 @@
 
 package com.google.devtools.depan.view_doc.model;
 
+import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeTreeProvider;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.api.RelationSet;
+import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.RelationSets;
+import com.google.devtools.depan.platform.ListenerManager;
+import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -90,15 +94,15 @@ public class ViewPreferences {
   /**
    * Manager object for handling all collapsed nodes.
    */
-  private Collapser collapser;
+  // TODO : private Collapser collapser;
 
   private Collection<GraphNode> selectedNodes = ImmutableList.of();
 
   private String selectedLayout;
 
-  private String description;
-
   private ScenePreferences scenePrefs;
+
+  private OptionPreference options;
 
   /**
    * Edge matcher used by layout algorithms by default if it wasn't
@@ -125,7 +129,7 @@ public class ViewPreferences {
   /**
    * Cached "read-only" version of Collapser
    */
-  private transient CollapseTreeModel collapseTree;
+  // TODO : private transient CollapseTreeModel collapseTree;
 
   /////////////////////////////////////
   // Listeners for structures changes
@@ -162,7 +166,7 @@ public class ViewPreferences {
         Maps.<GraphEdge, EdgeDisplayProperty>newHashMap(),
         Maps.<Relation, EdgeDisplayProperty>newHashMap(),
         ImmutableList.<GraphNode>of(),
-        EMPTY_DESCRIPTION);
+        OptionPreferences.getDefaultOptions());
   }
 
   public ViewPreferences(
@@ -173,9 +177,10 @@ public class ViewPreferences {
       Map<GraphEdge, EdgeDisplayProperty> newEdgeProperties,
       Map<Relation, EdgeDisplayProperty> newRelationProperties,
       Collection<GraphNode> newSelectedNodes,
-      String newDescription) {
+      OptionPreference options) {
     initTransients();
-    collapser = new Collapser();
+    // TODO
+    // collapser = new Collapser();
 
     this.scenePrefs = gripPrefs;
     this.nodeLocations = newNodeLocations;
@@ -184,7 +189,7 @@ public class ViewPreferences {
     this.edgeProperties = newEdgeProperties;
     this.relationProperties = newRelationProperties;
     this.selectedNodes = newSelectedNodes;
-    this.description = newDescription;
+    this.options = options;
   }
 
   /**
@@ -222,8 +227,8 @@ public class ViewPreferences {
     if (null == selectedNodes) {
       selectedNodes = ImmutableList.of();
     }
-    if (null == description) {
-      description = EMPTY_DESCRIPTION;
+    if (null == options) {
+      options = OptionPreferences.getDefaultOptions();
     }
   }
 
@@ -272,14 +277,17 @@ public class ViewPreferences {
       }
     }
 
-    String newDescription = (source.description.isEmpty())
-        ? "" : "Derived from " + source.description;
+    OptionPreference newOptions = OptionPreferences.getDefaultOptions();
+    String descrp = source.options.getOption(
+        OptionPreferences.OPTION_DESCRIPTION, "");
+    String newDescription = (descrp.isEmpty()) ? "" : "Derived from " + descrp;
+    newOptions.setOption(OptionPreferences.OPTION_DESCRIPTION, newDescription);
 
     ViewPreferences result = new ViewPreferences(
         ScenePreferences.getDefaultScenePrefs(),
         newNodeLocations, newNodeProperties,
         source.visibleRelationSet, newEdgeProperties, newRelationProps,
-        newSelectedNodes, newDescription);
+        newSelectedNodes, newOptions);
 
     return result;
   }
@@ -549,21 +557,32 @@ public class ViewPreferences {
   }
 
   /////////////////////////////////////
-  // Manipulate the description
+  // Manipulate the option
 
-  public String getDescription() {
-    return description;
+  public String getOption(String optionId) {
+    return options.getOption(optionId);
   }
 
-  public void setDescription(String newDescription) {
-    description = newDescription;
+  public void setOption(final String optionId, final String value) {
+    options.setOption(optionId, value);
 
     listeners.fireEvent(new SimpleDispatcher() {
       @Override
-      public void dispatch(ViewPrefsListener listener) {
-        listener.descriptionChanged(description);
+     public void dispatch(ViewPrefsListener listener) {
+        listener.optionChanged(optionId, value);
       }
     });
+  }
+
+  /////////////////////////////////////
+  // Manipulate the description
+
+  public String getDescription() {
+    return getOption(OptionPreferences.OPTION_DESCRIPTION);
+  }
+
+  public void setDescription(String newDescription) {
+    setOption(OptionPreferences.OPTION_DESCRIPTION, newDescription);
   }
 
   /////////////////////////////////////
@@ -577,106 +596,9 @@ public class ViewPreferences {
    * @return graph containing only uncollapsed nodes
    */
   public GraphModel getExposedGraph(GraphModel graph) {
-    return collapser.buildExposedGraph(graph);
+    return graph;
+    // TODO
+    // return collapser.buildExposedGraph(graph);
   }
 
-  /**
-   * Provide read-only access to the {@link Collapser}.  Any collapse changes
-   * should use the ViewPreferences accessor to ensure listeners are notified
-   * properly.
-   */
-  public CollapseTreeModel getCollapseTreeModel() {
-    if (null == collapseTree) {
-      collapseTree = new CollapseTreeModel(collapser);
-    }
-    return collapseTree;
-  }
-
-  public Collection<CollapseData> getCollapseState() {
-    return collapser.computeRoots();
-  }
-
-  /**
-   * Collapse a set of nodes under a specific master node.
-   *
-   * @param master node to represent collapsed nodes.  Should be in picked.
-   * @param picked collection of nodes to collapse
-   * @param erase erase (and merge) any collapsed nodes in picked as part of
-   * the new collapsed node
-   * @param author the initiator for this process
-   */
-  public void collapse(
-      GraphNode master,
-      Collection<GraphNode> picked,
-      boolean erase, Object author) {
-    collapser.collapse(master, picked, erase);
-
-    fireCollapseChanged(
-        Collections.singleton(collapser.getCollapseData(master)),
-        CollapseData.EMPTY_LIST,
-        author);
-  }
-
-  /**
-   * Uncollapse a specific master node.
-   *
-   * @param master node to represent collapsed nodes.  Should be in picked.
-   * @param author the initiator for this process
-   */
-  public void uncollapse(GraphNode master, Object author) {
-    CollapseData removedGroup = collapser.getCollapseData(master);
-    if (null == removedGroup) {
-      return;
-    }
-
-    // Perform the collapsing
-    collapser.uncollapse(master);
-
-    fireCollapseChanged(
-        CollapseData.EMPTY_LIST,
-        Collections.singleton(removedGroup),
-        author);
-  }
-
-  /**
-   * Collapse all Nodes in the exposed graph using
-   * the supplied hierarchy TreeModel.
-   * <p>
-   * The algorithm works by collapsing the nodes in treeData order
-   * from bottom to top. This allows a user to later uncollapse individual
-   * masters, and to incrementally expose their internal details.
-   *
-   * @param graph source of nodes to collapse
-   * @param treeData hierarchy data for graph
-   * @param author interface component that initiated the action
-   */
-  public void collapseTree(
-      GraphModel graph, TreeModel treeData, Object author) {
-
-    Collection<CollapseData> collapseChanges =
-        collapser.collapseTree(graph, treeData);
-
-    fireCollapseChanged(
-      collapseChanges,
-      CollapseData.EMPTY_LIST,
-      author);
-  }
-
-  private void fireCollapseChanged(
-      final Collection<CollapseData> created,
-      final Collection<CollapseData> removed,
-      final Object author) {
-
-    // Ignore empty collapse events - listeners never care
-    if (created.isEmpty() && removed.isEmpty()) {
-      return;
-    }
-
-    listeners.fireEvent(new SimpleDispatcher() {
-      @Override
-      public void dispatch(ViewPrefsListener listener) {
-        listener.collapseChanged(created, removed, author);
-      }
-    });
-  }
 }

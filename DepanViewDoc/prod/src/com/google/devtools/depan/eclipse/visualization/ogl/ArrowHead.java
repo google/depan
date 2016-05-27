@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.eclipse.visualization.ogl;
 
-import com.google.devtools.depan.eclipse.editors.EdgeDisplayProperty.ArrowheadStyle;
+import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty.ArrowheadStyle;
 
 import com.jogamp.opengl.GL2;
 

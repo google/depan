@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.eclipse.visualization.layout;
+package com.google.devtools.depan.view_doc.layout;
+
+import com.google.devtools.depan.model.GraphNode;
+import com.google.devtools.depan.view_doc.model.Point2dUtils;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;

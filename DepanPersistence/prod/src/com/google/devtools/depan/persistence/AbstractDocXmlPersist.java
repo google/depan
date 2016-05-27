@@ -16,8 +16,12 @@
 
 package com.google.devtools.depan.persistence;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.IProgressMonitor;
+
 import java.io.IOException;
 import java.net.URI;
+import java.text.MessageFormat;
 
 /**
  * Provide easy to use load and save methods for many document types.
@@ -38,15 +42,33 @@ public abstract class AbstractDocXmlPersist<T> {
     this.xmlPersist = xmlPersist;
   }
 
+  /////////////////////////////////////
+  // Hook methods for derived classes
   protected abstract T coerceLoad(Object load);
 
-  @SuppressWarnings("unchecked")
+  protected abstract String logLoadException(URI uri, Exception err);
+
+  public abstract String logSaveException(URI uri, Exception err);
+
+  protected String format(String pattern, Object... arguments) {
+    return MessageFormat.format(pattern, arguments);
+  }
+
+  protected void logException(String msg, Exception errIo) {
+    PersistenceLogger.logException(msg, errIo);
+  }
+
+  protected String logException(String pattern, URI uri, Exception errIo) {
+    String result = format(pattern, uri);
+    logException(result, errIo);
+    return result;
+  }
+
   public T load(URI uri) {
     try {
-      return (T) xmlPersist.load(uri);
+      return coerceLoad(xmlPersist.load(uri));
     } catch (IOException errIo) {
-      String msg = "Unable to load EdgeMatcher from " + uri;
-      PersistenceLogger.logException(msg, errIo);
+      String msg = logLoadException(uri, errIo);
       throw new RuntimeException(msg, errIo);
     }
   }
@@ -55,8 +77,7 @@ public abstract class AbstractDocXmlPersist<T> {
     try {
       xmlPersist.save(uri, doc);
     } catch (IOException errIo) {
-      String msg = "Unable to save EdgeMatcher to " + uri;
-      PersistenceLogger.logException(msg, errIo);
+      String msg = logSaveException(uri, errIo);
       throw new RuntimeException(msg, errIo);
     }
   }

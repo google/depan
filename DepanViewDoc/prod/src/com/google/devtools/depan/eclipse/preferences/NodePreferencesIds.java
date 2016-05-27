@@ -16,12 +16,12 @@
 
 package com.google.devtools.depan.eclipse.preferences;
 
-import com.google.devtools.depan.eclipse.editors.NodeDisplayProperty;
 import com.google.devtools.depan.eclipse.visualization.ogl.ColorMap;
 import com.google.devtools.depan.eclipse.visualization.ogl.GLEntity;
 import com.google.devtools.depan.eclipse.visualization.ogl.ShapeFactory;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.view_doc.eclipse.ui.plugins.JoglPluginRegistry;
+import com.google.devtools.depan.view_doc.model.NodeDisplayProperty;
 
 import java.awt.Color;
 
