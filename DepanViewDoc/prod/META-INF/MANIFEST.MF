@@ -20,9 +20,11 @@ Require-Bundle: com.google.guava,
  depan-jung-library,
  depan-jogl-library,
  com.google.devtools.depan.builder,
- com.google.devtools.depan.graph_doc.ui
+ com.google.devtools.depan.graph_doc.ui,
+ org.eclipse.ui
 Bundle-ClassPath: .
 Export-Package: com.google.devtools.depan.eclipse.cm,
  com.google.devtools.depan.eclipse.preferences,
  com.google.devtools.depan.eclipse.visualization.ogl
 Bundle-Activator: com.google.devtools.depan.view_doc.eclipse.ViewDocActivator
+Bundle-ActivationPolicy: lazy

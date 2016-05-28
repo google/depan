@@ -21,12 +21,12 @@ import com.google.devtools.depan.graph_doc.persistence.EdgeConverter;
 import com.google.devtools.depan.platform.ResourceCache;
 import com.google.devtools.depan.view_doc.model.GraphModelReference;
 
+import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
-import com.thoughtworks.xstream.mapper.Mapper;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -43,7 +43,12 @@ public class GraphModelReferenceConverter implements Converter {
 
   public static final String GRAPH_REF_TAG = "graph-ref";
 
-  public GraphModelReferenceConverter(Mapper mapper) {
+  public GraphModelReferenceConverter() {
+  }
+
+  public static void configXStream(XStream xstream) {
+    xstream.aliasType(GRAPH_REF_TAG, GraphModelReference.class);
+    xstream.registerConverter(new GraphModelReferenceConverter());
   }
 
   @Override

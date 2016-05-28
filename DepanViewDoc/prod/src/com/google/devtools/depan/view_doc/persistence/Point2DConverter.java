@@ -16,12 +16,12 @@
 
 package com.google.devtools.depan.view_doc.persistence;
 
+import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
-import com.thoughtworks.xstream.mapper.Mapper;
 
 import java.awt.geom.Point2D;
 
@@ -35,7 +35,12 @@ public class Point2DConverter implements Converter {
 
   public static final String POS_TAG = "pos";
 
-  public Point2DConverter(Mapper mapper) {
+  public Point2DConverter() {
+  }
+
+  public static void configXStream(XStream xstream) {
+    xstream.aliasType(POS_TAG, Point2D.class);
+    xstream.registerConverter(new Point2DConverter());
   }
 
   @Override

@@ -19,6 +19,7 @@ package com.google.devtools.depan.view_doc.persistence;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 
+import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
@@ -43,6 +44,12 @@ public class NodeReferenceConverter implements Converter {
    */
   public NodeReferenceConverter(ViewDocumentConverter viewConverter) {
     this.viewConverter = viewConverter;
+  }
+
+  public static void configXStream(
+      XStream xstream, ViewDocumentConverter converter) {
+    xstream.aliasType(NODE_REF_TAG, GraphNode.class);
+    xstream.registerConverter(new NodeReferenceConverter(converter));
   }
 
   @Override

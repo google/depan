@@ -22,6 +22,7 @@ import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 
+import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
@@ -53,6 +54,13 @@ public class EdgeReferenceConverter implements Converter {
       Mapper mapper, ViewDocumentConverter viewConverter) {
     this.mapper = mapper;
     this.viewConverter = viewConverter;
+  }
+
+  public static void configXStream(
+      XStream xstream, ViewDocumentConverter converter) {
+    xstream.aliasType(EDGE_REF_TAG, GraphEdge.class);
+    xstream.registerConverter(
+        new EdgeReferenceConverter(xstream.getMapper(), converter));
   }
 
   @Override

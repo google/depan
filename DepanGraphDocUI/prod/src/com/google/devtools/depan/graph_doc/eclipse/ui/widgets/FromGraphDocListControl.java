@@ -20,12 +20,12 @@ import com.google.devtools.depan.graph_doc.eclipse.ui.registry.FromGraphDocContr
 
 import com.google.common.collect.Lists;
 
+import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
@@ -41,7 +41,7 @@ import java.util.Map.Entry;
  */
 public class FromGraphDocListControl extends Composite {
 
-  private ListViewer viewer;
+  private ComboViewer viewer;
 
   private ControlSelectionChangedListener listener;
 
@@ -50,8 +50,9 @@ public class FromGraphDocListControl extends Composite {
     super(parent, SWT.NONE);
     setLayout(new FillLayout());
 
-    viewer = new ListViewer(
-        this, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
+    viewer = new ComboViewer(
+        this, SWT.FLAT | SWT.READ_ONLY | SWT.DROP_DOWN | SWT.SINGLE );
+//      ListViewer flags: SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
     viewer.setLabelProvider(new ControlLabelProvider());
     viewer.setContentProvider(new ControlContentProvider());
     viewer.setInput(contributions);

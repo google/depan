@@ -66,6 +66,9 @@ public class GraphEditor
     extends MultiPageEditorPart
     implements NodeTreeProvider<GraphNode> {
 
+  public static final String ID =
+      "com.google.devtools.depan.graph_doc.eclipse.ui.editor.GraphEditor";
+
   private IFile file = null;
   private GraphDocument graph = null;
 

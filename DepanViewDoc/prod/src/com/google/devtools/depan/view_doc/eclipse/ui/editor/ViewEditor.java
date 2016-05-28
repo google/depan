@@ -55,6 +55,7 @@ import com.google.devtools.depan.view_doc.model.ViewDocument;
 import com.google.devtools.depan.view_doc.model.ViewPrefsListener;
 import com.google.devtools.depan.view_doc.persistence.ViewDocXmlPersist;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -109,7 +110,7 @@ import javax.imageio.ImageIO;
 public class ViewEditor extends MultiPageEditorPart {
 
   public static final String ID =
-      "com.google.devtools.depan.eclipse.editors.ViewEditor";
+      "com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor";
 
   private static final Logger logger =
       Logger.getLogger(ViewEditor.class.getName());
@@ -178,8 +179,23 @@ public class ViewEditor extends MultiPageEditorPart {
   // Alternate graph perspectives and derived data
   // used in various tools and viewers
 
+  /**
+   * A {@link GraphModel} derived from the {@link GraphNode}s explicitly
+   * listed in the {@link ViewDocument}.  The {@link GraphEdge}s for are
+   * {@code viewGraph} are inferred (and reused) from the {@link GraphEdge}s
+   * defined in the {@link ViewDocument}'s referenced {@link GraphModel}.
+   * 
+   * This also defines the full set of nodes and edges that the OGL engine
+   * is prepared to draw.  As subset of these, from the {@link #exposedGraph},
+   * might actually be displayed.
+   */
   private GraphModel viewGraph;
 
+  /**
+   * The subset of {@link GraphNode}s and {@link GraphEdge}s
+   * (from {@link #viewGraph}) that are currently exposed and therefore
+   * being rendered.  The collapser is responsible for these transformations.
+   */
   private GraphModel exposedGraph;
 
   private NodeColorFactory nodeColorFactory;
@@ -321,6 +337,7 @@ public class ViewEditor extends MultiPageEditorPart {
    * entities should be defined.
    */
   private void prepareView() {
+    // Prepare renderer with full set of nodes and edges.
     renderer.setGraphModel(getViewGraph());
     renderer.initializeScenePrefs(getScenePrefs());
     renderer.initializeNodeLocations(viewInfo.getNodeLocations());
@@ -355,7 +372,8 @@ public class ViewEditor extends MultiPageEditorPart {
     final Text name = new Text(parent, SWT.BORDER | SWT.SINGLE);
 
     nameLabel.setText("Description");
-    name.setText(viewInfo.getDescription());
+    String descr = Strings.nullToEmpty(viewInfo.getDescription());
+    name.setText(descr);
 
     name.setLayoutData(fillGrid);
 
@@ -1250,6 +1268,7 @@ public class ViewEditor extends MultiPageEditorPart {
   }
 
   private void prepareRenderOptions() {
+    prepareColorSupplier();
     updateRootHighlight(
         getBooleanOption(OptionPreferences.ROOTHIGHLIGHT_ID));
     updateNodeStretchRatio(
@@ -1288,6 +1307,13 @@ public class ViewEditor extends MultiPageEditorPart {
       updateOptionDescription(value);
       return;
     }
+  }
+
+  private void prepareColorSupplier() {
+    for (GraphNode root : getExposedGraph().getNodes()) {
+      renderer.setNodeColorSupplier(root, nodeColorFactory.getColorSupplier(root));
+    }
+    return;
   }
 
   private void updateRootHighlight(boolean enable) {

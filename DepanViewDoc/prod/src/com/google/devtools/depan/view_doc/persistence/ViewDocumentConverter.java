@@ -19,12 +19,15 @@ package com.google.devtools.depan.view_doc.persistence;
 import com.google.devtools.depan.graph_doc.model.GraphDocument;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
+import com.google.devtools.depan.persistence.PersistenceLogger;
+import com.google.devtools.depan.view_doc.model.CameraDirPreference;
 import com.google.devtools.depan.view_doc.model.GraphModelReference;
 import com.google.devtools.depan.view_doc.model.ViewDocument;
 import com.google.devtools.depan.view_doc.model.ViewDocument.Components;
 import com.google.devtools.depan.view_doc.model.ViewPreferences;
 
 import com.google.common.collect.Sets;
+import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
@@ -44,10 +47,7 @@ import java.util.logging.Logger;
  */
 public class ViewDocumentConverter implements Converter {
 
-  public static final String VIEW_INFO_TAG = "view-info";
-
-  private static final Logger logger =
-      Logger.getLogger(ViewDocumentConverter.class.getName());
+  private static final String VIEW_INFO_TAG = "view-info";
 
   private static final String VIEW_NODES = "view-nodes";
 
@@ -58,6 +58,13 @@ public class ViewDocumentConverter implements Converter {
 
   public ViewDocumentConverter(Mapper mapper) {
     this.mapper = mapper;
+  }
+
+  public static ViewDocumentConverter configXStream(XStream xstream) {
+    ViewDocumentConverter result = new ViewDocumentConverter(xstream.getMapper());
+    xstream.aliasType(VIEW_INFO_TAG, ViewDocument.class);
+    xstream.registerConverter(result);
+    return result;
   }
 
   /** Provide access to the referenced {@code GraphDocument}. */
@@ -167,7 +174,8 @@ public class ViewDocumentConverter implements Converter {
     reader.moveDown();
     if (!isViewNodes(reader)) {
       reader.moveUp();
-      logger.info("Can't load nodes from section " + reader.getNodeName());
+      PersistenceLogger.LOG.info(
+          "Can't load nodes from section " + reader.getNodeName());
 
       return Collections.emptySet();
     }

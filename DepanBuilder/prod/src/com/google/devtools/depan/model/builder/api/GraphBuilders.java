@@ -61,4 +61,41 @@ public class GraphBuilders {
 
     return builder.createGraphModel();
   }
+
+  /**
+   * Build a graph given a collection of nodes. Nodes without any edges
+   * are included.
+   * 
+   * The {@code sourceNodes} members are expected to be nodes from the
+   * {@code master} {@link GraphModel}. Both the {@link GraphNode}s and
+   * {@link GraphEdge}s are reused directly from the GraphModel.  This
+   * is harmless (versus making copies) since nodes and edges are immutable.
+   * 
+   * This might have to be revisited if nodes or edges get attributes that
+   * are specialized to different views.
+   *
+   * @param master source of relationships between nodes.
+   * @param sourceNodes list of nodes in the graph
+   * @return a GraphModel made from the given collection of Edge, and Node
+   *         involved in those relations.
+   */
+  public static GraphModel buildFromNodes(
+      GraphModel master, Collection<GraphNode> sourceNodes) {
+
+    GraphBuilder builder = createGraphModelBuilder();
+
+    // Ensure that all desired nodes are included.
+    for (GraphNode node : sourceNodes) {
+      builder.mapNode(node);
+    }
+
+    for (GraphEdge edge : master.getEdges()) {
+      if (sourceNodes.contains(edge.getHead()) &&
+          sourceNodes.contains(edge.getTail())) {
+        builder.addEdge(edge);
+      }
+    }
+
+    return builder.createGraphModel();
+  }
 }

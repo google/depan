@@ -242,17 +242,9 @@ public class ViewDocument {
    * Normally, derived graphs have their own copies of the nodes and edges.
    */
   public GraphModel buildGraphView() {
-    GraphBuilder result = GraphBuilders.createGraphModelBuilder();
 
-    GraphModel source = parentGraph.getGraph().getGraph();
-    for (GraphEdge edge : source.getEdges()) {
-      if (viewNodes.contains(edge.getHead()) &&
-          viewNodes.contains(edge.getTail())) {
-        result.addEdge(edge);
-      }
-    }
-
-    return result.createGraphModel();
+    GraphModel master = parentGraph.getGraph().getGraph();
+    return GraphBuilders.buildFromNodes(master, viewNodes);
   }
 
   public ViewDocument newViewDocument(Collection<GraphNode> nodes) {
