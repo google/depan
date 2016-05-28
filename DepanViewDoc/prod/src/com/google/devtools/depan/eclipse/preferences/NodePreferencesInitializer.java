@@ -33,20 +33,13 @@ public class NodePreferencesInitializer extends AbstractPreferenceInitializer {
   public void initializeDefaultPreferences() {
     IEclipsePreferences defaults = PreferencesIds.getDefaultNode();
 
-    defaults.putBoolean(NodePreferencesIds.NODE_COLOR_ON, true);
     defaults.put(NodePreferencesIds.NODE_COLOR,
         NodeColors.getDefault().toString());
 
-    defaults.putBoolean(NodePreferencesIds.NODE_SHAPE_ON, true);
     defaults.put(NodePreferencesIds.NODE_SHAPE,
         NodeShape.getDefault().toString());
 
-    defaults.putBoolean(NodePreferencesIds.NODE_SIZE_ON, false);
     defaults.put(NodePreferencesIds.NODE_SIZE,
         NodeSize.getDefault().toString());
-
-    defaults.putBoolean(NodePreferencesIds.NODE_RATIO_ON, false);
-    defaults.putBoolean(NodePreferencesIds.NODE_ROOT_HIGHLIGHT_ON, false);
-    defaults.putBoolean(NodePreferencesIds.NODE_STROKE_HIGHLIGHT_ON, false);
   }
 }

@@ -20,16 +20,15 @@ import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds;
 import com.google.devtools.depan.eclipse.visualization.ogl.ArrowHead;
 import com.google.devtools.depan.eclipse.visualization.ogl.GLPanel;
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeColorSupplier;
-import com.google.devtools.depan.eclipse.visualization.ogl.NodeColorSupplier.Monochrome;
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeRatioSupplier;
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeShapeSupplier;
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeSizeSupplier;
 import com.google.devtools.depan.eclipse.visualization.ogl.RendererChangeListener;
-import com.google.devtools.depan.eclipse.visualization.plugins.impl.CollapsePlugin;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
+import com.google.devtools.depan.view_doc.layout.LayoutGenerator;
 import com.google.devtools.depan.view_doc.model.CameraDirPreference;
 import com.google.devtools.depan.view_doc.model.CameraPosPreference;
 import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty;
@@ -366,8 +365,8 @@ public class View {
     glPanel.setNodeShapeSupplier(node, supplier);
   }
 
-  public void setNodeStrokeHighlight(boolean enable) {
-    glPanel.setNodeStrokeHighlight(enable);
+  public void activateNodeStroke(boolean enable) {
+    glPanel.activateNodeStroke(enable);
   }
 
   public void setNodeNeighbors(Graph<GraphNode, GraphEdge> jungGraph) {

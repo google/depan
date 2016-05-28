@@ -18,6 +18,7 @@ package com.google.devtools.depan.view_doc.eclipse.ui.actions;
 import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds;
 import com.google.devtools.depan.eclipse.preferences.PreferencesIds;
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
+import com.google.devtools.depan.view_doc.layout.LayoutGenerator;
 import com.google.devtools.depan.view_doc.model.OptionPreferences;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
@@ -80,13 +81,13 @@ public class ViewEditorActionDelegate implements IEditorActionDelegate {
 
     // layouts
     if (id.equals(FRLAYOUT_ID)) {
-      applyLayout(JungLayoutGenerator.FRLayoutBuilder);
+      applyLayout(null); // JungLayoutGenerator.FRLayoutBuilder);
     } else if (id.equals(SPRINGLAYOUT_ID)) {
-      applyLayout(JungLayoutGenerator.SpringLayoutBuilder);
+      applyLayout(null); // JungLayoutGenerator.SpringLayoutBuilder);
     } else if (id.equals(TREELAYOUT_ID))  {
-      applyLayout(TreeLayoutGenerator.NewTreeLayoutBuilder);
+      applyLayout(null); // TreeLayoutGenerator.NewTreeLayoutBuilder);
     } else if (id.equals(RADIALLAYOUT_ID)) {
-      applyLayout(TreeLayoutGenerator.NewRadialLayoutBuilder);
+      applyLayout(null); // TreeLayoutGenerator.NewRadialLayoutBuilder);
 
     // visualization options
     } else if (id.equals(OptionPreferences.ROOTHIGHLIGHT_ID)) {

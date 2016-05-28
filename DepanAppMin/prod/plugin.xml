@@ -25,7 +25,7 @@
          </property>
          <property
                name="aboutImage"
-               value="platform:/plugin/com.google.devtools.depan/icons/branding/depan-icon-250x250.gif">
+               value="/DepanApp/icons/branding/depan-icon-250x250.gif">
          </property>
          <property
                name="aboutText"

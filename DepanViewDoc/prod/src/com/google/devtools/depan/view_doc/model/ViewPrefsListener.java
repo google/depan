@@ -78,10 +78,6 @@ public interface ViewPrefsListener {
     }
 
     @Override
-    public void descriptionChanged(String description) {
-    }
-
-    @Override
     public void nodeLocationsSet(Map<GraphNode, Point2D> newLocations) {
     }
 

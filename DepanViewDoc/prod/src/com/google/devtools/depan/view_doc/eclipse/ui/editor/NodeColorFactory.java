@@ -21,6 +21,7 @@ import com.google.common.collect.Maps;
 
 import edu.uci.ics.jung.algorithms.importance.KStepMarkov;
 import edu.uci.ics.jung.graph.DirectedGraph;
+import edu.uci.ics.jung.graph.Graph;
 
 import java.awt.Color;
 import java.util.Collection;
@@ -62,7 +63,7 @@ public class NodeColorFactory {
     maxRank = calcMaxRank();
   }
 
-  public Object getJungGraph() {
+  public Graph<GraphNode, GraphEdge> getJungGraph() {
     return jungGraph;
   };
 
@@ -169,20 +170,20 @@ public class NodeColorFactory {
 
   private static class JungStatsSizeSupplier implements NodeSizeSupplier {
 
-    private final NodeSize nodeSize;
+    private final float fixedSize;
     private final float voltagePercent;
     private final float degreePercent;
 
     public JungStatsSizeSupplier(
-        NodeSize nodeSize, float voltagePercent, float degreePercent) {
-      this.nodeSize = nodeSize;
+        float fixedSize, float voltagePercent, float degreePercent) {
+      this.fixedSize = fixedSize;
       this.voltagePercent = voltagePercent;
       this.degreePercent = degreePercent;
     }
 
     @Override
     public float getSize() {
-      return nodeSize.getSize(voltagePercent, degreePercent);
+      return fixedSize;
     }
 
     @Override
@@ -191,13 +192,13 @@ public class NodeColorFactory {
     }
   }
 
-  public NodeSizeSupplier getSizeSupplier(GraphNode node) {
+  public NodeSizeSupplier getSizeSupplier(GraphNode node, NodeSize nodeSize) {
     float voltagePercent = (float) (ranking.get(node) / maxRank);
     float inDegree = jungGraph.getPredecessorCount(node);
-    float inPercent = (float) (inDegree  / maxDegree);
+    float degreePercent = (float) (inDegree  / maxDegree);
+    float fixedSize = nodeSize.getSize(voltagePercent, degreePercent);
 
-    return new JungStatsSizeSupplier(
-        NodeSize.getDefault(), voltagePercent, inPercent);
+    return new JungStatsSizeSupplier(fixedSize, voltagePercent, degreePercent);
   };
 
   /////////////////////////////////////

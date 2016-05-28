@@ -18,6 +18,7 @@ package com.google.devtools.depan.view_doc.eclipse.ui.editor;
 
 import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds;
 import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeShape;
+import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeSize;
 import com.google.devtools.depan.eclipse.preferences.PreferencesIds;
 import com.google.devtools.depan.eclipse.ui.nodes.cache.HierarchyCache;
 import com.google.devtools.depan.eclipse.ui.nodes.trees.GraphData;
@@ -36,7 +37,6 @@ import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.RelationSets;
-import com.google.devtools.depan.persistence.PersistenceLogger;
 import com.google.devtools.depan.platform.ListenerManager;
 import com.google.devtools.depan.platform.NewEditorHelper;
 import com.google.devtools.depan.platform.WorkspaceTools;
@@ -57,18 +57,14 @@ import com.google.devtools.depan.view_doc.persistence.ViewDocXmlPersist;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.thoughtworks.xstream.XStream;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -1325,9 +1321,15 @@ public class ViewEditor extends MultiPageEditorPart {
 
   private void updateNodeSize(boolean enable) {
     if (enable) {
+      NodeSize size = NodeSize.valueOf(
+          PreferencesIds.getInstanceNode().get(
+              NodePreferencesIds.NODE_SIZE,
+              NodeSize.getDefault().toString()));
+
       for (GraphNode node : getExposedGraph().getNodes()) {
-        NodeSizeSupplier size = nodeColorFactory.getSizeSupplier(node);
-        renderer.setNodeSizeSupplier(node, size);
+        NodeSizeSupplier supplier =
+            nodeColorFactory.getSizeSupplier(node, size);
+        renderer.setNodeSizeSupplier(node, supplier);
       }
       return;
     }
@@ -1340,7 +1342,11 @@ public class ViewEditor extends MultiPageEditorPart {
   private void updateNodeShape(boolean enable) {
     if (enable) {
       for (GraphNode node : getExposedGraph().getNodes()) {
-        NodeShape mode;
+        NodeShape mode = NodeShape.valueOf(
+            PreferencesIds.getInstanceNode().get(
+                NodePreferencesIds.NODE_SHAPE,
+                NodeShape.getDefault().toString()));
+
         NodeShapeSupplier nodeShape =
             nodeColorFactory.getShapeSupplier(node, mode);
         renderer.setNodeShapeSupplier(node, nodeShape);
@@ -1355,7 +1361,7 @@ public class ViewEditor extends MultiPageEditorPart {
 
 
   private void updateNodeStrokeHighlight(boolean enable) {
-    renderer.setNodeStrokeHighlight(enable);
+    renderer.activateNodeStroke(enable);
   }
 
   private void updateOptionDescription(String value) {

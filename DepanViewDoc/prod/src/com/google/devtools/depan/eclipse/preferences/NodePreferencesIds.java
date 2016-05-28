@@ -58,14 +58,6 @@ public class NodePreferencesIds {
    */
   public static final String NODE_SIZE = NODE_PREFIX + "size";
 
-  // boolean values
-  public static final String NODE_COLOR_ON = NODE_PREFIX + "colorsenabled";
-  public static final String NODE_SHAPE_ON = NODE_PREFIX + "shapeenabled";
-  public static final String NODE_SIZE_ON = NODE_PREFIX + "sizeenabled";
-  public static final String NODE_RATIO_ON = NODE_PREFIX + "ratioenabled";
-  public static final String NODE_ROOT_HIGHLIGHT_ON = NODE_PREFIX + "roothighlightenabled";
-  public static final String NODE_STROKE_HIGHLIGHT_ON = NODE_PREFIX + "strokehighlightenabled";
-
   /**
    * Different modes for rendering node colors.
    *

@@ -15,7 +15,7 @@
  */
 package com.google.devtools.depan.view_doc.persistence;
 
-import com.google.devtools.depan.eclipse.editors.CameraPosPreference;
+import com.google.devtools.depan.view_doc.model.CameraPosPreference;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.Converter;

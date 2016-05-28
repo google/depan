@@ -225,7 +225,7 @@ public final class WorkspaceTools {
     URI location = file.getLocationURI();
     try {
       persist.save(location, docInfo);
-      file.touch(monitor);
+      file.refreshLocal(IResource.DEPTH_ZERO, monitor);
     } catch (Exception err) {
       if (null != monitor) {
         monitor.setCanceled(true);

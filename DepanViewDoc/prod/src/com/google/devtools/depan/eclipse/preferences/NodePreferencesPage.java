@@ -47,9 +47,6 @@ public class NodePreferencesPage extends FieldEditorPreferencePage
   protected void createFieldEditors() {
     Composite parent = getFieldEditorParent();
 
-    // colors: on/off
-    BooleanFieldEditor nodeColors = new BooleanFieldEditor(
-        NodePreferencesIds.NODE_COLOR_ON, "Node coloring...", parent);
     // color: mode
     RadioGroupFieldEditor colorSelect = new RadioGroupFieldEditor(
         NodePreferencesIds.NODE_COLOR, "...shows...", 3, new String[][] {
@@ -58,9 +55,6 @@ public class NodePreferencesPage extends FieldEditorPreferencePage
             {"Voltage", NodeColors.VOLTAGE.toString()}
         }, parent, true);
 
-    // shape: on/off
-    BooleanFieldEditor nodeShapes = new BooleanFieldEditor(
-        NodePreferencesIds.NODE_SHAPE_ON, "Node shapes...", parent);
     // shape: mode
     RadioGroupFieldEditor shapeSelect = new RadioGroupFieldEditor(
         NodePreferencesIds.NODE_SHAPE, "...shows...", 2, new String[][] {
@@ -68,9 +62,6 @@ public class NodePreferencesPage extends FieldEditorPreferencePage
             {"Role", NodeShape.ROLE.toString()},
         }, parent, true);
 
-    // size: on/off
-    BooleanFieldEditor nodeSizes = new BooleanFieldEditor(
-        NodePreferencesIds.NODE_SIZE_ON, "Node sizes...", parent);
     // size: mode
     RadioGroupFieldEditor sizeSelect = new RadioGroupFieldEditor(
         NodePreferencesIds.NODE_SIZE, "...shows...", 2, new String[][] {
@@ -78,28 +69,10 @@ public class NodePreferencesPage extends FieldEditorPreferencePage
             {"Voltage", NodeSize.VOLTAGE.toString()},
         }, parent, true);
 
-    // ratio: on/off
-    BooleanFieldEditor nodeRatio = new BooleanFieldEditor(
-        NodePreferencesIds.NODE_RATIO_ON, "Enable node ratio", parent);
-
-    // highlight root nodes: on/off
-    BooleanFieldEditor rootHighlight = new BooleanFieldEditor(
-        NodePreferencesIds.NODE_ROOT_HIGHLIGHT_ON, "Enable root highlight", parent);
-
-    // highlight selected nodes: on/off
-    BooleanFieldEditor strokeHighlight = new BooleanFieldEditor(
-        NodePreferencesIds.NODE_STROKE_HIGHLIGHT_ON, "Enable stroke highlight", parent);
-
     // add fields to the page
-    addField(nodeColors);
     addField(colorSelect);
-    addField(nodeShapes);
     addField(shapeSelect);
-    addField(nodeSizes);
     addField(sizeSelect);
-    addField(nodeRatio);
-    addField(rootHighlight);
-    addField(strokeHighlight);
   }
 
   @Override

@@ -16,10 +16,10 @@
 
 package com.google.devtools.depan.eclipse.visualization.plugins.impl;
 
-import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerator;
-import com.google.devtools.depan.eclipse.visualization.layout.LayoutGenerators;
 import com.google.devtools.depan.eclipse.visualization.ogl.GLPanel;
 import com.google.devtools.depan.eclipse.visualization.plugins.core.Plugin;
+import com.google.devtools.depan.view_doc.layout.LayoutGenerator;
+import com.google.devtools.depan.view_doc.layout.LayoutGenerators;
 
 import java.util.List;
 

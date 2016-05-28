@@ -16,14 +16,12 @@
 
 package com.google.devtools.depan.eclipse.preferences;
 
-import com.google.devtools.depan.eclipse.utils.Resources;
+import com.google.devtools.depan.view_doc.eclipse.ViewDocResources;
 
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
-
-
 
 /**
  * An namespace class for preferences IDs.
@@ -40,15 +38,15 @@ public final class PreferencesIds {
   public static final String VIEW_PREFIX = PREFIX + "view_";
 
   public static final IEclipsePreferences getDefaultNode() {
-    return DefaultScope.INSTANCE.getNode(Resources.PLUGIN_ID);
+    return DefaultScope.INSTANCE.getNode(ViewDocResources.PLUGIN_ID);
   }
 
   public static final IEclipsePreferences getInstanceNode() {
-    return InstanceScope.INSTANCE.getNode(Resources.PLUGIN_ID);
+    return InstanceScope.INSTANCE.getNode(ViewDocResources.PLUGIN_ID);
   }
 
   public static final ScopedPreferenceStore getInstanceStore() {
     return new ScopedPreferenceStore(
-        InstanceScope.INSTANCE, Resources.PLUGIN_ID);
+        InstanceScope.INSTANCE, ViewDocResources.PLUGIN_ID);
   }
 }

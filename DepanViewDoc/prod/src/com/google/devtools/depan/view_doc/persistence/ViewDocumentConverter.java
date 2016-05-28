@@ -16,14 +16,13 @@
 
 package com.google.devtools.depan.view_doc.persistence;
 
-import com.google.devtools.depan.eclipse.editors.GraphModelReference;
-import com.google.devtools.depan.eclipse.editors.ViewDocument;
-import com.google.devtools.depan.eclipse.editors.ViewDocument.Components;
-import com.google.devtools.depan.eclipse.editors.ViewPreferences;
-import com.google.devtools.depan.eclipse.persist.EdgeConverter;
 import com.google.devtools.depan.graph_doc.model.GraphDocument;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
+import com.google.devtools.depan.view_doc.model.GraphModelReference;
+import com.google.devtools.depan.view_doc.model.ViewDocument;
+import com.google.devtools.depan.view_doc.model.ViewDocument.Components;
+import com.google.devtools.depan.view_doc.model.ViewPreferences;
 
 import com.google.common.collect.Sets;
 import com.thoughtworks.xstream.converters.Converter;

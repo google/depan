@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="com.google.devtools.depan.graph_doc.eclipse.ui.registry.from_graph_doc">
+      <contribution
+            class="com.google.devtools.depan.view_doc.eclipse.ui.wizards.ViewFromGraphDocContributor">
+      </contribution>
+   </extension>
+
+</plugin>

@@ -26,21 +26,16 @@ import com.google.devtools.depan.eclipse.visualization.plugins.impl.LayoutPlugin
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.LayoutShortcutsPlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeColorPlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeLabelPlugin;
-import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeShapePlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeRatioPlugin;
+import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeShapePlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeSizePlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeStrokePlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.SteperPlugin;
-import com.google.devtools.depan.model.GraphEdge;
-import com.google.devtools.depan.model.GraphNode;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import edu.uci.ics.jung.graph.Graph;
-
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
