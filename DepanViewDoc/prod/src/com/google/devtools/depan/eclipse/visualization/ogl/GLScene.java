@@ -50,8 +50,6 @@ import java.util.logging.Logger;
  * @author Yohann Coppel
  */
 public abstract class GLScene {
-  public static final float FACTOR = 1f;
-
   private static final int[] EMPTY_HIT_LIST = new int[0];
 
   private static final Logger logger =
@@ -86,36 +84,6 @@ public abstract class GLScene {
 
   private boolean isSceneChanged = false;
 
-  /** speed for moves */
-  public static final int SPEED = 5;
-
-  /** Camera z position, if zoom value is set to "100%". */
-  public static final float HUNDRED_PERCENT_ZOOM = 2000.0f;
-
-  public static final float[] DEFAULT_CAMERA_POSITION = {
-    0.0f, 0.0f, HUNDRED_PERCENT_ZOOM
-  };
-
-  public static final float[] DEFAULT_CAMERA_DIRECTION = {
-    0.0f, 0.0f, 0.0f
-  };
-
-  // Full laptop screen vertical space:
-  // 7" vertical from 22" is ~ 20 degrees.
-  public static final float FOV = 20.0f;
-
-  public static final float Z_NEAR = 0.4f;
-
-  public static final float Z_FAR = 30000.0f;
-
-  public static final float PIXEL_QUANTA = 0.1f;
-
-  public static final float ZOOM_QUANTA = 1.0f;
-
-  public static final float ZOOM_MAX = 1.1f;
-
-  public static final float ROTATE_QUANTA = 0.001f;
-  
   public static boolean hyperbolic = false;
 
   /** Latest received mouse positions. */
@@ -229,7 +197,8 @@ public abstract class GLScene {
     int height = Math.max(rect.height, 1);
     float aspect = (float) width / (float) height;
 
-    glu.gluPerspective(FOV, aspect, Z_NEAR, Z_FAR);
+    glu.gluPerspective(
+        GLConstants.FOV, aspect, GLConstants.Z_NEAR, GLConstants.Z_FAR);
   }
 
   protected void dispose() {
@@ -366,13 +335,13 @@ public abstract class GLScene {
 
   public void homeCamera() {
     rotateToDirection(
-        DEFAULT_CAMERA_DIRECTION[0],
-        DEFAULT_CAMERA_DIRECTION[1],
-        DEFAULT_CAMERA_DIRECTION[2]);
+        GLConstants.DEFAULT_CAMERA_DIRECTION[0],
+        GLConstants.DEFAULT_CAMERA_DIRECTION[1],
+        GLConstants.DEFAULT_CAMERA_DIRECTION[2]);
     moveToPosition(
-        DEFAULT_CAMERA_POSITION[0],
-        DEFAULT_CAMERA_POSITION[1]);
-    zoomToCamera(DEFAULT_CAMERA_POSITION[2]);
+        GLConstants.DEFAULT_CAMERA_POSITION[0],
+        GLConstants.DEFAULT_CAMERA_POSITION[1]);
+    zoomToCamera(GLConstants.DEFAULT_CAMERA_POSITION[2]);
   }
 
   /**
@@ -394,12 +363,12 @@ public abstract class GLScene {
    * No direct assignments to targetZoff.
    */
   public void zoomToCamera(float zOffset) {
-    if (zOffset > (Z_FAR - 1.0f)) {
-      zOffset = Z_FAR - 1.0f;
+    if (zOffset > (GLConstants.Z_FAR - 1.0f)) {
+      zOffset = GLConstants.Z_FAR - 1.0f;
       logger.info("clamped zoom at " + zOffset);
     }
-    if (zOffset < (ZOOM_MAX)) {
-      zOffset = ZOOM_MAX;
+    if (zOffset < (GLConstants.ZOOM_MAX)) {
+      zOffset = GLConstants.ZOOM_MAX;
       logger.info("clamped zoom at " + zOffset);
     }
 
@@ -454,7 +423,7 @@ public abstract class GLScene {
    * @param scale
    */
   public void setZoom(float scale) {
-    zoomToCamera(HUNDRED_PERCENT_ZOOM / scale);
+    zoomToCamera(GLConstants.HUNDRED_PERCENT_ZOOM / scale);
   }
 
   /**
@@ -546,47 +515,47 @@ public abstract class GLScene {
     if (isPixelEpsilon(xoff, targetXoff)) {
       xoff = targetXoff;
     } else {
-      xoff += (targetXoff - xoff) / SPEED;
+      xoff += (targetXoff - xoff) / GLConstants.SPEED;
     }
     if (isPixelEpsilon(yoff, targetYoff)) {
       yoff = targetYoff;
     } else {
-      yoff += (targetYoff - yoff) / SPEED;
+      yoff += (targetYoff - yoff) / GLConstants.SPEED;
     }
 
     if (isZoomEpsilon(zoff, targetZoff)) {
       zoff = targetZoff;
     } else {
-      zoff += (targetZoff - zoff) / SPEED;
+      zoff += (targetZoff - zoff) / GLConstants.SPEED;
     }
 
     if (isRotateEpsilon(xrot, targetXrot)) {
       xrot = targetXrot;
     } else {
-      xrot += (targetXrot - xrot) / SPEED;
+      xrot += (targetXrot - xrot) / GLConstants.SPEED;
     }
     if (isRotateEpsilon(yrot, targetYrot)) {
       yrot = targetYrot;
     } else {
-      yrot += (targetYrot - yrot) / SPEED;
+      yrot += (targetYrot - yrot) / GLConstants.SPEED;
     }
     if (isRotateEpsilon(zrot, targetZrot)) {
       zrot = targetZrot;
     } else {
-      zrot += (targetZrot - zrot) / SPEED;
+      zrot += (targetZrot - zrot) / GLConstants.SPEED;
     }
   }
 
   private boolean isPixelEpsilon(float left, float right) {
-    return isEpsilon(left, right, PIXEL_QUANTA);
+    return isEpsilon(left, right, GLConstants.PIXEL_QUANTA);
   }
 
   private boolean isZoomEpsilon(float left, float right) {
-    return isEpsilon(left, right, ZOOM_QUANTA);
+    return isEpsilon(left, right, GLConstants.ZOOM_QUANTA);
   }
 
   private boolean isRotateEpsilon(float left, float right) {
-    return isEpsilon(left, right, ROTATE_QUANTA);
+    return isEpsilon(left, right, GLConstants.ROTATE_QUANTA);
   }
   
   private boolean isEpsilon(float left, float right, float epsilon) {
@@ -1046,7 +1015,8 @@ public abstract class GLScene {
     } else {
       // FIXME: uncomment this line, when fixed. we must use xoff here...
 //      return convertVertex(x+grip.xoff - FACTOR/2.0f, y+grip.yoff-FACTOR/2.0f);
-      return convertVertex(x - FACTOR/2.0f, y-FACTOR/2.0f);
+      return convertVertex(
+          x - GLConstants.FACTOR/2.0f, y-GLConstants.FACTOR/2.0f);
     }
   }
 
@@ -1057,7 +1027,8 @@ public abstract class GLScene {
       //FIXME: uncomment. when grip static is totally fixed
       //x = x+grip.xoff;
       //y = y+grip.yoff;
-      convertGLVertex(gl, x-FACTOR/2.0f, y-FACTOR/2.0f);
+      convertGLVertex(
+          gl, x-GLConstants.FACTOR/2.0f, y-GLConstants.FACTOR/2.0f);
     }
   }
 
@@ -1073,7 +1044,10 @@ public abstract class GLScene {
     return convertVertex(x,y,z,1,1,1,0,0,0);
   }
 
-  public static float[] convertVertex(float x, float y, float z, float a, float b, float c, float k, float h, float p) {
+  public static float[] convertVertex(
+      float x, float y, float z, 
+      float a, float b, float c,
+      float k, float h, float p) {
     // solve the equation:
     // - (x-k)^2 / a^2 - (y-h)^2 / b^2 + (z-l)^2 / c^2 = 1
     // to get z.
@@ -1099,23 +1073,14 @@ public abstract class GLScene {
     convertGLVertex(gl, x,y,z,1,1,1,0,0,0);
   }
 
-  public static void convertGLVertex(GL2 gl, float x, float y, float z, float a, float b, float c, float k, float h, float p) {
-    // solve the equation:
-    // - (x-k)^2 / a^2 - (y-h)^2 / b^2 + (z-l)^2 / c^2 = 1
-    // to get z.
-    float zoom = 1.0f;
-    x /= zoom;
-    y /= zoom;
-    z +=
-      -Math.sqrt(
-          c*c* (
-            (x-k) * (x-k) / (a*a)
-            + (y-h) * (y-h) / (b*b)
-            + 1))
-      + p;
+  public static void convertGLVertex(GL2 gl,
+      float x, float y, float z,
+      float a, float b, float c,
+      float k, float h, float p) {
 
+    float[] result = convertVertex(x, y, z, a, b, c, k, h, p);
     //System.out.println(""+x+":"+y+":"+z);
-    gl.glVertex3f(x,y,z);
+    gl.glVertex3f(result[0], result[1], result[3]);
   }
 
 }

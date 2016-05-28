@@ -15,7 +15,7 @@
  */
 package com.google.devtools.depan.view_doc.model;
 
-import com.google.devtools.depan.eclipse.visualization.ogl.GLScene;
+import com.google.devtools.depan.eclipse.visualization.ogl.GLConstants;
 
 /**
  * Capture the camera direction as type.
@@ -59,7 +59,7 @@ public class CameraDirPreference {
   }
 
   public static CameraDirPreference getDefaultCameraPos() {
-    float[] pos = GLScene.DEFAULT_CAMERA_DIRECTION;
+    float[] pos = GLConstants.DEFAULT_CAMERA_DIRECTION;
     return new CameraDirPreference(pos[0], pos[1], pos[2]);
   }
 }

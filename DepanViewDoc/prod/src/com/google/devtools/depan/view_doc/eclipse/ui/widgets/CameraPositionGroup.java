@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.view_doc.eclipse.ui.widgets;
 
-import com.google.devtools.depan.eclipse.visualization.ogl.GLScene;
+import com.google.devtools.depan.eclipse.visualization.ogl.GLConstants;
 import com.google.devtools.depan.platform.ListenerManager;
 import com.google.devtools.depan.platform.ListenerManager.Dispatcher;
 import com.google.devtools.depan.view_doc.model.CameraPosPreference;
@@ -99,7 +99,7 @@ public class CameraPositionGroup extends Composite {
     zposInput = new PositionInput(group, "Z-Pos",
         "Page-Up/Page-Dn");
     zposInput.setLayoutData(new RowData());
-    zposInput.setLimits((int) GLScene.ZOOM_MAX, (int) (GLScene.Z_FAR - 1));
+    zposInput.setLimits((int) GLConstants.ZOOM_MAX, (int) (GLConstants.Z_FAR - 1));
     zposInput.addModifyListener(INPUT_LISTENER);
   }
 

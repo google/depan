@@ -56,8 +56,8 @@ public class DrawingPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
     gl.glPushName(property.shapeId);
 
     // move
-    property.shape.setTranslation(property.positionX * GLScene.FACTOR,
-        property.positionY * GLScene.FACTOR, 0f);
+    property.shape.setTranslation(property.positionX * GLConstants.FACTOR,
+        property.positionY * GLConstants.FACTOR, 0f);
 
     // scale
     property.shape.setScale(property.size,
@@ -163,10 +163,10 @@ public class DrawingPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
           property.node2.collapsedUnder : property.node2;
 
       Point2D middle = ((Arrow) property.shape).linkShapes(gl,
-          new Point2D.Float(property.p1X * GLScene.FACTOR,
-              property.p1Y * GLScene.FACTOR),
-          new Point2D.Float(property.p2X * GLScene.FACTOR,
-              property.p2Y * GLScene.FACTOR),
+          new Point2D.Float(property.p1X * GLConstants.FACTOR,
+              property.p1Y * GLConstants.FACTOR),
+          new Point2D.Float(property.p2X * GLConstants.FACTOR,
+              property.p2Y * GLConstants.FACTOR),
           node1.shape, node2.shape, property.deviation);
 
       if (property.isTextVisible) {
@@ -220,8 +220,8 @@ public class DrawingPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
     float centerY = (property.size * property.ratio / 2 + halfHeight)
         * property.textDy;
 
-    centerX = property.positionX * GLScene.FACTOR + centerX;
-    centerY = property.positionY * GLScene.FACTOR + centerY;
+    centerX = property.positionX * GLConstants.FACTOR + centerX;
+    centerY = property.positionY * GLConstants.FACTOR + centerY;
 
     renderTexture(property.textTexture, centerX, centerY);
   }
