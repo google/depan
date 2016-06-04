@@ -41,6 +41,8 @@ import com.google.devtools.depan.platform.ListenerManager;
 import com.google.devtools.depan.platform.NewEditorHelper;
 import com.google.devtools.depan.platform.WorkspaceTools;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
+import com.google.devtools.depan.view_doc.eclipse.ViewDocLogger;
+import com.google.devtools.depan.view_doc.layout.GridLayoutGenerator;
 import com.google.devtools.depan.view_doc.layout.LayoutContext;
 import com.google.devtools.depan.view_doc.layout.LayoutGenerator;
 import com.google.devtools.depan.view_doc.layout.LayoutGenerators;
@@ -111,9 +113,6 @@ public class ViewEditor extends MultiPageEditorPart {
 
   public static final String ID =
       "com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor";
-
-  private static final Logger logger =
-      Logger.getLogger(ViewEditor.class.getName());
 
   /** How much room to consume for full viewport layout scaling. */
   public static final double FULLSCALE_MARGIN = 0.9;
@@ -208,7 +207,7 @@ public class ViewEditor extends MultiPageEditorPart {
 
     @Override
     public void captureException(RuntimeException errAny) {
-      logger.log(Level.WARNING, "Listener dispatch failure", errAny);
+      ViewDocLogger.logException("Listener dispatch failure", errAny);
     }
   }
 
@@ -288,8 +287,7 @@ public class ViewEditor extends MultiPageEditorPart {
       createDiagramPage();
       createDetailsPage();
     } catch (Exception err) {
-      logger.log(Level.SEVERE,
-              "Unable to create View pages", err);
+      ViewDocLogger.logException("Unable to create View pages", err);
     }
   }
 
@@ -325,8 +323,7 @@ public class ViewEditor extends MultiPageEditorPart {
     try {
       return new View(parent, SWT.NONE, this);
     } catch (Exception err) {
-      logger.log(Level.SEVERE,
-              "Unable to create View pages", err);
+      ViewDocLogger.logException("Unable to create View pages", err);
       throw err;
     }
   }
@@ -417,7 +414,7 @@ public class ViewEditor extends MultiPageEditorPart {
           // Don't layout nodes if no layout is defined
           LayoutGenerator selectedLayout = getSelectedLayout();
           if (null == selectedLayout ) {
-            return;
+            selectedLayout = new GridLayoutGenerator();
           }
 
           // Run the layout process on all nodes in the view.
@@ -1132,7 +1129,8 @@ public class ViewEditor extends MultiPageEditorPart {
 
       @Override
       public void captureException(RuntimeException errAny) {
-        logger.warning(errAny.toString());
+        ViewDocLogger.logException(
+            "Drawing bounds update bounds", errAny);
       }
     });
   }

@@ -17,11 +17,12 @@
 package com.google.devtools.depan.view_doc.layout;
 
 /**
- * @author Lee Carver
- *
+ * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public interface LayoutGenerator {
+public class GridLayoutGenerator implements LayoutGenerator {
 
-  LayoutRunner buildRunner(LayoutContext context);
-
+  @Override
+  public LayoutRunner buildRunner(LayoutContext context) {
+    return new GridLayoutRunner(context);
+  }
 }

@@ -13,8 +13,18 @@ public class LayoutUtil {
 
   public static Map<GraphNode, Point2D> calcPositions(LayoutGenerator layout,
       LayoutContext context, Collection<GraphNode> layoutNodes) {
-    // TODO Auto-generated method stub
-    return null;
+    LayoutRunner runner = layout.buildRunner(context);
+    runLayout(runner);
+    return runner.getPositions(layoutNodes);
+  }
+
+  private static void runLayout(LayoutRunner runner) {
+    if (runner.layoutDone())
+      return;
+
+    while (!runner.layoutDone()) {
+      runner.layoutStep();
+    }
   }
 
   public static DirectedGraph<GraphNode, GraphEdge> buildJungGraph(
