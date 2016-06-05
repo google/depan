@@ -33,18 +33,17 @@ import java.util.Collection;
  * {@code GraphModel}s and {@code GraphEdge}s, and all node and relations types
  * from all active plugins.
  * <p>
- * If you need custom configuration of an {@code XStream} instance, you can
- * construct it yourself and then configure it with
- * {@link #configureXStream(XStream)}.
+ * The {@link #build(boolean, XStreamConfig)} Factory method standardizes
+ * the process to configure an {@link XStream} for a document type.
+ * The supplied {@link XStreamConfig} parameter in that methods integrates
+ * document and plugin contributions to the {@code XStream}.
  * 
  * @author <a href="mailto:leeca@google.com">Lee Carver</a>
  */
 public class XStreamFactory {
 
-  /**
-   * Prevent instantiation of this namespace class
-   */
   private XStreamFactory() {
+    // Prevent instantiation.
   }
 
   /**
@@ -87,24 +86,38 @@ public class XStreamFactory {
     XStreamConfigRegistry.config(xstream);
   }
 
+  /**
+   * Factory method to configure underlying {@link XStream} properly for
+   * a desired document type.
+   * 
+   * This method integrates the document supplied {@link XStreamConfig}
+   * with the plugin contributions from {@link XStreamConfigRegistry}.
+   * The document supplied {@link XStreamConfig} values have priority,
+   * and can override both the {@code XStream} options and class path from
+   * the  {@link XStreamConfigRegistry}.
+   * It is appropriate to use care with this mechanism.
+   */
   public static ObjectXmlPersist build(
       boolean readable, XStreamConfig docConfig) {
     XStream xstream = XStreamFactory.newXStream(readable);
     XStreamFactory.configureXStream(xstream);
     docConfig.config(xstream);
 
-    PluginClassLoader loader = buildLoader(docConfig.getDocumentBundles());
+    PluginClassLoader loader = buildLoader(docConfig);
     xstream.setClassLoader(loader);
 
     return new ObjectXmlPersist(xstream);
   }
 
-  private static PluginClassLoader buildLoader(
-      Collection<? extends Bundle> documentBundles) {
+  /**
+   * In the returned class loader, bundles from the supplied
+   * {@link XStreamConfig} parameter are searched ahead of the
+   * plugins contributing to {@link XStreamConfigRegistry}.
+   */
+  private static PluginClassLoader buildLoader(XStreamConfig docConfig) {
     Collection<Bundle> loaders = Lists.newArrayList();
-    loaders.addAll(documentBundles);
+    loaders.addAll(docConfig.getDocumentBundles());
     loaders.addAll(XStreamConfigRegistry.getRegistryPluginBundles());
     return new PluginClassLoader(loaders);
   }
-
 }
