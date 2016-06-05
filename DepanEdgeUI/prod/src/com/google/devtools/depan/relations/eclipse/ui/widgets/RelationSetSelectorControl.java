@@ -14,7 +14,7 @@
  * the License.
  */
 
-package com.google.devtools.depan.matchers.eclipse.ui.widgets;
+package com.google.devtools.depan.relations.eclipse.ui.widgets;
 
 import com.google.devtools.depan.edge_ui.EdgeUILogger;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
@@ -32,22 +32,18 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
 
 import java.util.List;
 
 /**
- * A drop-down widget showing a list of named edge matchers
- * ({@link GraphEdgeMatcherDescriptor}.
+ * A drop-dowp widget showing a list of named relation sets
+ * ({@link RelationSetDescriptor}s).
  *
  * Listener are notified whenever the selected edge matcher is changed.
  *
  * @author ycoppel@google.com (Yohann Coppel)
  */
-public class GraphEdgeMatcherSelectorControl extends Composite {
-
-  /** Text for standard picker label */
-  public static final String EDGE_MATCHER_LABEL = "Edges: ";
+public class RelationSetSelectorControl extends Composite {
 
   /** The drop-down list itself. */
   private ComboViewer setsViewer = null;
@@ -55,21 +51,12 @@ public class GraphEdgeMatcherSelectorControl extends Composite {
   /////////////////////////////////////
   // Helpers for users.
 
-  /**
-   * Provide a standard label for a {@code RelationSetPickerControl}.
-   */
-  public static Label createEdgeMatcherLabel(Composite parent) {
-    Label result = new Label(parent, SWT.NONE);
-    result.setText(EDGE_MATCHER_LABEL);
-    return result;
-  }
-
   /////////////////////////////////////
   // Listener interface for interested parties
 
   public static interface SelectorListener {
-    public void selectedEdgeMatcherChanged(
-        GraphEdgeMatcherDescriptor edgeMatcher);
+    public void selectedRelationSetChanged(
+        RelationSetDescriptor relationSet);
   }
 
   /** Listener when the selection change. */
@@ -90,26 +77,27 @@ public class GraphEdgeMatcherSelectorControl extends Composite {
   /////////////////////////////////////
   // Edge Matcher Selector itself
 
-  public GraphEdgeMatcherSelectorControl(Composite parent) {
+  public RelationSetSelectorControl(Composite parent) {
     super(parent, SWT.NONE);
     setLayout(new FillLayout());
 
     setsViewer = new ComboViewer(this, SWT.READ_ONLY | SWT.FLAT);
     setsViewer.setContentProvider(new ArrayContentProvider());
-    setsViewer.setLabelProvider(GraphEdgeMatcherLabelProvider.PROVIDER);
+    setsViewer.setLabelProvider(RelationSetLabelProvider.PROVIDER);
     setsViewer.setSorter(new AlphabeticSorter());
 
     setsViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 
       @Override
       public void selectionChanged(SelectionChangedEvent event) {
-        GraphEdgeMatcherDescriptor edgeMatcher = extractFromSelection(event.getSelection());
-        if (null == edgeMatcher) {
+        RelationSetDescriptor relationSet =
+            extractFromSelection(event.getSelection());
+        if (null == relationSet) {
           return;
         }
 
         // Notify interested parties about the change
-        fireSelectionChange(edgeMatcher);
+        fireSelectionChange(relationSet);
       }
     });
   }
@@ -125,28 +113,26 @@ public class GraphEdgeMatcherSelectorControl extends Composite {
    * @param choices selectable alternatives
    */
   public void setInput(
-      GraphEdgeMatcherDescriptor selectedEdgeMatcher,
-      List<GraphEdgeMatcherDescriptor> choices) {
+      RelationSetDescriptor relationSet,
+      List<RelationSetDescriptor> choices) {
     setsViewer.setInput(choices);
-    setSelection(selectedEdgeMatcher);
+    setSelection(relationSet);
   }
 
   @SuppressWarnings("unchecked")
-  // TODO(leeca): make private .. needed temporarily to allow
-  // RelationshipPicker to add temporary RelSets.
-  public List<GraphEdgeMatcherDescriptor> getInput() {
-    return (List<GraphEdgeMatcherDescriptor>) setsViewer.getInput();
+  private List<RelationSetDescriptor> getInput() {
+    return (List<RelationSetDescriptor>) setsViewer.getInput();
   }
 
   /**
    * Select the given {@link RelationSetDescriptor} on the list if it is present.
    * @param instanceSet the {@link RelationSetDescriptor} to select.
    */
-  public void setSelection(GraphEdgeMatcherDescriptor edgeMatcher) {
-    for (GraphEdgeMatcherDescriptor choice : getInput()) {
-      if (choice == edgeMatcher) {
+  public void setSelection(RelationSetDescriptor relationSet) {
+    for (RelationSetDescriptor choice : getInput()) {
+      if (choice == relationSet) {
         setsViewer.setSelection(new StructuredSelection(choice));
-        fireSelectionChange(edgeMatcher);
+        fireSelectionChange(relationSet);
         return;
       }
     }
@@ -161,7 +147,7 @@ public class GraphEdgeMatcherSelectorControl extends Composite {
    * @return the currently selected GraphEdgeMatcherDescriptor,
    *    or {@code null} if nothing is selected.
    */
-  public GraphEdgeMatcherDescriptor getSelection() {
+  public RelationSetDescriptor getSelection() {
     return extractFromSelection(setsViewer.getSelection());
   }
 
@@ -174,13 +160,13 @@ public class GraphEdgeMatcherSelectorControl extends Composite {
    * @return the extracted {@link GraphEdgeMatcherDescriptor} or
    *   {@code null} in case of error.
    */
-  private GraphEdgeMatcherDescriptor extractFromSelection(ISelection selection) {
+  private RelationSetDescriptor extractFromSelection(ISelection selection) {
     if (!(selection instanceof IStructuredSelection)) {
       return null;
     }
     IStructuredSelection select = (IStructuredSelection) selection;
     if (select.getFirstElement() instanceof GraphEdgeMatcherDescriptor) {
-      return (GraphEdgeMatcherDescriptor) select.getFirstElement();
+      return (RelationSetDescriptor) select.getFirstElement();
     }
     return null;
   }
@@ -207,13 +193,13 @@ public class GraphEdgeMatcherSelectorControl extends Composite {
    * @param selection the new selection
    */
   protected void fireSelectionChange(
-      final GraphEdgeMatcherDescriptor newEdgeMatcher) {
+      final RelationSetDescriptor relationSet) {
 
     selectionListeners.fireEvent(new LoggingDispatcher() {
 
       @Override
       public void dispatch(SelectorListener listener) {
-        listener.selectedEdgeMatcherChanged(newEdgeMatcher);
+        listener.selectedRelationSetChanged(relationSet);
       }
     });
   }

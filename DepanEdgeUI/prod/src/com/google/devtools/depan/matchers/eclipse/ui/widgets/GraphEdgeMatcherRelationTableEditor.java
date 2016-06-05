@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.matchers.eclipse.ui.widgets;
 
+import com.google.devtools.depan.edge_ui.EdgeUILogger;
 import com.google.devtools.depan.edges.matchers.GraphEdgeMatchers;
 import com.google.devtools.depan.graph.api.EdgeMatcher;
 import com.google.devtools.depan.graph.api.Relation;
@@ -112,7 +113,7 @@ public class GraphEdgeMatcherRelationTableEditor {
 
     @Override
     public void captureException(RuntimeException errAny) {
-      EdgeGraphMatcherLogger.logException("Listener dispatch failure", errAny);
+      EdgeUILogger.logException("Listener dispatch failure", errAny);
     }
   };
 

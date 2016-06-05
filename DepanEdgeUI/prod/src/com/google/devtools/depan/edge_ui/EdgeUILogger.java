@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.matchers.eclipse.ui.widgets;
+package com.google.devtools.depan.edge_ui;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,12 +29,12 @@ import java.util.logging.Logger;
  *
  * @author <a href="mailto:leeca@pnambic.com">Lee Carver</a>
  */
-public class EdgeGraphMatcherLogger {
+public class EdgeUILogger {
 
   public static final Logger LOG =
-      Logger.getLogger(EdgeGraphMatcherLogger.class.getName());
+      Logger.getLogger(EdgeUILogger.class.getName());
 
-  private EdgeGraphMatcherLogger() {
+  private EdgeUILogger() {
     // Prevent instantiation.
   }
 
