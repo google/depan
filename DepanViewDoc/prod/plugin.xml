@@ -18,5 +18,19 @@
             name="View Diagram">
       </editor>
    </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            id="com.google.devtools.depan.view_doc.eclipse.ui.views"
+            name="ViewDoc Views">
+      </category>
+      <view
+            category="com.google.devtools.depan.view_doc.eclipse.ui.views"
+            class="com.google.devtools.depan.view_doc.eclipse.ui.views.ScenePrefsViewPart"
+            id="com.google.devtools.depan.view_doc.eclipse.ui.views.ScenePrefsViewPart"
+            name="Scene Preferences"
+            restorable="true">
+      </view>
+   </extension>
 
 </plugin>

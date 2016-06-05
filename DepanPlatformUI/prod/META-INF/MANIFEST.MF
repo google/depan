@@ -18,6 +18,7 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-ClassPath: .
 Export-Package: com.google.devtools.depan.platform,
  com.google.devtools.depan.platform.eclipse.ui.tables,
+ com.google.devtools.depan.platform.eclipse.ui.views,
  com.google.devtools.depan.platform.eclipse.ui.widgets,
  com.google.devtools.depan.platform.jobs,
  com.google.devtools.depan.platform.process,

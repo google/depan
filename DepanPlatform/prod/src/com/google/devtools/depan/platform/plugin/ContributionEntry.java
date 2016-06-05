@@ -25,7 +25,6 @@ import org.eclipse.core.runtime.IConfigurationElement;
  * Many components have a plugin registry for contributions of a simple type.
  *
  * @author Yohann Coppel
- *
  */
 public abstract class ContributionEntry<T> {
 
