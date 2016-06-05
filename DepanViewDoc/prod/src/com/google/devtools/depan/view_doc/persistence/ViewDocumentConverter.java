@@ -17,10 +17,10 @@
 package com.google.devtools.depan.view_doc.persistence;
 
 import com.google.devtools.depan.graph_doc.model.GraphDocument;
+import com.google.devtools.depan.graph_doc.persistence.EdgeConverter;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.persistence.PersistenceLogger;
-import com.google.devtools.depan.view_doc.model.CameraDirPreference;
 import com.google.devtools.depan.view_doc.model.GraphModelReference;
 import com.google.devtools.depan.view_doc.model.ViewDocument;
 import com.google.devtools.depan.view_doc.model.ViewDocument.Components;
@@ -38,7 +38,6 @@ import com.thoughtworks.xstream.mapper.Mapper;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
-import java.util.logging.Logger;
 
 /**
  * Custom {@code XStream} converter for {@code ViewDocument}s.

@@ -19,7 +19,6 @@ import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeColo
 import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeShape;
 import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeSize;
 
-import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.RadioGroupFieldEditor;
 import org.eclipse.swt.widgets.Composite;

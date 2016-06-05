@@ -19,10 +19,6 @@ package com.google.devtools.depan.view_doc.eclipse.ui.plugins;
 import com.google.devtools.depan.eclipse.visualization.ogl.GLEntity;
 import com.google.devtools.depan.model.Element;
 import com.google.devtools.depan.model.ElementTransformer;
-import com.google.devtools.depan.platform.plugin.ContributionEntry;
-
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IConfigurationElement;
 
 import java.util.Collection;
 
@@ -46,19 +42,4 @@ public interface JoglPlugin {
    *   {@link ElementTransformer}s.
    */
   Collection<Class<? extends Element>> getElementClasses();
-
-  /////////////////////////////////////
-  // Handle configuration elements for contribution
-
-  static class Entry extends ContributionEntry<JoglPlugin>{
-
-    public Entry(IConfigurationElement element) {
-      super(element);
-    }
-
-    @Override
-    protected JoglPlugin createInstance() throws CoreException {
-      return (JoglPlugin) buildInstance(ATTR_CLASS);
-    }
-  }
 }

@@ -87,6 +87,10 @@ public class LayoutContext {
     this.edgeMatcher = edgeMatcher;
   }
 
+  public Rectangle2D getViewport() {
+    return viewport;
+  }
+
   public void setViewport(Rectangle2D viewport) {
     this.viewport = viewport;
   }
@@ -113,5 +117,4 @@ public class LayoutContext {
       }
     }
   }
-
 }

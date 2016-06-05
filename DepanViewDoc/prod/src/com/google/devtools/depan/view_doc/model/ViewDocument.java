@@ -24,10 +24,8 @@ import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.model.builder.api.GraphBuilder;
 import com.google.devtools.depan.model.builder.api.GraphBuilders;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
-import com.google.devtools.depan.view_doc.eclipse.ui.plugins.JoglPlugin;
 
 import com.google.common.collect.ImmutableList;
 
@@ -35,7 +33,6 @@ import org.eclipse.core.resources.IResource;
 
 import java.awt.geom.Point2D;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 /**

@@ -19,6 +19,7 @@ Require-Bundle: com.google.guava,
 Export-Package: 
  com.google.devtools.depan.eclipse.ui.nodes.api,
  com.google.devtools.depan.eclipse.ui.nodes.cache,
+ com.google.devtools.depan.eclipse.ui.nodes.plugins,
  com.google.devtools.depan.eclipse.ui.nodes.trees,
  com.google.devtools.depan.eclipse.ui.nodes.viewers
 Bundle-ClassPath: .

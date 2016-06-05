@@ -17,9 +17,15 @@
 package com.google.devtools.depan.persistence;
 
 import com.google.devtools.depan.persistence.plugins.XStreamConfigRegistry;
+import com.google.devtools.depan.platform.plugin.PluginClassLoader;
 
+import com.google.common.collect.Lists;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
+
+import org.osgi.framework.Bundle;
+
+import java.util.Collection;
 
 /**
  * Generate {@code XStream} instances that are configured for DepAn.  The DepAn
@@ -86,6 +92,19 @@ public class XStreamFactory {
     XStream xstream = XStreamFactory.newXStream(readable);
     XStreamFactory.configureXStream(xstream);
     docConfig.config(xstream);
+
+    PluginClassLoader loader = buildLoader(docConfig.getDocumentBundles());
+    xstream.setClassLoader(loader);
+
     return new ObjectXmlPersist(xstream);
   }
+
+  private static PluginClassLoader buildLoader(
+      Collection<? extends Bundle> documentBundles) {
+    Collection<Bundle> loaders = Lists.newArrayList();
+    loaders.addAll(documentBundles);
+    loaders.addAll(XStreamConfigRegistry.getRegistryPluginBundles());
+    return new PluginClassLoader(loaders);
+  }
+
 }

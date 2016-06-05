@@ -32,6 +32,7 @@ import org.eclipse.core.runtime.Platform;
 import org.osgi.framework.Bundle;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -54,6 +55,9 @@ public abstract class ContributionRegistry<T> {
    * A list of all registered plugins entries. The key is the plugin id.
    */
   private final Map<String, ContributionEntry<T>> entries = Maps.newHashMap();
+
+  /** Probably only one document bundle at a time */
+  private List<Bundle> documentBundles = Lists.newLinkedList();
 
   /**
    * Allow derived classes to create a singleton instance.
@@ -129,15 +133,11 @@ public abstract class ContributionRegistry<T> {
   }
 
   // Keep this private for now.
-  private Collection<Bundle> getPluginBundles() {
+  public Collection<Bundle> getPluginBundles() {
     Collection<Bundle> result = Sets.newHashSet();
     for (ContributionEntry<T> entry: getContributions()) {
       result.add(Platform.getBundle(entry.getBundleId()));
     }
     return result;
-  }
-
-  public PluginClassLoader getClassLoader() {
-    return new PluginClassLoader(getPluginBundles());
   }
 }

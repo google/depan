@@ -25,6 +25,9 @@ import com.thoughtworks.xstream.XStream;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.osgi.framework.Bundle;
+
+import java.util.Collection;
 
 /**
  * Registry of XStream configuration contributions.  The data from all
@@ -79,8 +82,6 @@ public class XStreamConfigRegistry extends
   }
 
   private void configXStream(XStream xstream) {
-    xstream.setClassLoader(getClassLoader());
-
     for (ContributionEntry<XStreamConfig> entry : getContributions()) {
       entry.getInstance().config(xstream);
     }
@@ -103,5 +104,9 @@ public class XStreamConfigRegistry extends
 
   public static void config(XStream xstream) {
     getInstance().configXStream(xstream);
+  }
+
+  public static Collection<Bundle> getRegistryPluginBundles() {
+    return getInstance().getPluginBundles();
   }
 }

@@ -9,7 +9,6 @@ import com.google.devtools.depan.view_doc.model.ViewDocument;
 import com.google.devtools.depan.view_doc.model.ViewPreferences;
 
 import org.eclipse.core.resources.IContainer;
-import org.eclipse.core.resources.IFile;
 
 public class ViewFromGraphDocWizard extends FromGraphDocWizard {
 

@@ -16,31 +16,17 @@
 
 package com.google.devtools.depan.view_doc.eclipse.ui.plugins;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
-import com.google.devtools.depan.eclipse.ui.nodes.plugins.NodeElementPlugin;
-import com.google.devtools.depan.eclipse.ui.nodes.plugins.NodeElementPluginRegistry;
 import com.google.devtools.depan.eclipse.visualization.ogl.GLEntity;
-import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.model.Element;
 import com.google.devtools.depan.platform.plugin.ContributionEntry;
 import com.google.devtools.depan.platform.plugin.ContributionRegistry;
+import com.google.devtools.depan.view_doc.eclipse.ViewDocLogger;
 
-import com.thoughtworks.xstream.XStream;
+import com.google.common.collect.Maps;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IExtension;
-import org.eclipse.core.runtime.IExtensionPoint;
-import org.eclipse.core.runtime.IExtensionRegistry;
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.swt.graphics.Image;
 
-import java.awt.Color;
-import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -59,6 +45,7 @@ import java.util.Map;
  */
 public class JoglPluginRegistry
     extends ContributionRegistry<JoglPlugin> {
+
   /**
    * Extension point name for sourceplugins
    */
@@ -70,6 +57,18 @@ public class JoglPluginRegistry
    * It is created lazily on first access.
    */
   private static JoglPluginRegistry INSTANCE = null;
+
+  static class Entry extends ContributionEntry<JoglPlugin>{
+
+    public Entry(String bundleId, IConfigurationElement element) {
+      super(bundleId, element);
+    }
+
+    @Override
+    protected JoglPlugin createInstance() throws CoreException {
+      return (JoglPlugin) buildInstance(ATTR_CLASS);
+    }
+  }
 
   /**
    * List of all registered plugins instances.
@@ -89,6 +88,18 @@ public class JoglPluginRegistry
   private JoglPluginRegistry() {
   }
 
+  @Override
+  protected ContributionEntry<JoglPlugin> buildEntry(
+      String bundleId, IConfigurationElement element) {
+    return new Entry(bundleId, element);
+  }
+
+  @Override
+  protected void reportException(String entryId, Exception err) {
+    ViewDocLogger.logException(
+        "View OGL registry load failure for " + entryId, err);
+  }
+
   /////////////////////////////////////
   // Hook method implementations
 
@@ -104,17 +115,6 @@ public class JoglPluginRegistry
     for (Class<? extends Element> c : plugin.getElementClasses()) {
       transformers.put(c, t);
     }
-  }
-
-  @Override
-  protected ContributionEntry<JoglPlugin> buildEntry(
-      IConfigurationElement element) {
-    return new JoglPlugin.Entry(element);
-  }
-
-  @Override
-  protected void reportException(String entryId, Exception err) {
-    // TODO Auto-generated method stub
   }
 
   /////////////////////////////////////

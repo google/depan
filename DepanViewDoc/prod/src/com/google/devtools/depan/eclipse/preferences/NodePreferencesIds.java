@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.eclipse.preferences;
 
+import com.google.devtools.depan.eclipse.ui.nodes.plugins.NodeElementPluginRegistry;
 import com.google.devtools.depan.eclipse.visualization.ogl.ColorMap;
 import com.google.devtools.depan.eclipse.visualization.ogl.GLEntity;
 import com.google.devtools.depan.eclipse.visualization.ogl.ShapeFactory;
@@ -121,7 +122,7 @@ public class NodePreferencesIds {
     }
 
     public static Color matchNode(GraphNode node) {
-      Color c = JoglPluginRegistry.getColor(node);
+      Color c = NodeElementPluginRegistry.getColor(node);
       if (c != null) {
         return c;
       }

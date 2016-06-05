@@ -18,6 +18,10 @@ package com.google.devtools.depan.persistence;
 
 import com.thoughtworks.xstream.XStream;
 
+import org.osgi.framework.Bundle;
+
+import java.util.Collection;
+
 /**
  * Interface for objects that need to configure properties of the
  * {@code XStream} instances.
@@ -26,4 +30,6 @@ import com.thoughtworks.xstream.XStream;
  */
 public interface XStreamConfig {
   void config(XStream xstream);
+
+  Collection<? extends Bundle> getDocumentBundles();
 }

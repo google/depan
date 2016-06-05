@@ -4,27 +4,29 @@ Bundle-Name: DepanViewDoc
 Bundle-SymbolicName: com.google.devtools.depan.view_doc;singleton:=true
 Bundle-Version: 2.0.0.qualifier
 Bundle-Vendor: Pnambic Computing
-Require-Bundle: com.google.guava,
- com.google.devtools.depan.core,
- com.google.devtools.depan.graph_doc,
+Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
- com.google.devtools.depan.edges.ui,
- org.eclipse.ui.ide,
- depan-xstream-library,
- org.eclipse.core.runtime,
- com.google.devtools.depan.platform.ui,
  org.eclipse.swt,
  org.eclipse.jface,
+ org.eclipse.ui,
+ org.eclipse.ui.ide,
+ com.google.devtools.depan.core,
+ com.google.devtools.depan.builder,
+ com.google.devtools.depan.graph_doc,
+ com.google.devtools.depan.platform.ui,
+ com.google.devtools.depan.edges.ui,
+ com.google.devtools.depan.graph_doc.ui,
  com.google.devtools.depan.persistence,
  com.google.devtools.depan.nodes.ui,
+ com.google.guava,
+ depan-xstream-library,
  depan-jung-library,
- depan-jogl-library,
- com.google.devtools.depan.builder,
- com.google.devtools.depan.graph_doc.ui,
- org.eclipse.ui
+ depan-jogl-library
 Bundle-ClassPath: .
 Export-Package: com.google.devtools.depan.eclipse.cm,
  com.google.devtools.depan.eclipse.preferences,
- com.google.devtools.depan.eclipse.visualization.ogl
+ com.google.devtools.depan.eclipse.visualization.ogl,
+ com.google.devtools.depan.view_doc.eclipse.ui.plugins
 Bundle-Activator: com.google.devtools.depan.view_doc.eclipse.ViewDocActivator
 Bundle-ActivationPolicy: lazy
+Import-Package: com.google.devtools.depan.platform.plugin

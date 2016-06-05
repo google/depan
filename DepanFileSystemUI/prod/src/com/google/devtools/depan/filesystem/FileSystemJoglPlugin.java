@@ -16,17 +16,14 @@
 
 package com.google.devtools.depan.filesystem;
 
-import com.google.devtools.depan.filesystem.graph.DirectoryElement;
-import com.google.devtools.depan.filesystem.graph.FileElement;
-import com.google.devtools.depan.filesystem.graph.FileSystemRelation;
-import com.google.devtools.depan.persistence.XStreamConfig;
-
-import com.thoughtworks.xstream.XStream;
-
-import org.osgi.framework.Bundle;
+import com.google.devtools.depan.eclipse.visualization.ogl.GLEntity;
+import com.google.devtools.depan.filesystem.eclipse.FileSystemShapeTransformer;
+import com.google.devtools.depan.filesystem.graph.FileSystemElements;
+import com.google.devtools.depan.model.Element;
+import com.google.devtools.depan.model.ElementTransformer;
+import com.google.devtools.depan.view_doc.eclipse.ui.plugins.JoglPlugin;
 
 import java.util.Collection;
-import java.util.Collections;
 
 /**
  * DepAn Plug-in that models the File System. It is intended to be included from
@@ -35,17 +32,15 @@ import java.util.Collections;
  *
  * @author tugrul@google.com (Tugrul Ince)
  */
-public class FileSystemXStreamConfig implements XStreamConfig {
+public class FileSystemJoglPlugin implements JoglPlugin {
 
   @Override
-  public void config(XStream xstream) {
-    xstream.alias("fs-dir", DirectoryElement.class);
-    xstream.alias("fs-file", FileElement.class);
-    xstream.alias("fs-relation", FileSystemRelation.class);
+  public Collection<Class<? extends Element>> getElementClasses() {
+    return FileSystemElements.NODES;
   }
 
   @Override
-  public Collection<? extends Bundle> getDocumentBundles() {
-    return Collections.emptyList();
+  public ElementTransformer<GLEntity> getElementShapeProvider() {
+    return FileSystemShapeTransformer.getInstance();
   }
 }
