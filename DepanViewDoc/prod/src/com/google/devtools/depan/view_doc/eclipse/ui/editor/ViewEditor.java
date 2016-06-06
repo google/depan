@@ -31,6 +31,7 @@ import com.google.devtools.depan.eclipse.visualization.ogl.NodeShapeSupplier;
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeSizeSupplier;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.api.RelationSet;
+import com.google.devtools.depan.graph.registry.RelationRegistry;
 import com.google.devtools.depan.graph_doc.eclipse.ui.resources.GraphResources;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphEdge;
@@ -724,12 +725,16 @@ public class ViewEditor extends MultiPageEditorPart {
   // Provide standardized access to this view's
   // relation visibility
 
+  public RelationSet getVisibleRelationSet() {
+    return viewInfo.getVisibleRelationSet();
+  }
+
   public boolean isVisibleRelation(Relation relation) {
     return viewInfo.isVisibleRelation(relation);
   }
 
-  public void setVisibleRelation(Relation relation, boolean isChecked) {
-    viewInfo.setVisibleRelation(relation, isChecked);
+  public void setVisibleRelation(Relation relation, boolean isVisible) {
+    viewInfo.setVisibleRelation(relation, isVisible);
   }
 
   /////////////////////////////////////
@@ -754,12 +759,9 @@ public class ViewEditor extends MultiPageEditorPart {
     viewInfo.setEdgeProperty(edge, newProperty);
   }
 
-  public void setRelationVisible(Relation relation, boolean isVisible) {
-    viewInfo.setVisibleRelation(relation, isVisible);
-  }
-
   public Collection<Relation> getDisplayRelations() {
-    return viewInfo.getDisplayRelations();
+    // TODO: return viewInfo.getDisplayRelations();
+    return RelationRegistry.getRegistryRelations();
   }
 
   public EdgeDisplayProperty getRelationProperty(Relation relation) {
@@ -774,6 +776,9 @@ public class ViewEditor extends MultiPageEditorPart {
   private void initEdgeRendering() {
     for (GraphEdge edge : viewGraph.getEdges()) {
 
+      boolean isVisible = isVisibleRelation(edge.getRelation());
+      renderer.setEdgeVisible(edge, isVisible);
+
       // If the edge has explicit display properties, use those.
       EdgeDisplayProperty edgeProp = viewInfo.getEdgeProperty(edge);
       if (null != edgeProp) {
@@ -783,12 +788,9 @@ public class ViewEditor extends MultiPageEditorPart {
 
       EdgeDisplayProperty relationProp =
           getRelationProperty(edge.getRelation());
-      if (null == relationProp) {
-        renderer.setEdgeVisible(edge, false);
-        continue;
+      if (null != relationProp) {
+        renderer.updateEdgeProperty(edge, relationProp);
       }
-
-      renderer.updateEdgeProperty(edge, relationProp);
     }
   }
 

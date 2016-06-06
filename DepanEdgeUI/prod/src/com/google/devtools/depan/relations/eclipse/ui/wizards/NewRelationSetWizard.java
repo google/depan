@@ -14,12 +14,13 @@
  * the License.
  */
 
-package com.google.devtools.depan.matchers.eclipse.ui.wizards;
+package com.google.devtools.depan.relations.eclipse.ui.wizards;
 
-import com.google.devtools.depan.edges.matchers.GraphEdgeMatchers;
-import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
-import com.google.devtools.depan.matchers.persistence.EdgeMatcherDocXmlPersist;
+import com.google.devtools.depan.graph.api.RelationSet;
+import com.google.devtools.depan.model.RelationSets;
 import com.google.devtools.depan.persistence.AbstractDocXmlPersist;
+import com.google.devtools.depan.relations.models.RelationSetDescriptor;
+import com.google.devtools.depan.relations.persistence.RelationSetDescriptorXmlPersist;
 import com.google.devtools.depan.resource_doc.eclipse.ui.wizards.AbstractNewResourceWizard;
 
 import org.eclipse.core.resources.IFile;
@@ -27,67 +28,71 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 /**
- * A wizard to add a new {@link GraphEdgeMatcherDescriptor} in an existing
- * file, or to create a new file with this set.
+ * A wizard to add a new {@link RelationSetDescriptor} in an existing file,
+ * or to create a new file with this set.
  *
- * Based on the legacy {@code NewRelationshipSetWizard}, and should share the
- * same Toolkit persistance model with it.
- * 
  * @author ycoppel@google.com (Yohann Coppel)
+ *
  */
-public class NewEdgeMatcherWizard
-    extends AbstractNewResourceWizard<GraphEdgeMatcherDescriptor> {
+public class NewRelationSetWizard
+    extends AbstractNewResourceWizard<RelationSetDescriptor> {
 
   /**
    * Eclipse extension identifier for this wizard.
    */
   public static final String ANALYSIS_WIZARD_ID =
-      "com.google.devtools.depan.matchers.eclipse.ui.wizards.NewEdgeMatcher";
+      "com.google.devtools.depan.relations.eclipse.ui.wizards.NewRelationSetWizard";
 
   /**
    * The unique page for this wizard.
    */
-  private NewEdgeMatcherPage page;
+  private NewRelationSetPage page;
 
   /**
-   * {@link GraphEdgeMatcherDescriptor} to be saved.
+   * {@link RelationSet} to be saved.
    */
-  private final GraphEdgeMatcherDescriptor matcherInfo;
+  private final RelationSetDescriptor relationSet;
 
   /**
    * Constructor for a new wizard, for the creation of a new named
-   * {@link GraphEdgeMatcherDescriptor} described by {@code edgeMatcher}.
+   * {@link RelationshipSet} described by <code>finder</code>.
    *
    * @param finder A {@link DirectedRelationFinder} describing the new set.
    */
-  public NewEdgeMatcherWizard() {
-    this(new GraphEdgeMatcherDescriptor("Empty", GraphEdgeMatchers.EMPTY));
+  public NewRelationSetWizard(RelationSetDescriptor relationSet) {
+    this.relationSet = relationSet;
   }
 
-  public NewEdgeMatcherWizard(GraphEdgeMatcherDescriptor matcherInfo) {
-    this.matcherInfo = matcherInfo;
+  public NewRelationSetWizard(RelationSet relationSet) {
+    this(new RelationSetDescriptor("unnamed", relationSet));
   }
+
+  public NewRelationSetWizard() {
+    this(RelationSets.EMPTY);
+  }
+
 
   /////////////////////////////////////
   // Wizard hook methods
 
   @Override
   public void addPages() {
-    page = new NewEdgeMatcherPage();
+    page = new NewRelationSetPage();
     addPage(page);
   }
 
   /////////////////////////////////////
   // AbstractNewResourceWizard hook methods
 
+  @Override
   protected int countBuildWork() {
     return 1;
   }
 
-  protected GraphEdgeMatcherDescriptor buildDocument(IProgressMonitor monitor) {
+  protected RelationSetDescriptor buildDocument(IProgressMonitor monitor) {
     monitor.beginTask("Preparing edge matcher", 1);
     monitor.worked(1);
-    return matcherInfo;
+    return relationSet;
   }
 
   @Override
@@ -101,8 +106,8 @@ public class NewEdgeMatcherWizard
   }
 
   @Override
-  protected AbstractDocXmlPersist<GraphEdgeMatcherDescriptor>
+  protected AbstractDocXmlPersist<RelationSetDescriptor>
       getDocXmlPersist() {
-    return EdgeMatcherDocXmlPersist.build(false);
+    return RelationSetDescriptorXmlPersist.build(false);
   }
 }

@@ -337,7 +337,7 @@ public class GraphEditor
     wizard.init(file, graph, topNode, nodes);
 
     // Run the wizard.
-    Shell shell = this.getSite().getWorkbenchWindow().getShell();
+    Shell shell = getSite().getWorkbenchWindow().getShell();
     WizardDialog dialog = new WizardDialog(shell, wizard);
     dialog.open();
   }

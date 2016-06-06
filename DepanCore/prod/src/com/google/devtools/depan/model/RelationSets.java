@@ -22,6 +22,7 @@ import com.google.devtools.depan.graph.api.RelationSet;
 import com.google.common.collect.Sets;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -35,6 +36,18 @@ public class RelationSets {
 
   private RelationSets() {
     // Prevent instantiation.
+  }
+
+  public static Collection<Relation> filterRelations(
+      RelationSet filter, Collection<Relation> source) {
+
+    Set<Relation> result = Sets.newHashSet();
+    for (Relation relation : source) {
+      if (filter.contains(relation)) {
+        result.add(relation);
+      }
+    }
+    return result;
   }
 
   /////////////////////////////////////
@@ -119,14 +132,20 @@ public class RelationSets {
   };
 
   /////////////////////////////////////
-  // Set implemented relation sets
+  // Collection base relation sets.
+  // Use Set for Collection type for performance.
 
-  public static RelationSet createSimple(Set<Relation> relationSet) {
+  public static RelationSet createSimple(Collection<Relation> relationSet) {
     return new Simple(relationSet);
   }
 
   public static class Simple implements RelationSet {
+    // XStream can handle a set, but not a more generic collection
     private final Set<Relation> relationSet;
+
+    public Simple(Collection<Relation> relations) {
+      this(Sets.newHashSet(relations));
+    }
 
     public Simple(Set<Relation> relationSet) {
       this.relationSet = relationSet;

@@ -22,9 +22,8 @@ import com.google.devtools.depan.platform.InverseSorter;
 import com.google.devtools.depan.platform.LabelProviderToString;
 import com.google.devtools.depan.platform.PlatformResources;
 import com.google.devtools.depan.platform.eclipse.ui.tables.EditColTableDef;
+import com.google.devtools.depan.relations.models.RelationSetRepository;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -44,6 +43,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -52,13 +52,11 @@ import org.eclipse.swt.widgets.TableItem;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Run a view of the known relations as its own reusable "part".
  */
-public class RelationSetRelationTableEditor {
+public class RelationSetTableControl extends Composite {
 
   public static final String COL_NAME = "Name";
   public static final String COL_SOURCE = "Source";
@@ -77,34 +75,30 @@ public class RelationSetRelationTableEditor {
     new EditColTableDef(COL_VISIBLE, true, COL_VISIBLE, 70),
   };
 
-  /**
-   * Abstract repository that provides access to the relation selection.
-   */
-  public static interface RelationCheckedRepository {
+  private class ControlRelationVisibleListener
+      implements RelationSetRepository.ChangeListener {
 
-    /**
-     * Indicate whether the supplied {@code relation} is checked
-     * in the table.
-     */
-    boolean getRelationChecked(Relation relation);
-
-    /**
-     * Change the visibility of the supplied {@code relation} to the
-     * state of the supplied {@code isChecked}.
-     */
-    void setRelationChecked(Relation relation, boolean isChecked);
+    @Override
+    public void includedRelationChanged(Relation relation, boolean visible) {
+      viewer.update(relation, UPDATE_VISIBLE);
+    }
   }
 
-  private final RelationCheckedRepository visRepo;
+  private ControlRelationVisibleListener relSetListener;
+
+  private RelationSetRepository relSetRepo;
 
   private TableViewer viewer;
 
-  public RelationSetRelationTableEditor(RelationCheckedRepository visRepo) {
-    this.visRepo = visRepo;
-  }
+  public RelationSetTableControl(Composite parent) {
+    super(parent, SWT.NONE);
 
-  public TableViewer setupViewer(Composite parent) {
-    viewer = new TableViewer(parent,
+    GridLayout gridLayout = new GridLayout();
+    gridLayout.marginHeight = 0;
+    gridLayout.marginWidth = 0;
+    setLayout(gridLayout);
+
+    viewer = new TableViewer(this,
         SWT.FULL_SELECTION | SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
     // set up label provider
     viewer.setLabelProvider(new RelEditorLabelProvider());
@@ -134,14 +128,12 @@ public class RelationSetRelationTableEditor {
 
     // Configure content last: use updateTable() to render relations
     viewer.setContentProvider(ArrayContentProvider.getInstance());
-
-    return viewer;
   }
 
   /**
    * Fill the list with {@link Relation}s.
    */
-  public void updateTable(Collection<Relation> relations) {
+  public void setInput(Collection<Relation> relations) {
 
     // Since rendering depends on relPlugin, set input after
     // relPlugin is updated.
@@ -149,8 +141,22 @@ public class RelationSetRelationTableEditor {
   }
 
   @SuppressWarnings("unchecked")
-  public Collection<Relation> getTableRelations() {
+  public Collection<Relation> getInput() {
     return (Collection<Relation>) viewer.getInput();
+  }
+
+  public void setVisibiltyRepository(RelationSetRepository visRepo) {
+    this.relSetRepo = visRepo;
+    relSetListener = new ControlRelationVisibleListener();
+    visRepo.addChangeListener(relSetListener);
+  }
+
+  public void removeRelSetRepository(RelationSetRepository visRepo) {
+    if (null != relSetListener) {
+      this.relSetRepo.removeChangeListener(relSetListener);
+    }
+    relSetListener = null;
+    this.relSetRepo = null;
   }
 
   /////////////////////////////////////
@@ -170,49 +176,34 @@ public class RelationSetRelationTableEditor {
   }
 
   public void clearVisibleTable() {
-    clearRelations(getTableRelations());
+    clearRelations(getInput());
   }
 
   public void invertVisibleTable() {
-    invertRelations(getTableRelations());
+    invertRelations(getInput());
   }
 
   public void checkVisibleTable() {
-    checkRelations(getTableRelations());
+    checkRelations(getInput());
   }
 
   public void clearRelations(Collection<Relation> relations) {
     for (Relation relation : relations) {
-      visRepo.setRelationChecked(relation, false);
-      viewer.update(relation, UPDATE_VISIBLE);
+      relSetRepo.setRelationChecked(relation, false);
     }
   }
 
   public void invertRelations(Collection<Relation> relations) {
     for (Relation relation : relations) {
-      boolean wasChecked = visRepo.getRelationChecked(relation);
-      visRepo.setRelationChecked(relation, !wasChecked);
-      viewer.update(relation, UPDATE_VISIBLE);
+      boolean wasChecked = relSetRepo.isRelationIncluded(relation);
+      relSetRepo.setRelationChecked(relation, !wasChecked);
     }
   }
 
   public void checkRelations(Collection<Relation> relations) {
     for (Relation relation : relations) {
-      visRepo.setRelationChecked(relation, true);
-      viewer.update(relation, UPDATE_VISIBLE);
+      relSetRepo.setRelationChecked(relation, true);
     }
-  }
-
-  public Collection<Relation> getVisibleRelations() {
-    Collection<Relation> relations = getTableRelations();
-    Collection<Relation> result =
-        Lists.newArrayListWithExpectedSize(relations.size());
-    for (Relation relation : relations) {
-      if (visRepo.getRelationChecked(relation)) {
-        result.add(relation);
-      }
-    }
-    return result;
   }
 
   /**
@@ -227,7 +218,7 @@ public class RelationSetRelationTableEditor {
 
     IStructuredSelection structuredSelection = (IStructuredSelection) selection;
     Collection<Relation> inverse =
-        computeInverseRelations(getTableRelations(), structuredSelection);
+        computeInverseRelations(getInput(), structuredSelection);
 
     StructuredSelection nextSelection =
         new StructuredSelection(inverse.toArray());
@@ -339,7 +330,7 @@ public class RelationSetRelationTableEditor {
       if (!(e1 instanceof Relation)) {
         return false;
       }
-      return visRepo.getRelationChecked((Relation) e1);
+      return relSetRepo.isRelationIncluded((Relation) e1);
     }
   }
 
@@ -364,10 +355,17 @@ public class RelationSetRelationTableEditor {
     }
 
     private String getSourceLabelForRelation(Relation relation) {
-      SourcePlugin plugin = relPlugin.get(relation);
-      SourcePluginRegistry registry = SourcePluginRegistry.getInstance();
-      String sourceId = registry.getPluginId(plugin);
-      return registry.getSourcePluginEntry(sourceId).getSource();
+      ClassLoader loader = relation.getClass().getClassLoader();
+      String result = loader.toString();
+      int bound = result.length();
+      int start = Math.max(0, bound - 12);
+      return result.substring(start);
+
+      // TODO: More like this, with an relation registry
+      // SourcePlugin plugin = relPlugin.get(relation);
+      // SourcePluginRegistry registry = SourcePluginRegistry.getInstance();
+      // String sourceId = registry.getPluginId(plugin);
+      // return registry.getSourcePluginEntry(sourceId).getSource();
     }
 
     @Override
@@ -378,7 +376,7 @@ public class RelationSetRelationTableEditor {
 
       switch (columnIndex) {
       case INDEX_VISIBLE:
-        boolean isVis = visRepo.getRelationChecked((Relation) element);
+        boolean isVis = relSetRepo.isRelationIncluded((Relation) element);
         return PlatformResources.getOnOff(isVis);
       }
       return null;
@@ -402,7 +400,7 @@ public class RelationSetRelationTableEditor {
       }
       Relation relation = (Relation) element;
       if (COL_VISIBLE.equals(property)) {
-        return visRepo.getRelationChecked(relation);
+        return relSetRepo.isRelationIncluded(relation);
       }
       return null;
     }
@@ -418,10 +416,18 @@ public class RelationSetRelationTableEditor {
       }
       if (property.equals(COL_VISIBLE) && (value instanceof Boolean)) {
         Relation relation = (Relation) modifiedObject;
-        visRepo.setRelationChecked(
+        relSetRepo.setRelationChecked(
             relation, ((Boolean) value).booleanValue());
         viewer.update(relation, UPDATE_VISIBLE);
       }
     }
+  }
+
+  public void setSelection(ISelection selection) {
+    viewer.setSelection(selection);
+  }
+
+  public void refresh(boolean refresh) {
+    viewer.refresh(refresh);
   }
 }

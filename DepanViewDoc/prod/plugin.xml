@@ -27,8 +27,17 @@
       <view
             category="com.google.devtools.depan.view_doc.eclipse.ui.views"
             class="com.google.devtools.depan.view_doc.eclipse.ui.views.ScenePrefsViewPart"
+            icon="icons/zoom.png"
             id="com.google.devtools.depan.view_doc.eclipse.ui.views.ScenePrefsViewPart"
-            name="Scene Preferences"
+            name="Scene Controls"
+            restorable="true">
+      </view>
+      <view
+            category="com.google.devtools.depan.view_doc.eclipse.ui.views"
+            class="com.google.devtools.depan.view_doc.eclipse.ui.views.VisibleRelationsViewPart"
+            icon="icons/relpicker.png"
+            id="com.google.devtools.depan.view_doc.eclipse.ui.views.VisibleRelationsViewPart"
+            name="Visible Relations"
             restorable="true">
       </view>
    </extension>

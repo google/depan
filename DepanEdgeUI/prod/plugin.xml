@@ -21,6 +21,14 @@
             id="com.google.devtools.depan.matchers.eclipse.ui.editors.GraphEdgeMatcherEditor"
             name="Graph Edge Matcher">
       </editor>
+      <editor
+            class="com.google.devtools.depan.relations.eclipse.ui.editors.RelationSetDescriptorEditor"
+            default="false"
+            extensions="relxml"
+            icon="icons/relpicker.png"
+            id="com.google.devtools.depan.relations.eclipse.ui.editors.RelationSetDescriptorEditor"
+            name="Relation Set Editor">
+      </editor>
    </extension>
    <extension
          id="com.google.devtools.depan.matchers.persistence"

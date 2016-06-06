@@ -18,16 +18,14 @@ package com.google.devtools.depan.relations.eclipse.ui.widgets;
 
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.api.RelationSet;
-import com.google.devtools.depan.model.RelationSets;
+import com.google.devtools.depan.graph.registry.RelationRegistry;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
+import com.google.devtools.depan.relations.models.RelationSetRepository;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -35,9 +33,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
 
 import java.util.Collection;
 import java.util.List;
@@ -53,48 +49,48 @@ import java.util.List;
  * @author ycoppel@google.com (Yohann Coppel)
  * @author <a href="mailto:leeca@pnambic.com">Lee Carver</a>
  */
-public class RelationSetEditorPart {
+public class RelationSetEditorControl extends Composite {
 
   /////////////////////////////////////
   // UX Elements
-
-  /**
-   * Table of relation data.
-   */
-  private TableViewer table;
-
   /**
    * Manages the relation set data.
    */
-  private RelationSetRelationTableEditor viewer;
+  private RelationSetTableControl viewer;
 
   /**
    * The {@link RelationshipSetSelector} to choose a named set.
    */
   private RelationSetSelectorControl relationSetSelector;
 
-  /**
-   * Shell used to open dialogs (SaveAs dialog in this case).
-   */
-  protected Shell shell = null;
+  public RelationSetEditorControl(Composite parent) {
+    super(parent, SWT.NONE);
 
-  public Control getControl(
-      Composite parent, RelationCheckedRepository visRepo) {
-    this.shell = parent.getShell();
-
-    Composite topLevel = new Composite(parent, SWT.NONE);
     GridLayout gridLayout = new GridLayout();
     gridLayout.verticalSpacing = 10;
-    topLevel.setLayout(gridLayout);
+    setLayout(gridLayout);
 
-    Composite commands = setupCommandButtons(topLevel);
+    Composite commands = setupCommandButtons(this);
     commands.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, false));
 
-    viewer = new RelationSetRelationTableEditor(visRepo);
-    table = viewer.setupViewer(topLevel);
-    table.getControl().setLayoutData(
+    viewer = new RelationSetTableControl(this);
+    viewer.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, true));
+  }
+
+  public void setInput(Collection<Relation> relations) {
+    viewer.setInput(relations);
+  }
+
+  public void setRelationSetRepository(
+      RelationSetRepository visRepo) {
+    viewer.setVisibiltyRepository(visRepo);
+  }
+
+  public void removeRelationSetRepository(
+      RelationSetRepository relSetRepo) {
+    viewer.removeRelSetRepository(relSetRepo);
   }
 
   private Composite setupCommandButtons(Composite parent) {
@@ -122,17 +118,19 @@ public class RelationSetEditorPart {
     Composite region = new Composite(parent, SWT.None);
     region.setLayout(new GridLayout(3, false));
 
-    Label pickerLabel = RelationSetSelectorControl.createRelationSetLabel(region);
+    Label pickerLabel = new Label(region, SWT.NONE);
     pickerLabel.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, false));
+    pickerLabel.setText("Select Relations: ");
 
     relationSetSelector = new RelationSetSelectorControl(region);
     relationSetSelector.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, false));
 
-    relationSetSelector.addChangeListener(new RelationSetSelectorListener() {
+    relationSetSelector.addChangeListener(
+        new RelationSetSelectorControl.SelectorListener() {
       @Override
-      public void selectedSetChanged(RelationSetDescriptor relationSet) {
+      public void selectedRelationSetChanged(RelationSetDescriptor relationSet) {
         handleRelSetPickerChange(relationSet);
       }
     });
@@ -235,17 +233,6 @@ public class RelationSetEditorPart {
 
   /////////////////////////////////////
 
-  private Collection<Relation> buildSelected() {
-    RelationSetDescriptor pickerSet = relationSetSelector.getSelection();
-    if (null != pickerSet) {
-      return buildRelations(pickerSet);
-    }
-    viewer.getTableRelations();
-
-    // Build selection from list of visible relations.
-    return viewer.getVisibleRelations();
-  }
-
   /**
    * Change listener for RelationSetPickerControl.
    */
@@ -261,50 +248,25 @@ public class RelationSetEditorPart {
    */
   public void selectRelations(Collection<Relation> relations) {
     ISelection selection = new StructuredSelection(relations.toArray());
-    table.setSelection(selection);
+    viewer.setSelection(selection);
   }
 
   private Collection<Relation> buildRelations(RelationSet relationSet) {
     Collection<Relation> result = Lists.newArrayList();
-    for (SourcePlugin plugin : SourcePluginRegistry.getInstances()) {
-      for (Relation relation : plugin.getRelations()) {
-        if (relationSet.contains(relation)) {
-          result.add(relation);
-        }
+    for (Relation relation : RelationRegistry.getRegistryRelations()) {
+      if (relationSet.contains(relation)) {
+        result.add(relation);
       }
     }
     return result;
   }
 
   /**
-   * Return a {@link RelationFinder} describing the current selection.
-   *
-   * @return Return a {@link RelationFinder} describing the current selection.
-   */
-  public RelationSet buildRelationSet() {
-    return RelationSets.createSimple(Sets.newHashSet(buildSelected()));
-  }
-
-  /**
-   * Returns the <code>RelationshipSet</code> that contains the selected
-   * relations in this <code>RelationshipPicker</code>.
-   *
-   * @return Set of relations selected in this picker. Returns an empty object
-   * if a valid {@link RelationshipSetSelector} object is not found.
-   */
-  public RelationSetDescriptor getSelectedRelationSet() {
-    if (relationSetSelector == null) {
-      return RelationSetDescriptors.EMPTY;
-    }
-    return relationSetSelector.getSelection();
-  }
-
-  /**
    * Fill the list with {@link Relation}s.
    */
   public void updateTable(Collection<Relation> relations) {
-    viewer.updateTable(relations);
-    table.refresh(false);
+    viewer.setInput(relations);
+    viewer.refresh(false);
   }
 
   public void setRelationSetSelectorInput(

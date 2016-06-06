@@ -27,12 +27,16 @@ import java.util.Set;
 /**
  * Adds a name to a {@link RelationSet}.
  * 
+ * This is a persistable document type.
+ * 
  * @since 2015 Based on legacy RelationshipSet
  *
  * @author ycoppel@google.com (Yohann Coppel)
  */
 public class RelationSetDescriptor
     implements RelationSet {
+
+  public static final String EXTENSION = "relxml";
 
   private final String name;
 

@@ -14,16 +14,18 @@
  * the License.
  */
 
-package com.google.devtools.depan.matchers.eclipse.ui.editors;
+package com.google.devtools.depan.relations.eclipse.ui.editors;
 
 import com.google.devtools.depan.graph.api.Relation;
+import com.google.devtools.depan.graph.api.RelationSet;
 import com.google.devtools.depan.graph.registry.RelationRegistry;
-import com.google.devtools.depan.matchers.eclipse.ui.widgets.GraphEdgeMatcherEditorPart;
-import com.google.devtools.depan.matchers.eclipse.ui.widgets.ModificationListener;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
-import com.google.devtools.depan.matchers.persistence.EdgeMatcherDocXmlPersist;
-import com.google.devtools.depan.model.GraphEdgeMatcher;
 import com.google.devtools.depan.platform.WorkspaceTools;
+import com.google.devtools.depan.relations.eclipse.ui.widgets.RelationSetEditorControl;
+import com.google.devtools.depan.relations.models.RelationSetDescrRepo;
+import com.google.devtools.depan.relations.models.RelationSetDescriptor;
+import com.google.devtools.depan.relations.models.RelationSetRepository;
+import com.google.devtools.depan.relations.persistence.RelationSetDescriptorXmlPersist;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -33,7 +35,6 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
@@ -49,15 +50,15 @@ import org.eclipse.ui.part.EditorPart;
  * 
  * @author ycoppel@google.com (Yohann Coppel)
  */
-public class GraphEdgeMatcherEditor extends EditorPart {
+public class RelationSetDescriptorEditor extends EditorPart {
 
   public static final String ID =
-      "com.google.devtools.depan.matchers.eclipse.ui.editors.GraphEdgeMatcherEditor";
+      "com.google.devtools.depan.relations.eclipse.ui.editors.RelationSetDescriptorEditor";
 
   /**
-   * EdgeMatcher document that is being edited.
+   * RelationSetDescriptor document that is being edited.
    */
-  private GraphEdgeMatcherDescriptor matcherInfo;
+  private RelationSetDescriptor relSetInfo;
 
   /**
    * The file this editor is editing.
@@ -75,12 +76,11 @@ public class GraphEdgeMatcherEditor extends EditorPart {
   /**
    * Name of matcher in the editor.
    */
-  private Text matcherName;
+  private Text relSetName;
 
-  /**
-   * Relation editing table for EdgeMatcher.
-   */
-  private GraphEdgeMatcherEditorPart edgeMatcherEditor;
+  private RelationSetEditorControl relationSetEditor;
+
+  private RelationSetDescrRepo relRepo;
 
   @Override
   public void doSave(IProgressMonitor monitor) {
@@ -93,14 +93,14 @@ public class GraphEdgeMatcherEditor extends EditorPart {
   public void doSaveAs() {
     SaveAsDialog saveas = new SaveAsDialog(getSite().getShell());
     saveas.setOriginalFile(file);
-    saveas.setOriginalName(matcherInfo.getName());
+    saveas.setOriginalName(relSetInfo.getName());
     if (saveas.open() != SaveAsDialog.OK) {
       return;
     }
 
     // get the file relatively to the workspace.
     IFile saveFile = WorkspaceTools.calcViewFile(
-        saveas.getResult(), GraphEdgeMatcherDescriptor.EXTENSION);
+        saveas.getResult(), RelationSetDescriptor.EXTENSION);
     // TODO: set up a progress monitor
     file = saveFile;
     handleDocumentChange();
@@ -113,10 +113,11 @@ public class GraphEdgeMatcherEditor extends EditorPart {
    */
   private void updateDocument() {
 
-    GraphEdgeMatcher edgeMatcher = edgeMatcherEditor.createEdgeMatcher();
-    GraphEdgeMatcherDescriptor result =
-        new GraphEdgeMatcherDescriptor(matcherName.getText(), edgeMatcher);
-    matcherInfo = result;
+    RelationSet relSet = relRepo.getRelationSet();
+    RelationSetDescriptor result =
+        new RelationSetDescriptor(relSetName.getText(), relSet);
+    relSetInfo = result;
+    relRepo.setRelationSet(relSetInfo);
   }
 
   /**
@@ -127,8 +128,9 @@ public class GraphEdgeMatcherEditor extends EditorPart {
    * @param monitor
    */
   private void persistDocument(IProgressMonitor monitor) {
-    EdgeMatcherDocXmlPersist persist = EdgeMatcherDocXmlPersist.build(false);
-    WorkspaceTools.saveDocument(file, matcherInfo, persist, monitor);
+    RelationSetDescriptorXmlPersist persist =
+        RelationSetDescriptorXmlPersist.build(false);
+    WorkspaceTools.saveDocument(file, relSetInfo, persist, monitor);
 
     setDirtyState(false);
   }
@@ -137,8 +139,8 @@ public class GraphEdgeMatcherEditor extends EditorPart {
     StringBuilder result = new StringBuilder();
 
     // Format matcher name section
-    if (null != matcherInfo) {
-      result.append(matcherInfo.getName());
+    if (null != relSetInfo) {
+      result.append(relSetInfo.getName());
     } else {
       result.append("Unnamed");
     }
@@ -175,8 +177,13 @@ public class GraphEdgeMatcherEditor extends EditorPart {
       IFileEditorInput fileInput = (IFileEditorInput) input;
       file = fileInput.getFile();
 
-      EdgeMatcherDocXmlPersist persist = EdgeMatcherDocXmlPersist.build(true);
-      matcherInfo = persist.load(file.getRawLocationURI());
+      RelationSetDescriptorXmlPersist persist =
+          RelationSetDescriptorXmlPersist.build(true);
+      relSetInfo = persist.load(file.getRawLocationURI());
+
+      relRepo = new RelationSetDescrRepo(
+          RelationRegistry.getRegistryRelations());
+      relRepo.setRelationSet(relSetInfo);
 
       setPartName(buildPartName());
       setDirtyState(false);
@@ -217,7 +224,7 @@ public class GraphEdgeMatcherEditor extends EditorPart {
     layout.horizontalSpacing = 9;
     container.setLayout(layout);
 
-    // Name for matcher ..
+    // Name for RelationSet descriptor ..
     Composite props = new Composite(container, SWT.NONE);
     props.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, false));
@@ -226,16 +233,16 @@ public class GraphEdgeMatcherEditor extends EditorPart {
     Label label = new Label(props, SWT.NULL);
     label.setText("&Name:");
 
-    matcherName = new Text(props, SWT.BORDER | SWT.SINGLE);
-    matcherName.setLayoutData(
+    relSetName = new Text(props, SWT.BORDER | SWT.SINGLE);
+    relSetName.setLayoutData(
         new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-    if (null != matcherInfo) {
-      matcherName.setText(matcherInfo.getName());
+    if (null != relSetInfo) {
+      relSetName.setText(relSetInfo.getName());
     }
-    matcherName.addFocusListener(new FocusAdapter() {
+    relSetName.addFocusListener(new FocusAdapter() {
       @Override
       public void focusLost(FocusEvent e) {
-        if (matcherInfo.getName().equals(matcherName.getText())) {
+        if (relSetInfo.getName().equals(relSetName.getText())) {
           return;
         }
         setDirtyState(true);
@@ -243,28 +250,18 @@ public class GraphEdgeMatcherEditor extends EditorPart {
       }
     });
 
-    // relation picker (list of relationships with forward/backward selectors)
-    edgeMatcherEditor = new GraphEdgeMatcherEditorPart();
-    Control edgeMatcherControl = edgeMatcherEditor.getControl(container);
-    edgeMatcherControl.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+    relationSetEditor = new RelationSetEditorControl(container);
+    relationSetEditor.setLayoutData(
+        new GridData(SWT.FILL, SWT.FILL, true, false));
+    relationSetEditor.setRelationSetRepository(relRepo);
+    relationSetEditor.setInput(RelationRegistry.getRegistryRelations());
 
-    edgeMatcherEditor.updateTable(RelationRegistry.getRegistryRelations());
-    edgeMatcherEditor.updateEdgeMatcher(matcherInfo.getEdgeMatcher());
-
-    // listening for changes, so we can set dirtyState.
-    edgeMatcherEditor.registerModificationListener(
-        new ModificationListener<Relation, Boolean>() {
-
-          @Override
-          public void modify(Relation element, String property, Boolean value) {
-            handleModify(element, property, value);
-          }
-        }
-    );
-  }
-
-  private void handleModify(Relation element, String property, Boolean value) {
-    setDirtyState(true);
+    relRepo.addChangeListener(new RelationSetRepository.ChangeListener() {
+      @Override
+      public void includedRelationChanged(Relation relation, boolean visible) {
+        setDirtyState(true);
+      }
+    });
   }
 
   private void handleDocumentChange() {

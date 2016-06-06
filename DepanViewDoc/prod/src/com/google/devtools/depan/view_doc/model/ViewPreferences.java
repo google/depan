@@ -19,6 +19,7 @@ package com.google.devtools.depan.view_doc.model;
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeTreeProvider;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.api.RelationSet;
+import com.google.devtools.depan.graph.registry.RelationRegistry;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
@@ -493,7 +494,7 @@ public class ViewPreferences {
       return;
     }
 
-    Set<Relation> visibleRelations = getVisibleRelations();
+    Collection<Relation> visibleRelations = getVisibleRelations();
     if (isVisible) {
       visibleRelations.add(relation);
       visibleRelationSet = RelationSets.createSimple(visibleRelations);
@@ -517,17 +518,15 @@ public class ViewPreferences {
     }
   }
 
-  private Set<Relation> getVisibleRelations() {
-    Set<Relation> result = Sets.newHashSet();
-    for (Relation relation : getDisplayRelations()) {
-      if (isVisibleRelation(relation))
-        result.add(relation);
-    }
-    return result;
+  private Collection<Relation> getVisibleRelations() {
+    return RelationSets.filterRelations(
+        visibleRelationSet, getDisplayRelations());
   }
 
   public Collection<Relation> getDisplayRelations() {
-    return Lists.newArrayList(relationProperties.keySet());
+    // TODO: Should be based on included Relation plugins from
+    // GraphDoc reference
+    return RelationRegistry.getRegistryRelations();
   }
 
   public EdgeDisplayProperty getRelationProperty(Relation relation) {
