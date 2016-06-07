@@ -50,7 +50,7 @@ public class ColorPreferencesPage extends FieldEditorPreferencePage
 
   @Override
   public void init(IWorkbench workbench) {
-    setDescription("Define Maven Node Color Preferences.");
+    setDescription("Define FileSystem Node Color Preferences.");
     setPreferenceStore(FileSystemActivator.getDefault().getPreferenceStore());
   }
 }
