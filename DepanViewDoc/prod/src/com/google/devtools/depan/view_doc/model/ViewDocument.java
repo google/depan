@@ -223,7 +223,7 @@ public class ViewDocument {
   }
 
   public String getOption(String optionId) {
-    return userPrefs.getDescription();
+    return userPrefs.getOption(optionId);
   }
 
   public void setOption(String optionId, String value) {

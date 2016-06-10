@@ -41,5 +41,78 @@
             restorable="true">
       </view>
    </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="com.google.devtools.depan.view_doc.eclipse.ui.handlers.ViewEditorOptionHandler"
+            description="Ratio from degrees"
+            id="com.google.devtools.depan.eclipse.actions.view.StretchRatio"
+            name="Node ratio">
+      </command>
+      <command
+            defaultHandler="com.google.devtools.depan.view_doc.eclipse.ui.handlers.ViewEditorOptionHandler"
+            description="Node shape from role"
+            id="com.google.devtools.depan.eclipse.actions.view.Shape"
+            name="Shape by role">
+      </command>
+      <command
+            defaultHandler="com.google.devtools.depan.view_doc.eclipse.ui.handlers.ViewEditorOptionHandler"
+            description="Highlight root nodes"
+            id="com.google.devtools.depan.eclipse.actions.view.RootHighlight"
+            name="Root highlight">
+      </command>
+      <command
+            defaultHandler="com.google.devtools.depan.view_doc.eclipse.ui.handlers.ViewEditorOptionHandler"
+            description="Node size from degree"
+            id="com.google.devtools.depan.eclipse.actions.view.Size"
+            name="Size from degree">
+      </command>
+      <command
+            defaultHandler="com.google.devtools.depan.view_doc.eclipse.ui.handlers.ViewEditorOptionHandler"
+            description="Node stroke for select"
+            id="com.google.devtools.depan.eclipse.actions.view.StrokeHighlight"
+            name="Stroke highlight">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="menu:org.eclipse.ui.main.menu">
+         <menu
+               label="View">
+            <command
+                  commandId="com.google.devtools.depan.eclipse.actions.view.RootHighlight"
+                  icon="icons/flag_red.png"
+                  label="Root highlight"
+                  style="toggle">
+            </command>
+            <command
+                  commandId="com.google.devtools.depan.eclipse.actions.view.StrokeHighlight"
+                  icon="icons/link_go.png"
+                  label="Stroke highlight"
+                  style="toggle">
+            </command>
+            <command
+                  commandId="com.google.devtools.depan.eclipse.actions.view.Shape"
+                  icon="icons/plugin.png"
+                  label="Shape by role"
+                  style="toggle">
+            </command>
+            <command
+                  commandId="com.google.devtools.depan.eclipse.actions.view.StretchRatio"
+                  icon="icons/shape_handles.png"
+                  label="Ratio from degrees"
+                  style="toggle">
+            </command>
+            <command
+                  commandId="com.google.devtools.depan.eclipse.actions.view.Size"
+                  icon="icons/lightning.png"
+                  label="Size from degree"
+                  style="toggle">
+            </command>
+         </menu>
+      </menuContribution>
+   </extension>
 
 </plugin>

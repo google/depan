@@ -523,6 +523,10 @@ public class ViewEditor extends MultiPageEditorPart {
     viewInfo.setOption(optionId, value);
   }
 
+  public void setBooleanOption(String optionId, boolean value) {
+    viewInfo.setOption(optionId, OptionPreferences.booleanValue(value));
+  }
+
   /**
    * Take a screenshot of the given view. Ask the user a filename, and use
    * this filename to determine which type of file format has to be used.
@@ -1261,22 +1265,18 @@ public class ViewEditor extends MultiPageEditorPart {
   /////////////////////////////////////
   // Handle configuration and changes from options
 
-  private boolean getBooleanOption(String optionId) {
-    return Boolean.parseBoolean(viewInfo.getOption(optionId));
-  }
-
   private void prepareRenderOptions() {
     prepareColorSupplier();
     updateRootHighlight(
-        getBooleanOption(OptionPreferences.ROOTHIGHLIGHT_ID));
+        isOptionChecked(OptionPreferences.ROOTHIGHLIGHT_ID));
     updateNodeStretchRatio(
-        getBooleanOption(OptionPreferences.STRETCHRATIO_ID));
+        isOptionChecked(OptionPreferences.STRETCHRATIO_ID));
     updateNodeSize(
-        getBooleanOption(OptionPreferences.SIZE_ID));
+        isOptionChecked(OptionPreferences.SIZE_ID));
     updateNodeStrokeHighlight(
-        getBooleanOption(OptionPreferences.STROKEHIGHLIGHT_ID));
+        isOptionChecked(OptionPreferences.STROKEHIGHLIGHT_ID));
     updateNodeShape(
-        getBooleanOption(OptionPreferences.SHAPE_ID));
+        isOptionChecked(OptionPreferences.SHAPE_ID));
   }
 
   private void handleOptionChange(String optionId, String value) {

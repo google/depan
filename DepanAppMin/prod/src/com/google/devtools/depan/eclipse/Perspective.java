@@ -35,7 +35,7 @@ public class Perspective implements IPerspectiveFactory {
   public void createInitialLayout(IPageLayout layout) {
     // Define shortcuts for DepAn perspective
     // TODO: layout.addShowViewShortcut(Tools.VIEW_ID);
-    layout.addNewWizardShortcut(NewDepanProjectWizard.WIZARD_ID);
+    // layout.addNewWizardShortcut(NewDepanProjectWizard.WIZARD_ID);
 
     // Define screen regions for DepAn perspective
     IFolderLayout folder = layout.createFolder("views",

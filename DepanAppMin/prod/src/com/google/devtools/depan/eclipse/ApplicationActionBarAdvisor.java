@@ -26,8 +26,8 @@ import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.actions.ActionFactory;
-import org.eclipse.ui.actions.ContributionItemFactory;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
+import org.eclipse.ui.actions.ContributionItemFactory;
 import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
 
@@ -64,7 +64,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     register(saveAsAction);
     preferencesAction = ActionFactory.PREFERENCES.create(window);
     register(preferencesAction);
-
   }
 
   @Override
@@ -108,11 +107,12 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
   @Override
   protected void fillCoolBar(ICoolBarManager coolBar) {
     IToolBarManager toolbar = new ToolBarManager(coolBar.getStyle());
-    coolBar.add(toolbar);
     toolbar.add(saveAction);
     toolbar.add(ContributionItemFactory.NEW_WIZARD_SHORTLIST
         .create(getActionBarConfigurer().getWindowConfigurer().getWindow()));
+
+    coolBar.add(toolbar);
     // allow contributions here with id "additions" (MB_ADDITIONS)
-    coolBar.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+    // coolBar.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
   }
 }

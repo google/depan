@@ -39,6 +39,10 @@ public class OptionPreferences {
   public static final String STROKEHIGHLIGHT_ID =
       "com.google.devtools.depan.eclipse.actions.view.StrokeHighlight";
 
+  /**
+   * Various options where the default is not a {@code null} {@link String}
+   * (or a {@code false} {@link boolean}.
+   */
   public static final Map<String, String> DEFAULT_OPTIONS =
       buildDefaultOptions();
 

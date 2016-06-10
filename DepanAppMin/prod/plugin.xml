@@ -5,7 +5,8 @@
          id="application_min"
          name="DepAn [min]"
          point="org.eclipse.core.runtime.applications">
-      <application>
+      <application
+            icon="icons/branding/depan-icon-16x16.gif">
          <run
                class="com.google.devtools.depan.eclipse.Application">
          </run>
