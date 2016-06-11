@@ -40,6 +40,14 @@
             name="Visible Relations"
             restorable="true">
       </view>
+      <view
+            category="com.google.devtools.depan.view_doc.eclipse.ui.views"
+            class="com.google.devtools.depan.view_doc.eclipse.ui.views.EdgeDisplayViewPart"
+            icon="icons/relpicker.png"
+            id="com.google.devtools.depan.view_doc.eclipse.ui.views.EdgeDisplayViewPart"
+            name="Relation Properties"
+            restorable="true">
+      </view>
    </extension>
    <extension
          point="org.eclipse.ui.commands">

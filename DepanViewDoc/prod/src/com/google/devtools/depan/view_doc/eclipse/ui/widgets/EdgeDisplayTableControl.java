@@ -14,20 +14,16 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.eclipse.utils;
+package com.google.devtools.depan.view_doc.eclipse.ui.widgets;
 
-import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
-import com.google.devtools.depan.eclipse.plugins.SourcePluginRegistry;
-import com.google.devtools.depan.eclipse.plugins.SourcePlugins;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.platform.AlphabeticSorter;
+import com.google.devtools.depan.platform.Colors;
 import com.google.devtools.depan.platform.InverseSorter;
 import com.google.devtools.depan.platform.LabelProviderToString;
 import com.google.devtools.depan.platform.eclipse.ui.tables.EditColTableDef;
 import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty;
-
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import com.google.devtools.depan.view_doc.model.EdgeDisplayRepository;
 
 import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -36,10 +32,8 @@ import org.eclipse.jface.viewers.ColorCellEditor;
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
 import org.eclipse.jface.viewers.ICellModifier;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
@@ -48,6 +42,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -55,15 +50,11 @@ import org.eclipse.swt.widgets.TableItem;
 
 import java.awt.Color;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Run a view of the known relations as its own reusable "part".
  */
-public class RelationPropertyRelationTableEditor {
+public class EdgeDisplayTableControl extends Composite {
 
   public static final String COL_NAME = "Name";
   public static final String COL_SOURCE = "Source";
@@ -78,8 +69,6 @@ public class RelationPropertyRelationTableEditor {
   public static final int INDEX_COLOR = 2;
   public static final int INDEX_STYLE = 3;
   public static final int INDEX_ARROWHEAD = 4;
-//  public static final int INDEX_WIDTH = 2;
-//  public static final int INDEX_SHAPE = 0;
 
   private static final EditColTableDef[] TABLE_DEF = new EditColTableDef[] {
     new EditColTableDef(COL_NAME, false, COL_NAME, 180),
@@ -99,94 +88,105 @@ public class RelationPropertyRelationTableEditor {
     "arched", "straight"
   };
 
-  /**
-   * Abstract repository that provides access to the relation properties.
-   * 
-   * The normal one, from RelationPickerTool, is editor aware.
-   */
-  public static interface RelPropRepository {
+  private static final String[] UPDATE_COLUMNS = new String [] {
+    COL_COLOR, COL_WIDTH, COL_ARROWHEAD
+  };
 
-    /**
-     * Provide the display properties for the supplied relation.
-     */
-    EdgeDisplayProperty getDisplayProperty(Relation rel);
+  private class ControlChangeListener
+      implements EdgeDisplayRepository.ChangeListener {
 
-    /**
-     * Change the display properties for the supplied relation to the new
-     * values.
-     */
-    void setDisplayProperty(Relation rel, EdgeDisplayProperty prop);
+    @Override
+    public void edgeDisplayChanged(Relation relation, EdgeDisplayProperty props) {
+      propViewer.update(relation, UPDATE_COLUMNS);
+    }
   }
 
-  private final RelPropRepository propRepo;
+  private ControlChangeListener propListener;
 
-  private TableViewer viewer;
+  private EdgeDisplayRepository propRepo;
 
-  private Map<Relation, SourcePlugin> relPlugin = Maps.newHashMap();
+  private TableViewer propViewer;
 
-  public RelationPropertyRelationTableEditor(RelPropRepository propRepo) {
-    this.propRepo = propRepo;
-  }
+  public EdgeDisplayTableControl(Composite parent) {
+    super(parent, SWT.NONE);
 
-  public TableViewer setupViewer(Composite parent) {
-    viewer = new TableViewer(parent,
+    GridLayout gridLayout = new GridLayout();
+    gridLayout.marginHeight = 0;
+    gridLayout.marginWidth = 0;
+    setLayout(gridLayout);
+
+    propViewer = new TableViewer(this,
         SWT.FULL_SELECTION | SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
     // set up label provider
-    viewer.setLabelProvider(new RelEditorLabelProvider());
+    propViewer.setLabelProvider(new EdgeDisplayLabelProvider());
 
     // Set up layout properties
-    Table relTableControl = viewer.getTable();
-    relTableControl.setLayoutData(
+    Table propTableControl = propViewer.getTable();
+    propTableControl.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, true));
-    relTableControl.setToolTipText("List of Relations");
+    propTableControl.setToolTipText("Edge Display Properties");
 
     // initialize the table
-    relTableControl.setHeaderVisible(true);
-    EditColTableDef.setupTable(TABLE_DEF, relTableControl);
+    propTableControl.setHeaderVisible(true);
+    EditColTableDef.setupTable(TABLE_DEF, propTableControl);
 
     // Configure cell editing
     CellEditor[] cellEditors = new CellEditor[6];
     cellEditors[INDEX_NAME] = null;
     cellEditors[INDEX_SOURCE] = null;
-    cellEditors[INDEX_COLOR] = new ColorCellEditor(relTableControl);
-    cellEditors[INDEX_STYLE] = new ComboBoxCellEditor(relTableControl,
-        Tools.toString(EdgeDisplayProperty.LineStyle.values(), true));
-    cellEditors[INDEX_ARROWHEAD] = new ComboBoxCellEditor(relTableControl,
-        Tools.toString(EdgeDisplayProperty.ArrowheadStyle.values(), true));
+    cellEditors[INDEX_COLOR] = new ColorCellEditor(propTableControl);
+    cellEditors[INDEX_STYLE] = new ComboBoxCellEditor(propTableControl,
+        toString(EdgeDisplayProperty.LineStyle.values(), true));
+    cellEditors[INDEX_ARROWHEAD] = new ComboBoxCellEditor(propTableControl,
+        toString(EdgeDisplayProperty.ArrowheadStyle.values(), true));
 
-    viewer.setCellEditors(cellEditors);
-    viewer.setColumnProperties(EditColTableDef.getProperties(TABLE_DEF));
-    viewer.setCellModifier(new RelEditorCellModifierHandler());
+    propViewer.setCellEditors(cellEditors);
+    propViewer.setColumnProperties(EditColTableDef.getProperties(TABLE_DEF));
+    propViewer.setCellModifier(new EdgeDisplayCellModifier());
 
     // TODO: Add column sorters, filters?
-    configSorters(relTableControl);
+    configSorters(propTableControl);
 
     // Configure content last: use updateTable() to render relations
-    viewer.setContentProvider(ArrayContentProvider.getInstance());
-
-    return viewer;
+    propViewer.setContentProvider(ArrayContentProvider.getInstance());
   }
+
+  private String[] toString(Object[] objs, boolean lowercase) {
+    String[] s = new String[objs.length];
+    int i = 0;
+    for (Object o : objs) {
+      s[i++] = lowercase ? o.toString().toLowerCase() : o.toString();
+    }
+    return s;
+  }
+
 
   /**
    * Fill the list with {@link Relation}s.
+   * Since rendering depends on propRepo, set input after 
+   * the propRepo is installed.
    */
-  public void updateTable(List<SourcePlugin> plugins) {
-    // Build mapping from relations to their defining plugins.
-    // TODO: Make this a property of the view.
-    for (SourcePlugin plugin : plugins) {
-      for (Relation relation : plugin.getRelations()) {
-        relPlugin.put(relation, plugin);
-      }
-    }
-
-    // Since rendering depends on relPlugin, set input after
-    // relPlugin is updated.
-    viewer.setInput(SourcePlugins.getRelations(plugins));
+  public void setInput(Collection<Relation> relations) {
+    propViewer.setInput(relations);
   }
 
   @SuppressWarnings("unchecked")
-  public List<Relation> getTableRelations() {
-    return (List<Relation>) viewer.getInput();
+  public Collection<Relation> getInput() {
+    return (Collection<Relation>) propViewer.getInput();
+  }
+
+  public void setEdgeDisplayRepository(EdgeDisplayRepository edgeDisplayRepo) {
+    this.propRepo = edgeDisplayRepo;
+    propListener = new ControlChangeListener();
+    propRepo.addChangeListener(propListener);
+  }
+
+  public void removeEdgeDisplayRepository(EdgeDisplayRepository edgeDisplayRepo) {
+    if (null != propListener) {
+      this.propRepo.removeChangeListener(propListener);
+      propListener = null;
+    }
+    this.propRepo = null;
   }
 
   /////////////////////////////////////
@@ -221,56 +221,6 @@ public class RelationPropertyRelationTableEditor {
     return new EdgeDisplayProperty();
   }
 
-   /**
-   * Invert the set of relations selected in the table.
-   * Don't change the state of any relation.
-   */
-  public void invertSelectedRelations() {
-    ISelection selection = viewer.getSelection();
-    if (!(selection instanceof IStructuredSelection)) {
-      return;
-    }
-
-    IStructuredSelection structuredSelection = (IStructuredSelection) selection;
-    Collection<Relation> inverse =
-        computeInverseRelations(getTableRelations(), structuredSelection);
-
-    StructuredSelection nextSelection =
-        new StructuredSelection(inverse.toArray());
-    viewer.setSelection(nextSelection, true);
-  }
-
-  private Collection<Relation> getSelectedRelations() {
-    ISelection selection = viewer.getSelection();
-    if (!(selection instanceof IStructuredSelection)) {
-      return Collections.emptyList();
-    }
-
-    Collection<Relation> result = Sets.newHashSet();
-    @SuppressWarnings("rawtypes")
-    Iterator iter = ((IStructuredSelection) selection).iterator();
-    while (iter.hasNext()) {
-      result.add((Relation) iter.next());
-    }
-    return result;
-  }
-
-  private Collection<Relation> computeInverseRelations(
-      Collection<Relation> universe, IStructuredSelection selection) {
-
-    if (selection.isEmpty()) {
-      return universe;
-    }
-
-    Collection<Relation> inverse = Sets.newHashSet(universe);
-    @SuppressWarnings("rawtypes")
-    Iterator iter = selection.iterator();
-    while (iter.hasNext()) {
-      inverse.remove((Relation) iter.next());
-    }
-    return inverse;
-  }
-
   /////////////////////////////////////
   // Column sorting
 
@@ -293,7 +243,7 @@ public class RelationPropertyRelationTableEditor {
   }
 
   private int getSortDirection(TableColumn column) {
-    Table tableControl = (Table) viewer.getControl();
+    Table tableControl = (Table) propViewer.getControl();
     if (column != tableControl.getSortColumn()) {
       return SWT.DOWN;
     }
@@ -310,16 +260,17 @@ public class RelationPropertyRelationTableEditor {
       sorter = new InverseSorter(sorter);
     }
 
-    Table tableControl = (Table) viewer.getControl();
-    viewer.setSorter(sorter);
+    Table tableControl = (Table) propViewer.getControl();
+    propViewer.setSorter(sorter);
     tableControl.setSortColumn(column);
     tableControl.setSortDirection(direction);
   }
 
   private ViewerSorter buildColumnSorter(int colIndex) {
+
     // By default, use an alphabetic sort over the column labels.
     ITableLabelProvider labelProvider =
-        (ITableLabelProvider) viewer.getLabelProvider();
+        (ITableLabelProvider) propViewer.getLabelProvider();
     ViewerSorter result = new AlphabeticSorter(
         new LabelProviderToString(labelProvider, colIndex));
     return result;
@@ -328,19 +279,19 @@ public class RelationPropertyRelationTableEditor {
   /////////////////////////////////////
   // Label provider for table cell text
 
-  private class RelEditorLabelProvider extends LabelProvider
+  private class EdgeDisplayLabelProvider extends LabelProvider
       implements ITableLabelProvider {
 
     @Override
     public String getColumnText(Object element, int columnIndex) {
       if (element instanceof Relation) {
-        Relation rel = (Relation) element;
-        EdgeDisplayProperty prop = getDisplayProperty(rel);
+        Relation relation = (Relation) element;
+        EdgeDisplayProperty prop = getDisplayProperty(relation);
         switch (columnIndex) {
         case INDEX_NAME:
-          return rel.toString();
+          return relation.toString();
         case INDEX_SOURCE:
-          return getSourceLabelForRelation(rel);
+          return getSourceLabelForRelation(relation);
         case INDEX_COLOR:
           return getColorName(prop);
         // case INDEX_WIDTH:
@@ -360,10 +311,17 @@ public class RelationPropertyRelationTableEditor {
     }
 
     private String getSourceLabelForRelation(Relation relation) {
-      SourcePlugin plugin = relPlugin.get(relation);
-      SourcePluginRegistry registry = SourcePluginRegistry.getInstance();
-      String sourceId = registry.getPluginId(plugin);
-      return registry.getSourcePluginEntry(sourceId).getSource();
+      ClassLoader loader = relation.getClass().getClassLoader();
+      String result = loader.toString();
+      int bound = result.length();
+      int start = Math.max(0, bound - 12);
+      return result.substring(start);
+
+      // TODO: More like this, with an relation registry
+      // SourcePlugin plugin = relPlugin.get(relation);
+      // SourcePluginRegistry registry = SourcePluginRegistry.getInstance();
+      // String sourceId = registry.getPluginId(plugin);
+      // return registry.getSourcePluginEntry(sourceId).getSource();
     }
 
     private String getColorName(EdgeDisplayProperty prop) {
@@ -374,13 +332,12 @@ public class RelationPropertyRelationTableEditor {
       if (null == color) {
         return null;
       }
-      String result = StringConverter.asString(Tools.rgbFromColor(color));
+      String result = StringConverter.asString(Colors.rgbFromColor(color));
       return "(" + result + ")";
     }
 
     @Override
     public Image getColumnImage(Object element, int columnIndex) {
-      // No table columns use an image.
       return null;
     }
   }
@@ -388,7 +345,7 @@ public class RelationPropertyRelationTableEditor {
   /////////////////////////////////////
   // Value provider/modifier for edit cells
 
-  private class RelEditorCellModifierHandler implements ICellModifier{
+  private class EdgeDisplayCellModifier implements ICellModifier{
 
     @Override
     public boolean canModify(Object element, String property) {
@@ -397,28 +354,28 @@ public class RelationPropertyRelationTableEditor {
 
     @Override
     public Object getValue(Object element, String property) {
-      if (element instanceof Relation) {
-        Relation rel = (Relation) element;
-        EdgeDisplayProperty relProp = getDisplayProperty(rel);
-        if (COL_COLOR.equals(property)) {
-          Color relColor = relProp.getColor();
-          if (null == relColor) {
-            return new RGB(0, 0, 0);
-          }
-          RGB result = Tools.rgbFromColor(relColor);
-          return result;
-        }
-        if (COL_ARROWHEAD.equals(property)) {
-          return relProp.getArrowhead().ordinal();
-        }
-        if (COL_STYLE.equals(property)) {
-          return relProp.getLineStyle().ordinal();
-        }
-        if (COL_SHAPE.equals(property)) {
-          
-        }
+      if (!(element instanceof Relation)) {
+        return null;
       }
-      // TODO Auto-generated method stub
+      Relation relation = (Relation) element;
+      EdgeDisplayProperty relProp = getDisplayProperty(relation);
+      if (COL_COLOR.equals(property)) {
+        Color relColor = relProp.getColor();
+        if (null == relColor) {
+          return new RGB(0, 0, 0);
+        }
+         RGB result = Colors.rgbFromColor(relColor);
+        return result;
+      }
+      if (COL_ARROWHEAD.equals(property)) {
+        return relProp.getArrowhead().ordinal();
+      }
+      if (COL_STYLE.equals(property)) {
+        return relProp.getLineStyle().ordinal();
+      }
+      if (COL_SHAPE.equals(property)) {
+        
+      }
       return null;
     }
 
@@ -444,12 +401,20 @@ public class RelationPropertyRelationTableEditor {
       } else if (property.equals(COL_ARROWHEAD) && (value instanceof Integer)) {
         relProp.setArrowhead(EdgeDisplayProperty.ArrowheadStyle.values()[(Integer) value]);
       } else if (property.equals(COL_COLOR) && (value instanceof RGB)) {
-        Color newColor = Tools.colorFromRgb((RGB) value);
+        Color newColor = Colors.colorFromRgb((RGB) value);
         relProp.setColor(newColor);
       }
 
       saveDisplayProperty(relation, relProp);
-      viewer.update(relation, new String[] {property});
+      // Viewer update via ChangeListener
     }
+  }
+
+  public void setSelection(ISelection selection) {
+    propViewer.setSelection(selection);
+  }
+
+  public void refresh(boolean refresh) {
+    propViewer.refresh(refresh);
   }
 }
