@@ -30,14 +30,15 @@ import com.google.devtools.depan.filesystem.graph.FileSystemRelation;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.model.Element;
 import com.google.devtools.depan.model.ElementTransformer;
+import com.google.devtools.depan.persistence.XStreamConfig;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
+import com.google.devtools.depan.remap_doc.plugins.ElementEditor;
+import com.google.devtools.depan.view_doc.eclipse.ui.plugins.ElementClassTransformer;
 
 import com.google.common.collect.Lists;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
-
-import sun.security.krb5.Config;
 
 import java.awt.Color;
 import java.util.Collection;
@@ -50,7 +51,7 @@ import java.util.Comparator;
  *
  * @author tugrul@google.com (Tugrul Ince)
  */
-public class FileSystemPlugin extends AbstractSourcePlugin {
+public class FileSystemPlugin { // { extends AbstractSourcePlugin {
 
   /**
    * List of Analysis wizards to include in the DepAn perspective.
@@ -87,8 +88,8 @@ public class FileSystemPlugin extends AbstractSourcePlugin {
     classes.add(DirectoryElement.class);
     classes.add(FileElement.class);
 
-    Builder containerBuilder = RelationSetDescriptor.createBuilder(
-        "Filesystem Containers");
+    RelationSetDescriptor.Builder containerBuilder =
+        RelationSetDescriptor.createBuilder("Filesystem Containers");
     relations = Lists.newArrayList(); 
     for (Relation r : FileSystemRelation.values()) {
       relations.add(r);
@@ -119,67 +120,67 @@ public class FileSystemPlugin extends AbstractSourcePlugin {
   }
 
   public FileSystemPlugin() {
-    setupEdgeMatchers();
+    // setupEdgeMatchers();
   }
 
-  @Override
+  // @Override
   public Collection<Class<? extends Element>> getElementClasses() {
     return classes;
   }
 
-  @Override
+  // @Override
   public Collection<? extends Relation> getRelations() {
     return relations;
   }
 
-  @Override
+  // @Override
   public Collection<? extends RelationSetDescriptor> getBuiltinRelationshipSets() {
     return builtinSets;
   }
 
-  @Override
+  // @Override
   public RelationSetDescriptor getDefaultRelationSetDescriptor() {
     return FS_CONTAINER;
   }
 
-  @Override
+  // @Override
   public ElementTransformer<Color> getElementColorProvider() {
     return FileSystemNodePainter.getInstance();
   }
 
-  @Override
+  // @Override
   public ElementClassTransformer<Class<? extends ElementEditor>>
       getElementEditorProvider() {
     return FileSystemElementEditors.getInstance();
   }
 
-  @Override
+  // @Override
   public ElementTransformer<ImageDescriptor>
       getElementImageDescriptorProvider() {
     return FileSystemIconTransformer.getInstance();
   }
 
-  @Override
+  // @Override
   public ElementTransformer<Image> getElementImageProvider() {
     return FileSystemImageTransformer.getInstance();
   }
 
-  @Override
+  // @Override
   public ElementTransformer<GLEntity> getElementShapeProvider() {
     return FileSystemShapeTransformer.getInstance();
   }
 
-  @Override
+  // @Override
   public Comparator<Element> getElementSorter() {
     return FileSystemNodeComparator.getInstance();
   }
 
-  @Override
-  public Config getXMLConfig() {
-    return FileSystemDefinitions.getInstance();
+  // @Override
+  public XStreamConfig getXMLConfig() {
+    return null; // FileSystemDefinitions.getInstance();
   }
 
-  @Override
+  // @Override
   public Collection<String> getNewAnalysisIds() {
     return ANALYSIS_WIZARD_IDS;
   }

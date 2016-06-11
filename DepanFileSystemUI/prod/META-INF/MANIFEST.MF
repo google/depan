@@ -19,5 +19,7 @@ Require-Bundle: org.eclipse.core.runtime,
  com.google.devtools.depan.graph_doc.ui,
  com.google.devtools.depan.view_doc,
  com.google.guava,
- com.google.devtools.depan.platform
+ com.google.devtools.depan.platform,
+ com.google.devtools.depan.remap,
+ com.google.devtools.depan.persistence
 Import-Package: com.google.devtools.depan.eclipse.ui.nodes.plugins

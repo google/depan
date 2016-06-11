@@ -16,12 +16,13 @@
 
 package com.google.devtools.depan.remap_doc.eclipse.ui.editors;
 
+import com.google.devtools.depan.remap_doc.eclipse.ui.registry.RemapRegistry;
+import com.google.devtools.depan.remap_doc.model.MigrationRule;
+
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 
-import com.google.devtools.depan.eclipse.plugins.SourcePluginRegistry;
-import com.google.devtools.depan.tasks.MigrationRule;
 
 /**
  * A Helper class for RemapTable, handling text labels and icons.
@@ -38,7 +39,7 @@ public class RemapTableHelper extends LabelProvider
       MigrationRule<?> rule = (MigrationRule<?>) element;
       switch (columnIndex) {
       case 0:
-        return SourcePluginRegistry.getImage(rule.getSource());
+        return RemapRegistry.getRegistryImage(rule.getSource());
       default:
         break;
       }

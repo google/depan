@@ -19,7 +19,10 @@ package com.google.devtools.depan.remap_doc.eclipse.ui.widgets;
 import com.google.common.collect.Maps;
 
 import com.google.devtools.depan.model.Element;
+import com.google.devtools.depan.remap_doc.eclipse.ui.registry.RemapContributor;
+import com.google.devtools.depan.remap_doc.eclipse.ui.registry.RemapRegistry;
 import com.google.devtools.depan.remap_doc.plugins.ElementEditor;
+import com.google.devtools.depan.view_doc.eclipse.ui.plugins.ElementClassTransformer;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StackLayout;
@@ -66,7 +69,7 @@ public class DoubleElementEditorChooser extends Composite {
     stackLayout = new StackLayout();
 
     // Install editors for every Element type known to every plugin
-    for (SourcePlugin p : SourcePluginRegistry.getInstances()) {
+    for (RemapContributor p : RemapRegistry.getRegistryRemapContributions()) {
       // get the transformer for an Element to an ElementEditor
       ElementClassTransformer<Class<? extends ElementEditor>> transformer =
           p.getElementEditorProvider();
@@ -103,7 +106,7 @@ public class DoubleElementEditorChooser extends Composite {
       return;
     }
     Class<? extends ElementEditor> klass =
-        SourcePluginRegistry.getEditor(element);
+        RemapRegistry.getRegistryEditor(element);
     stackLayout.topControl = editors.get(klass);
     this.layout();
   }

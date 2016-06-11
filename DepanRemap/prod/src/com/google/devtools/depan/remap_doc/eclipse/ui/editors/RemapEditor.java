@@ -16,16 +16,17 @@
 
 package com.google.devtools.depan.remap_doc.eclipse.ui.editors;
 
-import com.google.devtools.depan.eclipse.persist.ObjectXmlPersist;
-import com.google.devtools.depan.eclipse.persist.XStreamFactory;
-import com.google.devtools.depan.eclipse.utils.Tools;
-import com.google.devtools.depan.tasks.MigrationGroup;
-import com.google.devtools.depan.tasks.MigrationRule;
-import com.google.devtools.depan.tasks.MigrationTask;
+
+import com.google.devtools.depan.persistence.ObjectXmlPersist;
+import com.google.devtools.depan.persistence.XStreamFactory;
+import com.google.devtools.depan.remap_doc.model.MigrationGroup;
+import com.google.devtools.depan.remap_doc.model.MigrationRule;
+import com.google.devtools.depan.remap_doc.model.MigrationTask;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
@@ -83,7 +84,17 @@ public class RemapEditor extends MultiPageEditorPart
     Color color = new Color(
         getContainer().getDisplay(), new RGB(255, 255, 255));
     for (Control c : getContainer().getChildren()) {
-      Tools.setBackgroundRecursively(color, c);
+      setBackgroundRecursively(color, c);
+    }
+  }
+
+  private static void setBackgroundRecursively(
+      org.eclipse.swt.graphics.Color color, Control control) {
+    control.setBackground(color);
+    if (control instanceof Composite) {
+      for (Control child : ((Composite) control).getChildren()) {
+        setBackgroundRecursively(color, child);
+      }
     }
   }
 
@@ -142,8 +153,7 @@ public class RemapEditor extends MultiPageEditorPart
       try {
         uri = ((IFileEditorInput) input).getFile().getLocationURI();
         // TODO(leeca):  Is this configured with the correct XStream flavor?
-        ObjectXmlPersist persist =
-            new ObjectXmlPersist(XStreamFactory.getSharedRefXStream());
+        ObjectXmlPersist persist = XStreamFactory.build(true, null);
 
         migrationTask = loadMigrationTask(persist);
         this.setPartName(migrationTask.getName());
@@ -162,8 +172,7 @@ public class RemapEditor extends MultiPageEditorPart
   public void doSave(IProgressMonitor monitor) {
     try {
       // TODO(leeca):  Is this configured with the correct XStream flavor?
-      ObjectXmlPersist persist =
-          new ObjectXmlPersist(XStreamFactory.getSharedRefXStream());
+      ObjectXmlPersist persist = XStreamFactory.build(false, null);
       persist.save(uri, migrationTask);
       setDirtyState(false);
     } catch (IOException errIo) {

@@ -16,9 +16,9 @@
 
 package com.google.devtools.depan.remap_doc.eclipse.ui.editors;
 
-import com.google.devtools.depan.eclipse.utils.EditColTableDef;
 import com.google.devtools.depan.platform.TableContentProvider;
-import com.google.devtools.depan.tasks.MigrationRule;
+import com.google.devtools.depan.platform.eclipse.ui.tables.EditColTableDef;
+import com.google.devtools.depan.remap_doc.model.MigrationRule;
 
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.TableViewer;

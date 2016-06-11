@@ -16,10 +16,11 @@
 
 package com.google.devtools.depan.remap_doc.eclipse.ui.editors;
 
-import com.google.devtools.depan.eclipse.utils.Sasher;
-import com.google.devtools.depan.tasks.MigrationGroup;
-import com.google.devtools.depan.tasks.MigrationRule;
-import com.google.devtools.depan.tasks.MigrationTask;
+
+import com.google.devtools.depan.platform.eclipse.ui.widgets.Sasher;
+import com.google.devtools.depan.remap_doc.model.MigrationGroup;
+import com.google.devtools.depan.remap_doc.model.MigrationRule;
+import com.google.devtools.depan.remap_doc.model.MigrationTask;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;

@@ -34,6 +34,7 @@
     <module>../DepanGraphDocUI/prod</module>
     <module>../DepanNodeUI/prod</module>
     <module>../DepanPlatformUI/prod</module>
+    <module>../DepanRemap/prod</module>
     <module>../DepanViewDoc/prod</module>
 
     <!-- Dependency modeling components-->

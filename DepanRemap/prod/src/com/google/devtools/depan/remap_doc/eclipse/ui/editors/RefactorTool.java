@@ -16,9 +16,8 @@
 
 package com.google.devtools.depan.remap_doc.eclipse.ui.editors;
 
-import com.google.devtools.depan.eclipse.utils.Resources;
-import com.google.devtools.depan.eclipse.views.ViewSelectionListenerTool;
 import com.google.devtools.depan.model.GraphNode;
+import com.google.devtools.depan.remap_doc.eclipse.RemapResources;
 import com.google.devtools.depan.remap_doc.eclipse.ui.widgets.DoubleElementEditorChooser;
 
 import org.eclipse.swt.SWT;
@@ -37,11 +36,11 @@ import java.util.Collection;
  * @author ycoppel@google.com (Yohann Coppel)
  *
  */
-public class RefactorTool extends ViewSelectionListenerTool {
+public class RefactorTool { // extends ViewSelectionListenerTool {
 
   private DoubleElementEditorChooser chooser;
 
-  @Override
+  // @Override
   public void emptySelection() {
     chooser.setNoEditor();
   }
@@ -50,17 +49,17 @@ public class RefactorTool extends ViewSelectionListenerTool {
     chooser.setEditorFor(node);
   }
 
-  @Override
+  // @Override
   public Image getIcon() {
-    return Resources.IMAGE_REFACTORING;
+    return RemapResources.IMAGE_REFACTORING;
   }
 
-  @Override
+  // @Override
   public String getName() {
-    return Resources.NAME_REFACTORING;
+    return RemapResources.NAME_REFACTORING;
   }
 
-  @Override
+  // @Override
   public Control setupComposite(Composite parent) {
     Composite composite = new Composite(parent, SWT.NONE);
 
@@ -75,7 +74,7 @@ public class RefactorTool extends ViewSelectionListenerTool {
     return composite;
   }
 
-  @Override
+  // @Override
   public void updateSelectedExtend(Collection<GraphNode> extension) {
     if (extension.size() == 0) {
       emptySelection();
@@ -84,12 +83,12 @@ public class RefactorTool extends ViewSelectionListenerTool {
     setNode(extension.iterator().next());
   }
 
-  @Override
+  // @Override
   public void updateSelectedReduce(Collection<GraphNode> reduction) {
     emptySelection();
   }
 
-  @Override
+  // @Override
   public void updateSelectionTo(Collection<GraphNode> selection) {
     emptySelection();
     updateSelectedExtend(selection);

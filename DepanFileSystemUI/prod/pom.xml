@@ -27,6 +27,11 @@
     </dependency>
 
     <dependency>
+      <groupId>joda-time</groupId>
+      <artifactId>joda-time</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>com.pnambic.depan</groupId>
       <artifactId>depan-jogl-library</artifactId>
     </dependency>
