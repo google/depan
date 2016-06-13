@@ -808,6 +808,15 @@ public class ViewEditor extends MultiPageEditorPart {
     }
   }
 
+  /**
+   * Edges that lack an explict {@link EdgeDisplayProperty} are
+   * updated to render with the latest {@link EdgeDisplayProperty}
+   * associated with the edge's {@link Relation}.
+   * 
+   * This does not directly affect edge visibility, which is
+   * handled separately. (However, poor rendering choices
+   * may lead to invisibly rendered lines.)
+   */
   private void updateEdgesToRelationProperties() {
     for (GraphEdge edge : viewGraph.getEdges()) {
 
@@ -819,12 +828,12 @@ public class ViewEditor extends MultiPageEditorPart {
 
       EdgeDisplayProperty relationProp =
           getRelationProperty(edge.getRelation());
-      if (null == relationProp) {
-        renderer.setEdgeVisible(edge, false);
+      if (null != relationProp) {
+        renderer.updateEdgeProperty(edge, relationProp);
         continue;
       }
-      renderer.updateEdgeProperty(edge, relationProp);
 
+      // Nothing to do if no properties have changed.
     }
   }
 
