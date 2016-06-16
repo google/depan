@@ -18,8 +18,7 @@ package com.google.devtools.depan.view_doc.persistence;
 
 import com.google.devtools.depan.persistence.XStreamConfig;
 import com.google.devtools.depan.view_doc.eclipse.ViewDocResources;
-import com.google.devtools.depan.view_doc.model.ViewDocument;
-import com.google.devtools.depan.view_doc.model.ViewPreferences;
+import com.google.devtools.depan.view_doc.model.EdgeDisplayDocument;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -29,32 +28,24 @@ import java.util.Collection;
 import java.util.Collections;
 
 /**
- * Prepare an {@link XStream} for serializing an {@link ViewDocument}.
+ * Prepare an {@link XStream} for serializing an {@link EdgeDisplayDocument}.
  * 
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public class ViewDocXStreamConfig implements XStreamConfig {
+public class EdgeDisplayDocumentXStreamConfig implements XStreamConfig {
 
-  private static final String VIEW_PREFS = "view-prefs";
+  public static final String EDGE_DISPLAY_INFO_TAG = "edge-display-info";
 
   @Override
   public void config(XStream xstream) {
     xstream.setMode(XStream.NO_REFERENCES);
-
-    xstream.alias(VIEW_PREFS, ViewPreferences.class);
-
-    ViewDocumentConverter converter = ViewDocumentConverter.configXStream(xstream);
-    EdgeReferenceConverter.configXStream(xstream, converter);
-    NodeReferenceConverter.configXStream(xstream, converter);
-
-    CameraPosConverter.configXStream(xstream);
-    CameraDirConverter.configXStream(xstream);
-    GraphModelReferenceConverter.configXStream(xstream);
-    Point2DConverter.configXStream(xstream);
+    xstream.alias(EDGE_DISPLAY_INFO_TAG, EdgeDisplayDocument.class);
   }
+
 
   @Override
   public Collection<? extends Bundle> getDocumentBundles() {
+    // EdgeDisplayDocument is an implicit types derived from ViewDocument.
     return Collections.singletonList(ViewDocResources.BUNDLE);
   }
 }

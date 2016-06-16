@@ -25,6 +25,8 @@ import com.google.devtools.depan.platform.eclipse.ui.tables.EditColTableDef;
 import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty;
 import com.google.devtools.depan.view_doc.model.EdgeDisplayRepository;
 
+import com.google.common.collect.Lists;
+
 import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellEditor;
@@ -32,6 +34,7 @@ import org.eclipse.jface.viewers.ColorCellEditor;
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
 import org.eclipse.jface.viewers.ICellModifier;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
@@ -50,6 +53,8 @@ import org.eclipse.swt.widgets.TableItem;
 
 import java.awt.Color;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Run a view of the known relations as its own reusable "part".
@@ -168,6 +173,30 @@ public class EdgeDisplayTableControl extends Composite {
    */
   public void setInput(Collection<Relation> relations) {
     propViewer.setInput(relations);
+  }
+
+  /**
+   * Provide the set of currently selected {@link Relation} rows in
+   * the {@link TableViewer}.
+   */
+  public Collection<Relation> getSelection() {
+    ISelection selection = propViewer.getSelection();
+    if (!(selection instanceof IStructuredSelection)) {
+      return Collections.emptyList();
+    }
+    List<?> choices = ((IStructuredSelection) selection).toList();
+    if (choices.isEmpty()) {
+      return Collections.emptyList();
+    }
+    Collection<Relation> result =
+        Lists.newArrayListWithExpectedSize(choices.size());
+    for (Object item : choices) {
+      if (!(item instanceof Relation)) {
+        continue;
+      }
+      result .add((Relation) item);
+    }
+    return result;
   }
 
   @SuppressWarnings("unchecked")

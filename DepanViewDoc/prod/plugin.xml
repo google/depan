@@ -17,6 +17,14 @@
             id="com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor"
             name="View Diagram">
       </editor>
+      <editor
+            class="com.google.devtools.depan.view_doc.eclipse.ui.editor.EdgeDisplayEditor"
+            default="false"
+            extensions="vedxml"
+            icon="icons/relpicker.png"
+            id="com.google.devtools.depan.view_doc.eclipse.ui.editor.EdgeDisplayEditor"
+            name="Edge Display">
+      </editor>
    </extension>
    <extension
          point="org.eclipse.ui.views">
@@ -121,6 +129,17 @@
             </command>
          </menu>
       </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <wizard
+            category="com.google.devtools.depan.eclipse.ui.wizards"
+            class="com.google.devtools.depan.view_doc.eclipse.ui.wizards.NewEdgeDisplayDocWizard"
+            icon="icons/relpicker.png"
+            id="com.google.devtools.depan.view_doc.eclipse.ui.wizards.NewEdgeDisplayDocWizard"
+            name="New edge properties"
+            project="true">
+      </wizard>
    </extension>
 
 </plugin>

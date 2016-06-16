@@ -21,6 +21,13 @@ import com.google.devtools.depan.graph.api.Relation;
 import java.util.Map;
 
 /**
+ * Define a persistent document for edge display properties.
+ * This document type is intentionally consistent with the
+ * {@link ViewDocument}'s relation display properties data structure,
+ * and can be created from or inserted into that component.
+ * 
+ * This should be a project managed resource document.
+ * 
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
 public class EdgeDisplayDocument {
@@ -31,7 +38,22 @@ public class EdgeDisplayDocument {
    * Hash map that contains a list of edge display property objects
    * for known relations.
    */
-  private Map<Relation, EdgeDisplayProperty> relationProperties;
+  private final Map<Relation, EdgeDisplayProperty> relationProperties;
 
-  private String name;
+  private final String name;
+
+  public EdgeDisplayDocument(String name,
+      Map<Relation, EdgeDisplayProperty> relationProperties) {
+    super();
+    this.name = name;
+    this.relationProperties = relationProperties;
+  }
+
+  public Map<Relation, EdgeDisplayProperty> getRelationProperties() {
+    return relationProperties;
+  }
+
+  public String getName() {
+    return name;
+  }
 }
