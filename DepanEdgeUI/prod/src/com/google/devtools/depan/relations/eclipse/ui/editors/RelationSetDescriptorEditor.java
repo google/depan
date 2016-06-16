@@ -117,7 +117,7 @@ public class RelationSetDescriptorEditor extends EditorPart {
     RelationSetDescriptor result =
         new RelationSetDescriptor(relSetName.getText(), relSet);
     relSetInfo = result;
-    relRepo.setRelationSet(relSetInfo);
+    relRepo.setRelationSet(relSetInfo.getRelationSet());
   }
 
   /**
@@ -183,7 +183,7 @@ public class RelationSetDescriptorEditor extends EditorPart {
 
       relRepo = new RelationSetDescrRepo(
           RelationRegistry.getRegistryRelations());
-      relRepo.setRelationSet(relSetInfo);
+      relRepo.setRelationSet(relSetInfo.getRelationSet());
 
       setPartName(buildPartName());
       setDirtyState(false);

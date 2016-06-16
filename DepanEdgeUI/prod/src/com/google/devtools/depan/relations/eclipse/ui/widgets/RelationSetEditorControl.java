@@ -238,7 +238,7 @@ public class RelationSetEditorControl extends Composite {
    */
   private void handleRelSetPickerChange(RelationSetDescriptor relationSet) {
     if (null != relationSet) {
-      selectRelations(buildRelations(relationSet));
+      selectRelations(buildRelations(relationSet.getRelationSet()));
     }
   }
 

@@ -17,6 +17,7 @@
 package com.google.devtools.depan.view_doc.eclipse.ui.views;
 
 import com.google.devtools.depan.graph.api.Relation;
+import com.google.devtools.depan.graph.api.RelationSet;
 import com.google.devtools.depan.graph.registry.RelationRegistry;
 import com.google.devtools.depan.relations.eclipse.ui.wizards.NewRelationSetWizard;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
@@ -219,7 +220,8 @@ public class EdgeDisplayViewPart extends AbstractViewDocViewPart {
     URI visURI = new File(visFilename).toURI();
     RelationSetDescriptorXmlPersist loader =
         RelationSetDescriptorXmlPersist.build(true);
-    RelationSetDescriptor visRels = loader.load(visURI);
+    RelationSetDescriptor visDescr = loader.load(visURI);
+    RelationSet visRels = visDescr.getRelationSet();
 
     ViewEditor ed = getEditor();
     for (Relation relation : RelationRegistry.getRegistryRelations()) {

@@ -29,12 +29,14 @@ import java.util.Set;
  * 
  * This is a persistable document type.
  * 
+ * @since Jun-2016 Contains a RelationSet, but isn't one.  This encourages
+ *  clean handling as a document type.
+ *
  * @since 2015 Based on legacy RelationshipSet
  *
  * @author ycoppel@google.com (Yohann Coppel)
  */
-public class RelationSetDescriptor
-    implements RelationSet {
+public class RelationSetDescriptor {
 
   public static final String EXTENSION = "relxml";
 
@@ -57,9 +59,9 @@ public class RelationSetDescriptor
     return name;
   }
 
-  @Override
-  public boolean contains(Relation relation) {
-    return relationSet.contains(relation);
+
+  public RelationSet getRelationSet() {
+    return relationSet;
   }
 
   /**
