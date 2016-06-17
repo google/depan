@@ -479,7 +479,12 @@ public class ViewEditor extends MultiPageEditorPart {
     return viewGraph;
   }
 
-  private GraphModel getExposedGraph() {
+  /**
+   * Provide the {@link GraphModel} that is currently being rendered.
+   * Some nodes or edges of the basis graph may be hidden, compressed,
+   * or aliased.
+   */
+  public GraphModel getExposedGraph() {
     return exposedGraph;
   }
 
