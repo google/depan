@@ -20,10 +20,10 @@ import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.persistence.PersistenceLogger;
 import com.google.devtools.depan.platform.ListenerManager;
 import com.google.devtools.depan.platform.ListenerManager.Dispatcher;
-import com.google.devtools.depan.view_doc.eclipse.ui.widgets.EdgeDisplayTableControl;
-import com.google.devtools.depan.view_doc.model.EdgeDisplayDocument;
+import com.google.devtools.depan.view_doc.eclipse.ui.widgets.RelationDisplayTableControl;
+import com.google.devtools.depan.view_doc.model.RelationDisplayDocument;
 import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty;
-import com.google.devtools.depan.view_doc.model.EdgeDisplayRepository;
+import com.google.devtools.depan.view_doc.model.RelationDisplayRepository;
 
 import com.google.common.collect.Maps;
 
@@ -31,15 +31,15 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
- * Provide an {@link EdgeDisplayRepository} based on an
- * {@link EdgeDisplayDocument}.  The supports integration with the
- * standard {@link EdgeDisplayTableControl} for {@link Relation}
+ * Provide an {@link RelationDisplayRepository} based on an
+ * {@link RelationDisplayDocument}.  The supports integration with the
+ * standard {@link RelationDisplayTableControl} for {@link Relation}
  * grained changes to edge rendering properties.
  * 
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public class EdgeDisplayDocumentRepo
-    implements EdgeDisplayRepository {
+public class RelationDisplayDocumentRepo
+    implements RelationDisplayRepository {
 
   private final Collection<Relation> universe;
 
@@ -60,7 +60,7 @@ public class EdgeDisplayDocumentRepo
     }
   };
 
-  public EdgeDisplayDocumentRepo(Collection<Relation> universe) {
+  public RelationDisplayDocumentRepo(Collection<Relation> universe) {
     this.universe = universe;
   }
 

@@ -18,7 +18,7 @@ package com.google.devtools.depan.view_doc.persistence;
 
 import com.google.devtools.depan.persistence.XStreamConfig;
 import com.google.devtools.depan.view_doc.eclipse.ViewDocResources;
-import com.google.devtools.depan.view_doc.model.EdgeDisplayDocument;
+import com.google.devtools.depan.view_doc.model.RelationDisplayDocument;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -28,18 +28,18 @@ import java.util.Collection;
 import java.util.Collections;
 
 /**
- * Prepare an {@link XStream} for serializing an {@link EdgeDisplayDocument}.
+ * Prepare an {@link XStream} for serializing an {@link RelationDisplayDocument}.
  * 
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public class EdgeDisplayDocumentXStreamConfig implements XStreamConfig {
+public class RelationDisplayDocumentXStreamConfig implements XStreamConfig {
 
   public static final String EDGE_DISPLAY_INFO_TAG = "edge-display-info";
 
   @Override
   public void config(XStream xstream) {
     xstream.setMode(XStream.NO_REFERENCES);
-    xstream.alias(EDGE_DISPLAY_INFO_TAG, EdgeDisplayDocument.class);
+    xstream.alias(EDGE_DISPLAY_INFO_TAG, RelationDisplayDocument.class);
   }
 
 

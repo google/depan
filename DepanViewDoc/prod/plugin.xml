@@ -18,9 +18,9 @@
             name="View Diagram">
       </editor>
       <editor
-            class="com.google.devtools.depan.view_doc.eclipse.ui.editor.EdgeDisplayEditor"
+            class="com.google.devtools.depan.view_doc.eclipse.ui.editor.RelationDisplayEditor"
             default="false"
-            extensions="vedxml"
+            extensions="vrdxml"
             icon="icons/relpicker.png"
             id="com.google.devtools.depan.view_doc.eclipse.ui.editor.EdgeDisplayEditor"
             name="Edge Display">
@@ -50,7 +50,7 @@
       </view>
       <view
             category="com.google.devtools.depan.view_doc.eclipse.ui.views"
-            class="com.google.devtools.depan.view_doc.eclipse.ui.views.EdgeDisplayViewPart"
+            class="com.google.devtools.depan.view_doc.eclipse.ui.views.RelationDisplayViewPart"
             icon="icons/relpicker.png"
             id="com.google.devtools.depan.view_doc.eclipse.ui.views.EdgeDisplayViewPart"
             name="Relation Properties"
@@ -134,7 +134,7 @@
          point="org.eclipse.ui.newWizards">
       <wizard
             category="com.google.devtools.depan.eclipse.ui.wizards"
-            class="com.google.devtools.depan.view_doc.eclipse.ui.wizards.NewEdgeDisplayDocWizard"
+            class="com.google.devtools.depan.view_doc.eclipse.ui.wizards.NewRelationDisplayDocWizard"
             icon="icons/relpicker.png"
             id="com.google.devtools.depan.view_doc.eclipse.ui.wizards.NewEdgeDisplayDocWizard"
             name="New edge properties"

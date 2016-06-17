@@ -5,7 +5,7 @@ import com.google.devtools.depan.graph.api.Relation;
 /**
  * Abstract repository that provides access to edge display properties.
  */
-public interface EdgeDisplayRepository {
+public interface RelationDisplayRepository {
 
   public static interface ChangeListener {
     void edgeDisplayChanged(Relation relation, EdgeDisplayProperty prop);

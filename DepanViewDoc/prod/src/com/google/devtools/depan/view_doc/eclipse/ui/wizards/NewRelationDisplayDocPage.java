@@ -20,7 +20,7 @@ import com.google.devtools.depan.platform.WorkspaceTools;
 import com.google.devtools.depan.resource_doc.eclipse.ui.wizards.AbstractResouceWizardPage;
 import com.google.devtools.depan.resource_doc.eclipse.ui.wizards.ResourceOptionWizard;
 import com.google.devtools.depan.resource_doc.eclipse.ui.wizards.ResourceOutputPart;
-import com.google.devtools.depan.view_doc.model.EdgeDisplayDocument;
+import com.google.devtools.depan.view_doc.model.RelationDisplayDocument;
 
 import com.google.common.base.Strings;
 
@@ -36,16 +36,16 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * A wizard page to create a new {@link EdgeDisplayDocument}.
+ * A wizard page to create a new {@link RelationDisplayDocument}.
  *
  * @author ycoppel@google.com (Yohann Coppel)
  */
-public class NewEdgeDisplayDocPage extends AbstractResouceWizardPage {
+public class NewRelationDisplayDocPage extends AbstractResouceWizardPage {
 
   public static final String DEFAULT_FILENAME =
-      "edges." + EdgeDisplayDocument.EXTENSION;
+      "edges." + RelationDisplayDocument.EXTENSION;
 
-  private final EdgeDisplayDocument propInfo;
+  private final RelationDisplayDocument propInfo;
 
   /**
    * The new name for the edge properties.
@@ -56,7 +56,7 @@ public class NewEdgeDisplayDocPage extends AbstractResouceWizardPage {
    * Construct the new Wizard page.
    * @param propInfo 
    */
-  protected NewEdgeDisplayDocPage(EdgeDisplayDocument propInfo) {
+  protected NewRelationDisplayDocPage(RelationDisplayDocument propInfo) {
     super(null,
         "New edge display properties",
         "Save edge display properties as a resource.");
@@ -73,7 +73,7 @@ public class NewEdgeDisplayDocPage extends AbstractResouceWizardPage {
     return new ResourceOutputPart(
         this, "Edge display properties location",
         outputContainer, outputFilename,
-        EdgeDisplayDocument.EXTENSION);
+        RelationDisplayDocument.EXTENSION);
   }
 
   @Override

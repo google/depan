@@ -23,7 +23,7 @@ import com.google.devtools.depan.platform.InverseSorter;
 import com.google.devtools.depan.platform.LabelProviderToString;
 import com.google.devtools.depan.platform.eclipse.ui.tables.EditColTableDef;
 import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty;
-import com.google.devtools.depan.view_doc.model.EdgeDisplayRepository;
+import com.google.devtools.depan.view_doc.model.RelationDisplayRepository;
 
 import com.google.common.collect.Lists;
 
@@ -59,7 +59,7 @@ import java.util.List;
 /**
  * Run a view of the known relations as its own reusable "part".
  */
-public class EdgeDisplayTableControl extends Composite {
+public class RelationDisplayTableControl extends Composite {
 
   public static final String COL_NAME = "Name";
   public static final String COL_SOURCE = "Source";
@@ -98,7 +98,7 @@ public class EdgeDisplayTableControl extends Composite {
   };
 
   private class ControlChangeListener
-      implements EdgeDisplayRepository.ChangeListener {
+      implements RelationDisplayRepository.ChangeListener {
 
     @Override
     public void edgeDisplayChanged(Relation relation, EdgeDisplayProperty props) {
@@ -108,11 +108,11 @@ public class EdgeDisplayTableControl extends Composite {
 
   private ControlChangeListener propListener;
 
-  private EdgeDisplayRepository propRepo;
+  private RelationDisplayRepository propRepo;
 
   private TableViewer propViewer;
 
-  public EdgeDisplayTableControl(Composite parent) {
+  public RelationDisplayTableControl(Composite parent) {
     super(parent, SWT.NONE);
 
     GridLayout gridLayout = new GridLayout();
@@ -204,13 +204,13 @@ public class EdgeDisplayTableControl extends Composite {
     return (Collection<Relation>) propViewer.getInput();
   }
 
-  public void setEdgeDisplayRepository(EdgeDisplayRepository edgeDisplayRepo) {
-    this.propRepo = edgeDisplayRepo;
+  public void setEdgeDisplayRepository(RelationDisplayRepository propRepo) {
+    this.propRepo = propRepo;
     propListener = new ControlChangeListener();
     propRepo.addChangeListener(propListener);
   }
 
-  public void removeEdgeDisplayRepository(EdgeDisplayRepository edgeDisplayRepo) {
+  public void removeEdgeDisplayRepository(RelationDisplayRepository edgeDisplayRepo) {
     if (null != propListener) {
       this.propRepo.removeChangeListener(propListener);
       propListener = null;

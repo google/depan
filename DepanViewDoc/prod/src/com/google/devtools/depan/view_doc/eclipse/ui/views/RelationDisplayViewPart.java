@@ -20,13 +20,13 @@ import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.registry.RelationRegistry;
 import com.google.devtools.depan.view_doc.eclipse.ViewDocResources;
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
-import com.google.devtools.depan.view_doc.eclipse.ui.widgets.EdgeDisplayTableControl;
-import com.google.devtools.depan.view_doc.eclipse.ui.wizards.NewEdgeDisplayDocWizard;
-import com.google.devtools.depan.view_doc.model.EdgeDisplayDocument;
+import com.google.devtools.depan.view_doc.eclipse.ui.widgets.RelationDisplayTableControl;
+import com.google.devtools.depan.view_doc.eclipse.ui.wizards.NewRelationDisplayDocWizard;
+import com.google.devtools.depan.view_doc.model.RelationDisplayDocument;
 import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty;
-import com.google.devtools.depan.view_doc.model.EdgeDisplayRepository;
+import com.google.devtools.depan.view_doc.model.RelationDisplayRepository;
 import com.google.devtools.depan.view_doc.model.ViewPrefsListener;
-import com.google.devtools.depan.view_doc.persistence.EdgeDisplayDocumentXmlPersist;
+import com.google.devtools.depan.view_doc.persistence.RelationDisplayDocumentXmlPersist;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Maps;
@@ -53,19 +53,19 @@ import java.util.Map;
  *
  * @author ycoppel@google.com (Yohann Coppel)
  */
-public class EdgeDisplayViewPart extends AbstractViewDocViewPart {
+public class RelationDisplayViewPart extends AbstractViewDocViewPart {
 
-  public static final String PART_NAME = "Edge Properties";
+  public static final String PART_NAME = "Relations Properties";
 
   /**
    * The <code>RelationSetEditorControl</code> that controls the UX.
    */
-  private EdgeDisplayTableControl propEditor;
+  private RelationDisplayTableControl propEditor;
 
-  private EdgeDisplayRepository propRepo;
+  private RelationDisplayRepository propRepo;
 
-  private static class ToolEdgeDisplayRepo
-      implements EdgeDisplayRepository {
+  private static class PartRelationDisplayRepo
+      implements RelationDisplayRepository {
 
     private final ViewEditor editor;
 
@@ -73,7 +73,7 @@ public class EdgeDisplayViewPart extends AbstractViewDocViewPart {
 
     private Map<Relation, EdgeDisplayProperty> tempRows;
 
-    public ToolEdgeDisplayRepo(ViewEditor editor) {
+    public PartRelationDisplayRepo(ViewEditor editor) {
       this.editor = editor;
     }
 
@@ -120,9 +120,9 @@ public class EdgeDisplayViewPart extends AbstractViewDocViewPart {
 
   private static class EdgeDisplayListener extends ViewPrefsListener.Simple {
 
-    private EdgeDisplayRepository.ChangeListener listener;
+    private RelationDisplayRepository.ChangeListener listener;
 
-    public EdgeDisplayListener(EdgeDisplayRepository.ChangeListener listener) {
+    public EdgeDisplayListener(RelationDisplayRepository.ChangeListener listener) {
       this.listener = listener;
     }
 
@@ -148,7 +148,7 @@ public class EdgeDisplayViewPart extends AbstractViewDocViewPart {
     Composite result = new Composite(parent, SWT.NONE);
     result.setLayout(new GridLayout());
 
-    propEditor = new EdgeDisplayTableControl(result);
+    propEditor = new RelationDisplayTableControl(result);
     propEditor.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, false));
 
@@ -201,23 +201,23 @@ public class EdgeDisplayViewPart extends AbstractViewDocViewPart {
    */
   private void saveSelection() {
 
-    EdgeDisplayDocument saveInfo = buildSaveDocument();
-    NewEdgeDisplayDocWizard wizard =
-        new NewEdgeDisplayDocWizard(saveInfo);
+    RelationDisplayDocument saveInfo = buildSaveDocument();
+    NewRelationDisplayDocWizard wizard =
+        new NewRelationDisplayDocWizard(saveInfo);
 
     Shell shell = getSite().getWorkbenchWindow().getShell();
     WizardDialog dialog = new WizardDialog(shell, wizard);
     dialog.open();
   }
 
-  private EdgeDisplayDocument buildSaveDocument() {
+  private RelationDisplayDocument buildSaveDocument() {
     Collection<Relation> relations = propEditor.getSelection();
     Map<Relation, EdgeDisplayProperty> props =
         buildEdgeDisplayProperties(relations);
 
     ViewEditor ed = getEditor();
     String name = ed.getBaseName();
-    return new EdgeDisplayDocument(name, props);
+    return new RelationDisplayDocument(name, props);
   }
 
   private Map<Relation, EdgeDisplayProperty>
@@ -243,9 +243,9 @@ public class EdgeDisplayViewPart extends AbstractViewDocViewPart {
     }
 
     URI visURI = new File(visFilename).toURI();
-    EdgeDisplayDocumentXmlPersist loader =
-        EdgeDisplayDocumentXmlPersist.build(true);
-    EdgeDisplayDocument propInfo = loader.load(visURI);
+    RelationDisplayDocumentXmlPersist loader =
+        RelationDisplayDocumentXmlPersist.build(true);
+    RelationDisplayDocument propInfo = loader.load(visURI);
 
     // TODO: Options might control overwriting or adding relations
     ViewEditor ed = getEditor();
@@ -260,7 +260,7 @@ public class EdgeDisplayViewPart extends AbstractViewDocViewPart {
     FileDialog result = new FileDialog(shell, SWT.OPEN);
     String[] names = new String [] {"Relation properties"};
     String[] filters = new String[] {
-        buildExtensionFilter(EdgeDisplayDocument.EXTENSION)};
+        buildExtensionFilter(RelationDisplayDocument.EXTENSION)};
     result.setFilterNames(names);
     result.setFilterExtensions(filters);
     return result;
@@ -283,7 +283,7 @@ public class EdgeDisplayViewPart extends AbstractViewDocViewPart {
 
     ViewEditor editor = getEditor();
 
-    propRepo = new ToolEdgeDisplayRepo(editor);
+    propRepo = new PartRelationDisplayRepo(editor);
     propEditor.setEdgeDisplayRepository(propRepo);
 
     // TODO: Should come from editor

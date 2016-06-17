@@ -19,9 +19,9 @@ package com.google.devtools.depan.view_doc.eclipse.ui.wizards;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.persistence.AbstractDocXmlPersist;
 import com.google.devtools.depan.resource_doc.eclipse.ui.wizards.AbstractNewResourceWizard;
-import com.google.devtools.depan.view_doc.model.EdgeDisplayDocument;
+import com.google.devtools.depan.view_doc.model.RelationDisplayDocument;
 import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty;
-import com.google.devtools.depan.view_doc.persistence.EdgeDisplayDocumentXmlPersist;
+import com.google.devtools.depan.view_doc.persistence.RelationDisplayDocumentXmlPersist;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -31,15 +31,15 @@ import java.util.Collections;
 import java.util.Map;
 
 /**
- * A wizard to create a new {@link EdgeDisplayDocument}.
+ * A wizard to create a new {@link RelationDisplayDocument}.
  * 
- * The name of the supplied (or default) {@link EdgeDisplayDocument} can be
+ * The name of the supplied (or default) {@link RelationDisplayDocument} can be
  * changed, but the rest of the document is unchanged as it is saved.
  *
  * @author ycoppel@google.com (Yohann Coppel)
  */
-public class NewEdgeDisplayDocWizard
-    extends AbstractNewResourceWizard<EdgeDisplayDocument> {
+public class NewRelationDisplayDocWizard
+    extends AbstractNewResourceWizard<RelationDisplayDocument> {
 
   /**
    * Eclipse extension identifier for this wizard.
@@ -50,12 +50,12 @@ public class NewEdgeDisplayDocWizard
   /**
    * The unique page for this wizard.
    */
-  private NewEdgeDisplayDocPage page;
+  private NewRelationDisplayDocPage page;
 
   /**
    * {@link RelationSet} to be saved.
    */
-  private final EdgeDisplayDocument propInfo;
+  private final RelationDisplayDocument propInfo;
 
   /**
    * Constructor for a new wizard, for the creation of a new named
@@ -63,16 +63,16 @@ public class NewEdgeDisplayDocWizard
    *
    * @param finder A {@link DirectedRelationFinder} describing the new set.
    */
-  public NewEdgeDisplayDocWizard(EdgeDisplayDocument propInfo) {
+  public NewRelationDisplayDocWizard(RelationDisplayDocument propInfo) {
     this.propInfo = propInfo;
   }
 
-  public NewEdgeDisplayDocWizard(
+  public NewRelationDisplayDocWizard(
       Map<Relation, EdgeDisplayProperty> edgeProps) {
-    this(new EdgeDisplayDocument("unnamed", edgeProps));
+    this(new RelationDisplayDocument("unnamed", edgeProps));
   }
 
-  public NewEdgeDisplayDocWizard() {
+  public NewRelationDisplayDocWizard() {
     this(Collections.<Relation, EdgeDisplayProperty>emptyMap());
   }
 
@@ -81,7 +81,7 @@ public class NewEdgeDisplayDocWizard
 
   @Override
   public void addPages() {
-    page = new NewEdgeDisplayDocPage(propInfo);
+    page = new NewRelationDisplayDocPage(propInfo);
     addPage(page);
   }
 
@@ -93,7 +93,7 @@ public class NewEdgeDisplayDocWizard
     return 1;
   }
 
-  protected EdgeDisplayDocument buildDocument(IProgressMonitor monitor) {
+  protected RelationDisplayDocument buildDocument(IProgressMonitor monitor) {
     monitor.beginTask("Preparing edge display properties", 1);
     monitor.worked(1);
 
@@ -102,8 +102,8 @@ public class NewEdgeDisplayDocWizard
       return propInfo;
     }
 
-    EdgeDisplayDocument result =
-        new EdgeDisplayDocument(docName, propInfo.getRelationProperties());
+    RelationDisplayDocument result =
+        new RelationDisplayDocument(docName, propInfo.getRelationProperties());
     return result;
   }
 
@@ -118,8 +118,8 @@ public class NewEdgeDisplayDocWizard
   }
 
   @Override
-  protected AbstractDocXmlPersist<EdgeDisplayDocument>
+  protected AbstractDocXmlPersist<RelationDisplayDocument>
       getDocXmlPersist() {
-    return EdgeDisplayDocumentXmlPersist.build(false);
+    return RelationDisplayDocumentXmlPersist.build(false);
   }
 }

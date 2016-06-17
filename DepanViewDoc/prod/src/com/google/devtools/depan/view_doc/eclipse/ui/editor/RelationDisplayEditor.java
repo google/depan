@@ -21,11 +21,11 @@ import com.google.devtools.depan.graph.registry.RelationRegistry;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.platform.WorkspaceTools;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
-import com.google.devtools.depan.view_doc.eclipse.ui.widgets.EdgeDisplayTableControl;
-import com.google.devtools.depan.view_doc.model.EdgeDisplayDocument;
+import com.google.devtools.depan.view_doc.eclipse.ui.widgets.RelationDisplayTableControl;
+import com.google.devtools.depan.view_doc.model.RelationDisplayDocument;
 import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty;
-import com.google.devtools.depan.view_doc.model.EdgeDisplayRepository;
-import com.google.devtools.depan.view_doc.persistence.EdgeDisplayDocumentXmlPersist;
+import com.google.devtools.depan.view_doc.model.RelationDisplayRepository;
+import com.google.devtools.depan.view_doc.persistence.RelationDisplayDocumentXmlPersist;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -48,21 +48,21 @@ import org.eclipse.ui.part.EditorPart;
 import java.util.Map;
 
 /**
- * Editor for {@link EdgeDisplayDocument} resources.
+ * Editor for {@link RelationDisplayDocument} resources.
  * 
  * Based on the [Jun 2106] legacy version of {@code RelationSetDescriptorEditor}.
  * 
  * @author ycoppel@google.com (Yohann Coppel)
  */
-public class EdgeDisplayEditor extends EditorPart {
+public class RelationDisplayEditor extends EditorPart {
 
   public static final String ID =
       "com.google.devtools.depan.view_doc.eclipse.ui.editor.EdgeDisplayEditor";
 
   /**
-   * {@link EdgeDisplayDocument} that is being edited.
+   * {@link RelationDisplayDocument} that is being edited.
    */
-  private EdgeDisplayDocument propInfo;
+  private RelationDisplayDocument propInfo;
 
   /**
    * The file this editor is editing.
@@ -82,9 +82,9 @@ public class EdgeDisplayEditor extends EditorPart {
    */
   private Text relSetName;
 
-  private EdgeDisplayTableControl propEditor;
+  private RelationDisplayTableControl propEditor;
 
-  private EdgeDisplayDocumentRepo propRepo;
+  private RelationDisplayDocumentRepo propRepo;
 
   @Override
   public void doSave(IProgressMonitor monitor) {
@@ -119,8 +119,8 @@ public class EdgeDisplayEditor extends EditorPart {
 
     Map<Relation, EdgeDisplayProperty> props =
         propInfo.getRelationProperties();
-    EdgeDisplayDocument result =
-        new EdgeDisplayDocument(relSetName.getText(), props);
+    RelationDisplayDocument result =
+        new RelationDisplayDocument(relSetName.getText(), props);
     propInfo = result;
     propRepo.setEdgeDisplayProperties(propInfo.getRelationProperties());
   }
@@ -133,8 +133,8 @@ public class EdgeDisplayEditor extends EditorPart {
    * @param monitor
    */
   private void persistDocument(IProgressMonitor monitor) {
-    EdgeDisplayDocumentXmlPersist persist =
-        EdgeDisplayDocumentXmlPersist.build(false);
+    RelationDisplayDocumentXmlPersist persist =
+        RelationDisplayDocumentXmlPersist.build(false);
     WorkspaceTools.saveDocument(file, propInfo, persist, monitor);
 
     setDirtyState(false);
@@ -182,11 +182,11 @@ public class EdgeDisplayEditor extends EditorPart {
       IFileEditorInput fileInput = (IFileEditorInput) input;
       file = fileInput.getFile();
 
-      EdgeDisplayDocumentXmlPersist persist =
-          EdgeDisplayDocumentXmlPersist.build(true);
+      RelationDisplayDocumentXmlPersist persist =
+          RelationDisplayDocumentXmlPersist.build(true);
       propInfo = persist.load(file.getRawLocationURI());
 
-      propRepo = new EdgeDisplayDocumentRepo(
+      propRepo = new RelationDisplayDocumentRepo(
           RelationRegistry.getRegistryRelations());
       propRepo.setEdgeDisplayProperties(propInfo.getRelationProperties());
 
@@ -255,13 +255,13 @@ public class EdgeDisplayEditor extends EditorPart {
       }
     });
 
-    propEditor = new EdgeDisplayTableControl(container);
+    propEditor = new RelationDisplayTableControl(container);
     propEditor.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, false));
     propEditor.setEdgeDisplayRepository(propRepo);
     propEditor.setInput(RelationRegistry.getRegistryRelations());
 
-    propRepo.addChangeListener(new EdgeDisplayRepository.ChangeListener() {
+    propRepo.addChangeListener(new RelationDisplayRepository.ChangeListener() {
       @Override
       public void edgeDisplayChanged(
           Relation relation, EdgeDisplayProperty props) {

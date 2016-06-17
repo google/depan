@@ -30,9 +30,9 @@ import java.util.Map;
  * 
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public class EdgeDisplayDocument {
+public class RelationDisplayDocument {
 
-  public static final String EXTENSION = "vedxml";
+  public static final String EXTENSION = "vrdxml";
 
   /**
    * Hash map that contains a list of edge display property objects
@@ -42,7 +42,7 @@ public class EdgeDisplayDocument {
 
   private final String name;
 
-  public EdgeDisplayDocument(String name,
+  public RelationDisplayDocument(String name,
       Map<Relation, EdgeDisplayProperty> relationProperties) {
     super();
     this.name = name;
