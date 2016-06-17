@@ -17,18 +17,22 @@
 package com.google.devtools.depan.view_doc.eclipse.ui.widgets;
 
 import com.google.devtools.depan.graph.api.Relation;
-import com.google.devtools.depan.model.GraphEdge;
+import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.platform.AlphabeticSorter;
 import com.google.devtools.depan.platform.Colors;
 import com.google.devtools.depan.platform.InverseSorter;
 import com.google.devtools.depan.platform.LabelProviderToString;
+import com.google.devtools.depan.platform.PlatformResources;
 import com.google.devtools.depan.platform.eclipse.ui.tables.EditColTableDef;
+import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
 import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty;
-import com.google.devtools.depan.view_doc.model.EdgeDisplayRepository;
+import com.google.devtools.depan.view_doc.model.NodeDisplayProperty;
+import com.google.devtools.depan.view_doc.model.NodeDisplayRepository;
 
 import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellEditor;
+import org.eclipse.jface.viewers.CheckboxCellEditor;
 import org.eclipse.jface.viewers.ColorCellEditor;
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
 import org.eclipse.jface.viewers.ICellModifier;
@@ -36,6 +40,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -55,63 +60,57 @@ import java.util.Collection;
 /**
  * Run a view of the known edges as its own reusable "part".
  */
-public class EdgeDisplayTableControl extends Composite {
+/**
+ * @author <a href="leeca@pnambic.com">Lee Carver</a>
+ */
+public class NodeDisplayTableControl extends Composite {
 
-  public static final String COL_NAME = "Relation";
-  public static final String COL_HEAD = "Head";
-  public static final String COL_TAIL = "Tail";
+  public static final String COL_NAME = "Node";
+  protected static final String COL_XPOS = "X";
+  protected static final String COL_YPOS = "Y";
+  protected static final String COL_VISIBLE = "Visible";
+  protected static final String COL_SELECTED = "Selected";
+  protected static final String COL_SIZE = "Size";
   public static final String COL_COLOR = "Color";
-  public static final String COL_WIDTH = "Width";
-  public static final String COL_STYLE = "Style";
-  public static final String COL_SHAPE = "Shape";
-  public static final String COL_ARROWHEAD = "Arrowhead";
 
   public static final int INDEX_NAME = 0;
-  public static final int INDEX_HEAD = 1;
-  public static final int INDEX_TAIL = 2;
-  public static final int INDEX_COLOR = 3;
-  public static final int INDEX_STYLE = 4;
-  public static final int INDEX_ARROWHEAD = 5;
+  public static final int INDEX_XPOS = 1;
+  public static final int INDEX_YPOS = 2;
+  public static final int INDEX_VISIBLE = 3;
+  public static final int INDEX_SIZE = 4;
+  public static final int INDEX_COLOR = 5;
 
   private static final EditColTableDef[] TABLE_DEF = new EditColTableDef[] {
-    new EditColTableDef(COL_NAME, false, COL_NAME, 180),
-    new EditColTableDef(COL_HEAD, false, COL_HEAD, 180),
-    new EditColTableDef(COL_TAIL, false, COL_TAIL, 180),
-    new EditColTableDef(COL_COLOR, true, COL_COLOR, 80),
-//    new EditColTableDef(COL_WIDTH, false, COL_WIDTH, 180),
-    new EditColTableDef(COL_STYLE, true, COL_STYLE, 60),
-    new EditColTableDef(COL_ARROWHEAD, true, COL_ARROWHEAD, 110),
-//    new EditColTableDef(COL_SHAPE, false, COL_SHAPE, 180),
-  };
-
-  private static final String[] LINE_WIDTHS = {
-    "0", "1", "2", "3", "4"
-  };
-
-  private static final String[] LINE_SHAPES = {
-    "arched", "straight"
+    new EditColTableDef(COL_NAME, false, COL_NAME, 600),
+    new EditColTableDef(COL_XPOS, false, COL_XPOS, 100),
+    new EditColTableDef(COL_YPOS, false, COL_YPOS, 100),
+    new EditColTableDef(COL_VISIBLE, true, COL_VISIBLE, 100),
+    new EditColTableDef(COL_SIZE, true, COL_SIZE, 100),
+    new EditColTableDef(COL_COLOR, true, COL_COLOR, 180)
   };
 
   private static final String[] UPDATE_COLUMNS = new String [] {
-    COL_COLOR, COL_WIDTH, COL_ARROWHEAD
+    COL_VISIBLE, COL_SIZE, COL_COLOR
   };
 
   private class ControlChangeListener
-      implements EdgeDisplayRepository.ChangeListener {
+      implements NodeDisplayRepository.ChangeListener {
 
     @Override
-    public void edgeDisplayChanged(GraphEdge edge, EdgeDisplayProperty props) {
-      propViewer.update(edge, UPDATE_COLUMNS);
+    public void nodeDisplayChanged(GraphNode node, NodeDisplayProperty props) {
+      propViewer.update(node, UPDATE_COLUMNS);
     }
   }
 
+  private final TableViewer propViewer;
+
   private ControlChangeListener propListener;
 
-  private EdgeDisplayRepository propRepo;
+  private NodeDisplayRepository propRepo;
 
-  private TableViewer propViewer;
+  private ViewEditor viewer;
 
-  public EdgeDisplayTableControl(Composite parent) {
+  public NodeDisplayTableControl(Composite parent) {
     super(parent, SWT.NONE);
 
     GridLayout gridLayout = new GridLayout();
@@ -122,7 +121,7 @@ public class EdgeDisplayTableControl extends Composite {
     propViewer = new TableViewer(this,
         SWT.FULL_SELECTION | SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
     // set up label provider
-    propViewer.setLabelProvider(new EdgeDisplayLabelProvider());
+    propViewer.setLabelProvider(new PartLabelProvider());
 
     // Set up layout properties
     Table propTableControl = propViewer.getTable();
@@ -135,15 +134,14 @@ public class EdgeDisplayTableControl extends Composite {
     EditColTableDef.setupTable(TABLE_DEF, propTableControl);
 
     // Configure cell editing
-    CellEditor[] cellEditors = new CellEditor[6];
+    CellEditor[] cellEditors = new CellEditor[TABLE_DEF.length];
     cellEditors[INDEX_NAME] = null;
-    cellEditors[INDEX_HEAD] = null;
-    cellEditors[INDEX_TAIL] = null;
+    cellEditors[INDEX_XPOS] = null;
+    cellEditors[INDEX_YPOS] = null;
+    cellEditors[INDEX_VISIBLE] = new CheckboxCellEditor(propTableControl);
+    cellEditors[INDEX_SIZE] = new ComboBoxCellEditor(propTableControl,
+        toString(NodeDisplayProperty.Size.values(), true));
     cellEditors[INDEX_COLOR] = new ColorCellEditor(propTableControl);
-    cellEditors[INDEX_STYLE] = new ComboBoxCellEditor(propTableControl,
-        toString(EdgeDisplayProperty.LineStyle.values(), true));
-    cellEditors[INDEX_ARROWHEAD] = new ComboBoxCellEditor(propTableControl,
-        toString(EdgeDisplayProperty.ArrowheadStyle.values(), true));
 
     propViewer.setCellEditors(cellEditors);
     propViewer.setColumnProperties(EditColTableDef.getProperties(TABLE_DEF));
@@ -165,14 +163,13 @@ public class EdgeDisplayTableControl extends Composite {
     return s;
   }
 
-
   /**
-   * Fill the list with {@link GraphEdge}s.
+   * Fill the list with {@link GraphNode}s.
    * Since rendering depends on propRepo, set input after 
    * the propRepo is installed.
    */
-  public void setInput(Collection<GraphEdge> edges) {
-    propViewer.setInput(edges);
+  public void setInput(Collection<GraphNode> nodes) {
+    propViewer.setInput(nodes);
   }
 
   @SuppressWarnings("unchecked")
@@ -180,18 +177,24 @@ public class EdgeDisplayTableControl extends Composite {
     return (Collection<Relation>) propViewer.getInput();
   }
 
-  public void setEdgeDisplayRepository(EdgeDisplayRepository edgeDisplayRepo) {
-    this.propRepo = edgeDisplayRepo;
+  /**
+   * @param viewer effective repository for node's (x,y) position
+   * @param propRepo source for node display properties
+   */
+  public void setNodeDisplayRepository(ViewEditor viewer, NodeDisplayRepository propRepo) {
+    this.viewer = viewer;
+    this.propRepo = propRepo;
     propListener = new ControlChangeListener();
     propRepo.addChangeListener(propListener);
   }
 
-  public void removeEdgeDisplayRepository(EdgeDisplayRepository edgeDisplayRepo) {
+  public void removeNodeDisplayRepository(NodeDisplayRepository propRepo) {
     if (null != propListener) {
       this.propRepo.removeChangeListener(propListener);
       propListener = null;
     }
     this.propRepo = null;
+    this.viewer = null;
   }
 
   /////////////////////////////////////
@@ -201,15 +204,15 @@ public class EdgeDisplayTableControl extends Composite {
    * Acquire properties directly, avoid setting up a default.
    */
   private void saveDisplayProperty(
-      GraphEdge edge, EdgeDisplayProperty props) {
-    propRepo.setDisplayProperty(edge, props);
+      GraphNode node, NodeDisplayProperty props) {
+    propRepo.setDisplayProperty(node, props);
   }
 
   /**
    * Acquire properties directly, avoid setting up a default.
    */
-  private EdgeDisplayProperty loadDisplayProperty(GraphEdge edge) {
-    return propRepo.getDisplayProperty(edge);
+  private NodeDisplayProperty loadDisplayProperty(GraphNode node) {
+    return propRepo.getDisplayProperty(node);
   }
 
   /**
@@ -217,13 +220,8 @@ public class EdgeDisplayTableControl extends Composite {
    * Note that the default constructor for {@link EdgeDisplayProperty}
    * uses the default values for all member elements.
    */
-  private EdgeDisplayProperty getDisplayProperty(GraphEdge edge) {
-    EdgeDisplayProperty relationProp = loadDisplayProperty(edge);
-    if (null != relationProp) {
-      return relationProp;
-    }
-    // Provide the default if none are persisted.
-    return new EdgeDisplayProperty();
+  private NodeDisplayProperty getDisplayProperty(GraphNode node) {
+    return loadDisplayProperty(node);
   }
 
   /////////////////////////////////////
@@ -272,6 +270,9 @@ public class EdgeDisplayTableControl extends Composite {
   }
 
   private ViewerSorter buildColumnSorter(int colIndex) {
+    if (INDEX_VISIBLE == colIndex) {
+      return new BooleanViewSorter();
+    }
 
     // By default, use an alphabetic sort over the column labels.
     ITableLabelProvider labelProvider =
@@ -281,43 +282,58 @@ public class EdgeDisplayTableControl extends Composite {
     return result;
   }
 
+  private class BooleanViewSorter extends ViewerSorter {
+
+    @Override
+    public int compare(Viewer viewer, Object e1, Object e2) {
+      boolean vis1 = isVisible(e1);
+      boolean vis2 = isVisible(e2);
+      return Boolean.compare(vis1, vis2);
+    }
+
+    private boolean isVisible(Object item) {
+      if (!(item instanceof GraphNode)) {
+        return false;
+      }
+      GraphNode node = (GraphNode) item;
+      NodeDisplayProperty prop = propRepo.getDisplayProperty(node);
+      return prop.isVisible();
+    }
+  }
+
   /////////////////////////////////////
   // Label provider for table cell text
 
-  private class EdgeDisplayLabelProvider extends LabelProvider
+  private class PartLabelProvider extends LabelProvider
       implements ITableLabelProvider {
 
     @Override
     public String getColumnText(Object element, int columnIndex) {
-      if (element instanceof GraphEdge) {
-        GraphEdge edge = (GraphEdge) element;
-        EdgeDisplayProperty prop = getDisplayProperty(edge);
+      if (element instanceof GraphNode) {
+        GraphNode node = (GraphNode) element;
+        NodeDisplayProperty prop = getDisplayProperty(node);
         switch (columnIndex) {
         case INDEX_NAME:
-          return edge.getRelation().toString();
-        case INDEX_HEAD:
-          return edge.getHead().toString();
-        case INDEX_TAIL:
-          return edge.getTail().toString();
+          return node.toString();
+        case INDEX_XPOS:
+          return fmtDouble(viewer.getXPos(node));
+        case INDEX_YPOS:
+          return fmtDouble(viewer.getYPos(node));
         case INDEX_COLOR:
           return getColorName(prop);
-        // case INDEX_WIDTH:
-        case INDEX_STYLE:
-          if (null != prop) {
-            return prop.getLineStyle().toString().toLowerCase();
-          }
-          return null;
-        case INDEX_ARROWHEAD:
-          if (null != prop) {
-            return prop.getArrowhead().toString().toLowerCase();
-          }
-          return null;
+        case INDEX_SIZE:
+          return getSizeName(prop);
         }
       }
       return null;
     }
 
-    private String getColorName(EdgeDisplayProperty prop) {
+    private String fmtDouble(double pos) {
+      // TODO: 3 significant digits
+      return Double.toString(pos);
+    }
+
+    private String getColorName(NodeDisplayProperty prop) {
       if (null == prop) {
         return null;
       }
@@ -329,8 +345,21 @@ public class EdgeDisplayTableControl extends Composite {
       return "(" + result + ")";
     }
 
+    private String getSizeName(NodeDisplayProperty prop) {
+      return prop.getSize().toString().toLowerCase();
+    }
+
     @Override
     public Image getColumnImage(Object element, int columnIndex) {
+      if (element instanceof GraphNode) {
+        GraphNode node = (GraphNode) element;
+        NodeDisplayProperty prop = getDisplayProperty(node);
+        switch (columnIndex) {
+        case INDEX_VISIBLE:
+          return PlatformResources.getOnOff(prop.isVisible());
+        }
+      }
+      // Fall through and unknown type
       return null;
     }
   }
@@ -347,27 +376,24 @@ public class EdgeDisplayTableControl extends Composite {
 
     @Override
     public Object getValue(Object element, String property) {
-      if (!(element instanceof GraphEdge)) {
+      if (!(element instanceof GraphNode)) {
         return null;
       }
-      GraphEdge edge = (GraphEdge) element;
-      EdgeDisplayProperty relProp = getDisplayProperty(edge);
+      GraphNode node = (GraphNode) element;
+      NodeDisplayProperty nodeProp = getDisplayProperty(node);
       if (COL_COLOR.equals(property)) {
-        Color relColor = relProp.getColor();
+        Color relColor = nodeProp.getColor();
         if (null == relColor) {
           return new RGB(0, 0, 0);
         }
-         RGB result = Colors.rgbFromColor(relColor);
+        RGB result = Colors.rgbFromColor(relColor);
         return result;
       }
-      if (COL_ARROWHEAD.equals(property)) {
-        return relProp.getArrowhead().ordinal();
+      if (COL_VISIBLE.equals(property)) {
+        return Boolean.valueOf(nodeProp.isVisible());
       }
-      if (COL_STYLE.equals(property)) {
-        return relProp.getLineStyle().ordinal();
-      }
-      if (COL_SHAPE.equals(property)) {
-        
+      if (COL_SIZE.equals(property)) {
+        return nodeProp.getSize().ordinal();
       }
       return null;
     }
@@ -378,28 +404,28 @@ public class EdgeDisplayTableControl extends Composite {
         return;
       }
       Object modifiedObject = ((TableItem) element).getData();
-      if (!(modifiedObject instanceof GraphEdge)) {
+      if (!(modifiedObject instanceof GraphNode)) {
         return;
       }
 
-      GraphEdge edge = (GraphEdge) modifiedObject;
+      GraphNode node = (GraphNode) modifiedObject;
 
-      EdgeDisplayProperty relProp = loadDisplayProperty(edge);
-      if (null == relProp) {
+      NodeDisplayProperty nodeProp = loadDisplayProperty(node);
+      if (null == nodeProp) {
         return; // For example, when there is no editor.
       }
 
-      if (property.equals(COL_STYLE) && (value instanceof Integer)) {
-        relProp.setLineStyle(EdgeDisplayProperty.LineStyle.values()[(Integer) value]);
-      } else if (property.equals(COL_ARROWHEAD) && (value instanceof Integer)) {
-        relProp.setArrowhead(EdgeDisplayProperty.ArrowheadStyle.values()[(Integer) value]);
+      if (property.equals(COL_VISIBLE) && (value instanceof Boolean)) {
+        nodeProp.setVisible(((Boolean) value).booleanValue());
+      } else if (property.equals(COL_SIZE) && (value instanceof Integer)) {
+        nodeProp.setSize(NodeDisplayProperty.Size.values()[(Integer) value]);
       } else if (property.equals(COL_COLOR) && (value instanceof RGB)) {
         Color newColor = Colors.colorFromRgb((RGB) value);
-        relProp.setColor(newColor);
+        nodeProp.setColor(newColor);
       }
 
-      saveDisplayProperty(edge, relProp);
-      // Viewer update via ChangeListener
+      saveDisplayProperty(node, nodeProp);
+      // Viewer updates via ChangeListener
     }
   }
 

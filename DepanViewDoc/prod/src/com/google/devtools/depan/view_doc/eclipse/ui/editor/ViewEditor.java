@@ -338,6 +338,7 @@ public class ViewEditor extends MultiPageEditorPart {
     renderer.initializeScenePrefs(getScenePrefs());
     renderer.initializeNodeLocations(viewInfo.getNodeLocations());
     renderer.setNodeNeighbors(nodeColorFactory.getJungGraph());
+    initNodeRendering();
     initSelectedNodes(getSelectedNodes());
     initEdgeRendering();
     prepareRenderOptions();
@@ -780,6 +781,19 @@ public class ViewEditor extends MultiPageEditorPart {
   public void setRelationProperty(
       Relation relation, EdgeDisplayProperty relProp) {
     viewInfo.setRelationProperty(relation, relProp);
+  }
+
+  /**
+   * Initialize rendering properties for those nodes in the view graph that
+   * have explicit property settings.
+   */
+  private void initNodeRendering() {
+    for (GraphNode node : viewGraph.getNodes()) {
+      NodeDisplayProperty prop = viewInfo.getNodeProperty(node);
+      if (null != prop) {
+        renderer.updateNodeProperty(node, prop );
+      }
+    }
   }
 
   private void initEdgeRendering() {

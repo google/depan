@@ -16,12 +16,12 @@
 
 package com.google.devtools.depan.view_doc.eclipse.ui.views;
 
-import com.google.devtools.depan.model.GraphEdge;
+import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.view_doc.eclipse.ViewDocResources;
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
-import com.google.devtools.depan.view_doc.eclipse.ui.widgets.EdgeDisplayTableControl;
-import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty;
-import com.google.devtools.depan.view_doc.model.EdgeDisplayRepository;
+import com.google.devtools.depan.view_doc.eclipse.ui.widgets.NodeDisplayTableControl;
+import com.google.devtools.depan.view_doc.model.NodeDisplayProperty;
+import com.google.devtools.depan.view_doc.model.NodeDisplayRepository;
 import com.google.devtools.depan.view_doc.model.ViewPrefsListener;
 
 import org.eclipse.swt.SWT;
@@ -33,45 +33,45 @@ import org.eclipse.swt.widgets.Composite;
 import java.util.Collection;
 
 /**
- * Tool for set display properties for individual edges.
+ * Tool to set display properties for individual nodes.
  *
  * @author ycoppel@google.com (Yohann Coppel)
  */
-public class EdgeDisplayViewPart extends AbstractViewDocViewPart {
+public class NodeDisplayViewPart extends AbstractViewDocViewPart {
 
-  public static final String PART_NAME = "Edge Properties";
+  public static final String PART_NAME = "Node Properties";
 
   /**
    * The <code>RelationSetEditorControl</code> that controls the UX.
    */
-  private EdgeDisplayTableControl propEditor;
+  private NodeDisplayTableControl propEditor;
 
-  private EdgeDisplayRepository propRepo;
+  private NodeDisplayRepository propRepo;
 
-  private static class ToolEdgeDisplayRepo
-      implements EdgeDisplayRepository {
+  private static class PartEdgeDisplayRepo
+      implements NodeDisplayRepository {
 
     private final ViewEditor editor;
 
-    private EdgeDisplayListener prefsListener;
+    private PartPrefsListener prefsListener;
 
-    public ToolEdgeDisplayRepo(ViewEditor editor) {
+    public PartEdgeDisplayRepo(ViewEditor editor) {
       this.editor = editor;
     }
 
     @Override
-    public EdgeDisplayProperty getDisplayProperty(GraphEdge edge) {
-      return editor.getEdgeProperty(edge);
+    public NodeDisplayProperty getDisplayProperty(GraphNode node) {
+      return editor.getNodeProperty(node);
     }
 
     @Override
-    public void setDisplayProperty(GraphEdge edge, EdgeDisplayProperty props) {
-      editor.setEdgeProperty(edge, props);
+    public void setDisplayProperty(GraphNode node, NodeDisplayProperty props) {
+      editor.setNodeProperty(node, props);
     }
 
     @Override
     public void addChangeListener(ChangeListener listener) {
-      prefsListener = new EdgeDisplayListener(listener);
+      prefsListener = new PartPrefsListener(listener);
       editor.addViewPrefsListener(prefsListener);
     }
 
@@ -83,18 +83,18 @@ public class EdgeDisplayViewPart extends AbstractViewDocViewPart {
     }
   }
 
-  private static class EdgeDisplayListener extends ViewPrefsListener.Simple {
+  private static class PartPrefsListener extends ViewPrefsListener.Simple {
 
-    private EdgeDisplayRepository.ChangeListener listener;
+    private NodeDisplayRepository.ChangeListener listener;
 
-    public EdgeDisplayListener(EdgeDisplayRepository.ChangeListener listener) {
+    public PartPrefsListener(NodeDisplayRepository.ChangeListener listener) {
       this.listener = listener;
     }
 
     @Override
-    public void edgePropertyChanged(
-        GraphEdge edge, EdgeDisplayProperty newProperty) {
-      listener.edgeDisplayChanged(edge, newProperty);
+    public void nodePropertyChanged(
+        GraphNode node, NodeDisplayProperty newProperty) {
+      listener.nodeDisplayChanged(node, newProperty);
     }
   }
 
@@ -113,7 +113,7 @@ public class EdgeDisplayViewPart extends AbstractViewDocViewPart {
     Composite result = new Composite(parent, SWT.NONE);
     result.setLayout(new GridLayout());
 
-    propEditor = new EdgeDisplayTableControl(result);
+    propEditor = new NodeDisplayTableControl(result);
     propEditor.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, false));
   }
@@ -131,18 +131,18 @@ public class EdgeDisplayViewPart extends AbstractViewDocViewPart {
 
     ViewEditor editor = getEditor();
 
-    propRepo = new ToolEdgeDisplayRepo(editor);
-    propEditor.setEdgeDisplayRepository(propRepo);
+    propRepo = new PartEdgeDisplayRepo(editor);
+    propEditor.setNodeDisplayRepository(editor, propRepo);
 
     // TODO: Should come from editor
-    Collection<GraphEdge> edges = editor.getExposedGraph().getEdges();
+    Collection<GraphNode> edges = editor.getExposedGraph().getNodes();
     propEditor.setInput(edges);
     propEditor.update();
   }
 
   @Override
   protected void releaseResources() {
-    propEditor.removeEdgeDisplayRepository(propRepo);
+    propEditor.removeNodeDisplayRepository(propRepo);
     propRepo = null;
   }
 }

@@ -303,9 +303,6 @@ public class RelationSetTableControl extends Composite {
   }
 
   private ViewerSorter buildColumnSorter(int colIndex) {
-    // if (INDEX_VISIBLE == colIndex) {
-    //   return new BooleanViewSorter();
-    // }
     if (INDEX_VISIBLE == colIndex) {
       return new BooleanViewSorter();
     }

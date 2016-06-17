@@ -39,13 +39,13 @@ public interface NodeColorSupplier {
 
     @Override
     public Color getFillColor(
-        NodeColors nodeColors, GraphNode node, ColorMap cm ) {
+        NodeColors nodeColors, GraphNode node, ColorMap cm) {
       return color;
     }
 
     @Override
     public Color getStrokeColor(
-        NodeColors nodeColors, GraphNode node, ColorMap cm ) {
+        NodeColors nodeColors, GraphNode node, ColorMap cm) {
       return color;
     }
   }

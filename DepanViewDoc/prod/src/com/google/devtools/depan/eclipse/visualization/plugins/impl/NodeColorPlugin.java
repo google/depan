@@ -54,6 +54,9 @@ public class NodeColorPlugin extends NodeRenderingPlugin.Simple {
     NodeColorSupplier supplier = (NodeColorSupplier) p.pluginStore.get(this);
     Color stroke = supplier.getStrokeColor(nodeColors, p.node, cm);
     Color fill = supplier.getFillColor(nodeColors, p.node, cm);
+    if (null != p.overriddenColor) {
+      fill = p.overriddenColor;
+    }
 
     if (p.isSelected()) {
       p.targetStrokeColor = Color.red;

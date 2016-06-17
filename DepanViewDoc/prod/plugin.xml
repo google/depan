@@ -64,6 +64,14 @@
             name="Edge Properties"
             restorable="true">
       </view>
+      <view
+            category="com.google.devtools.depan.view_doc.eclipse.ui.views"
+            class="com.google.devtools.depan.view_doc.eclipse.ui.views.NodeDisplayViewPart"
+            icon="icons/nodeeditor.png"
+            id="com.google.devtools.depan.view_doc.eclipse.ui.views.NodeDisplayViewPart"
+            name="Node Properties"
+            restorable="true">
+      </view>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
