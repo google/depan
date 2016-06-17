@@ -24,10 +24,12 @@ import com.google.devtools.depan.platform.InverseSorter;
 import com.google.devtools.depan.platform.LabelProviderToString;
 import com.google.devtools.depan.platform.PlatformResources;
 import com.google.devtools.depan.platform.eclipse.ui.tables.EditColTableDef;
-import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
+import com.google.devtools.depan.view_doc.eclipse.ViewDocLogger;
 import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty;
 import com.google.devtools.depan.view_doc.model.NodeDisplayProperty;
 import com.google.devtools.depan.view_doc.model.NodeDisplayRepository;
+import com.google.devtools.depan.view_doc.model.NodeLocationRepository;
+import com.google.devtools.depan.view_doc.model.Point2dUtils;
 
 import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -40,6 +42,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
@@ -55,12 +58,13 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
 import java.awt.Color;
+import java.awt.geom.Point2D;
 import java.util.Collection;
 
 /**
- * Run a view of the known edges as its own reusable "part".
- */
-/**
+ * Run a view of the known nodes and their attributes
+ * as its own reusable {@link Control}.
+ * 
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
 public class NodeDisplayTableControl extends Composite {
@@ -82,33 +86,57 @@ public class NodeDisplayTableControl extends Composite {
 
   private static final EditColTableDef[] TABLE_DEF = new EditColTableDef[] {
     new EditColTableDef(COL_NAME, false, COL_NAME, 600),
-    new EditColTableDef(COL_XPOS, false, COL_XPOS, 100),
-    new EditColTableDef(COL_YPOS, false, COL_YPOS, 100),
+    new EditColTableDef(COL_XPOS, true, COL_XPOS, 100),
+    new EditColTableDef(COL_YPOS, true, COL_YPOS, 100),
     new EditColTableDef(COL_VISIBLE, true, COL_VISIBLE, 100),
     new EditColTableDef(COL_SIZE, true, COL_SIZE, 100),
     new EditColTableDef(COL_COLOR, true, COL_COLOR, 180)
   };
 
-  private static final String[] UPDATE_COLUMNS = new String [] {
+  private final TableViewer propViewer;
+
+  /////////////////////////////////////
+  // Display attribute integration
+
+  private NodeDisplayRepository displayRepo;
+
+  private ControlDisplayChangeListener displayListener;
+
+  private static final String[] UPDATE_DISPLAY_COLUMNS = new String [] {
     COL_VISIBLE, COL_SIZE, COL_COLOR
   };
 
-  private class ControlChangeListener
-      implements NodeDisplayRepository.ChangeListener {
+  private class ControlDisplayChangeListener
+  implements NodeDisplayRepository.ChangeListener {
 
     @Override
     public void nodeDisplayChanged(GraphNode node, NodeDisplayProperty props) {
-      propViewer.update(node, UPDATE_COLUMNS);
+      propViewer.update(node, UPDATE_DISPLAY_COLUMNS);
     }
   }
 
-  private final TableViewer propViewer;
+  /////////////////////////////////////
+  // Location integration
 
-  private ControlChangeListener propListener;
+  private NodeLocationRepository posRepo;
 
-  private NodeDisplayRepository propRepo;
+  private ControlLocationChangeListener posListener;
 
-  private ViewEditor viewer;
+  private static final String[] UPDATE_LOCATION_COLUMNS = new String [] {
+    COL_XPOS, COL_YPOS
+  };
+
+  private class ControlLocationChangeListener
+      implements NodeLocationRepository.ChangeListener {
+
+    @Override
+    public void nodeLocationChanged(GraphNode node, Point2D location) {
+      propViewer.update(node, UPDATE_LOCATION_COLUMNS);
+    }
+  }
+
+  /////////////////////////////////////
+  // Control construction
 
   public NodeDisplayTableControl(Composite parent) {
     super(parent, SWT.NONE);
@@ -136,8 +164,8 @@ public class NodeDisplayTableControl extends Composite {
     // Configure cell editing
     CellEditor[] cellEditors = new CellEditor[TABLE_DEF.length];
     cellEditors[INDEX_NAME] = null;
-    cellEditors[INDEX_XPOS] = null;
-    cellEditors[INDEX_YPOS] = null;
+    cellEditors[INDEX_XPOS] = new TextCellEditor(propTableControl);
+    cellEditors[INDEX_YPOS] = new TextCellEditor(propTableControl);
     cellEditors[INDEX_VISIBLE] = new CheckboxCellEditor(propTableControl);
     cellEditors[INDEX_SIZE] = new ComboBoxCellEditor(propTableControl,
         toString(NodeDisplayProperty.Size.values(), true));
@@ -178,41 +206,55 @@ public class NodeDisplayTableControl extends Composite {
   }
 
   /**
-   * @param viewer effective repository for node's (x,y) position
-   * @param propRepo source for node display properties
+   * @param posRepo source for node's location
+   * @param propRepo source for node's display properties
    */
-  public void setNodeDisplayRepository(ViewEditor viewer, NodeDisplayRepository propRepo) {
-    this.viewer = viewer;
-    this.propRepo = propRepo;
-    propListener = new ControlChangeListener();
-    propRepo.addChangeListener(propListener);
+  public void setNodeRepository(
+      NodeLocationRepository posRepo,
+      NodeDisplayRepository displayRepo) {
+    this.posRepo = posRepo;
+    posListener = new ControlLocationChangeListener();
+    posRepo.addChangeListener(posListener);
+
+    this.displayRepo = displayRepo;
+    displayListener = new ControlDisplayChangeListener();
+    displayRepo.addChangeListener(displayListener);
   }
 
-  public void removeNodeDisplayRepository(NodeDisplayRepository propRepo) {
-    if (null != propListener) {
-      this.propRepo.removeChangeListener(propListener);
-      propListener = null;
+  public void removeNodeRepository(
+      NodeLocationRepository posRepo,
+      NodeDisplayRepository displayRepo) {
+    if (null != displayListener) {
+      this.displayRepo.removeChangeListener(displayListener);
+      displayListener = null;
     }
-    this.propRepo = null;
-    this.viewer = null;
+    if (null != posListener) {
+      this.posRepo.removeChangeListener(posListener);
+      posListener = null;
+    }
   }
 
   /////////////////////////////////////
-  // Property repository methods
+  // Display repository methods
 
   /**
    * Acquire properties directly, avoid setting up a default.
    */
   private void saveDisplayProperty(
       GraphNode node, NodeDisplayProperty props) {
-    propRepo.setDisplayProperty(node, props);
+    displayRepo.setDisplayProperty(node, props);
   }
 
   /**
    * Acquire properties directly, avoid setting up a default.
    */
   private NodeDisplayProperty loadDisplayProperty(GraphNode node) {
-    return propRepo.getDisplayProperty(node);
+    return displayRepo.getDisplayProperty(node);
+  }
+
+  private boolean isVisible(GraphNode node) {
+    NodeDisplayProperty prop = getDisplayProperty(node);
+    return prop.isVisible();
   }
 
   /**
@@ -222,6 +264,76 @@ public class NodeDisplayTableControl extends Composite {
    */
   private NodeDisplayProperty getDisplayProperty(GraphNode node) {
     return loadDisplayProperty(node);
+  }
+
+  private String getColorName(GraphNode node) {
+    NodeDisplayProperty prop = getDisplayProperty(node);
+    if (null == prop) {
+      return null;
+    }
+    Color color = prop.getColor();
+    if (null == color) {
+      return null;
+    }
+    String result = StringConverter.asString(Colors.rgbFromColor(color));
+    return "(" + result + ")";
+  }
+
+  private String getSizeName(GraphNode node) {
+    NodeDisplayProperty prop = getDisplayProperty(node);
+    return prop.getSize().toString().toLowerCase();
+  }
+
+  /////////////////////////////////////
+  // Location repository methods
+
+  private void updateLocationX(GraphNode node, Object update) {
+    try {
+      double newX = Double.parseDouble((String) update);
+      Point2D pos = posRepo.getLocation(node);
+      Point2D location = Point2dUtils.newPoint2D(newX, pos.getY());
+      posRepo.setLocation(node, location);
+    } catch (NumberFormatException errNum) {
+      ViewDocLogger.logException("Bad number format for X position", errNum);
+    } catch (RuntimeException err) {
+      ViewDocLogger.logException("Bad update value for X position", err);
+    }
+  }
+
+  private void updateLocationY(GraphNode node, Object update) {
+    try {
+      double newY = Double.parseDouble((String) update);
+      Point2D pos = posRepo.getLocation(node);
+      Point2D location = Point2dUtils.newPoint2D(pos.getX(), newY);
+      posRepo.setLocation(node, location);
+    } catch (NumberFormatException errNum) {
+      ViewDocLogger.logException("Bad number format for Y position", errNum);
+    } catch (RuntimeException err) {
+      ViewDocLogger.logException("Bad update value for Y position", err);
+    }
+  }
+
+  /** Not every node has a position */
+  public String getXPos(GraphNode node) {
+    Point2D position = posRepo.getLocation(node);
+    if (null != position) {
+      return fmtDouble(position.getX());
+    }
+    return "";
+  }
+
+  /** Not every node has a position */
+  public String getYPos(GraphNode node) {
+    Point2D position = posRepo.getLocation(node);
+    if (null != position) {
+      return fmtDouble(position.getY());
+    }
+    return "";
+  }
+
+  private String fmtDouble(double pos) {
+    // TODO: 3 significant digits
+    return Double.toString(pos);
   }
 
   /////////////////////////////////////
@@ -295,9 +407,7 @@ public class NodeDisplayTableControl extends Composite {
       if (!(item instanceof GraphNode)) {
         return false;
       }
-      GraphNode node = (GraphNode) item;
-      NodeDisplayProperty prop = propRepo.getDisplayProperty(node);
-      return prop.isVisible();
+      return isVisible((GraphNode) item);
     }
   }
 
@@ -311,52 +421,29 @@ public class NodeDisplayTableControl extends Composite {
     public String getColumnText(Object element, int columnIndex) {
       if (element instanceof GraphNode) {
         GraphNode node = (GraphNode) element;
-        NodeDisplayProperty prop = getDisplayProperty(node);
         switch (columnIndex) {
         case INDEX_NAME:
           return node.toString();
         case INDEX_XPOS:
-          return fmtDouble(viewer.getXPos(node));
+          return getXPos(node);
         case INDEX_YPOS:
-          return fmtDouble(viewer.getYPos(node));
+          return getYPos(node);
         case INDEX_COLOR:
-          return getColorName(prop);
+          return getColorName(node);
         case INDEX_SIZE:
-          return getSizeName(prop);
+          return getSizeName(node);
         }
       }
       return null;
-    }
-
-    private String fmtDouble(double pos) {
-      // TODO: 3 significant digits
-      return Double.toString(pos);
-    }
-
-    private String getColorName(NodeDisplayProperty prop) {
-      if (null == prop) {
-        return null;
-      }
-      Color color = prop.getColor();
-      if (null == color) {
-        return null;
-      }
-      String result = StringConverter.asString(Colors.rgbFromColor(color));
-      return "(" + result + ")";
-    }
-
-    private String getSizeName(NodeDisplayProperty prop) {
-      return prop.getSize().toString().toLowerCase();
     }
 
     @Override
     public Image getColumnImage(Object element, int columnIndex) {
       if (element instanceof GraphNode) {
         GraphNode node = (GraphNode) element;
-        NodeDisplayProperty prop = getDisplayProperty(node);
         switch (columnIndex) {
         case INDEX_VISIBLE:
-          return PlatformResources.getOnOff(prop.isVisible());
+          return PlatformResources.getOnOff(isVisible(node));
         }
       }
       // Fall through and unknown type
@@ -380,6 +467,12 @@ public class NodeDisplayTableControl extends Composite {
         return null;
       }
       GraphNode node = (GraphNode) element;
+      if (COL_XPOS.equals(property)) {
+        return getXPos(node);
+      }
+      if (COL_YPOS.equals(property)) {
+        return getXPos(node);
+      }
       NodeDisplayProperty nodeProp = getDisplayProperty(node);
       if (COL_COLOR.equals(property)) {
         Color relColor = nodeProp.getColor();
@@ -409,17 +502,25 @@ public class NodeDisplayTableControl extends Composite {
       }
 
       GraphNode node = (GraphNode) modifiedObject;
+      if (COL_XPOS.equals(property)) {
+        updateLocationX(node, value);
+        return;
+      }
+      if (COL_YPOS.equals(property)) {
+        updateLocationY(node, value);
+        return;
+      }
 
       NodeDisplayProperty nodeProp = loadDisplayProperty(node);
       if (null == nodeProp) {
         return; // For example, when there is no editor.
       }
 
-      if (property.equals(COL_VISIBLE) && (value instanceof Boolean)) {
+      if (COL_VISIBLE.equals(property) && (value instanceof Boolean)) {
         nodeProp.setVisible(((Boolean) value).booleanValue());
-      } else if (property.equals(COL_SIZE) && (value instanceof Integer)) {
+      } else if (COL_SIZE.equals(property) && (value instanceof Integer)) {
         nodeProp.setSize(NodeDisplayProperty.Size.values()[(Integer) value]);
-      } else if (property.equals(COL_COLOR) && (value instanceof RGB)) {
+      } else if (COL_COLOR.equals(property) && (value instanceof RGB)) {
         Color newColor = Colors.colorFromRgb((RGB) value);
         nodeProp.setColor(newColor);
       }

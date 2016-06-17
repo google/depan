@@ -14,15 +14,23 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.view_doc.layout;
+package com.google.devtools.depan.view_doc.layout.grid;
+
+import com.google.devtools.depan.view_doc.layout.LayoutGenerator;
+import com.google.devtools.depan.view_doc.layout.registry.LayoutGeneratorContributor;
 
 /**
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public class GridLayoutGenerator implements LayoutGenerator {
+public class GridLayoutContribution implements LayoutGeneratorContributor {
 
   @Override
-  public LayoutRunner buildRunner(LayoutContext context) {
-    return new GridLayoutRunner(context);
+  public String getLabel() {
+    return "Grid";
+  }
+
+  @Override
+  public LayoutGenerator getLayoutGenerator() {
+    return new GridLayoutGenerator();
   }
 }

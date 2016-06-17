@@ -32,6 +32,7 @@
     <module>../DepanAppMin/prod</module>
     <module>../DepanEdgeUI/prod</module>
     <module>../DepanGraphDocUI/prod</module>
+    <module>../DepanLayouts/prod</module>
     <module>../DepanNodeUI/prod</module>
     <module>../DepanPlatformUI/prod</module>
     <module>../DepanRemap/prod</module>
@@ -40,13 +41,6 @@
     <!-- Dependency modeling components-->
     <module>../DepanFileSystem/prod</module>
     <module>../DepanFileSystemUI/prod</module>
-
-<!-- 
-    <module>../DepanNodeUI/prod</module>
-    <module>../DepanGraphDocUI/prod</module>
-    <module>../DepanViewDoc/prod</module>
-    <module>../DepanPlatformUI/prod</module>
- -->
 
     <!-- Features -->
     <module>../depan-app-feature</module>

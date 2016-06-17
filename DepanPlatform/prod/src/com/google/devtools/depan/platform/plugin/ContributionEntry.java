@@ -22,6 +22,16 @@ import org.eclipse.core.runtime.IConfigurationElement;
 /**
  * Basic contribution with a unique identifier bound to a contributed class.
  * 
+ * Extension point schemas based on this class should define their 
+ * contribution class to have two attributes.
+ * 
+ * The class attribute should be required, and type java.  The schema should
+ * specify the required conforming interface for contributing extensions.
+ * 
+ * The id attribute should be required, and type string.  This should uniquely
+ * identify the contribution within the universe of all contributions.  The
+ * FQCN for the implementing class is a typical value.
+ * 
  * Many components have a plugin registry for contributions of a simple type.
  *
  * @author Yohann Coppel

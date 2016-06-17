@@ -1,5 +1,7 @@
 package com.google.devtools.depan.view_doc.eclipse;
 
+import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditorInput;
+
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
@@ -16,11 +18,24 @@ public class ViewDocResources {
     // Prevent instantiation.
   }
 
+  /** Public for {@link ViewEditorInput} compliance.*/
+  public static final ImageDescriptor IMAGE_DESC_VIEWDOC =
+      getImageDescriptor("icons/view-editor.gif");
+
+  public static final Image IMAGE_VIEWDOC =
+      getImage(IMAGE_DESC_VIEWDOC);
+
   private static final ImageDescriptor IMAGE_DESC_RELATIONPICKER =
       getImageDescriptor("icons/relpicker.png");
 
-  public static Image IMAGE_RELATIONPICKER =
+  public static final Image IMAGE_RELATIONPICKER =
       getImage(IMAGE_DESC_RELATIONPICKER);
+
+  private static final ImageDescriptor IMAGE_DESC_NODEEDITOR =
+      getImageDescriptor("icons/nodeeditor.png");
+
+  public static final Image IMAGE_NODEEDITOR =
+      getImage(IMAGE_DESC_NODEEDITOR);
 
   private static ImageDescriptor getImageDescriptor(String path) {
     return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);

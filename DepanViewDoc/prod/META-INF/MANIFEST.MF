@@ -28,7 +28,10 @@ Bundle-ClassPath: .
 Export-Package: com.google.devtools.depan.eclipse.cm,
  com.google.devtools.depan.eclipse.preferences,
  com.google.devtools.depan.eclipse.visualization.ogl,
- com.google.devtools.depan.view_doc.eclipse.ui.plugins
+ com.google.devtools.depan.view_doc.eclipse.ui.plugins,
+ com.google.devtools.depan.view_doc.layout,
+ com.google.devtools.depan.view_doc.layout.registry,
+ com.google.devtools.depan.view_doc.model
 Bundle-Activator: com.google.devtools.depan.view_doc.eclipse.ViewDocActivator
 Bundle-ActivationPolicy: lazy
 Import-Package: com.google.devtools.depan.platform.plugin

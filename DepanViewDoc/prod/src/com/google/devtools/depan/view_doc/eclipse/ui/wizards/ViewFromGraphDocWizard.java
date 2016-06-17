@@ -4,6 +4,8 @@ import com.google.devtools.depan.graph_doc.eclipse.ui.registry.FromGraphDocWizar
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.platform.NewEditorHelper;
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
+import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditorInput;
+import com.google.devtools.depan.view_doc.layout.LayoutGenerator;
 import com.google.devtools.depan.view_doc.model.GraphModelReference;
 import com.google.devtools.depan.view_doc.model.ViewDocument;
 import com.google.devtools.depan.view_doc.model.ViewPreferences;
@@ -41,6 +43,15 @@ public class ViewFromGraphDocWizard extends FromGraphDocWizard {
 
   @Override
   public boolean performFinish() {
+    ViewEditorInput viewInput = buildViewInput();
+    ViewEditor.startViewEditor(viewInput);
+    return true;
+  }
+
+  /**
+   * Unpack wizard page controls into a {@link ViewEditorInput}.
+   */
+  private ViewEditorInput buildViewInput() {
 
     String baseName = NewEditorHelper.newEditorLabel(
         page.getFilename() + " - New View");
@@ -48,19 +59,17 @@ public class ViewFromGraphDocWizard extends FromGraphDocWizard {
     // Create ViewDocument elements
     GraphModelReference graphRef =
         new GraphModelReference(getGraphFile(), getGraphDoc());
-    ViewPreferences userPrefs = buildViewPreferences();
+
+    ViewPreferences userPrefs = new ViewPreferences();
+    // userPrefs.setLayoutFinder(layoutEdgeMatcher);
 
     ViewDocument viewInfo = new ViewDocument(graphRef, getNodes(), userPrefs);
-    ViewEditor.startViewEditor(viewInfo, baseName);
-    return true;
-  }
 
-  private ViewPreferences buildViewPreferences() {
-    ViewPreferences result = new ViewPreferences();
-
-    // No locations, so initial layout occurs in ViewEditor once viewport
-    // is constructed.
-
+    ViewEditorInput result = new ViewEditorInput(viewInfo, baseName);
+    LayoutGenerator layout = page.getLayoutGenerator();
+    if (null != layout) {
+      result.setInitialLayout(layout);
+    }
     return result;
   }
 }

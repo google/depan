@@ -28,7 +28,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import java.util.Map;
 
 /**
- * @author Lee Carver
+ * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
 public class FromGraphDocRegistry extends
     ContributionRegistry<FromGraphDocContributor> {

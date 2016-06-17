@@ -9,12 +9,8 @@ import com.google.devtools.depan.eclipse.visualization.ogl.NodeColorSupplier;
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeRatioSupplier;
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeShapeSupplier;
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeSizeSupplier;
-import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptors;
 import com.google.devtools.depan.model.GraphEdge;
-import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.view_doc.layout.LayoutContext;
-import com.google.devtools.depan.view_doc.layout.LayoutUtil;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -29,11 +25,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public class NodeColorFactory {
+public class NodeSupplierFactory {
 
-  private GraphModel graphModel;
-
-  private Collection<GraphNode> movables;
+  private Collection<GraphNode> nodes;
 
   /** Used for rendering and ranking in the rending pipe. */
   private DirectedGraph<GraphNode, GraphEdge> jungGraph;
@@ -44,20 +38,11 @@ public class NodeColorFactory {
 
   private Double maxRank;
 
-  public NodeColorFactory(
-      GraphModel graphModel, Collection<GraphNode> movables) {
-    this.graphModel = graphModel;
-    this.movables = movables;
-  }
-
-  public void buildJungGraph() {
-    LayoutContext context = new LayoutContext();
-    context.setGraphModel(graphModel);
-    context.setMovableNodes(movables);
-    // TODO: Compute ranking based on selected edge matcher
-    context.setEdgeMatcher(GraphEdgeMatcherDescriptors.FORWARD);
-
-    jungGraph = LayoutUtil.buildJungGraph(context);
+  public NodeSupplierFactory(
+      Collection<GraphNode> nodes,
+      DirectedGraph<GraphNode, GraphEdge> jungGraph) {
+    this.nodes = nodes;
+    this.jungGraph = jungGraph;
     ranking = rankGraph();
     maxDegree = calcMaxDegree();
     maxRank = calcMaxRank();
@@ -71,7 +56,7 @@ public class NodeColorFactory {
 
     Double unit = 1.0;
     Map<GraphNode, Double> result = Maps.newHashMap();
-    for (GraphNode node : graphModel.getNodes()) {
+    for (GraphNode node : nodes) {
       result.put(node, unit);
     }
     return result;
@@ -80,7 +65,7 @@ public class NodeColorFactory {
   private int calcMaxDegree() {
     int result = 0;
 
-    for (GraphNode node : graphModel.getNodes()) {
+    for (GraphNode node : nodes) {
       int degree = jungGraph.getPredecessorCount(node);
       result = Math.max(result, degree);
     }
@@ -115,7 +100,7 @@ public class NodeColorFactory {
     ranker.evaluate();
 
     Map<GraphNode, Double> result = Maps.newHashMap();
-    for (GraphNode node : graphModel.getNodes()) {
+    for (GraphNode node : nodes) {
       result.put(node, ranker.getVertexRankScore(node));
     }
 

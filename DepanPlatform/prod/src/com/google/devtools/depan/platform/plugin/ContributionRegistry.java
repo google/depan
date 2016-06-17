@@ -16,8 +16,11 @@
 
 package com.google.devtools.depan.platform.plugin;
 
+import static com.google.devtools.depan.platform.PlatformLogger.LOG;
+
 import com.google.devtools.depan.model.Element;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -96,6 +99,10 @@ public abstract class ContributionRegistry<T> {
         // obtain an object on the entry
         ContributionEntry<T> entry = buildEntry(bundleId, element);
         String entryId = entry.getId();
+        if (Strings.isNullOrEmpty(entryId)) {
+          LOG.warning("Empty entry id in " + bundleId  + 
+              " for " + extensionId);
+        }
         entries.put(entryId, entry);
 
         // try to instantiate the contribution and install it

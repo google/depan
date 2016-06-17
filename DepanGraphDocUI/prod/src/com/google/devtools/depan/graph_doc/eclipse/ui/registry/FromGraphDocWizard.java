@@ -25,8 +25,7 @@ import org.eclipse.jface.wizard.Wizard;
 import java.util.Collection;
 
 /**
- * @author Lee Carver
- *
+ * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
 public abstract class FromGraphDocWizard extends Wizard {
 

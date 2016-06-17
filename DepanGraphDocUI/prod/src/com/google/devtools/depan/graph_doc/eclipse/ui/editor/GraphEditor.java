@@ -24,7 +24,6 @@ import com.google.devtools.depan.eclipse.ui.nodes.viewers.HierarchyViewer.Hierar
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeTreeProvider;
 import com.google.devtools.depan.graph_doc.GraphDocLogger;
 import com.google.devtools.depan.graph_doc.eclipse.ui.registry.FromGraphDocContributor;
-import com.google.devtools.depan.graph_doc.eclipse.ui.registry.FromGraphDocRegistry;
 import com.google.devtools.depan.graph_doc.eclipse.ui.registry.FromGraphDocWizard;
 import com.google.devtools.depan.graph_doc.eclipse.ui.widgets.FromGraphDocListControl;
 import com.google.devtools.depan.graph_doc.model.GraphDocument;
@@ -57,7 +56,6 @@ import org.eclipse.ui.part.MultiPageEditorPart;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Map;
 
 /**
  * @author ycoppel@google.com (Yohann Coppel)
@@ -156,10 +154,7 @@ public class GraphEditor
       }
     });
 
-    Map<String, FromGraphDocContributor> contribs =
-        FromGraphDocRegistry.getRegistryContributionMap();
-    fromGraphDoc =
-        new FromGraphDocListControl(top, contribs);
+    fromGraphDoc = new FromGraphDocListControl(top);
 
     // tree --------------------
     checkNodeTreeView = new CheckNodeTreeView<GraphNode>(
@@ -180,19 +175,6 @@ public class GraphEditor
     int index = addPage(composite);
     setPageText(index, "New View");
   }
-
-//  private LayoutChoicesControl setupLayoutChoices(Composite parent) {
-//    LayoutChoicesControl result = new LayoutChoicesControl(
-//        parent, LayoutChoicesControl.Style.LINEAR);
-//    result.setLayoutChoices(LayoutGenerators.getLayoutNames(false));
-//
-//    GraphEdgeMatcherDescriptor edgeMatcher = getDefaultEdgeMatcher();
-//    java.util.List<GraphEdgeMatcherDescriptor> choices =
-//        GraphEdgeMatcherDescriptors.buildGraphChoices(graph);
-//    result.setEdgeMatcherInput(edgeMatcher, choices);
-//
-//    return result;
-//  }
 
   private HierarchyViewer<GraphNode> createHierarchyViewer(Composite parent) {
     HierarchyViewer<GraphNode> result = new HierarchyViewer<GraphNode>(parent, false);
@@ -329,7 +311,7 @@ public class GraphEditor
       GraphNode topNode, Collection<GraphNode> nodes) {
 
     // Prepare the wizard.
-    FromGraphDocContributor choice = fromGraphDoc.getFromGraphDocChoice();
+    FromGraphDocContributor choice = fromGraphDoc.getChoice();
     if (null == choice) {
       return;
     }

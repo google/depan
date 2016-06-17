@@ -22,6 +22,7 @@ import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
 import com.google.devtools.depan.view_doc.eclipse.ui.widgets.NodeDisplayTableControl;
 import com.google.devtools.depan.view_doc.model.NodeDisplayProperty;
 import com.google.devtools.depan.view_doc.model.NodeDisplayRepository;
+import com.google.devtools.depan.view_doc.model.NodeLocationRepository;
 import com.google.devtools.depan.view_doc.model.ViewPrefsListener;
 
 import org.eclipse.swt.SWT;
@@ -30,7 +31,11 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
+import java.awt.geom.Point2D;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Tool to set display properties for individual nodes.
@@ -45,6 +50,9 @@ public class NodeDisplayViewPart extends AbstractViewDocViewPart {
    * The <code>RelationSetEditorControl</code> that controls the UX.
    */
   private NodeDisplayTableControl propEditor;
+
+  /////////////////////////////////////
+  // Display attribute integration
 
   private NodeDisplayRepository propRepo;
 
@@ -98,9 +106,88 @@ public class NodeDisplayViewPart extends AbstractViewDocViewPart {
     }
   }
 
+  /////////////////////////////////////
+  // Location integration
+
+  private NodeLocationRepository posRepo;
+
+  private static class PartNodeLocationRepo
+      implements NodeLocationRepository {
+
+    private final ViewEditor editor;
+
+    private PosPrefsListener posListener;
+
+    public PartNodeLocationRepo(ViewEditor editor) {
+      this.editor = editor;
+    }
+
+    @Override
+    public Point2D getLocation(GraphNode node) {
+      return editor.getPosition(node);
+    }
+
+    @Override
+    public void setLocation(GraphNode node, Point2D location) {
+      Map<GraphNode, Point2D> update = Collections.singletonMap(node, location);
+      editor.editNodeLocations(update, this);
+    }
+
+    @Override
+    public void addChangeListener(ChangeListener listener) {
+      posListener = new PosPrefsListener(editor, listener);
+      editor.addViewPrefsListener(posListener);
+    }
+
+    @Override
+    public void removeChangeListener(ChangeListener listener) {
+      // TODO: if multiple ChangeListener,
+      // add Map<ChangeListener, EdgeDisplayListener>
+      editor.removeViewPrefsListener(posListener);
+    }
+  }
+
+  private static class PosPrefsListener extends ViewPrefsListener.Simple {
+
+    private final ViewEditor editor;
+
+    private final NodeLocationRepository.ChangeListener listener;
+
+    public PosPrefsListener(
+        ViewEditor editor, NodeLocationRepository.ChangeListener listener) {
+      this.editor = editor;
+      this.listener = listener;
+    }
+
+    @Override
+    public void nodeLocationsChanged(
+        Map<GraphNode, Point2D> locations, Object author) {
+      if (this == author) {
+        return;
+      }
+      updateLocations(locations);
+    }
+
+    @Override
+    public void nodeLocationsSet(final Map<GraphNode, Point2D> newLocations) {
+      // All locations changed, regardless of their inclusion in new locations
+      updateLocations(editor.getNodeLocations());
+    }
+
+    private void updateLocations(final Map<GraphNode, Point2D> locations) {
+      // All locations changed, regardless of their inclusion in new locations
+      for (Entry<GraphNode, Point2D> entry : locations.entrySet()) {
+        listener.nodeLocationChanged(entry.getKey(), entry.getValue());
+      }
+    }
+  }
+
+  /////////////////////////////////////
+  //
+
   @Override
   public Image getTitleImage() {
-    return ViewDocResources.IMAGE_RELATIONPICKER;
+    return ViewDocResources.IMAGE_NODEEDITOR;
   }
 
   @Override
@@ -115,7 +202,7 @@ public class NodeDisplayViewPart extends AbstractViewDocViewPart {
 
     propEditor = new NodeDisplayTableControl(result);
     propEditor.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false));
+        new GridData(SWT.FILL, SWT.FILL, true, true));
   }
 
   @Override
@@ -132,7 +219,8 @@ public class NodeDisplayViewPart extends AbstractViewDocViewPart {
     ViewEditor editor = getEditor();
 
     propRepo = new PartEdgeDisplayRepo(editor);
-    propEditor.setNodeDisplayRepository(editor, propRepo);
+    posRepo = new PartNodeLocationRepo(editor);
+    propEditor.setNodeRepository(posRepo, propRepo);
 
     // TODO: Should come from editor
     Collection<GraphNode> edges = editor.getExposedGraph().getNodes();
@@ -142,7 +230,7 @@ public class NodeDisplayViewPart extends AbstractViewDocViewPart {
 
   @Override
   protected void releaseResources() {
-    propEditor.removeNodeDisplayRepository(propRepo);
+    propEditor.removeNodeRepository(posRepo, propRepo);
     propRepo = null;
   }
 }

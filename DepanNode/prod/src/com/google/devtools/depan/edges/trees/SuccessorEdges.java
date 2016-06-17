@@ -79,7 +79,7 @@ public abstract class SuccessorEdges {
    * 
    * @return Collection of successor Nodes
    */
-  public Collection<GraphNode>computeSuccessorNodes() {
+  public Collection<GraphNode> computeSuccessorNodes() {
     Collection<GraphNode> result = Lists.newArrayList();
     for (GraphEdge edge : getForwardEdges()) {
       result.add(edge.getTail());

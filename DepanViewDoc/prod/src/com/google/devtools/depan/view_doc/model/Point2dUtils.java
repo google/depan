@@ -199,11 +199,10 @@ public class Point2dUtils {
       Translater intoRegion) {
 
     for (GraphNode node : moveNodes) {
-      Point2D location = translateNode(node, positions, intoRegion);
-      if (null == location) {
-        continue;
+      Point2D location = positions.get(node);
+      if (null != location) {
+        positions.put(node, intoRegion.translate(location));
       }
-      positions.put(node, location);
     }
   }
 
@@ -221,24 +220,12 @@ public class Point2dUtils {
         Maps.newHashMapWithExpectedSize(moveNodes.size());
 
     for (GraphNode node : moveNodes) {
-      Point2D location = translateNode(node, positions, translater);
-      if (null == location) {
-        continue;
+      Point2D location = positions.get(node);
+      if (null != location) {
+        result.put(node, translater.translate(location));
       }
-      result.put(node, translater.translate(location));
     }
     return result;
-  }
-
-
-  private static Point2D translateNode(
-      GraphNode node, Map<GraphNode, Point2D> positions, Translater intoRegion) {
-    Point2D location = positions.get(node);
-    if (null == location) {
-      return null;
-    }
-    Point2D translated = intoRegion.translate(location);
-    return translated;
   }
 
   public static void translatePos(

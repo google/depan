@@ -33,7 +33,9 @@ import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.api.RelationSet;
 import com.google.devtools.depan.graph.registry.RelationRegistry;
 import com.google.devtools.depan.graph_doc.eclipse.ui.resources.GraphResources;
+import com.google.devtools.depan.graph_doc.model.GraphDocument;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
+import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptors;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
@@ -43,12 +45,11 @@ import com.google.devtools.depan.platform.NewEditorHelper;
 import com.google.devtools.depan.platform.WorkspaceTools;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 import com.google.devtools.depan.view_doc.eclipse.ViewDocLogger;
-import com.google.devtools.depan.view_doc.layout.GridLayoutGenerator;
 import com.google.devtools.depan.view_doc.layout.LayoutContext;
 import com.google.devtools.depan.view_doc.layout.LayoutGenerator;
 import com.google.devtools.depan.view_doc.layout.LayoutGenerators;
-import com.google.devtools.depan.view_doc.layout.LayoutScaler;
 import com.google.devtools.depan.view_doc.layout.LayoutUtil;
+import com.google.devtools.depan.view_doc.layout.grid.GridLayoutGenerator;
 import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty;
 import com.google.devtools.depan.view_doc.model.NodeDisplayProperty;
 import com.google.devtools.depan.view_doc.model.OptionPreferences;
@@ -60,7 +61,8 @@ import com.google.devtools.depan.view_doc.persistence.ViewDocXmlPersist;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+
+import edu.uci.ics.jung.graph.DirectedGraph;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -97,7 +99,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -112,18 +113,6 @@ public class ViewEditor extends MultiPageEditorPart {
 
   public static final String ID =
       "com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor";
-
-  /** How much room to consume for full viewport layout scaling. */
-  public static final double FULLSCALE_MARGIN = 0.9;
-
-  /**
-   * Defines the OpenGL distance between two points that should be considered
-   * equivalent to zero.
-   * 
-   * <p>Ideally, this should be obtained from the GLPanel/View, perhaps as the
-   * half the OpenGL distance between two pixels.  But that will have to wait.
-   */
-  private static final double ZERO_THRESHOLD = 0.1;
 
   /////////////////////////////////////
   // Editor state for persistence
@@ -142,9 +131,17 @@ public class ViewEditor extends MultiPageEditorPart {
 
   /**
    * Base name to use for created files. Typically set through the
-   * ViewEditorInput supplied at editor startup.
+   * {@link ViewEditorInput} supplied at editor startup.
    */
   private String baseName;
+
+  /**
+   * {@link LayoutGenerator} to use if the nodes arrive in the editor with
+   * no locations.  This is typical for new {@link ViewDocument}s coming
+   * from a {@link GraphDocument}. Typically set through the
+   * {@link ViewEditorInput} supplied at editor startup.
+   */
+  private LayoutGenerator initialLayout;
 
   /** Dirty state. */
   private boolean isDirty = true;
@@ -196,7 +193,7 @@ public class ViewEditor extends MultiPageEditorPart {
    */
   private GraphModel exposedGraph;
 
-  private NodeColorFactory nodeColorFactory;
+  private NodeSupplierFactory nodeSupplierFactory;
 
   /////////////////////////////////////
   // Dispatch errors to go our logger
@@ -239,6 +236,15 @@ public class ViewEditor extends MultiPageEditorPart {
 
   public GraphEdgeMatcherDescriptor getTreeEdgeMatcher() {
     return viewInfo.getLayoutFinder();
+  }
+
+  public GraphEdgeMatcherDescriptor getLayoutEdgeMatcher() {
+    GraphEdgeMatcherDescriptor result = viewInfo.getLayoutFinder();
+    if (null != result) {
+      return result;
+    }
+
+    return viewResources.getDefaultEdgeMatcher();
   }
 
   public RelationSetDescriptor getDisplayRelationSet() {
@@ -337,7 +343,7 @@ public class ViewEditor extends MultiPageEditorPart {
     renderer.setGraphModel(getViewGraph());
     renderer.initializeScenePrefs(getScenePrefs());
     renderer.initializeNodeLocations(viewInfo.getNodeLocations());
-    renderer.setNodeNeighbors(nodeColorFactory.getJungGraph());
+    renderer.setNodeNeighbors(nodeSupplierFactory.getJungGraph());
     initNodeRendering();
     initSelectedNodes(getSelectedNodes());
     initEdgeRendering();
@@ -406,25 +412,31 @@ public class ViewEditor extends MultiPageEditorPart {
     // Force a layout if there are no locations.
     if (viewInfo.getNodeLocations().isEmpty()) {
       markDirty();
+      final LayoutGenerator initLayout = getInitialLayout();
       addDrawingListener(new DrawingListener() {
 
         @Override
         public void updateDrawingBounds(
             Rectangle2D drawing, Rectangle2D viewport) {
-          // Don't layout nodes if no layout is defined
-          LayoutGenerator selectedLayout = getSelectedLayout();
-          if (null == selectedLayout ) {
-            selectedLayout = new GridLayoutGenerator();
-          }
 
-          // Run the layout process on all nodes in the view.
-          applyLayout(selectedLayout,
-              viewInfo.getLayoutFinder(), viewInfo.getViewNodes());
+          // TODO: Use edge matcher from ViewEditorInput, too.
+          applyLayout(initLayout);
 
           // Only need to do this once on startup
           removeDrawingListener(this);
         }});
     }
+  }
+
+  private LayoutGenerator getInitialLayout() {
+    LayoutGenerator selectedLayout = getSelectedLayout();
+    if (null != selectedLayout ) {
+      return selectedLayout;
+    }
+    if (null != initialLayout) {
+      return initialLayout;
+    }
+    return new GridLayoutGenerator();
   }
 
   private void initFromInput(IEditorInput input) throws PartInitException {
@@ -433,6 +445,7 @@ public class ViewEditor extends MultiPageEditorPart {
       viewFile = null; // not yet saved
       baseName = editorInput.getBaseName();
       viewInfo = editorInput.getViewDocument();
+      initialLayout = editorInput.getInitialLayout();
       setPartName(calcPartName());
       markDirty();
     } else if (input instanceof IFileEditorInput) {
@@ -440,6 +453,7 @@ public class ViewEditor extends MultiPageEditorPart {
         viewFile = ((IFileEditorInput) input).getFile();
         baseName = viewFile.getName();
         viewInfo = loadViewDocument(viewFile);
+        initialLayout = null;
         setPartName(calcPartName());
         setDirtyState(false);
       } catch (RuntimeException e) {
@@ -470,9 +484,22 @@ public class ViewEditor extends MultiPageEditorPart {
 
     exposedGraph = buildExposedGraph();
 
-    nodeColorFactory = new NodeColorFactory(
-        exposedGraph, exposedGraph.getNodes());
-    nodeColorFactory.buildJungGraph();
+    nodeSupplierFactory = buildNodeSupplierFactory();
+  }
+
+  private NodeSupplierFactory buildNodeSupplierFactory() {
+
+    Collection<GraphNode> nodes = exposedGraph.getNodes();
+
+    LayoutContext context = new LayoutContext();
+    context.setGraphModel(exposedGraph);
+    context.setMovableNodes(nodes);
+    // TODO: Compute ranking based on selected edge matcher
+    context.setEdgeMatcher(GraphEdgeMatcherDescriptors.FORWARD);
+
+    DirectedGraph<GraphNode, GraphEdge> jungGraph =
+        LayoutUtil.buildJungGraph(context);
+    return new NodeSupplierFactory(nodes, jungGraph);
   }
 
   private GraphModel buildExposedGraph() {
@@ -791,7 +818,7 @@ public class ViewEditor extends MultiPageEditorPart {
     for (GraphNode node : viewGraph.getNodes()) {
       NodeDisplayProperty prop = viewInfo.getNodeProperty(node);
       if (null != prop) {
-        renderer.updateNodeProperty(node, prop );
+        renderer.updateNodeProperty(node, prop);
       }
     }
   }
@@ -944,53 +971,9 @@ public class ViewEditor extends MultiPageEditorPart {
       Collection<GraphNode> layoutNodes, Map<GraphNode, Point2D> locations) {
     Rectangle2D viewport = renderer.getOGLViewport();
     Map<GraphNode, Point2D> changes = 
-            computeFullViewScale(layoutNodes, locations, viewport);
+        LayoutUtil.computeFullViewScale(layoutNodes, locations, viewport);
     editNodeLocations(changes);
   }
-
-  /**
-   * Scale the nodes so that they would fit in the viewport, but don't force
-   * them into the viewport.
-   * 
-   * @param layoutNodes
-   * @param locations
-   * @param viewport
-   * @return updated node locations that are the same size as the viewport
-   */
-  private Map<GraphNode, Point2D> computeFullViewScale(
-          Collection<GraphNode> layoutNodes,
-          Map<GraphNode, Point2D> locations,
-          Rectangle2D viewport) {
-
-    if (layoutNodes.size() <= 0) {
-      return Collections.emptyMap();
-    }
-
-    // If there is only one node, don't change its location
-    Map<GraphNode, Point2D> result = Maps.newHashMap();
-    if (layoutNodes.size() == 1) {
-      GraphNode singletonNode = layoutNodes.iterator().next();
-      Point2D singletonLocation = locations.get(singletonNode);
-      if (null != singletonLocation) {
-        result.put(singletonNode, singletonLocation);
-      }
-      return result;
-    }
-
-    // Scale all the nodes to fit within the indicated region
-    LayoutScaler scaler = new LayoutScaler(layoutNodes, locations);
-    double scaleView = scaleWithMargin(scaler, viewport);
-    Point2dUtils.Translater translater =
-            Point2dUtils.newScaleTranslater(scaleView, scaleView);
-    return Point2dUtils.translateNodes(layoutNodes, locations, translater);
-  }
-
-  private double scaleWithMargin(
-          LayoutScaler scaler, Rectangle2D viewport) {
-    return FULLSCALE_MARGIN
-            * scaler.getFullViewScale(viewport, ZERO_THRESHOLD);
-  }
-
 
   /////////////////////////////////////
   // Compute new positions based on a LayoutGenerator
@@ -1010,7 +993,7 @@ public class ViewEditor extends MultiPageEditorPart {
   }
 
   public void applyLayout(LayoutGenerator layout) {
-    applyLayout(layout, viewInfo.getLayoutFinder());
+    applyLayout(layout, getLayoutEdgeMatcher());
   }
 
   public void applyLayout(
@@ -1337,13 +1320,13 @@ public class ViewEditor extends MultiPageEditorPart {
 
   private void prepareColorSupplier() {
     for (GraphNode root : getExposedGraph().getNodes()) {
-      renderer.setNodeColorSupplier(root, nodeColorFactory.getColorSupplier(root));
+      renderer.setNodeColorSupplier(root, nodeSupplierFactory.getColorSupplier(root));
     }
     return;
   }
 
   private void updateRootHighlight(boolean enable) {
-    List<GraphNode> roots = nodeColorFactory.getRoots();
+    List<GraphNode> roots = nodeSupplierFactory.getRoots();
     if (enable) {
       Monochrome seedColor = new NodeColorSupplier.Monochrome(Color.GREEN);
       for (GraphNode root : roots) {
@@ -1353,7 +1336,7 @@ public class ViewEditor extends MultiPageEditorPart {
     }
 
     for (GraphNode root : roots) {
-      renderer.setNodeColorSupplier(root, nodeColorFactory.getColorSupplier(root));
+      renderer.setNodeColorSupplier(root, nodeSupplierFactory.getColorSupplier(root));
     }
     return;
   }
@@ -1361,7 +1344,7 @@ public class ViewEditor extends MultiPageEditorPart {
   private void updateNodeStretchRatio(boolean enable) {
     if (enable) {
       for (GraphNode node : getExposedGraph().getNodes()) {
-        renderer.setNodeRatioSupplier(node, nodeColorFactory.getRatioSupplier(node));
+        renderer.setNodeRatioSupplier(node, nodeSupplierFactory.getRatioSupplier(node));
       }
       return;
     }
@@ -1380,7 +1363,7 @@ public class ViewEditor extends MultiPageEditorPart {
 
       for (GraphNode node : getExposedGraph().getNodes()) {
         NodeSizeSupplier supplier =
-            nodeColorFactory.getSizeSupplier(node, size);
+            nodeSupplierFactory.getSizeSupplier(node, size);
         renderer.setNodeSizeSupplier(node, supplier);
       }
       return;
@@ -1400,7 +1383,7 @@ public class ViewEditor extends MultiPageEditorPart {
                 NodeShape.getDefault().toString()));
 
         NodeShapeSupplier nodeShape =
-            nodeColorFactory.getShapeSupplier(node, mode);
+            nodeSupplierFactory.getShapeSupplier(node, mode);
         renderer.setNodeShapeSupplier(node, nodeShape);
       }
       return;
@@ -1534,20 +1517,26 @@ public class ViewEditor extends MultiPageEditorPart {
    * This is an asynchronous activate, as the new editor will execute
    * separately from the other workbench windows.
    */
-  public static void startViewEditor(ViewDocument newInfo, String baseName) {
-    final ViewEditorInput input = new ViewEditorInput(newInfo, baseName);
-    getWorkbenchDisplay().asyncExec(new Runnable() {
+  public static void startViewEditor(ViewEditorInput viewInput) {
+    getWorkbenchDisplay().asyncExec(new ViewEditorRunnable(viewInput));
+  }
 
-      @Override
-      public void run() {
-        IWorkbenchPage page = PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getActivePage();
-        try {
-          page.openEditor(input, ViewEditor.ID);
-        } catch (PartInitException e) {
-          e.printStackTrace();
-        }
+  private static class ViewEditorRunnable implements Runnable {
+    private final ViewEditorInput input;
+
+    private ViewEditorRunnable(ViewEditorInput input) {
+      this.input = input;
+    }
+
+    @Override
+    public void run() {
+      IWorkbenchPage page = PlatformUI.getWorkbench()
+          .getActiveWorkbenchWindow().getActivePage();
+      try {
+        page.openEditor(input, ViewEditor.ID);
+      } catch (PartInitException e) {
+        e.printStackTrace();
       }
-    });
+    }
   }
 }

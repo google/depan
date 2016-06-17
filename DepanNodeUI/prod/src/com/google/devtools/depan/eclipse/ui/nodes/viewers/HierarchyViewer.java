@@ -114,7 +114,7 @@ public class HierarchyViewer<T> extends Composite {
       HierarchyCache<T> hierarchies,
       GraphEdgeMatcherDescriptor selectedEdgeMatcher,
       List<GraphEdgeMatcherDescriptor> choices) {
-    edgeMatcherSelector.setInput(selectedEdgeMatcher, choices );
+    edgeMatcherSelector.setInput(selectedEdgeMatcher, choices);
     this.hierarchies = hierarchies;
   }
 

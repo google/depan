@@ -16,6 +16,8 @@
 
 package com.google.devtools.depan.view_doc.eclipse.ui.editor;
 
+import com.google.devtools.depan.view_doc.eclipse.ViewDocResources;
+import com.google.devtools.depan.view_doc.layout.LayoutGenerator;
 import com.google.devtools.depan.view_doc.model.ViewDocument;
 
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -31,6 +33,8 @@ public class ViewEditorInput implements IEditorInput {
 
   private final String baseName;
 
+  private LayoutGenerator initialLayout;
+
   public ViewEditorInput(ViewDocument viewInfo, String baseName) {
     this.viewInfo = viewInfo;
     this.baseName = baseName;
@@ -42,6 +46,14 @@ public class ViewEditorInput implements IEditorInput {
 
   public ViewDocument getViewDocument() {
     return viewInfo;
+  }
+
+  public void setInitialLayout(LayoutGenerator initialLayout) {
+    this.initialLayout = initialLayout;
+  }
+
+  public LayoutGenerator getInitialLayout() {
+    return initialLayout;
   }
 
   @Override
@@ -58,7 +70,7 @@ public class ViewEditorInput implements IEditorInput {
 
   @Override
   public ImageDescriptor getImageDescriptor() {
-    return null;
+    return ViewDocResources.IMAGE_DESC_VIEWDOC;
   }
 
   @Override

@@ -102,7 +102,7 @@ public class LayoutScaler {
   }
 
   /**
-   * Provide a translater that maps the graph area to the region.  Nodes in the
+   * Provide a translator that maps the graph area to the region.  Nodes in the
    * center (and corners) go to the same location in the into regions.  Other
    *  nodes are shifted proportionately.
    */
