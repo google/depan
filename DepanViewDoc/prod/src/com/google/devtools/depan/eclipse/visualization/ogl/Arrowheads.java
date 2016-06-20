@@ -29,6 +29,14 @@ public class Arrowheads {
   private Arrowheads() { /* no instances */ }
 
   /**
+   * This should be aligned with the default value in
+   * {@code EdgeDisplayProperty.ArrowheadStyles}.
+   */
+  public static ArrowHead buildDefault() {
+    return new ArtisticArrowhead();
+  }
+
+  /**
    * A 4-vertex old style artistic arrow head used with edges.
    */
   public static class ArtisticArrowhead extends ArrowHead {

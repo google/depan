@@ -126,7 +126,7 @@ public class VisibleRelationsViewPart extends AbstractViewDocViewPart {
 
     relationSetEditor = new RelationSetEditorControl(result);
     relationSetEditor.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false));
+        new GridData(SWT.FILL, SWT.FILL, true, true));
 
     Composite saves = setupSaveButtons(result);
     saves.setLayoutData(

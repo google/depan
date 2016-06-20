@@ -16,8 +16,6 @@
 
 package com.google.devtools.depan.eclipse.visualization.ogl;
 
-import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty.ArrowheadStyle;
-
 import com.jogamp.opengl.GL2;
 
 import java.awt.geom.Point2D;
@@ -45,7 +43,7 @@ public class Arrow extends OpenGLShape {
    * Constructs a new <code>Arrow</code> with the default {@link ArrowHead}.
    */
   public Arrow() {
-    this.head = ArrowHead.createNewArrowhead(ArrowheadStyle.getDefault());
+    this.head = Arrowheads.buildDefault();
   }
 
   /**

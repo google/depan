@@ -16,8 +16,6 @@
 
 package com.google.devtools.depan.eclipse.visualization.ogl;
 
-import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty.ArrowheadStyle;
-
 import com.jogamp.opengl.GL2;
 
 import java.awt.geom.Point2D;
@@ -143,24 +141,5 @@ public abstract class ArrowHead extends OpenGLShape {
     GLPanel.V(gl, controlPoints[1].x, controlPoints[1].y);
     gl.glEnd();
     gl.glPopMatrix();
-  }
-
-  /**
-   * Creates a new {@link ArrowHead} object using the given style.
-   *
-   * @param arrowheadStyle The style of the new arrowhead.
-   * @return A new {@link ArrowHead} object with the given style.
-   */
-  public static ArrowHead createNewArrowhead(ArrowheadStyle arrowheadStyle) {
-    switch (arrowheadStyle) {
-      case FILLED:
-        return new Arrowheads.FilledArrowhead();
-      case OPEN:
-        return new Arrowheads.OpenArrowhead();
-      case TRIANGLE:
-        return new Arrowheads.UnfilledArrowhead();
-      default:
-        return new Arrowheads.ArtisticArrowhead();
-    }
   }
 }

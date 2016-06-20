@@ -115,7 +115,7 @@ public class EdgeDisplayViewPart extends AbstractViewDocViewPart {
 
     propEditor = new EdgeDisplayTableControl(result);
     propEditor.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false));
+        new GridData(SWT.FILL, SWT.FILL, true, true));
   }
 
   @Override

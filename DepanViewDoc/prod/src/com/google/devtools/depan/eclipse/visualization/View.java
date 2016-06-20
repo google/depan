@@ -18,6 +18,7 @@ package com.google.devtools.depan.eclipse.visualization;
 
 import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds;
 import com.google.devtools.depan.eclipse.visualization.ogl.ArrowHead;
+import com.google.devtools.depan.eclipse.visualization.ogl.Arrowheads;
 import com.google.devtools.depan.eclipse.visualization.ogl.GLPanel;
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeColorSupplier;
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeRatioSupplier;
@@ -30,6 +31,7 @@ import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.view_doc.model.CameraDirPreference;
 import com.google.devtools.depan.view_doc.model.CameraPosPreference;
 import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty;
+import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty.ArrowheadStyle;
 import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty.LineStyle;
 import com.google.devtools.depan.view_doc.model.NodeDisplayProperty;
 import com.google.devtools.depan.view_doc.model.NodeDisplayProperty.Size;
@@ -154,8 +156,27 @@ public class View {
     boolean stippled = (property.getLineStyle() == LineStyle.DASHED);
     glPanel.setEdgeLineStyle(edge, stippled);
 
-    glPanel.setArrowhead(edge,
-        ArrowHead.createNewArrowhead(property.getArrowhead()));
+    glPanel.setArrowhead(edge, createNewArrowhead(property.getArrowhead()));
+  }
+
+  /**
+   * Transform a {@code ViewDoc} arrowhead style into a concrete
+   * {@link ArrowHead}.
+   *
+   * @param arrowheadStyle The style of the new arrowhead.
+   * @return A new {@link ArrowHead} object with the given style.
+   */
+  private ArrowHead createNewArrowhead(ArrowheadStyle arrowheadStyle) {
+    switch (arrowheadStyle) {
+      case FILLED:
+        return new Arrowheads.FilledArrowhead();
+      case OPEN:
+        return new Arrowheads.OpenArrowhead();
+      case TRIANGLE:
+        return new Arrowheads.UnfilledArrowhead();
+      default:
+        return new Arrowheads.ArtisticArrowhead();
+    }
   }
 
   /////////////////////////////////////
