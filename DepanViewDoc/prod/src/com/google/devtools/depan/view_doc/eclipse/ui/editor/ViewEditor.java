@@ -29,6 +29,7 @@ import com.google.devtools.depan.eclipse.visualization.ogl.NodeColorSupplier.Mon
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeRatioSupplier;
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeShapeSupplier;
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeSizeSupplier;
+import com.google.devtools.depan.eclipse.visualization.ogl.RendererChangeListener;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.api.RelationSet;
 import com.google.devtools.depan.graph.registry.RelationRegistry;
@@ -326,7 +327,7 @@ public class ViewEditor extends MultiPageEditorPart {
   private View createView(Composite parent) {
     // bottom composite containing main diagram
     try {
-      return new View(parent, SWT.NONE, this);
+      return new View(parent, getPartName(), new RendererChangeReceiver(this));
     } catch (Exception err) {
       ViewDocLogger.logException("Unable to create View pages", err);
       throw err;
@@ -1136,6 +1137,10 @@ public class ViewEditor extends MultiPageEditorPart {
 
   public void updateDrawingBounds(
       final Rectangle2D drawing, final Rectangle2D viewport) {
+
+    // Tell the scroll bar directly
+    renderer.updateDrawingBounds(drawing, viewport);
+
     drawingListeners.fireEvent(new ListenerManager.Dispatcher<DrawingListener>() {
       @Override
       public void dispatch(DrawingListener listener) {
@@ -1505,6 +1510,69 @@ public class ViewEditor extends MultiPageEditorPart {
     @Override
     public void optionChanged(String optionId, String value) {
       handleOptionChange(optionId, value);
+    }
+  }
+
+  /////////////////////////////////////
+  // Handle feedback from OGL renderer
+
+  private static class RendererChangeReceiver
+      implements RendererChangeListener {
+
+    private final ViewEditor editor;
+
+    public RendererChangeReceiver(ViewEditor editor) {
+      this.editor = editor;
+    }
+
+    @Override
+    public void locationsChanged(Map<GraphNode, Point2D> changes) {
+      editor.editNodeLocations(changes, this);
+    }
+
+    @Override
+    public void selectionMoved(double x, double y) {
+      editor.moveSelectionDelta(x, y, this);
+    }
+
+    @Override
+    public void selectionChanged(Collection<GraphNode> pickedNodes) {
+      editor.selectNodes(pickedNodes);
+    }
+
+    @Override
+    public void selectionExtended(Collection<GraphNode> extendNodes) {
+      editor.extendSelection(extendNodes, null);
+    }
+
+    @Override
+    public void selectionReduced(Collection<GraphNode> reduceNodes) {
+      editor.reduceSelection(reduceNodes, null);
+    }
+
+    @Override
+    public void updateDrawingBounds(Rectangle2D drawing, Rectangle2D viewport) {
+      editor.updateDrawingBounds(drawing, viewport);
+    }
+
+    @Override
+    public void sceneChanged() {
+      editor.sceneChanged();
+    }
+
+    @Override
+    public void applyLayout(LayoutGenerator layout) {
+      editor.applyLayout(layout);
+    }
+
+    @Override
+    public void scaleLayout(double scaleX, double scaleY) {
+      editor.scaleLayout(scaleX, scaleY);
+    }
+
+    @Override
+    public void scaleToViewport() {
+      editor.scaleToViewport();
     }
   }
 

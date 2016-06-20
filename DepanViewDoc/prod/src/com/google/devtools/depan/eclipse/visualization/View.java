@@ -28,7 +28,6 @@ import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
-import com.google.devtools.depan.view_doc.layout.LayoutGenerator;
 import com.google.devtools.depan.view_doc.model.CameraDirPreference;
 import com.google.devtools.depan.view_doc.model.CameraPosPreference;
 import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty;
@@ -54,17 +53,15 @@ import java.util.Map;
  * Hides the {@link GLPanel} and other OGL artifacts from the
  * {@link ViewEditor}.
  * 
+ * Wraps the {@link GLPanel} canvas with a horizontal and a vertical
+ * scrollbar. Make sure to notify this instance via
+ * {@link #updateDrawingBounds(Rectangle2D, Rectangle2D)} for any
+ * {@link RendererChangeReceiver#updateDrawingBounds(Rectangle2D, Rectangle2D)}
+ * event that are received.
+ * 
  * @author ycoppel@google.com (Yohann Coppel)
  */
 public class View {
-
-  // TODO: Turn this into an event dispatcher, and have editor
-  // register a listener.
-  private final ViewEditor editor;
-
-  /** Callbacks from {@link GLPanel}. */
-  private final RendererChangeReceiver changeReceiver =
-      new RendererChangeReceiver();
 
   /** Run the scroll bar for the OGL canvas. */
   private final ScrollbarHandler scrollHandler;
@@ -85,10 +82,9 @@ public class View {
    * @param editor source of rendering properties and target of change actions
    */
   public View(
-      Composite parent, int style, ViewEditor editor) {
-    this.editor = editor;
+      Composite parent, String partName, RendererChangeListener changeListener) {
 
-    glPanel = new GLPanel(parent, changeReceiver, editor.getPartName());
+    glPanel = new GLPanel(parent, changeListener, partName);
 
     scrollHandler = new ScrollbarHandler(parent, glPanel);
     scrollHandler.acquireResources();
@@ -126,6 +122,10 @@ public class View {
 
   public BufferedImage takeScreenshot() {
     return glPanel.takeScreenshot();
+  }
+
+  public void updateDrawingBounds(Rectangle2D drawing, Rectangle2D viewport) {
+    scrollHandler.updateDrawingBounds(drawing, viewport);
   }
 
   /////////////////////////////////////
@@ -371,63 +371,5 @@ public class View {
 
   public void setNodeNeighbors(Graph<GraphNode, GraphEdge> jungGraph) {
     glPanel.setNodeNeighbors(jungGraph);
-  }
-
-  /////////////////////////////////////
-  // Callbacks from the rendering engine.
-
-  private class RendererChangeReceiver
-      implements RendererChangeListener {
-
-    @Override
-    public void locationsChanged(Map<GraphNode, Point2D> changes) {
-      editor.editNodeLocations(changes, this);
-    }
-
-    @Override
-    public void selectionMoved(double x, double y) {
-      editor.moveSelectionDelta(x, y, this);
-    }
-
-    @Override
-    public void selectionChanged(Collection<GraphNode> pickedNodes) {
-      editor.selectNodes(pickedNodes);
-    }
-
-    @Override
-    public void selectionExtended(Collection<GraphNode> extendNodes) {
-      editor.extendSelection(extendNodes, null);
-    }
-
-    @Override
-    public void selectionReduced(Collection<GraphNode> reduceNodes) {
-      editor.reduceSelection(reduceNodes, null);
-    }
-
-    @Override
-    public void updateDrawingBounds(Rectangle2D drawing, Rectangle2D viewport) {
-      scrollHandler.updateDrawingBounds(drawing, viewport);
-      editor.updateDrawingBounds(drawing, viewport);
-    }
-
-    @Override
-    public void sceneChanged() {
-      editor.sceneChanged();
-    }
-
-    @Override
-    public void applyLayout(LayoutGenerator layout) {
-      editor.applyLayout(layout);
-    }
-
-    @Override
-    public void scaleLayout(double scaleX, double scaleY) {
-      editor.scaleLayout(scaleX, scaleY);
-    }
-
-    @Override
-    public void scaleToViewport() {
-      editor.scaleToViewport();
-    }
   }
 }
