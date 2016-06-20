@@ -20,7 +20,6 @@ import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.view_doc.layout.LayoutGenerator;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -659,15 +658,7 @@ public class GLPanel extends GLScene {
     }
   }
 
-  public void applyLayout(LayoutGenerator layout) {
-    getRendererCallback().applyLayout(layout);
-  }
-
-  public void scaleLayout(double zoomX, double zoomY) {
-    getRendererCallback().scaleLayout(zoomX, zoomY);
-  }
-
-  public void scaleToViewport() {
-    getRendererCallback().scaleToViewport();
+  public void handleEvent(RendererEvent event) {
+    getRendererCallback().handleEvent(event);
   }
 }

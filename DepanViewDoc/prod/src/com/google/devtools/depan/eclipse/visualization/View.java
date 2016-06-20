@@ -27,7 +27,6 @@ import com.google.devtools.depan.eclipse.visualization.ogl.RendererChangeListene
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
 import com.google.devtools.depan.view_doc.model.CameraDirPreference;
 import com.google.devtools.depan.view_doc.model.CameraPosPreference;
 import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty;
@@ -51,7 +50,7 @@ import java.util.Map;
  * ViewEditor.
  * 
  * Hides the {@link GLPanel} and other OGL artifacts from the
- * {@link ViewEditor}.
+ * {@code ViewEditor}.
  * 
  * Wraps the {@link GLPanel} canvas with a horizontal and a vertical
  * scrollbar. Make sure to notify this instance via

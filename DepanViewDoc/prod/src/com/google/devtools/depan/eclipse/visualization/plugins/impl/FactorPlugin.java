@@ -18,6 +18,8 @@ package com.google.devtools.depan.eclipse.visualization.plugins.impl;
 
 import com.google.devtools.depan.eclipse.visualization.ogl.GLPanel;
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeRenderingProperty;
+import com.google.devtools.depan.eclipse.visualization.ogl.RendererEvent;
+import com.google.devtools.depan.eclipse.visualization.ogl.RendererEvents;
 import com.google.devtools.depan.eclipse.visualization.plugins.core.NodeRenderingPlugin;
 
 /**
@@ -44,10 +46,6 @@ public class FactorPlugin extends NodeRenderingPlugin.Simple {
 
   private final GLPanel panel;
 
-  public double ZOOM_IN_FACTOR = 1.1;
-
-  public double ZOOM_OUT_FACTOR = 0.9;
-
   public FactorPlugin(GLPanel panel) {
     this.panel = panel;
   }
@@ -61,15 +59,15 @@ public class FactorPlugin extends NodeRenderingPlugin.Simple {
   public boolean keyPressed(int keycode, char character, boolean ctrl,
       boolean alt, boolean shift) {
     if (character == '+') {
-      panel.scaleLayout(ZOOM_IN_FACTOR, ZOOM_IN_FACTOR);
+      panel.handleEvent(RendererEvents.ScaleEvents.ZOOM_IN);
       return true;
     }
     if (character == '-') {
-      panel.scaleLayout(ZOOM_OUT_FACTOR, ZOOM_OUT_FACTOR);
+      panel.handleEvent(RendererEvents.ScaleEvents.ZOOM_OUT);
       return true;
     }
     if (character == 'a' || character == 'A') {
-      panel.scaleToViewport();
+      panel.handleEvent(RendererEvents.ScaleEvents.SCALE_TO_VIEWPORT);
       return true;
     }
     return false;

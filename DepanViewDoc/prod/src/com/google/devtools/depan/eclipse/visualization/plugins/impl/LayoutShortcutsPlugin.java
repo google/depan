@@ -17,11 +17,10 @@
 package com.google.devtools.depan.eclipse.visualization.plugins.impl;
 
 import com.google.devtools.depan.eclipse.visualization.ogl.GLPanel;
+import com.google.devtools.depan.eclipse.visualization.ogl.RendererEvent;
+import com.google.devtools.depan.eclipse.visualization.ogl.RendererEvents;
+import com.google.devtools.depan.eclipse.visualization.ogl.RendererEvents.LayoutEvents;
 import com.google.devtools.depan.eclipse.visualization.plugins.core.Plugin;
-import com.google.devtools.depan.view_doc.layout.LayoutGenerator;
-import com.google.devtools.depan.view_doc.layout.LayoutGenerators;
-
-import java.util.List;
 
 /**
  * Plugin that implements some editor shortcuts for layout options.
@@ -30,6 +29,12 @@ import java.util.List;
  * the editor should update the nodes to the corresponding layout. If 'l' is 
  * followed by a key that does not correspond to a layout number, the plugin
  * stops waiting for a number.
+ * 
+ * [Jun-2016] Now that this is de-coupled from direct knowledge of the layout
+ * options, the {@link GLPanel} (and {@link RenderListener}) can process the
+ * keystroke-detected event in any way that is sensible.  Eventually, this
+ * legacy component for keystoke handling might be merged into a unified
+ * OGL keystroke handler.
  *
  * @author Yohann Coppel
  * @author <a href='mailto:leeca@google.com'>Lee Carver</a> (extracted from {@link LayoutPlugin})
@@ -77,7 +82,7 @@ public class LayoutShortcutsPlugin implements Plugin {
       if (character == 'l' || character == 'L') {
         this.keyState = KeyState.LISTENING;
         System.out.println("Listening for a layout number. If the next key "
-            + "stroke is a number, the corresonding layout will be applied. if"
+            + "stroke is a number [1-9], the corresonding layout will be applied. if"
             + "not, stop listening.");
         return true;
       }
@@ -85,14 +90,12 @@ public class LayoutShortcutsPlugin implements Plugin {
 
     case LISTENING:
       this.keyState = KeyState.WAITING;
-      String layoutName = getLayoutName(character);
-      if (null == layoutName)
-        break;
-
-      System.out.println("Apply layout " + layoutName);
-      LayoutGenerator layout = LayoutGenerators.getByName(layoutName);
-      panel.applyLayout(layout);
-      return true;
+      RendererEvent event = getRendererEvent(character);
+      if (null != event) {
+        panel.handleEvent(event);
+        return true;
+      }
+      break;
 
     default:
       break;
@@ -100,7 +103,7 @@ public class LayoutShortcutsPlugin implements Plugin {
     return false;
   }
 
-  private String getLayoutName(int character) {
+  private RendererEvent getRendererEvent(char character) {
     if (character < '1') {
       return null;
     }
@@ -109,11 +112,13 @@ public class LayoutShortcutsPlugin implements Plugin {
     }
 
     int index = character - '1';
-    List<String> choices = LayoutGenerators.getLayoutNames(false);
-    if (index >= choices.size()) {
+    if (index < 0) {
       return null;
     }
-
-    return choices.get(index);
+    LayoutEvents[] events = RendererEvents.LayoutEvents.values();
+    if (index > events.length) {
+      return null;
+    }
+    return events[index];
   }
 }

@@ -30,6 +30,8 @@ import com.google.devtools.depan.eclipse.visualization.ogl.NodeRatioSupplier;
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeShapeSupplier;
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeSizeSupplier;
 import com.google.devtools.depan.eclipse.visualization.ogl.RendererChangeListener;
+import com.google.devtools.depan.eclipse.visualization.ogl.RendererEvent;
+import com.google.devtools.depan.eclipse.visualization.ogl.RendererEvents;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.api.RelationSet;
 import com.google.devtools.depan.graph.registry.RelationRegistry;
@@ -114,6 +116,17 @@ public class ViewEditor extends MultiPageEditorPart {
 
   public static final String ID =
       "com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor";
+
+  // TODO: Expected to evolve ..
+  private static final LayoutGenerator[] OGL_LAYOUTS = new LayoutGenerator[] {
+    new GridLayoutGenerator(),
+  };
+
+  // TODO: Could be user option
+  public static final double ZOOM_IN_FACTOR = 1.1;
+
+  // TODO: Could be user option
+  public static final double ZOOM_OUT_FACTOR = 0.9;
 
   /////////////////////////////////////
   // Editor state for persistence
@@ -1516,6 +1529,32 @@ public class ViewEditor extends MultiPageEditorPart {
   /////////////////////////////////////
   // Handle feedback from OGL renderer
 
+  /**
+   * Convert Renderer events into editor actions.
+   */
+  public void handleRendererEvent(RendererEvent event) {
+    if (event instanceof RendererEvents.LayoutEvents) {
+      int index = ((RendererEvents.LayoutEvents) event).ordinal();
+      if (index < OGL_LAYOUTS.length) {
+        applyLayout(OGL_LAYOUTS[index]);
+      }
+      return;
+    }
+
+    if (RendererEvents.ScaleEvents.ZOOM_IN.equals(event)) {
+      scaleLayout(ZOOM_IN_FACTOR, ZOOM_IN_FACTOR);
+      return;
+    }
+    if (RendererEvents.ScaleEvents.ZOOM_OUT.equals(event)) {
+      scaleLayout(ZOOM_OUT_FACTOR, ZOOM_OUT_FACTOR);
+      return;
+    }
+    if (RendererEvents.ScaleEvents.SCALE_TO_VIEWPORT.equals(event)) {
+      scaleToViewport();
+      return;
+    }
+  }
+
   private static class RendererChangeReceiver
       implements RendererChangeListener {
 
@@ -1561,18 +1600,8 @@ public class ViewEditor extends MultiPageEditorPart {
     }
 
     @Override
-    public void applyLayout(LayoutGenerator layout) {
-      editor.applyLayout(layout);
-    }
-
-    @Override
-    public void scaleLayout(double scaleX, double scaleY) {
-      editor.scaleLayout(scaleX, scaleY);
-    }
-
-    @Override
-    public void scaleToViewport() {
-      editor.scaleToViewport();
+    public void handleEvent(RendererEvent event) {
+      editor.handleRendererEvent(event);
     }
   }
 

@@ -17,7 +17,6 @@
 package com.google.devtools.depan.eclipse.visualization.ogl;
 
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.view_doc.layout.LayoutGenerator;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -26,12 +25,11 @@ import java.util.Map;
 
 /**
  * A listener to notify when the renderer changes significant properties of 
- * presentation.  This currently handles location and location changes.
- * It should also support zoom and scale changes.
+ * presentation.
  * 
  * <p>These notifications indicate that the user as requested the indicated
  * changes, but no change of rendering state has been made.  The receiver
- * (e.g. {@link ViewEditor}) must update the state of the rendered objects
+ * (e.g. {@code ViewEditor}) must update the state of the rendered objects
  * to complete the request.
  * 
  * <p>This class is defined as a Listener, but works more like a Callback.
@@ -41,7 +39,6 @@ import java.util.Map;
  *
  * @author <a href="mailto:leeca@google.com">Lee Carver</a>
  */
-// TODO(leeca):  See Javadoc above
 public interface RendererChangeListener {
 
   /**
@@ -92,19 +89,8 @@ public interface RendererChangeListener {
   public void sceneChanged();
 
   /**
-   * Notify the receiver that the supplied layout should be used.
+   * Notify the receiver that a user action event has been detected on the
+   * OGL canvas. Many of these are based on keyboard or mouse gestures.
    */
-  public void applyLayout(LayoutGenerator layout);
-
-  /**
-   * Notify the receiver that node positions should be scaled with the
-   * provided factors.
-   */
-  public void scaleLayout(double scaleX, double scaley);
-
-  /**
-   * Notify the receiver that nodes positions should be scaled to fit
-   * entirely within the current viewport.
-   */
-  public void scaleToViewport();
+  public void handleEvent(RendererEvent event);
 }
