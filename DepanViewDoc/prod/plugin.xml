@@ -15,6 +15,10 @@
             class="com.google.devtools.depan.view_doc.layout.grid.GridLayoutContribution"
             id="com.google.devtools.depan.view_doc.layout.grid.GridLayoutContribution">
       </layout>
+      <layout
+            class="com.google.devtools.depan.view_doc.layout.keep.KeepLocationsGenerator$Contribution"
+            id="com.google.devtools.depan.view_doc.layout.keep.KeepLocationsContribution">
+      </layout>
    </extension>
    <extension
          point="org.eclipse.ui.editors">

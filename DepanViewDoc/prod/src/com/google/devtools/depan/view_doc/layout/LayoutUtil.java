@@ -35,8 +35,10 @@ public class LayoutUtil {
    */
   private static final double ZERO_THRESHOLD = 0.1;
 
-  public static Map<GraphNode, Point2D> calcPositions(LayoutGenerator layout,
-      LayoutContext context, Collection<GraphNode> layoutNodes) {
+  public static Map<GraphNode, Point2D> calcPositions(
+      LayoutGenerator layout,
+      LayoutContext context,
+      Collection<GraphNode> layoutNodes) {
     LayoutRunner runner = layout.buildRunner(context);
     runLayout(runner);
     return runner.getPositions(layoutNodes);

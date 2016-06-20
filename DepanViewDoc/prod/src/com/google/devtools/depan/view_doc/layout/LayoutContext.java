@@ -117,4 +117,11 @@ public class LayoutContext {
       }
     }
   }
+
+  /**
+   * Provide a snapshot of the original positions.
+   */
+  public Map<GraphNode, Point2D> getNodeLocations() {
+    return Maps.newHashMap(nodeLocations);
+  }
 }

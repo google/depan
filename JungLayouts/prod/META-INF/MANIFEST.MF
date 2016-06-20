@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: DepanPlatform
+Bundle-SymbolicName: com.google.devtools.depan.view_doc.jung_layouts;singleton:=true
+Bundle-Version: 2.0.0.qualifier
+Bundle-Vendor: Pnambic Computing
+Require-Bundle: com.google.guava,
+ org.eclipse.core.runtime,
+ com.google.devtools.depan.core,
+ depan-jung-library,
+ com.google.devtools.depan.nodes,
+ com.google.devtools.depan.view_doc,
+ com.google.devtools.depan.edges,
+ com.google.devtools.depan.edges.ui
+Bundle-ClassPath: .

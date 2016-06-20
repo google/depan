@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="com.google.devtools.depan.view_doc.layout.registry.Generators">
+      <layout
+            class="com.google.devtools.depan.view_doc.layout.jung.JungLayoutContributions$FRLayout"
+            id="com.google.devtools.depan.view_doc.layout.jung.FRLayout">
+      </layout>
+      <layout
+            class="com.google.devtools.depan.view_doc.layout.jung.JungLayoutContributions$FR2Layout"
+            id="com.google.devtools.depan.view_doc.layout.jung.FR2Layout">
+      </layout>
+      <layout
+            class="com.google.devtools.depan.view_doc.layout.jung.JungLayoutContributions$ISOMLayout"
+            id="com.google.devtools.depan.view_doc.layout.jung.ISOMLayout">
+      </layout>
+      <layout
+            class="com.google.devtools.depan.view_doc.layout.jung.JungLayoutContributions$KKLayout"
+            id="com.google.devtools.depan.view_doc.layout.jung.KKLayout">
+      </layout>
+      <layout
+            class="com.google.devtools.depan.view_doc.layout.jung.JungLayoutContributions$SpringLayout"
+            id="com.google.devtools.depan.view_doc.layout.jung.SpringLayout">
+      </layout>
+      <layout
+            class="com.google.devtools.depan.view_doc.layout.jung.JungLayoutContributions$Spring2Layout"
+            id="com.google.devtools.depan.view_doc.layout.jung.Spring2Layout">
+      </layout>
+   </extension>
+
+</plugin>

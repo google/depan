@@ -37,6 +37,7 @@
     <module>../DepanPlatformUI/prod</module>
     <module>../DepanRemap/prod</module>
     <module>../DepanViewDoc/prod</module>
+    <module>../JungLayouts/prod</module>
 
     <!-- Dependency modeling components-->
     <module>../DepanFileSystem/prod</module>

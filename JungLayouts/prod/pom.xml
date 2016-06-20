@@ -7,12 +7,12 @@
     <relativePath>../../depan-luna-parent</relativePath>
   </parent>
 
-  <artifactId>com.google.devtools.depan.view_doc.depan_layouts</artifactId>
+  <artifactId>com.google.devtools.depan.view_doc.jung_layouts</artifactId>
   <version>2.0.0-SNAPSHOT</version>
   <packaging>eclipse-plugin</packaging>
 
-  <name>DepAn Layouts</name>
-  <description>Graph layout generators for DepAn.</description>
+  <name>Jung Layouts</name>
+  <description>Graph layouts based on JUNG algorithms.</description>
 
   <build>
     <sourceDirectory>src</sourceDirectory>
