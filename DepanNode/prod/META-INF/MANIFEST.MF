@@ -7,4 +7,4 @@ Bundle-Vendor: Pnambic Computing
 Require-Bundle: com.google.devtools.depan.core,
  com.google.guava
 Bundle-ClassPath: .
-Export-Package: com.google.devtools.depan.edges.trees
+Export-Package: com.google.devtools.depan.nodes.trees

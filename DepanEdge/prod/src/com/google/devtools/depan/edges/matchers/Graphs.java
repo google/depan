@@ -1,13 +1,13 @@
 package com.google.devtools.depan.edges.matchers;
 
-import com.google.devtools.depan.edges.trees.SuccessorEdges;
-import com.google.devtools.depan.edges.trees.SuccessorsMap;
 import com.google.devtools.depan.graph.api.EdgeMatcher;
 import com.google.devtools.depan.graph.api.RelationSet;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphEdgeMatcher;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
+import com.google.devtools.depan.nodes.trees.SuccessorEdges;
+import com.google.devtools.depan.nodes.trees.SuccessorsMap;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;

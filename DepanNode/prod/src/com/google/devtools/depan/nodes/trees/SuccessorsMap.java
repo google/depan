@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.edges.trees;
+package com.google.devtools.depan.nodes.trees;
 
 import com.google.common.collect.Maps;
 

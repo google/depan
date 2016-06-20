@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.google.devtools.depan.edges.trees;
+package com.google.devtools.depan.nodes.trees;
 
 import com.google.devtools.depan.model.GraphNode;
 

@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.eclipse.ui.nodes.trees;
 
-import com.google.devtools.depan.edges.trees.TreeModel;
+import com.google.devtools.depan.nodes.trees.TreeModel;
 
 import org.eclipse.core.runtime.PlatformObject;
 
