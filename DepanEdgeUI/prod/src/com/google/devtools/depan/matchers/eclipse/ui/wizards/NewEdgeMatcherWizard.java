@@ -80,10 +80,12 @@ public class NewEdgeMatcherWizard
   /////////////////////////////////////
   // AbstractNewResourceWizard hook methods
 
+  @Override
   protected int countBuildWork() {
     return 1;
   }
 
+  @Override
   protected GraphEdgeMatcherDescriptor buildDocument(IProgressMonitor monitor) {
     monitor.beginTask("Preparing edge matcher", 1);
     monitor.worked(1);

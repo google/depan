@@ -89,6 +89,7 @@ public class NewRelationSetWizard
     return 1;
   }
 
+  @Override
   protected RelationSetDescriptor buildDocument(IProgressMonitor monitor) {
     monitor.beginTask("Preparing edge matcher", 1);
     monitor.worked(1);

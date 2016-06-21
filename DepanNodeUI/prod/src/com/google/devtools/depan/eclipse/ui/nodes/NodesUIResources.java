@@ -22,17 +22,17 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 /**
  * @author ycoppel@google.com (Yohann Coppel)
- *
  */
-public final class Resources {
+public final class NodesUIResources {
 
-  public static final String PLUGIN_ID = "com.google.devtools.depan.eclipse.ui.nodes";
+  public static final String PLUGIN_ID = "com.google.devtools.depan.nodes.ui";
 
   public static final Image IMAGE_EXPANDALL =
-      Resources.getImageFromPath("icons/expandall.png");
+      NodesUIResources.getImageFromPath("icons/expandall.png");
 
-  // private constructor to prevent instantiation
-  private Resources() { }
+  private NodesUIResources() {
+    // Prevent instantiation.
+  }
 
   public static ImageDescriptor getImageDescriptor(String path) {
     return AbstractUIPlugin.imageDescriptorFromPlugin(

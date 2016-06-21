@@ -20,4 +20,5 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-ClassPath: .
 Export-Package: com.google.devtools.depan.graph_doc.eclipse.ui.plugins,
  com.google.devtools.depan.graph_doc.eclipse.ui.resources,
+ com.google.devtools.depan.graph_doc.eclipse.ui.widgets,
  com.google.devtools.depan.graph_doc.eclipse.ui.wizards

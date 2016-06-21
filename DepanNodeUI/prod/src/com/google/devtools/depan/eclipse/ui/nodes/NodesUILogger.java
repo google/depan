@@ -26,12 +26,12 @@ import java.util.logging.Logger;
  *
  * @author <a href="mailto:leeca@pnambic.com">Lee Carver</a>
  */
-public class NodesLogger {
+public class NodesUILogger {
 
   public static final Logger LOG =
-      Logger.getLogger(NodesLogger.class.getName());
+      Logger.getLogger(NodesUILogger.class.getName());
 
-  private NodesLogger() {
+  private NodesUILogger() {
     // Prevent instantiation.
   }
 

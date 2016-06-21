@@ -69,7 +69,8 @@ public class RubyIconTransformer
     return RubyActivator.IMAGE_DESC_CLASS;
   }
 
-   public ImageDescriptor match(ClassMethodElement element) {
+  @Override
+  public ImageDescriptor match(ClassMethodElement element) {
      return RubyActivator.IMAGE_DESC_CLASS_METHOD;
   }
 

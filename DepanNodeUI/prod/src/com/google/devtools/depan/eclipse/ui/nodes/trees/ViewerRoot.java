@@ -26,7 +26,7 @@ import org.eclipse.core.runtime.PlatformObject;
 public class ViewerRoot extends PlatformObject {
   private final Object[] roots;
 
-  ViewerRoot(Object[] roots) {
+  public ViewerRoot(Object[] roots) {
     this.roots = roots;
   }
 

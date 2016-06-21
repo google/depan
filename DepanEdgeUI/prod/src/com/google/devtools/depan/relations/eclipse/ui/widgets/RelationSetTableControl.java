@@ -17,13 +17,17 @@
 package com.google.devtools.depan.relations.eclipse.ui.widgets;
 
 import com.google.devtools.depan.graph.api.Relation;
+import com.google.devtools.depan.graph.api.RelationSet;
 import com.google.devtools.depan.platform.AlphabeticSorter;
 import com.google.devtools.depan.platform.InverseSorter;
 import com.google.devtools.depan.platform.LabelProviderToString;
 import com.google.devtools.depan.platform.PlatformResources;
 import com.google.devtools.depan.platform.eclipse.ui.tables.EditColTableDef;
+import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 import com.google.devtools.depan.relations.models.RelationSetRepository;
 
+import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -42,28 +46,47 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
+import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 /**
- * Run a view of the known relations as its own reusable "part".
+ * Show a table of {@link Relation}s, marked visible/included.  The
+ * {@link Relation}s shown depend on a universe thats is defined externally
+ * (via the {@link #setInput(Collection)} method). The {@link Relation}s
+ * marked as included depend on the supplied {@link RelationSet}.
+ * 
+ * Assumes the set of {@link Relation}s being shown (the universe) will not
+ * change externally.  Update the control for external changes via the
+ * {@link #setInput(Collection)} method. This might be part of an document
+ * change in a containing {@link Control}.
+ * 
+ * Changes to the set of visible {@link Relation}s are managed through the
+ * {@link RelationSetRepository.ChangeListener} and the 
+ * {@link #setVisibiltyRepository(RelationSetRepository)} and
+ * other feature specific methods.
+ * 
+ * Although the caller sets the range of displayed relations via the
+ * {@link #setInput(Collection)} method, this {@link Control} hides this
+ * notion of a fixed "universe" from normal use.  This facilitates the use
+ * of "intentional" {@link RelationSet}s (e.g. {@code ALL}, {@code EMPTY},
+ * {@code EVEN}) in concert with the commonly used "extensional"
+ * {@link RelationSet}s (e.g. enumerated {@link Relation}s). The method
+ * {@link #selectedInvertRelations()} 
  */
 public class RelationSetTableControl extends Composite {
 
   public static final String COL_NAME = "Name";
   public static final String COL_SOURCE = "Source";
   public static final String COL_VISIBLE = "Visible";
-
-  /** To indicate that the "Visible" column should be updated. */
-  public static final String[] UPDATE_VISIBLE = {COL_VISIBLE};
 
   public static final int INDEX_NAME = 0;
   public static final int INDEX_SOURCE = 1;
@@ -75,12 +98,22 @@ public class RelationSetTableControl extends Composite {
     new EditColTableDef(COL_VISIBLE, true, COL_VISIBLE, 70),
   };
 
+  /////////////////////////////////////
+  // RelationSet integration
+
+  public static final String[] UPDATE_VISIBLE = {COL_VISIBLE};
+
   private class ControlRelationVisibleListener
       implements RelationSetRepository.ChangeListener {
 
     @Override
     public void includedRelationChanged(Relation relation, boolean visible) {
-      viewer.update(relation, UPDATE_VISIBLE);
+      updateRelationColumns(relation, UPDATE_VISIBLE);
+    }
+
+    @Override
+    public void relationsChanged() {
+      refresh();
     }
   }
 
@@ -88,61 +121,58 @@ public class RelationSetTableControl extends Composite {
 
   private RelationSetRepository relSetRepo;
 
-  private TableViewer viewer;
+  /////////////////////////////////////
+  // UX Elements
+
+  private TableViewer relSetViewer;
+
+  /////////////////////////////////////
+  // Public methods
 
   public RelationSetTableControl(Composite parent) {
     super(parent, SWT.NONE);
+    setLayout(Widgets.buildContainerLayout(1));
 
-    GridLayout gridLayout = new GridLayout();
-    gridLayout.marginHeight = 0;
-    gridLayout.marginWidth = 0;
-    setLayout(gridLayout);
-
-    viewer = new TableViewer(this,
+    // Layout embedded table
+    relSetViewer = new TableViewer(this,
         SWT.FULL_SELECTION | SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
-    // set up label provider
-    viewer.setLabelProvider(new RelEditorLabelProvider());
 
     // Set up layout properties
-    Table relTableControl = viewer.getTable();
-    relTableControl.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, true));
-    relTableControl.setToolTipText("List of Relations");
+    Table relSetTable = relSetViewer.getTable();
+    relSetTable.setLayoutData(Widgets.buildGrabFillData());
 
     // initialize the table
-    relTableControl.setHeaderVisible(true);
-    EditColTableDef.setupTable(TABLE_DEF, relTableControl);
+    relSetTable.setHeaderVisible(true);
+    relSetTable.setToolTipText("List of Relations");
+    EditColTableDef.setupTable(TABLE_DEF, relSetTable);
 
     // Configure cell editing
-    CellEditor[] cellEditors = new CellEditor[6];
+    CellEditor[] cellEditors = new CellEditor[TABLE_DEF.length];
     cellEditors[INDEX_NAME] = null;
     cellEditors[INDEX_SOURCE] = null;
-    cellEditors[INDEX_VISIBLE] = new CheckboxCellEditor(relTableControl);
+    cellEditors[INDEX_VISIBLE] = new CheckboxCellEditor(relSetTable);
 
-    viewer.setCellEditors(cellEditors);
-    viewer.setColumnProperties(EditColTableDef.getProperties(TABLE_DEF));
-    viewer.setCellModifier(new RelEditorCellModifierHandler());
+    // Configure table properties.
+    relSetViewer.setCellEditors(cellEditors);
+    relSetViewer.setLabelProvider(new ControlLabelProvider());
+    relSetViewer.setColumnProperties(EditColTableDef.getProperties(TABLE_DEF));
+    relSetViewer.setCellModifier(new ControlCellModifier());
 
-    // TODO: Add column sorters, filters?
-    configSorters(relTableControl);
+    configSorters(relSetTable);
 
     // Configure content last: use updateTable() to render relations
-    viewer.setContentProvider(ArrayContentProvider.getInstance());
+    relSetViewer.setContentProvider(ArrayContentProvider.getInstance());
   }
 
   /**
-   * Fill the list with {@link Relation}s.
+   * Fill the list with {@link Relation}s.  This is normally the universe
+   * of relations for the current document.
+   * 
+   * Whether they show on or off depends on the separately supplied
+   * {@link RelationSetRepository}.
    */
   public void setInput(Collection<Relation> relations) {
-
-    // Since rendering depends on relPlugin, set input after
-    // relPlugin is updated.
-    viewer.setInput(relations);
-  }
-
-  @SuppressWarnings("unchecked")
-  public Collection<Relation> getInput() {
-    return (Collection<Relation>) viewer.getInput();
+    relSetViewer.setInput(relations);
   }
 
   public void setVisibiltyRepository(RelationSetRepository visRepo) {
@@ -160,33 +190,77 @@ public class RelationSetTableControl extends Composite {
     this.relSetRepo = null;
   }
 
+  public void refresh() {
+    relSetViewer.refresh();
+  }
+
+  @SuppressWarnings("unchecked")
+  private Collection<Relation> getInput() {
+    return (Collection<Relation>) relSetViewer.getInput();
+  }
+
+  private void updateRelationColumns(Relation relation, String[] cols) {
+    relSetViewer.update(relation, cols);
+  }
+
   /////////////////////////////////////
-  // Convenience for modifying visibility property.
+  // External actions
   // Useful for buttons external to the table (e.g. clear all)
 
-  public void clearVisibleSelection() {
-    clearRelations(getSelectedRelations());
-  }
-
-  public void invertVisibleSelection() {
-    invertRelations(getSelectedRelations());
-  }
-
-  public void checkVisibleSelection() {
-    checkRelations(getSelectedRelations());
-  }
-
-  public void clearVisibleTable() {
+  public void clearAll() {
     clearRelations(getInput());
   }
 
-  public void invertVisibleTable() {
+  public void invertAll() {
     invertRelations(getInput());
   }
 
-  public void checkVisibleTable() {
+  public void checkAll() {
     checkRelations(getInput());
   }
+
+  public Collection<Relation> getSelectedRelations() {
+    ISelection selection = relSetViewer.getSelection();
+    if (!(selection instanceof IStructuredSelection)) {
+      return ImmutableList.of();
+    }
+
+    Collection<Relation> result = Sets.newHashSet();
+    @SuppressWarnings("rawtypes")
+    Iterator iter = ((IStructuredSelection) selection).iterator();
+    while (iter.hasNext()) {
+      result.add((Relation) iter.next());
+    }
+    return result;
+  }
+
+  public void setSelectedRelations(
+      Collection<Relation> relations, boolean reveal) {
+    StructuredSelection nextSelection =
+        new StructuredSelection(relations.toArray());
+    relSetViewer.setSelection(nextSelection, reveal);
+  }
+
+  public void selectInverseRelations(Collection<Relation> relations) {
+    Collection<Relation> inverse = computeInverseRelations(relations);
+    setSelectedRelations(inverse, true);
+  }
+
+  private Collection<Relation> computeInverseRelations(
+      Collection<Relation> relations) {
+
+    Collection<Relation> universe = getInput();
+    if (relations.isEmpty()) {
+      return universe;
+    }
+
+    Collection<Relation> result = Sets.newHashSet(universe);
+    result.removeAll(relations);
+    return result;
+  }
+
+  /////////////////////////////////////
+  // Property repository methods
 
   public void clearRelations(Collection<Relation> relations) {
     for (Relation relation : relations) {
@@ -205,56 +279,6 @@ public class RelationSetTableControl extends Composite {
     for (Relation relation : relations) {
       relSetRepo.setRelationChecked(relation, true);
     }
-  }
-
-  /**
-   * Invert the set of relations selected in the table.
-   * Don't change the state of any relation.
-   */
-  public void invertSelectedRelations() {
-    ISelection selection = viewer.getSelection();
-    if (!(selection instanceof IStructuredSelection)) {
-      return;
-    }
-
-    IStructuredSelection structuredSelection = (IStructuredSelection) selection;
-    Collection<Relation> inverse =
-        computeInverseRelations(getInput(), structuredSelection);
-
-    StructuredSelection nextSelection =
-        new StructuredSelection(inverse.toArray());
-    viewer.setSelection(nextSelection, true);
-  }
-
-  private Collection<Relation> getSelectedRelations() {
-    ISelection selection = viewer.getSelection();
-    if (!(selection instanceof IStructuredSelection)) {
-      return Collections.emptyList();
-    }
-
-    Collection<Relation> result = Sets.newHashSet();
-    @SuppressWarnings("rawtypes")
-    Iterator iter = ((IStructuredSelection) selection).iterator();
-    while (iter.hasNext()) {
-      result.add((Relation) iter.next());
-    }
-    return result;
-  }
-
-  private Collection<Relation> computeInverseRelations(
-      Collection<Relation> universe, IStructuredSelection selection) {
-
-    if (selection.isEmpty()) {
-      return universe;
-    }
-
-    Collection<Relation> inverse = Sets.newHashSet(universe);
-    @SuppressWarnings("rawtypes")
-    Iterator iter = selection.iterator();
-    while (iter.hasNext()) {
-      inverse.remove((Relation) iter.next());
-    }
-    return inverse;
   }
 
   /////////////////////////////////////
@@ -279,7 +303,7 @@ public class RelationSetTableControl extends Composite {
   }
 
   private int getSortDirection(TableColumn column) {
-    Table tableControl = (Table) viewer.getControl();
+    Table tableControl = (Table) relSetViewer.getControl();
     if (column != tableControl.getSortColumn()) {
       return SWT.DOWN;
     }
@@ -296,8 +320,8 @@ public class RelationSetTableControl extends Composite {
       sorter = new InverseSorter(sorter);
     }
 
-    Table tableControl = (Table) viewer.getControl();
-    viewer.setSorter(sorter);
+    Table tableControl = (Table) relSetViewer.getControl();
+    relSetViewer.setSorter(sorter);
     tableControl.setSortColumn(column);
     tableControl.setSortDirection(direction);
   }
@@ -309,7 +333,7 @@ public class RelationSetTableControl extends Composite {
 
     // By default, use an alphabetic sort over the column labels.
     ITableLabelProvider labelProvider =
-        (ITableLabelProvider) viewer.getLabelProvider();
+        (ITableLabelProvider) relSetViewer.getLabelProvider();
     ViewerSorter result = new AlphabeticSorter(
         new LabelProviderToString(labelProvider, colIndex));
     return result;
@@ -335,7 +359,11 @@ public class RelationSetTableControl extends Composite {
   /////////////////////////////////////
   // Label provider for table cell text
 
-  private class RelEditorLabelProvider extends LabelProvider
+  /**
+   * Cannot be singleton/{@code static} since it relies on {@link #relSetRepo}
+   * for field values.
+   */
+  private class ControlLabelProvider extends LabelProvider
       implements ITableLabelProvider {
 
     @Override
@@ -353,17 +381,21 @@ public class RelationSetTableControl extends Composite {
     }
 
     private String getSourceLabelForRelation(Relation relation) {
-      ClassLoader loader = relation.getClass().getClassLoader();
-      String result = loader.toString();
-      int bound = result.length();
-      int start = Math.max(0, bound - 12);
-      return result.substring(start);
+      // [Jun-2016] Stop-gap until better resource management is invented
+      String pkgName = relation.getClass().getPackage().getName();
+      List<String> pkgs = Splitter.on(".").splitToList(pkgName);
+      while(!pkgs.isEmpty()) {
+        int last = pkgs.size() - 1;
+        String tail = pkgs.get(last);
+        if ("graph".equals(tail)) {
+          pkgs = pkgs.subList(0, last);
+        } else
+          return tail;
+      }
 
-      // TODO: More like this, with an relation registry
-      // SourcePlugin plugin = relPlugin.get(relation);
-      // SourcePluginRegistry registry = SourcePluginRegistry.getInstance();
-      // String sourceId = registry.getPluginId(plugin);
-      // return registry.getSourcePluginEntry(sourceId).getSource();
+      String msg = MessageFormat.format(
+          "- unsrcd {0} -", relation.getForwardName());
+      return msg;
     }
 
     @Override
@@ -384,7 +416,7 @@ public class RelationSetTableControl extends Composite {
   /////////////////////////////////////
   // Value provider/modifier for edit cells
 
-  private class RelEditorCellModifierHandler implements ICellModifier{
+  private class ControlCellModifier implements ICellModifier{
 
     @Override
     public boolean canModify(Object element, String property) {
@@ -416,16 +448,8 @@ public class RelationSetTableControl extends Composite {
         Relation relation = (Relation) modifiedObject;
         relSetRepo.setRelationChecked(
             relation, ((Boolean) value).booleanValue());
-        viewer.update(relation, UPDATE_VISIBLE);
+        relSetViewer.update(relation, UPDATE_VISIBLE);
       }
     }
-  }
-
-  public void setSelection(ISelection selection) {
-    viewer.setSelection(selection);
-  }
-
-  public void refresh(boolean refresh) {
-    viewer.refresh(refresh);
   }
 }

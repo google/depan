@@ -1,4 +1,4 @@
-package com.google.devtools.depan.edges.matchers;
+package com.google.devtools.depan.nodes;
 
 import com.google.devtools.depan.graph.api.EdgeMatcher;
 import com.google.devtools.depan.graph.api.RelationSet;

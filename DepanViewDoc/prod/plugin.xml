@@ -65,7 +65,7 @@
             category="com.google.devtools.depan.view_doc.eclipse.ui.views"
             class="com.google.devtools.depan.view_doc.eclipse.ui.views.RelationDisplayViewPart"
             icon="icons/relpicker.png"
-            id="com.google.devtools.depan.view_doc.eclipse.ui.views.EdgeDisplayViewPart"
+            id="com.google.devtools.depan.view_doc.eclipse.ui.views.RelationDisplayViewPart"
             name="Relation Properties"
             restorable="true">
       </view>
@@ -83,6 +83,14 @@
             icon="icons/nodeeditor.png"
             id="com.google.devtools.depan.view_doc.eclipse.ui.views.NodeDisplayViewPart"
             name="Node Properties"
+            restorable="true">
+      </view>
+      <view
+            category="com.google.devtools.depan.view_doc.eclipse.ui.views"
+            class="com.google.devtools.depan.view_doc.eclipse.ui.views.NodeFilterViewPart"
+            icon="icons/selectioneditor.png"
+            id="com.google.devtools.depan.view_doc.eclipse.ui.views.NodeFilterViewPart"
+            name="Node Filter"
             restorable="true">
       </view>
    </extension>

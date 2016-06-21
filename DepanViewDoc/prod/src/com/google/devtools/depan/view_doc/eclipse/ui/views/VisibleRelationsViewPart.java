@@ -19,6 +19,7 @@ package com.google.devtools.depan.view_doc.eclipse.ui.views;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.api.RelationSet;
 import com.google.devtools.depan.graph.registry.RelationRegistry;
+import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 import com.google.devtools.depan.relations.eclipse.ui.widgets.RelationSetEditorControl;
 import com.google.devtools.depan.relations.eclipse.ui.wizards.NewRelationSetWizard;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
@@ -33,8 +34,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
@@ -42,6 +41,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import java.io.File;
 import java.net.URI;
+import java.util.Collection;
 
 /**
  * Tool for selecting relations that have to be shown.
@@ -52,21 +52,28 @@ public class VisibleRelationsViewPart extends AbstractViewDocViewPart {
 
   public static final String PART_NAME = "Relation Visibility";
 
+  /////////////////////////////////////
+  // UX Elements
+
   /**
    * The <code>RelationSetEditorControl</code> that controls the UX.
    */
   private RelationSetEditorControl relationSetEditor;
 
-  private ToolRelationRepo vizRepo;
+  /////////////////////////////////////
+  // RelationSet integration
 
-  private static class ToolRelationRepo
-      implements RelationSetRepository {
+  private PartRelationRepo vizRepo;
+
+  private static class PartRelationRepo
+      implements RelationSetRepository,
+          RelationSetRepository.ProvidesUniverse {
 
     private final ViewEditor editor;
 
-    private VisibleListener prefsListener;
+    private PartPrefsListener prefsListener;
 
-    public ToolRelationRepo(ViewEditor editor) {
+    public PartRelationRepo(ViewEditor editor) {
       this.editor = editor;
     }
 
@@ -83,7 +90,7 @@ public class VisibleRelationsViewPart extends AbstractViewDocViewPart {
     @Override
     public void addChangeListener(
         RelationSetRepository.ChangeListener listener) {
-      prefsListener = new VisibleListener(listener);
+      prefsListener = new PartPrefsListener(listener);
       editor.addViewPrefsListener(prefsListener);
     }
 
@@ -92,13 +99,18 @@ public class VisibleRelationsViewPart extends AbstractViewDocViewPart {
         RelationSetRepository.ChangeListener listener) {
       editor.removeViewPrefsListener(prefsListener);
     }
+
+    @Override
+    public Collection<Relation> getUniverse() {
+      return editor.getDisplayRelations();
+    }
   }
 
-  private static class VisibleListener extends ViewPrefsListener.Simple {
+  private static class PartPrefsListener extends ViewPrefsListener.Simple {
 
     private RelationSetRepository.ChangeListener listener;
 
-    public VisibleListener(RelationSetRepository.ChangeListener listener) {
+    public PartPrefsListener(RelationSetRepository.ChangeListener listener) {
       this.listener = listener;
     }
 
@@ -106,8 +118,10 @@ public class VisibleRelationsViewPart extends AbstractViewDocViewPart {
     public void relationVisibleChanged(Relation relation, boolean visible) {
       listener.includedRelationChanged(relation, visible);
     }
-
   }
+
+  /////////////////////////////////////
+  // Public methods
 
   @Override
   public Image getTitleImage() {
@@ -119,18 +133,18 @@ public class VisibleRelationsViewPart extends AbstractViewDocViewPart {
     return PART_NAME;
   }
 
+  /////////////////////////////////////
+  // UX Setup
+
   @Override
   protected void createGui(Composite parent) {
-    Composite result = new Composite(parent, SWT.NONE);
-    result.setLayout(new GridLayout());
+    Composite result = Widgets.buildGridContainer(parent, 1);
 
     relationSetEditor = new RelationSetEditorControl(result);
-    relationSetEditor.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, true));
+    relationSetEditor.setLayoutData(Widgets.buildGrabFillData());
 
     Composite saves = setupSaveButtons(result);
-    saves.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false));
+    saves.setLayoutData(Widgets.buildHorzFillData());
   }
 
   @Override
@@ -139,17 +153,10 @@ public class VisibleRelationsViewPart extends AbstractViewDocViewPart {
   }
 
   private Composite setupSaveButtons(Composite parent) {
-    Composite result = new Composite(parent, SWT.NONE);
-    GridLayout layout = new GridLayout(2, false);
-    layout.marginWidth = 0;
-    layout.marginHeight = 0;
-    result.setLayout(layout);
+    Composite result = Widgets.buildGridContainer(parent, 2);
 
-    Button saveRels = new Button(result, SWT.PUSH);
-    saveRels.setText("Save visible as RelationSet...");
-    saveRels.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false));
-
+    Button saveRels = Widgets.buildGridPushButton(
+        result, "Save visible as RelationSet...");
     saveRels.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -157,12 +164,9 @@ public class VisibleRelationsViewPart extends AbstractViewDocViewPart {
       }
     });
 
-    Button saveProps = new Button(result, SWT.PUSH);
-    saveProps.setText("Load visible from RelationSet...");
-    saveProps.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false));
-
-    saveProps.addSelectionListener(new SelectionAdapter() {
+    Button loadRels = Widgets.buildGridPushButton(
+        result, "Load visible from RelationSet...");
+    loadRels.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
         loadSelection();
@@ -216,12 +220,8 @@ public class VisibleRelationsViewPart extends AbstractViewDocViewPart {
     // relationSetEditor.updateTable(editor.getBuiltinAnalysisPlugins());
     relationSetEditor.selectRelations(editor.getDisplayRelations());
 
-    vizRepo = new ToolRelationRepo(editor);
+    vizRepo = new PartRelationRepo(editor);
     relationSetEditor.setRelationSetRepository(vizRepo);
-
-    // TODO: Should come from editor
-    relationSetEditor.setInput(RelationRegistry.getRegistryRelations());
-    relationSetEditor.update();
   }
 
   @Override

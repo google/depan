@@ -70,6 +70,7 @@ public class GraphNodeViewProvider<T, E> implements NodeViewerProvider {
     });
   }
 
+  @Override
   @SuppressWarnings({ "rawtypes", "unchecked" })
   public ViewerRoot buildViewerRoots() {
     List<Object> result = Lists.newArrayList();

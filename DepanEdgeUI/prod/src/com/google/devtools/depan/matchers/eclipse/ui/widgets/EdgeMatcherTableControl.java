@@ -25,13 +25,14 @@ import com.google.devtools.depan.model.RelationSets;
 import com.google.devtools.depan.platform.AlphabeticSorter;
 import com.google.devtools.depan.platform.ListenerManager;
 import com.google.devtools.depan.platform.PlatformResources;
-import com.google.devtools.depan.platform.TableContentProvider;
 import com.google.devtools.depan.platform.ViewerObjectToString;
 import com.google.devtools.depan.platform.eclipse.ui.tables.EditColTableDef;
+import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CheckboxCellEditor;
 import org.eclipse.jface.viewers.ICellModifier;
@@ -50,12 +51,11 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Display or edit an EdgeMatcher based on a table of Relations.
- * 
+ * Show (and edit) a EdgeMatcher for a table of Relations.
  *
  * @author ycoppel@google.com (Yohann Coppel)
  */
-public class GraphEdgeMatcherRelationTableEditor {
+public class EdgeMatcherTableControl extends Composite {
 
   public static final String COL_RELATION = "Relation";
   public static final String COL_FORWARD = "Forward";
@@ -74,25 +74,21 @@ public class GraphEdgeMatcherRelationTableEditor {
   private static final String[] REVERSE_MATCHERS =
       new String [] { COL_BACKWARD };
 
-  /**
-   * UX Elements
-   */
-  private TableViewer viewer;
-
-  private TableContentProvider<Relation> content;
+  /////////////////////////////////////
+  // Edge matcher integration
 
   /**
    * Data being managed
    */
   private final Set<Relation> forwardMatchers = Sets.newHashSet();
+
   private final Set<Relation> reverseMatchers = Sets.newHashSet();
 
-  // private ModificationListener<Relation, Boolean> changeListener;
-
   private ListenerManager<ModificationListener<Relation, Boolean>>
-      changeListener = new ListenerManager<ModificationListener<Relation, Boolean>>();
+      changeListener =
+          new ListenerManager<ModificationListener<Relation, Boolean>>();
 
-  private static class SimpleDispatcher
+  private static class ControlDispatcher
       implements ListenerManager.Dispatcher<ModificationListener<Relation, Boolean>> {
 
     // Retain these values just long enough to dispatch the event
@@ -100,7 +96,7 @@ public class GraphEdgeMatcherRelationTableEditor {
     private final String property;
     private final boolean change;
 
-    public SimpleDispatcher(Relation relation, String property, boolean change) {
+    public ControlDispatcher(Relation relation, String property, boolean change) {
       this.relation = relation;
       this.property = property;
       this.change = change;
@@ -117,28 +113,44 @@ public class GraphEdgeMatcherRelationTableEditor {
     }
   };
 
-  public TableViewer setupTableViewer(Composite parent) {
-    viewer = new TableViewer(
-        parent, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
+  /////////////////////////////////////
+  // UX Elements
+
+  private TableViewer viewer;
+
+  // private TableContentProvider<Relation> content;
+
+  /////////////////////////////////////
+  // Public methods
+
+  public EdgeMatcherTableControl(Composite parent) {
+    super(parent, SWT.NONE);
+    setLayout(Widgets.buildContainerLayout(1));
+
+    viewer = new TableViewer(this,
+        SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
+
+    // Layout embedded table
+    Table relationTable = viewer.getTable();
+    relationTable.setLayoutData(Widgets.buildGrabFillData());
 
     // initialize the table
-    Table relationTable = viewer.getTable();
     relationTable.setHeaderVisible(true);
-    EditColTableDef.setupTable(
-        GraphEdgeMatcherRelationTableEditor.TABLE_DEF, relationTable);
+    relationTable.setToolTipText("Edge Matcher Definition");
+    EditColTableDef.setupTable(TABLE_DEF, relationTable);
 
-    CellEditor[] cellEditors = new CellEditor[3];
+    CellEditor[] cellEditors = new CellEditor[TABLE_DEF.length];
     cellEditors[0] = null;
     cellEditors[1] = new CheckboxCellEditor(relationTable);
     cellEditors[2] = new CheckboxCellEditor(relationTable);
 
     // cell content
     viewer.setCellEditors(cellEditors);
-    viewer.setColumnProperties(EditColTableDef.getProperties(
-        GraphEdgeMatcherRelationTableEditor.TABLE_DEF));
-
     viewer.setLabelProvider(new CellLabelProvider());
+    viewer.setColumnProperties(EditColTableDef.getProperties(TABLE_DEF));
     viewer.setCellModifier(new CellModifier());
+    viewer.setContentProvider(ArrayContentProvider.getInstance());
+
     viewer.setSorter(new AlphabeticSorter(new ViewerObjectToString() {
       @Override
       public String getString(Object object) {
@@ -150,10 +162,8 @@ public class GraphEdgeMatcherRelationTableEditor {
         }
       }));
 
-    content = new TableContentProvider<Relation>();
-    content.initViewer(viewer);
-
-    return viewer;
+    // content = new TableContentProvider<Relation>();
+    // content.initViewer(viewer);
   }
 
   /////////////////////////////////////
@@ -177,10 +187,7 @@ public class GraphEdgeMatcherRelationTableEditor {
     forwardMatchers.clear();
     reverseMatchers.clear();
 
-    content.clear();
-    for (Relation relation : rowRelations) {
-      content.add(relation);
-    }
+    viewer.setInput(rowRelations);
     viewer.refresh(false);
   }
 
@@ -192,7 +199,7 @@ public class GraphEdgeMatcherRelationTableEditor {
     forwardMatchers.clear();
     reverseMatchers.clear();
 
-    for (Relation relation : content.getObjects()) {
+    for (Relation relation : getInput()) {
       if (edgeMatcher.relationForward(relation)) {
         forwardMatchers.add(relation);
       }
@@ -203,7 +210,7 @@ public class GraphEdgeMatcherRelationTableEditor {
     }
   }
 
-  public GraphEdgeMatcher createEdgeMatcher() {
+  public GraphEdgeMatcher buildEdgeMatcher() {
     // Build result from defensive snapshots of current matchers
     Set<Relation> onForward = Sets.newHashSet(forwardMatchers);
     Set<Relation> onReverse = Sets.newHashSet(reverseMatchers);
@@ -221,11 +228,11 @@ public class GraphEdgeMatcherRelationTableEditor {
   }
 
   public void reverseRelations() {
-    reverseRelations(content.getObjects());
+    reverseRelations(getInput());
   }
 
   public void invertRelations() {
-    invertRelations(content.getObjects());
+    invertRelations(getInput());
   }
 
   /////////////////////////////////////
@@ -267,6 +274,11 @@ public class GraphEdgeMatcherRelationTableEditor {
     return result;
   }
 
+  @SuppressWarnings("unchecked")
+  private Collection<Relation> getInput() {
+    return (Collection<Relation>) viewer.getInput();
+  }
+
   /////////////////////////////////////
   // Change values for collected relations
 
@@ -274,8 +286,8 @@ public class GraphEdgeMatcherRelationTableEditor {
     for (Relation relation : relations) {
       boolean wasForward = forwardMatchers.contains(relation);
       boolean wasReverse = reverseMatchers.contains(relation);
-      setMatcher(forwardMatchers, relation, wasReverse);
-      setMatcher(reverseMatchers, relation, wasForward);
+      setForward(relation, wasReverse);
+      setReverse(relation, wasForward);
       viewer.update(relation, BOTH_MATCHERS);
     }
   }
@@ -284,8 +296,8 @@ public class GraphEdgeMatcherRelationTableEditor {
     for (Relation relation : relations) {
       boolean wasForward = forwardMatchers.contains(relation);
       boolean wasReverse = reverseMatchers.contains(relation);
-      setMatcher(forwardMatchers, relation, !wasForward);
-      setMatcher(reverseMatchers, relation, !wasReverse);
+      setForward(relation, !wasForward);
+      setReverse(relation, !wasReverse);
       viewer.update(relation, BOTH_MATCHERS);
     }
   }
@@ -293,7 +305,7 @@ public class GraphEdgeMatcherRelationTableEditor {
   public void setForwardRelations(
       Collection<Relation> relations, boolean select) {
     for (Relation relation : relations) {
-      setMatcher(forwardMatchers, relation, select);
+      setForward(relation, select);
       viewer.update(relation, FORWARD_MATCHERS);
     }
   }
@@ -301,7 +313,7 @@ public class GraphEdgeMatcherRelationTableEditor {
   public void invertForwardRelations(Collection<Relation> relations) {
     for (Relation relation : relations) {
       boolean wasForward = forwardMatchers.contains(relation);
-      setMatcher(forwardMatchers, relation, !wasForward);
+      setForward(relation, !wasForward);
       viewer.update(relation, FORWARD_MATCHERS);
     }
   }
@@ -309,7 +321,7 @@ public class GraphEdgeMatcherRelationTableEditor {
   public void setReverseRelations(
       Collection<Relation> relations, boolean select) {
     for (Relation relation : relations) {
-      setMatcher(reverseMatchers, relation, select);
+      setReverse(relation, select);
       viewer.update(relation, REVERSE_MATCHERS);
     }
   }
@@ -317,9 +329,19 @@ public class GraphEdgeMatcherRelationTableEditor {
   public void invertReverseRelations(Collection<Relation> relations) {
     for (Relation relation : relations) {
       boolean wasForward = forwardMatchers.contains(relation);
-      setMatcher(reverseMatchers, relation, !wasForward);
+      setReverse(relation, !wasForward);
       viewer.update(relation, REVERSE_MATCHERS);
     }
+  }
+
+  private void setForward(Relation relation, boolean included) {
+    setMatcher(forwardMatchers, relation, included);
+    fireChangeEvent(relation, COL_FORWARD, included);
+  }
+
+  private void setReverse(Relation relation, boolean included) {
+    setMatcher(reverseMatchers, relation, included);
+    fireChangeEvent(relation, COL_BACKWARD, included);
   }
 
   private void setMatcher(
@@ -333,6 +355,13 @@ public class GraphEdgeMatcherRelationTableEditor {
     else {
       matchers.remove(relation);
     }
+    // fireChangeEvent(relation, property, isOn);
+  }
+
+  private void fireChangeEvent(
+      Relation relation, String direction, Boolean include) {
+    changeListener.fireEvent(new ControlDispatcher(
+        relation, direction, include));
   }
 
   /////////////////////////////////////
@@ -421,18 +450,17 @@ public class GraphEdgeMatcherRelationTableEditor {
       }
 
       Relation relation = ((Relation) o);
-
-      changeListener.fireEvent(new SimpleDispatcher(
-              relation, property, ((Boolean) value).booleanValue()));
+      boolean include = ((Boolean) value).booleanValue();
 
       if (property.equals(COL_BACKWARD)) {
-        setMatcher(reverseMatchers, relation, (Boolean) value);
+        setMatcher(reverseMatchers, relation, include);
       } else if (property.equals(COL_FORWARD)) {
-        setMatcher(forwardMatchers, relation, (Boolean) value);
+        setMatcher(forwardMatchers, relation, include);
       }
 
       // update the column / line we just modified
       viewer.update(o, new String[] {property});
+      fireChangeEvent(relation, property, include);
     }
   }
 }

@@ -37,6 +37,12 @@ public class ViewDocResources {
   public static final Image IMAGE_NODEEDITOR =
       getImage(IMAGE_DESC_NODEEDITOR);
 
+  private static final ImageDescriptor IMAGE_DESC_SELECTIONEDITOR =
+      getImageDescriptor("icons/selectioneditor.png");
+
+  public static final Image IMAGE_SELECTIONEDITOR =
+      getImage(IMAGE_DESC_SELECTIONEDITOR);
+
   private static ImageDescriptor getImageDescriptor(String path) {
     return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
   }

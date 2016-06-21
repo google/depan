@@ -20,10 +20,11 @@ import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.registry.RelationRegistry;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.platform.WorkspaceTools;
+import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 import com.google.devtools.depan.view_doc.eclipse.ui.widgets.RelationDisplayTableControl;
-import com.google.devtools.depan.view_doc.model.RelationDisplayDocument;
 import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty;
+import com.google.devtools.depan.view_doc.model.RelationDisplayDocument;
 import com.google.devtools.depan.view_doc.model.RelationDisplayRepository;
 import com.google.devtools.depan.view_doc.persistence.RelationDisplayDocumentXmlPersist;
 
@@ -32,7 +33,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
@@ -86,6 +86,9 @@ public class RelationDisplayEditor extends EditorPart {
 
   private RelationDisplayDocumentRepo propRepo;
 
+  /////////////////////////////////////
+  // Public methods
+
   @Override
   public void doSave(IProgressMonitor monitor) {
 
@@ -109,20 +112,6 @@ public class RelationDisplayEditor extends EditorPart {
     file = saveFile;
     handleDocumentChange();
     persistDocument(null);
-  }
-
-  /**
-   * Use the information in the editor to create new document content,
-   * for external use (e.g. persistence).
-   */
-  private void updateDocument() {
-
-    Map<Relation, EdgeDisplayProperty> props =
-        propInfo.getRelationProperties();
-    RelationDisplayDocument result =
-        new RelationDisplayDocument(relSetName.getText(), props);
-    propInfo = result;
-    propRepo.setEdgeDisplayProperties(propInfo.getRelationProperties());
   }
 
   /**
@@ -223,27 +212,53 @@ public class RelationDisplayEditor extends EditorPart {
   }
 
   @Override
+  public void setFocus() {
+    if (relSetName.getText().isEmpty()) {
+      relSetName.setFocus();
+    }
+  }
+
+  /////////////////////////////////////
+  // UX Setup
+
+  @Override
   public void createPartControl(Composite parent) {
     Composite container = new Composite(parent, SWT.NONE);
-    GridLayout layout = new GridLayout();
+    GridLayout layout = Widgets.buildContainerLayout(1);
     layout.horizontalSpacing = 9;
     container.setLayout(layout);
 
     // Name for RelationSet descriptor ..
-    Composite props = new Composite(container, SWT.NONE);
-    props.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false));
-    props.setLayout(new GridLayout(2, false));
+    Composite props =  setupProperties(container);
+    props.setLayoutData(Widgets.buildHorzFillData());
 
-    Label label = new Label(props, SWT.NULL);
-    label.setText("&Name:");
+    propEditor = new RelationDisplayTableControl(container);
+    propEditor.setLayoutData(Widgets.buildHorzFillData());
+    propRepo.addChangeListener(new RelationDisplayRepository.ChangeListener() {
+      @Override
+      public void edgeDisplayChanged(
+          Relation relation, EdgeDisplayProperty props) {
+        setDirtyState(true);
+      }
+    });
 
-    relSetName = new Text(props, SWT.BORDER | SWT.SINGLE);
-    relSetName.setLayoutData(
-        new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     if (null != propInfo) {
-      relSetName.setText(propInfo.getName());
+      setInput(propInfo);
     }
+  }
+
+  /**
+   * In a future world, this might provide access to a complete set
+   * of {@code ResourceDocument} properties.
+   */
+  @SuppressWarnings("unused")
+  private Composite setupProperties(Composite parent) {
+    Composite result = Widgets.buildGridContainer(parent, 2);
+
+    Label label = Widgets.buildCompactLabel(result, "&Name:");
+
+    relSetName = new Text(result, SWT.BORDER | SWT.SINGLE);
+    relSetName.setLayoutData(Widgets.buildHorzFillData());
     relSetName.addFocusListener(new FocusAdapter() {
       @Override
       public void focusLost(FocusEvent e) {
@@ -254,28 +269,33 @@ public class RelationDisplayEditor extends EditorPart {
         handleDocumentChange();
       }
     });
+    return result;
+  }
 
-    propEditor = new RelationDisplayTableControl(container);
-    propEditor.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false));
+  private void setInput(RelationDisplayDocument propInfo) {
+    relSetName.setText(propInfo.getName());
+
     propEditor.setEdgeDisplayRepository(propRepo);
     propEditor.setInput(RelationRegistry.getRegistryRelations());
+  }
 
-    propRepo.addChangeListener(new RelationDisplayRepository.ChangeListener() {
-      @Override
-      public void edgeDisplayChanged(
-          Relation relation, EdgeDisplayProperty props) {
-        setDirtyState(true);
-      }
-    });
+  /**
+   * Use the information in the editor to create new document content,
+   * for external use (e.g. persistence).
+   * @return 
+   */
+  private RelationDisplayDocument buildRelationDisplayDocument() {
+
+    Map<Relation, EdgeDisplayProperty> props =
+        propInfo.getRelationProperties();
+    RelationDisplayDocument result =
+        new RelationDisplayDocument(relSetName.getText(), props);
+    return result;
   }
 
   private void handleDocumentChange() {
-    updateDocument();
+    propInfo = buildRelationDisplayDocument();
+    propRepo.setEdgeDisplayProperties(propInfo.getRelationProperties());
     setPartName(buildPartName());
-  }
-
-  @Override
-  public void setFocus() {
   }
 }

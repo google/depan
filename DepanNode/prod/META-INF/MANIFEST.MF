@@ -5,6 +5,10 @@ Bundle-SymbolicName: com.google.devtools.depan.nodes;singleton:=true
 Bundle-Version: 2.0.0.qualifier
 Bundle-Vendor: Pnambic Computing
 Require-Bundle: com.google.devtools.depan.core,
- com.google.guava
+ com.google.guava,
+ com.google.devtools.depan.platform
 Bundle-ClassPath: .
-Export-Package: com.google.devtools.depan.nodes.trees
+Export-Package: com.google.devtools.depan.nodes,
+ com.google.devtools.depan.nodes.filters.model,
+ com.google.devtools.depan.nodes.filters.sequence,
+ com.google.devtools.depan.nodes.trees

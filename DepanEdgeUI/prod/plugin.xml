@@ -15,10 +15,10 @@
    <extension
          point="org.eclipse.ui.editors">
       <editor
-            class="com.google.devtools.depan.matchers.eclipse.ui.editors.GraphEdgeMatcherEditor"
+            class="com.google.devtools.depan.matchers.eclipse.ui.editors.EdgeMatcherEditor"
             extensions="gemxml"
             icon="icons/matcher_16x16.png"
-            id="com.google.devtools.depan.matchers.eclipse.ui.editors.GraphEdgeMatcherEditor"
+            id="com.google.devtools.depan.matchers.eclipse.ui.editors.EdgeMatcherEditor"
             name="Graph Edge Matcher">
       </editor>
       <editor

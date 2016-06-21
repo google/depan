@@ -1,10 +1,10 @@
 /*
- * Copyright 2008 The Depan Project Authors
- * 
+ * Copyright 2016 The Depan Project Authors
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -14,44 +14,35 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.paths.filters;
+package com.google.devtools.depan.nodes.filters.sequence;
+
+import com.google.devtools.depan.model.Element;
+import com.google.devtools.depan.model.GraphNode;
 
 import com.google.common.collect.Lists;
-import com.google.devtools.depan.model.Element;
-import com.google.devtools.depan.model.GraphModel;
-import com.google.devtools.depan.model.GraphNode;
 
 import java.util.Collection;
 import java.util.List;
 
 /**
- * A PathMatcher that only matches nodes for a set of node types.
- * 
- * @author <a href="leeca@google.com">Lee Carver</a>
+ * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public class NodeKindMatcher implements PathMatcher {
-  private final Collection<Class<? extends Element>> nodeClasses;
+public class NodeKindFilter extends BasicFilter {
 
-  public NodeKindMatcher(Collection<Class<? extends Element>> nodeClasses) {
+  private Collection<Class<? extends Element>> nodeClasses;
+
+  public NodeKindFilter(Collection<Class<? extends Element>> nodeClasses) {
     this.nodeClasses = nodeClasses;
   }
 
   @Override
-  public String getDisplayName() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public Collection<GraphNode> nextMatch(
-      GraphModel graph, Collection<GraphNode> input) {
+  public Collection<GraphNode> computeNodes(Collection<GraphNode> nodes) {
     List<GraphNode> result = Lists.newArrayList();
-    for (GraphNode node : input) {
+    for (GraphNode node : nodes) {
       if (matchesKind(node)) {
         result.add(node);
       }
     }
-
     return result;
   }
 
@@ -69,5 +60,9 @@ public class NodeKindMatcher implements PathMatcher {
     }
 
     return false;
+  }
+
+  public Collection<Class<? extends Element>> getNodeKinds() {
+    return nodeClasses;
   }
 }

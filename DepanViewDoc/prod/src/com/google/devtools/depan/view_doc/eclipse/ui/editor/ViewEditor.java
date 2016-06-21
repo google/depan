@@ -43,11 +43,14 @@ import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.RelationSets;
+import com.google.devtools.depan.nodes.filters.model.ContextualFilter;
+import com.google.devtools.depan.nodes.filters.sequence.SteppingFilter;
 import com.google.devtools.depan.platform.ListenerManager;
 import com.google.devtools.depan.platform.NewEditorHelper;
 import com.google.devtools.depan.platform.WorkspaceTools;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 import com.google.devtools.depan.view_doc.eclipse.ViewDocLogger;
+import com.google.devtools.depan.view_doc.eclipse.ui.views.NodeFilterViewPart;
 import com.google.devtools.depan.view_doc.layout.LayoutContext;
 import com.google.devtools.depan.view_doc.layout.LayoutGenerator;
 import com.google.devtools.depan.view_doc.layout.LayoutGenerators;
@@ -101,6 +104,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -209,6 +213,15 @@ public class ViewEditor extends MultiPageEditorPart {
 
   private NodeSupplierFactory nodeSupplierFactory;
 
+  /**
+   * The active {@link ContextualFilter} for this editing session.
+   * This is not persisted as part of the {@link ViewDocument},
+   * but it is maintained during the activation of a {@link ViewEditor}.
+   * 
+   * The Node Filter view allows this to be saved as a separate resource.
+   */
+  private SteppingFilter nodeFilter;
+
   /////////////////////////////////////
   // Dispatch errors to go our logger
 
@@ -271,6 +284,24 @@ public class ViewEditor extends MultiPageEditorPart {
 
   public ScenePreferences getScenePrefs() {
     return viewInfo.getScenePrefs();
+  }
+
+  /**
+   * Since the {@link NodeFilterViewPart} is always going to cast the result
+   * to {@link SteppingFilter}, return that type anyway.
+   * 
+   * Conceptually, the {@link ViewEditor}'s node filter could be any
+   * type derived from {@link ContextualFilter}.  In practice, editability
+   * and the {@link SteppingFilter}'s ability to encapsulate any
+   * {@link ContextualFilter} ensures that the concrete type will always be
+   * {@link SteppingFilter}.
+   */
+  public SteppingFilter getActiveNodeFilter( ) {
+    if (null == nodeFilter) {
+      String name = MessageFormat.format("{0} node filters", getPartName());
+      nodeFilter = new SteppingFilter(name);
+    }
+    return nodeFilter;
   }
 
   /////////////////////////////////////

@@ -179,7 +179,7 @@ public abstract class AbstractResouceWizardPage extends WizardPage {
   }
 
   protected IContainer guessContainer() {
-    return  WorkspaceTools.guessContainer(selection);
+    return WorkspaceTools.guessContainer(selection);
   }
 
   /////////////////////////////////////

@@ -63,6 +63,13 @@ public class RelationSetDescrRepo
   public void setRelationSet(RelationSet relSet) {
     this.relSet = relSet;
     updates = null;
+
+    listeners.fireEvent(new LoggingDispatcher() {
+      @Override
+      public void dispatch(ChangeListener listener) {
+        listener.relationsChanged();
+      }
+    });
   }
 
   public Set<Relation> getUpdateSet() {

@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.eclipse.ui.nodes.plugins;
 
-import com.google.devtools.depan.eclipse.ui.nodes.NodesLogger;
+import com.google.devtools.depan.eclipse.ui.nodes.NodesUILogger;
 import com.google.devtools.depan.model.Element;
 import com.google.devtools.depan.platform.plugin.ContributionEntry;
 import com.google.devtools.depan.platform.plugin.ContributionRegistry;
@@ -96,7 +96,7 @@ public class NodeElementPluginRegistry
 
   @Override
   protected void reportException(String entryId, Exception err) {
-    NodesLogger.logException(
+    NodesUILogger.logException(
         "NodeElement registry load failure for " + entryId, err);
   }
 

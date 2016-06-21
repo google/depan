@@ -25,7 +25,7 @@ public class SolitaryRoot<E> extends PlatformObject {
 
   private NodeWrapper<E>[] children;
 
-  SolitaryRoot(GraphData<E> nodes, String label) {
+  public SolitaryRoot(GraphData<E> nodes, String label) {
     this.nodes = nodes;
     this.label = label;
   }

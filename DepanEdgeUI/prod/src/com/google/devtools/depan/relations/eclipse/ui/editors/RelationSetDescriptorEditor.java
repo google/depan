@@ -18,9 +18,9 @@ package com.google.devtools.depan.relations.eclipse.ui.editors;
 
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.api.RelationSet;
-import com.google.devtools.depan.graph.registry.RelationRegistry;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.platform.WorkspaceTools;
+import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 import com.google.devtools.depan.relations.eclipse.ui.widgets.RelationSetEditorControl;
 import com.google.devtools.depan.relations.models.RelationSetDescrRepo;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
@@ -32,8 +32,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
@@ -181,8 +179,11 @@ public class RelationSetDescriptorEditor extends EditorPart {
           RelationSetDescriptorXmlPersist.build(true);
       relSetInfo = persist.load(file.getRawLocationURI());
 
-      relRepo = new RelationSetDescrRepo(
-          RelationRegistry.getRegistryRelations());
+      // No explicit universe for relation set.
+      // .. editor will implicitly use all registered relations
+      // .. maybe in the future, it should use only project relations?
+      // see RelationRegistry.getRegistryRelations()
+      relRepo = new RelationSetDescrRepo(null);
       relRepo.setRelationSet(relSetInfo.getRelationSet());
 
       setPartName(buildPartName());
@@ -219,26 +220,52 @@ public class RelationSetDescriptorEditor extends EditorPart {
 
   @Override
   public void createPartControl(Composite parent) {
-    Composite container = new Composite(parent, SWT.NONE);
-    GridLayout layout = new GridLayout();
-    layout.horizontalSpacing = 9;
-    container.setLayout(layout);
+    Composite container = Widgets.buildGridContainer(parent, 1);
 
     // Name for RelationSet descriptor ..
-    Composite props = new Composite(container, SWT.NONE);
-    props.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false));
-    props.setLayout(new GridLayout(2, false));
+    Composite props = setupProperties(container);
+    props.setLayoutData(Widgets.buildHorzFillData());
 
-    Label label = new Label(props, SWT.NULL);
-    label.setText("&Name:");
+    relationSetEditor = new RelationSetEditorControl(container);
+    relationSetEditor.setLayoutData(Widgets.buildHorzFillData());
 
-    relSetName = new Text(props, SWT.BORDER | SWT.SINGLE);
-    relSetName.setLayoutData(
-        new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+    relRepo.addChangeListener(new RelationSetRepository.ChangeListener() {
+      @Override
+      public void includedRelationChanged(Relation relation, boolean visible) {
+        setDirtyState(true);
+      }
+
+      @Override
+      public void relationsChanged() {
+        setDirtyState(true);
+      }
+    });
     if (null != relSetInfo) {
-      relSetName.setText(relSetInfo.getName());
+      setInput(relSetInfo);
     }
+  }
+
+  /**
+   * @param relSetInfo2
+   */
+  private void setInput(RelationSetDescriptor relSetInfo) {
+    relSetName.setText(relSetInfo.getName());
+    relationSetEditor.setRelationSetRepository(relRepo);
+  }
+
+  /**
+   * In a future world, this might provide access to a complete set
+   * of {@code ResourceDocument} properties.
+   * @return 
+   */
+  @SuppressWarnings("unused")
+  private Composite setupProperties(Composite parent) {
+    Composite result = Widgets.buildGridContainer(parent, 2);
+
+    Label label = Widgets.buildCompactLabel(result, "&Name:");
+
+    relSetName = new Text(result, SWT.BORDER | SWT.SINGLE);
+    relSetName.setLayoutData(Widgets.buildHorzFillData());
     relSetName.addFocusListener(new FocusAdapter() {
       @Override
       public void focusLost(FocusEvent e) {
@@ -249,19 +276,7 @@ public class RelationSetDescriptorEditor extends EditorPart {
         handleDocumentChange();
       }
     });
-
-    relationSetEditor = new RelationSetEditorControl(container);
-    relationSetEditor.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false));
-    relationSetEditor.setRelationSetRepository(relRepo);
-    relationSetEditor.setInput(RelationRegistry.getRegistryRelations());
-
-    relRepo.addChangeListener(new RelationSetRepository.ChangeListener() {
-      @Override
-      public void includedRelationChanged(Relation relation, boolean visible) {
-        setDirtyState(true);
-      }
-    });
+    return result;
   }
 
   private void handleDocumentChange() {

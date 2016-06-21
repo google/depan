@@ -52,10 +52,6 @@ public class NodeTreeView<E> {
 
   private GraphData<E> data;
 
-  static {
-    NodeViewAdapterFactory.register();
-  }
-
   public NodeTreeView(Composite parent, int style) {
     initWidget(parent, style);
   }

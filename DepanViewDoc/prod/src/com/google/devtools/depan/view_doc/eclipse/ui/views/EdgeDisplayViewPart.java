@@ -17,6 +17,7 @@
 package com.google.devtools.depan.view_doc.eclipse.ui.views;
 
 import com.google.devtools.depan.model.GraphEdge;
+import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 import com.google.devtools.depan.view_doc.eclipse.ViewDocResources;
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
 import com.google.devtools.depan.view_doc.eclipse.ui.widgets.EdgeDisplayTableControl;
@@ -24,16 +25,13 @@ import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty;
 import com.google.devtools.depan.view_doc.model.EdgeDisplayRepository;
 import com.google.devtools.depan.view_doc.model.ViewPrefsListener;
 
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 import java.util.Collection;
 
 /**
- * Tool for set display properties for individual edges.
+ * Tool for setting display properties for individual edges.
  *
  * @author ycoppel@google.com (Yohann Coppel)
  */
@@ -41,10 +39,13 @@ public class EdgeDisplayViewPart extends AbstractViewDocViewPart {
 
   public static final String PART_NAME = "Edge Properties";
 
-  /**
-   * The <code>RelationSetEditorControl</code> that controls the UX.
-   */
+  /////////////////////////////////////
+  // UX Elements
+
   private EdgeDisplayTableControl propEditor;
+
+  /////////////////////////////////////
+  // EdgeDisplayProperty integration
 
   private EdgeDisplayRepository propRepo;
 
@@ -98,6 +99,9 @@ public class EdgeDisplayViewPart extends AbstractViewDocViewPart {
     }
   }
 
+  /////////////////////////////////////
+  // Public methods
+
   @Override
   public Image getTitleImage() {
     return ViewDocResources.IMAGE_RELATIONPICKER;
@@ -108,14 +112,15 @@ public class EdgeDisplayViewPart extends AbstractViewDocViewPart {
     return PART_NAME;
   }
 
+  /////////////////////////////////////
+  // UX Setup
+
   @Override
   protected void createGui(Composite parent) {
-    Composite result = new Composite(parent, SWT.NONE);
-    result.setLayout(new GridLayout());
+    Composite result = Widgets.buildGridContainer(parent, 1);
 
     propEditor = new EdgeDisplayTableControl(result);
-    propEditor.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, true));
+    propEditor.setLayoutData(Widgets.buildGrabFillData());
   }
 
   @Override

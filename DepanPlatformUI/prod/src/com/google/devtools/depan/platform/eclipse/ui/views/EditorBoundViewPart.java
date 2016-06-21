@@ -18,9 +18,9 @@ package com.google.devtools.depan.platform.eclipse.ui.views;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IPartListener;
+import org.eclipse.ui.IPartService;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IPartService;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
@@ -66,8 +66,8 @@ public abstract class EditorBoundViewPart<E extends IWorkbenchPart>
   public void createPartControl(Composite parentComposite) {
     IWorkbenchPage parentPage = getViewSite().getPage();
     editor = getAcceptableEditor(parentPage.getActiveEditor());
-    parentPage.addPartListener(partListener);
     createGui(parentComposite);
+    parentPage.addPartListener(partListener);
   }
 
   @Override

@@ -20,13 +20,12 @@ import com.google.devtools.depan.graph.api.EdgeMatcher;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.model.GraphEdgeMatcher;
 import com.google.devtools.depan.platform.PlatformResources;
+import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 
-import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -45,14 +44,15 @@ import java.util.List;
  *
  * @author ycoppel@google.com (Yohann Coppel)
  */
-public class GraphEdgeMatcherEditorPart {
+public class EdgeMatcherEditorControl extends Composite {
 
   /////////////////////////////////////
   // UX Elements
 
-  private GraphEdgeMatcherRelationTableEditor editor;
+  private EdgeMatcherTableControl editor;
 
   /////////////////////////////////////
+  // Public methods
 
   /**
    * return a {@link Control} for this widget, containing every useful buttons,
@@ -61,26 +61,18 @@ public class GraphEdgeMatcherEditorPart {
    * @param parent the parent.
    * @return a {@link Control} containing this widget.
    */
-  public Control getControl(Composite parent) {
-    // component
-    Composite panel = new Composite(parent, SWT.BORDER);
-    panel.setLayout(new GridLayout());
+  public EdgeMatcherEditorControl(Composite parent) {
+    super(parent, SWT.BORDER);
+    setLayout(Widgets.buildContainerLayout(1));
 
-    // components inside the panel
-    Composite allRels = setupAllRelsButtons(panel);
-    allRels.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false));
+    Composite allRels = setupAllRelsButtons(this);
+    allRels.setLayoutData(Widgets.buildHorzFillData());
 
-    editor = new GraphEdgeMatcherRelationTableEditor();
-    TableViewer tableViewer = editor.setupTableViewer(panel);
-    tableViewer.getTable().setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, true));
+    editor = new EdgeMatcherTableControl(this);
+    editor.setLayoutData(Widgets.buildGrabFillData());
 
-    Composite toggles = setupRelationToggles(panel);
-    toggles.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false));
-
-    return panel;
+    Composite toggles = setupRelationToggles(this);
+    toggles.setLayoutData(Widgets.buildHorzFillData());
   }
 
   public void registerModificationListener(
@@ -93,18 +85,29 @@ public class GraphEdgeMatcherEditorPart {
     editor.unregisterModificationListener(listener);
   }
 
+  /**
+   * Fill the list with {@link Relation}s.
+   */
+  public void updateTable(List<Relation> relations) {
+    editor.updateTableRows(relations);
+  }
+
+  public void updateEdgeMatcher(EdgeMatcher<String> edgeMatcher) {
+    editor.updateEdgeMatcher(edgeMatcher);
+  }
+
+  public GraphEdgeMatcher buildEdgeMatcher() {
+    return editor.buildEdgeMatcher();
+  }
+
+  /////////////////////////////////////
+  // UX Setup
+
   private Composite setupAllRelsButtons(Composite parent) {
-    Composite result = new Composite(parent, SWT.NONE);
-    result.setLayout(new GridLayout(2, false));
+    Composite result = Widgets.buildGridContainer(parent, 2);
 
-    Button reverseAll = new Button(result, SWT.PUSH);
-    reverseAll.setText("Reverse all lines");
-    reverseAll.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-
-    Button invertAll = new Button(result, SWT.PUSH);
-    invertAll.setText("Invert all lines");
-    invertAll.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-
+    Button reverseAll =
+        Widgets.buildGridPushButton(result, "Reverse all lines");
     reverseAll.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -112,6 +115,7 @@ public class GraphEdgeMatcherEditorPart {
       }
     });
 
+    Button invertAll = Widgets.buildGridPushButton(result, "Invert all lines");
     invertAll.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -122,30 +126,29 @@ public class GraphEdgeMatcherEditorPart {
     return result;
   }
 
+  @SuppressWarnings("unused")
   private Composite setupRelationToggles(Composite parent) {
-    Composite result = new Composite(parent, SWT.NONE);
-    GridLayout togglesLayout = new GridLayout(1, false);
-    togglesLayout.verticalSpacing = 0;
-    result.setLayout(togglesLayout);
+    Composite result = Widgets.buildGridContainer(parent, 1);
 
-    Label optionsLabel = new Label(result, SWT.NONE);
-    optionsLabel.setText("For selected lines:");
-    optionsLabel.setLayoutData(
-        new GridData(SWT.LEFT, SWT.FILL, false, false));
+    Label optionsLabel = Widgets.buildCompactLabel(result, "For selected lines:");
 
-    // Relation operations
-    Composite group = new Composite(result, SWT.NONE);
-    group.setLayout(new GridLayout(2, false));
-    group.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false));
+    Composite relOps = setupRelationOps(result);
+    relOps.setLayoutData(Widgets.buildHorzFillData());
 
-    Button groupReverse = new Button(group, SWT.PUSH);
-    groupReverse.setText("Reverse");
-    groupReverse.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+    Composite toggles = setupToggleOps(result);
+    toggles.setLayoutData(Widgets.buildHorzFillData());
 
-    Button groupInvert = new Button(group, SWT.PUSH);
-    groupInvert.setText("Invert");
-    groupInvert.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+    return result;
+  }
+
+  private Composite setupRelationOps(Composite parent) {
+    Composite result = Widgets.buildGridContainer(parent, 2);
+
+    Button groupReverse = Widgets.buildGridPushButton(result, "Reverse");
+    groupReverse.setLayoutData(Widgets.buildHorzFillData());
+
+    Button groupInvert = Widgets.buildGridPushButton(result, "Invert");
+    groupInvert.setLayoutData(Widgets.buildHorzFillData());
 
     groupReverse.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -159,45 +162,35 @@ public class GraphEdgeMatcherEditorPart {
         editor.invertSelectedRelations();
       }
     });
+    return result;
+  }
 
-    // Toggle operations
-    Composite toggles = new Composite(result, SWT.NONE);
-    toggles.setLayout(new GridLayout(8, false));
-    toggles.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false));
+  private Composite setupToggleOps(Composite parent) {
+    Composite result = Widgets.buildGridContainer(parent, 8);
 
-    Label forward = new Label(toggles, SWT.NONE);
+    Label forward = new Label(result, SWT.NONE);
     forward.setText("Forward");
     forward.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
 
-    Button forwardAll = new Button(toggles, SWT.PUSH);
+    Button forwardAll = Widgets.buildGridPushButton(result);
     forwardAll.setImage(PlatformResources.IMAGE_ON);
-    forwardAll.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
-    Button forwardNone = new Button(toggles, SWT.PUSH);
+    Button forwardNone = Widgets.buildGridPushButton(result);
     forwardNone.setImage(PlatformResources.IMAGE_OFF);
-    forwardNone.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
-    Button forwardInvert = new Button(toggles, SWT.PUSH);
-    forwardInvert.setText("Invert");
-    forwardInvert.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+    Button forwardInvert = Widgets.buildGridPushButton(result, "Invert");
 
-    Label backward = new Label(toggles, SWT.NONE);
+    Label backward = new Label(result, SWT.NONE);
     backward.setText("Backward");
     backward.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
 
-    Button backwardAll = new Button(toggles, SWT.PUSH);
+    Button backwardAll = Widgets.buildGridPushButton(result);
     backwardAll.setImage(PlatformResources.IMAGE_ON);
-    backwardAll.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
-    Button backwardNone = new Button(toggles, SWT.PUSH);
+    Button backwardNone = Widgets.buildGridPushButton(result);
     backwardNone.setImage(PlatformResources.IMAGE_OFF);
-    backwardNone.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
-    Button backwardInvert = new Button(toggles, SWT.PUSH);
-    backwardInvert.setText("Invert");
-    backwardInvert.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false));
+    Button backwardInvert = Widgets.buildGridPushButton(result, "Invert");
 
     // actions
     forwardAll.addSelectionListener(new SelectionAdapter() {
@@ -242,20 +235,5 @@ public class GraphEdgeMatcherEditorPart {
       }
     });
     return result;
-  }
-
-  /**
-   * Fill the list with {@link Relation}s.
-   */
-  public void updateTable(List<Relation> relations) {
-    editor.updateTableRows(relations);
-  }
-
-  public void updateEdgeMatcher(EdgeMatcher<String> edgeMatcher) {
-    editor.updateEdgeMatcher(edgeMatcher);
-  }
-
-  public GraphEdgeMatcher createEdgeMatcher() {
-    return editor.createEdgeMatcher();
   }
 }

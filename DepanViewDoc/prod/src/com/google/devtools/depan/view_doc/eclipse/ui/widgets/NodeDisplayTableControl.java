@@ -16,7 +16,6 @@
 
 package com.google.devtools.depan.view_doc.eclipse.ui.widgets;
 
-import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.platform.AlphabeticSorter;
 import com.google.devtools.depan.platform.Colors;
@@ -24,6 +23,7 @@ import com.google.devtools.depan.platform.InverseSorter;
 import com.google.devtools.depan.platform.LabelProviderToString;
 import com.google.devtools.depan.platform.PlatformResources;
 import com.google.devtools.depan.platform.eclipse.ui.tables.EditColTableDef;
+import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 import com.google.devtools.depan.view_doc.eclipse.ViewDocLogger;
 import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty;
 import com.google.devtools.depan.view_doc.model.NodeDisplayProperty;
@@ -50,8 +50,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -62,8 +60,8 @@ import java.awt.geom.Point2D;
 import java.util.Collection;
 
 /**
- * Run a view of the known nodes and their attributes
- * as its own reusable {@link Control}.
+ * Show a table of the nodes, with their attributes.  The attributes
+ * include node visibility and {@link NodeDisplayProperty}s.
  * 
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
@@ -93,10 +91,8 @@ public class NodeDisplayTableControl extends Composite {
     new EditColTableDef(COL_COLOR, true, COL_COLOR, 180)
   };
 
-  private final TableViewer propViewer;
-
   /////////////////////////////////////
-  // Display attribute integration
+  // NodeDisplayProperty integration
 
   private NodeDisplayRepository displayRepo;
 
@@ -111,7 +107,7 @@ public class NodeDisplayTableControl extends Composite {
 
     @Override
     public void nodeDisplayChanged(GraphNode node, NodeDisplayProperty props) {
-      propViewer.update(node, UPDATE_DISPLAY_COLUMNS);
+      updateNodeColumns(node, UPDATE_DISPLAY_COLUMNS);
     }
   }
 
@@ -131,37 +127,35 @@ public class NodeDisplayTableControl extends Composite {
 
     @Override
     public void nodeLocationChanged(GraphNode node, Point2D location) {
-      propViewer.update(node, UPDATE_LOCATION_COLUMNS);
+      updateNodeColumns(node, UPDATE_LOCATION_COLUMNS);
     }
   }
 
   /////////////////////////////////////
-  // Control construction
+  // UX Elements
+
+  private final TableViewer propViewer;
+
+  /////////////////////////////////////
+  // Public methods
 
   public NodeDisplayTableControl(Composite parent) {
     super(parent, SWT.NONE);
-
-    GridLayout gridLayout = new GridLayout();
-    gridLayout.marginHeight = 0;
-    gridLayout.marginWidth = 0;
-    setLayout(gridLayout);
+    setLayout(Widgets.buildContainerLayout(1));
 
     propViewer = new TableViewer(this,
         SWT.FULL_SELECTION | SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
-    // set up label provider
-    propViewer.setLabelProvider(new PartLabelProvider());
 
-    // Set up layout properties
+    // Set up layout properties.
     Table propTableControl = propViewer.getTable();
-    propTableControl.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, true));
-    propTableControl.setToolTipText("Edge Display Properties");
+    propTableControl.setLayoutData(Widgets.buildGrabFillData());
 
-    // initialize the table
+    // Initialize the table.
     propTableControl.setHeaderVisible(true);
+    propTableControl.setToolTipText("Node Display Properties");
     EditColTableDef.setupTable(TABLE_DEF, propTableControl);
 
-    // Configure cell editing
+    // Configure cell editing.
     CellEditor[] cellEditors = new CellEditor[TABLE_DEF.length];
     cellEditors[INDEX_NAME] = null;
     cellEditors[INDEX_XPOS] = new TextCellEditor(propTableControl);
@@ -172,6 +166,7 @@ public class NodeDisplayTableControl extends Composite {
     cellEditors[INDEX_COLOR] = new ColorCellEditor(propTableControl);
 
     propViewer.setCellEditors(cellEditors);
+    propViewer.setLabelProvider(new PartLabelProvider());
     propViewer.setColumnProperties(EditColTableDef.getProperties(TABLE_DEF));
     propViewer.setCellModifier(new EdgeDisplayCellModifier());
 
@@ -200,15 +195,10 @@ public class NodeDisplayTableControl extends Composite {
     propViewer.setInput(nodes);
   }
 
-  @SuppressWarnings("unchecked")
-  public Collection<Relation> getInput() {
-    return (Collection<Relation>) propViewer.getInput();
+  public void refresh(boolean refresh) {
+    propViewer.refresh(refresh);
   }
 
-  /**
-   * @param posRepo source for node's location
-   * @param propRepo source for node's display properties
-   */
   public void setNodeRepository(
       NodeLocationRepository posRepo,
       NodeDisplayRepository displayRepo) {
@@ -232,6 +222,10 @@ public class NodeDisplayTableControl extends Composite {
       this.posRepo.removeChangeListener(posListener);
       posListener = null;
     }
+  }
+
+  private void updateNodeColumns(GraphNode node, String[] cols) {
+    propViewer.update(node, cols);
   }
 
   /////////////////////////////////////
@@ -385,6 +379,12 @@ public class NodeDisplayTableControl extends Composite {
     if (INDEX_VISIBLE == colIndex) {
       return new BooleanViewSorter();
     }
+    if (INDEX_XPOS == colIndex) {
+      return new PositionSorter(true);
+    }
+    if (INDEX_YPOS == colIndex) {
+      return new PositionSorter(false);
+    }
 
     // By default, use an alphabetic sort over the column labels.
     ITableLabelProvider labelProvider =
@@ -392,6 +392,30 @@ public class NodeDisplayTableControl extends Composite {
     ViewerSorter result = new AlphabeticSorter(
         new LabelProviderToString(labelProvider, colIndex));
     return result;
+  }
+
+  private class PositionSorter extends ViewerSorter {
+
+    private final boolean useX;
+
+    private PositionSorter(boolean useX) {
+      this.useX = useX;
+    }
+
+    @Override
+    public int compare(Viewer viewer, Object e1, Object e2) {
+      double pos1 = getPosition(e1);
+      double pos2 = getPosition(e2);
+      return Double.compare(pos1, pos2);
+    }
+
+    private double getPosition(Object item) {
+      if (item instanceof GraphNode) {
+        Point2D position = posRepo.getLocation((GraphNode) item);
+        return useX ? position.getX() : position.getY();
+      }
+      return 0.0;
+    }
   }
 
   private class BooleanViewSorter extends ViewerSorter {
@@ -404,10 +428,10 @@ public class NodeDisplayTableControl extends Composite {
     }
 
     private boolean isVisible(Object item) {
-      if (!(item instanceof GraphNode)) {
-        return false;
+      if (item instanceof GraphNode) {
+        return NodeDisplayTableControl.this.isVisible((GraphNode) item);
       }
-      return isVisible((GraphNode) item);
+      return false;
     }
   }
 
@@ -528,13 +552,5 @@ public class NodeDisplayTableControl extends Composite {
       saveDisplayProperty(node, nodeProp);
       // Viewer updates via ChangeListener
     }
-  }
-
-  public void setSelection(ISelection selection) {
-    propViewer.setSelection(selection);
-  }
-
-  public void refresh(boolean refresh) {
-    propViewer.refresh(refresh);
   }
 }

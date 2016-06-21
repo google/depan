@@ -3,6 +3,7 @@ package com.google.devtools.depan.view_doc.eclipse.ui.wizards;
 import com.google.devtools.depan.graph_doc.eclipse.ui.plugins.FromGraphDocWizard;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.platform.NewEditorHelper;
+import com.google.devtools.depan.platform.WorkspaceTools;
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditorInput;
 import com.google.devtools.depan.view_doc.layout.LayoutGenerator;
@@ -19,7 +20,7 @@ public class ViewFromGraphDocWizard extends FromGraphDocWizard {
   @Override
   public void addPages() {
     String filename = getName() + '.' + ViewDocument.EXTENSION;
-    IContainer defaultContainer = null;
+    IContainer defaultContainer = WorkspaceTools.guessContainer(null);
     page = new ViewFromGraphDocPage(defaultContainer, filename);
     addPage(page);
   }

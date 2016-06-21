@@ -22,6 +22,7 @@ import com.google.devtools.depan.platform.Colors;
 import com.google.devtools.depan.platform.InverseSorter;
 import com.google.devtools.depan.platform.LabelProviderToString;
 import com.google.devtools.depan.platform.eclipse.ui.tables.EditColTableDef;
+import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty;
 import com.google.devtools.depan.view_doc.model.RelationDisplayRepository;
 
@@ -44,8 +45,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -57,7 +56,13 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Run a view of the known relations as its own reusable "part".
+ * Show a table of the relations with their {@link EdgeDisplayProperty}
+ * rendering properties.
+ * 
+ * [Jun 2016] Given the number of columns shared with
+ * {@link EdgeDisplayTableControl}, these classes should be sharing more
+ * of their implementation.  See also {@link NodeDisplayTableControl} for
+ * additional columns to consider.
  */
 public class RelationDisplayTableControl extends Composite {
 
@@ -93,6 +98,9 @@ public class RelationDisplayTableControl extends Composite {
     "arched", "straight"
   };
 
+  /////////////////////////////////////
+  // EdgeDisplayProperty integration
+
   private static final String[] UPDATE_COLUMNS = new String [] {
     COL_COLOR, COL_WIDTH, COL_ARROWHEAD
   };
@@ -102,7 +110,7 @@ public class RelationDisplayTableControl extends Composite {
 
     @Override
     public void edgeDisplayChanged(Relation relation, EdgeDisplayProperty props) {
-      propViewer.update(relation, UPDATE_COLUMNS);
+      updateRelationColumns(relation, UPDATE_COLUMNS);
     }
   }
 
@@ -110,47 +118,47 @@ public class RelationDisplayTableControl extends Composite {
 
   private RelationDisplayRepository propRepo;
 
+  /////////////////////////////////////
+  // UX Elements
+
   private TableViewer propViewer;
+
+  /////////////////////////////////////
+  // Public methods
 
   public RelationDisplayTableControl(Composite parent) {
     super(parent, SWT.NONE);
-
-    GridLayout gridLayout = new GridLayout();
-    gridLayout.marginHeight = 0;
-    gridLayout.marginWidth = 0;
-    setLayout(gridLayout);
+    setLayout(Widgets.buildContainerLayout(1));
 
     propViewer = new TableViewer(this,
         SWT.FULL_SELECTION | SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
-    // set up label provider
-    propViewer.setLabelProvider(new EdgeDisplayLabelProvider());
 
-    // Set up layout properties
-    Table propTableControl = propViewer.getTable();
-    propTableControl.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, true));
-    propTableControl.setToolTipText("Edge Display Properties");
+    // Layout embedded table
+    Table propTable = propViewer.getTable();
+    propTable.setLayoutData(Widgets.buildGrabFillData());
 
     // initialize the table
-    propTableControl.setHeaderVisible(true);
-    EditColTableDef.setupTable(TABLE_DEF, propTableControl);
+    propTable.setHeaderVisible(true);
+    propTable.setToolTipText("Relations Display Properties");
+    EditColTableDef.setupTable(TABLE_DEF, propTable);
 
     // Configure cell editing
-    CellEditor[] cellEditors = new CellEditor[6];
+    CellEditor[] cellEditors = new CellEditor[TABLE_DEF.length];
     cellEditors[INDEX_NAME] = null;
     cellEditors[INDEX_SOURCE] = null;
-    cellEditors[INDEX_COLOR] = new ColorCellEditor(propTableControl);
-    cellEditors[INDEX_STYLE] = new ComboBoxCellEditor(propTableControl,
+    cellEditors[INDEX_COLOR] = new ColorCellEditor(propTable);
+    cellEditors[INDEX_STYLE] = new ComboBoxCellEditor(propTable,
         toString(EdgeDisplayProperty.LineStyle.values(), true));
-    cellEditors[INDEX_ARROWHEAD] = new ComboBoxCellEditor(propTableControl,
+    cellEditors[INDEX_ARROWHEAD] = new ComboBoxCellEditor(propTable,
         toString(EdgeDisplayProperty.ArrowheadStyle.values(), true));
 
     propViewer.setCellEditors(cellEditors);
+    propViewer.setLabelProvider(new EdgeDisplayLabelProvider());
     propViewer.setColumnProperties(EditColTableDef.getProperties(TABLE_DEF));
     propViewer.setCellModifier(new EdgeDisplayCellModifier());
 
     // TODO: Add column sorters, filters?
-    configSorters(propTableControl);
+    configSorters(propTable);
 
     // Configure content last: use updateTable() to render relations
     propViewer.setContentProvider(ArrayContentProvider.getInstance());
@@ -164,7 +172,6 @@ public class RelationDisplayTableControl extends Composite {
     }
     return s;
   }
-
 
   /**
    * Fill the list with {@link Relation}s.
@@ -199,11 +206,6 @@ public class RelationDisplayTableControl extends Composite {
     return result;
   }
 
-  @SuppressWarnings("unchecked")
-  public Collection<Relation> getInput() {
-    return (Collection<Relation>) propViewer.getInput();
-  }
-
   public void setEdgeDisplayRepository(RelationDisplayRepository propRepo) {
     this.propRepo = propRepo;
     propListener = new ControlChangeListener();
@@ -216,6 +218,10 @@ public class RelationDisplayTableControl extends Composite {
       propListener = null;
     }
     this.propRepo = null;
+  }
+
+  private void updateRelationColumns(Relation relation, String[] cols) {
+    propViewer.update(relation, cols);
   }
 
   /////////////////////////////////////
@@ -437,13 +443,5 @@ public class RelationDisplayTableControl extends Composite {
       saveDisplayProperty(relation, relProp);
       // Viewer update via ChangeListener
     }
-  }
-
-  public void setSelection(ISelection selection) {
-    propViewer.setSelection(selection);
-  }
-
-  public void refresh(boolean refresh) {
-    propViewer.refresh(refresh);
   }
 }

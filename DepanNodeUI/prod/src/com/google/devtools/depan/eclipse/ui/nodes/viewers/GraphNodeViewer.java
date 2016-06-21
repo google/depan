@@ -16,7 +16,8 @@
 
 package com.google.devtools.depan.eclipse.ui.nodes.viewers;
 
-import com.google.devtools.depan.eclipse.ui.nodes.Resources;
+import com.google.devtools.depan.eclipse.ui.nodes.NodesUIResources;
+import com.google.devtools.depan.eclipse.ui.nodes.trees.NodeWrapperTreeSorter;
 import com.google.devtools.depan.eclipse.ui.nodes.trees.ViewerRoot;
 
 import org.eclipse.jface.action.IMenuListener;
@@ -48,7 +49,10 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
  *
  * @param <T>
  */
-public class GraphNodeViewer<T> {
+public class GraphNodeViewer extends Composite {
+
+  private static final NodeWrapperTreeSorter SORTER =
+      new NodeWrapperTreeSorter();
 
   private NodeViewerProvider provider;
 
@@ -63,25 +67,24 @@ public class GraphNodeViewer<T> {
   public void refresh() {
     ViewerRoot treeRoots = provider.buildViewerRoots();
     treeViewer.setInput(treeRoots);
+    treeViewer.refresh();
   }
 
-  public Composite createNodeViewer(Composite parent) {
-    Composite result = new Composite(parent, SWT.NONE);
-    result.setLayout(new GridLayout(1, false));
+  public GraphNodeViewer(Composite parent) {
+    super(parent, SWT.NONE);
+    this.setLayout(new GridLayout(1, false));
 
-    Composite optionsSection = new Composite(result, SWT.NONE);
+    Composite optionsSection = new Composite(this, SWT.NONE);
     optionsSection.setLayout(new GridLayout(1, false));
     optionsSection.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
     ToolBar rightOptions = createToolBar(optionsSection);
     rightOptions.setLayoutData(new GridData(SWT.END, SWT.FILL, true, false));
 
-    ViewerSorter sorter = provider.getViewSorter();
-    treeViewer = createTreeViewer(result, sorter);
+    ViewerSorter sorter = SORTER; // provider.getViewSorter();
+    treeViewer = createTreeViewer(this, sorter);
     treeViewer.getControl().setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, true));
-
-    return result;
   }
 
   private TreeViewer createTreeViewer(Composite parent, ViewerSorter sorter) {
@@ -172,7 +175,7 @@ public class GraphNodeViewer<T> {
 
   private ToolItem createExpandAllPushIcon(ToolBar parent) {
     ToolItem result = new ToolItem(parent, SWT.PUSH | SWT.FLAT);
-    result.setImage(Resources.IMAGE_EXPANDALL);
+    result.setImage(NodesUIResources.IMAGE_EXPANDALL);
     return result;
   }
 

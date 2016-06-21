@@ -20,6 +20,7 @@ import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.Viewer;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -48,6 +49,11 @@ public class TableContentProvider<E> implements IStructuredContentProvider {
   public void initViewer(StructuredViewer viewer) {
     viewer.setContentProvider(this);
     viewer.setInput(objects);
+  }
+
+  public void setInput(Collection<E> elements) {
+    clear();
+    objects.addAll(elements);
   }
 
   /**

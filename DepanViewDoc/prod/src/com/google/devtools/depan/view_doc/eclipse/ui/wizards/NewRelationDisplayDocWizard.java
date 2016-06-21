@@ -93,6 +93,7 @@ public class NewRelationDisplayDocWizard
     return 1;
   }
 
+  @Override
   protected RelationDisplayDocument buildDocument(IProgressMonitor monitor) {
     monitor.beginTask("Preparing edge display properties", 1);
     monitor.worked(1);

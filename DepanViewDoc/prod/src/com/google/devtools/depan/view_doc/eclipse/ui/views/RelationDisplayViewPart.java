@@ -18,12 +18,13 @@ package com.google.devtools.depan.view_doc.eclipse.ui.views;
 
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.registry.RelationRegistry;
+import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 import com.google.devtools.depan.view_doc.eclipse.ViewDocResources;
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
 import com.google.devtools.depan.view_doc.eclipse.ui.widgets.RelationDisplayTableControl;
 import com.google.devtools.depan.view_doc.eclipse.ui.wizards.NewRelationDisplayDocWizard;
-import com.google.devtools.depan.view_doc.model.RelationDisplayDocument;
 import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty;
+import com.google.devtools.depan.view_doc.model.RelationDisplayDocument;
 import com.google.devtools.depan.view_doc.model.RelationDisplayRepository;
 import com.google.devtools.depan.view_doc.model.ViewPrefsListener;
 import com.google.devtools.depan.view_doc.persistence.RelationDisplayDocumentXmlPersist;
@@ -36,8 +37,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
@@ -57,10 +56,16 @@ public class RelationDisplayViewPart extends AbstractViewDocViewPart {
 
   public static final String PART_NAME = "Relations Properties";
 
+
+  /////////////////////////////////////
+  // UX Elements
   /**
    * The <code>RelationSetEditorControl</code> that controls the UX.
    */
   private RelationDisplayTableControl propEditor;
+
+  /////////////////////////////////////
+  // RelationSet integration
 
   private RelationDisplayRepository propRepo;
 
@@ -69,7 +74,7 @@ public class RelationDisplayViewPart extends AbstractViewDocViewPart {
 
     private final ViewEditor editor;
 
-    private EdgeDisplayListener prefsListener;
+    private PartPrefsListener prefsListener;
 
     private Map<Relation, EdgeDisplayProperty> tempRows;
 
@@ -106,7 +111,7 @@ public class RelationDisplayViewPart extends AbstractViewDocViewPart {
 
     @Override
     public void addChangeListener(ChangeListener listener) {
-      prefsListener = new EdgeDisplayListener(listener);
+      prefsListener = new PartPrefsListener(listener);
       editor.addViewPrefsListener(prefsListener);
     }
 
@@ -118,11 +123,11 @@ public class RelationDisplayViewPart extends AbstractViewDocViewPart {
     }
   }
 
-  private static class EdgeDisplayListener extends ViewPrefsListener.Simple {
+  private static class PartPrefsListener extends ViewPrefsListener.Simple {
 
     private RelationDisplayRepository.ChangeListener listener;
 
-    public EdgeDisplayListener(RelationDisplayRepository.ChangeListener listener) {
+    public PartPrefsListener(RelationDisplayRepository.ChangeListener listener) {
       this.listener = listener;
     }
 
@@ -132,6 +137,9 @@ public class RelationDisplayViewPart extends AbstractViewDocViewPart {
       listener.edgeDisplayChanged(relation, newProperty);
     }
   }
+
+  /////////////////////////////////////
+  // Public methods
 
   @Override
   public Image getTitleImage() {
@@ -143,18 +151,18 @@ public class RelationDisplayViewPart extends AbstractViewDocViewPart {
     return PART_NAME;
   }
 
+  /////////////////////////////////////
+  // UX Setup
+
   @Override
   protected void createGui(Composite parent) {
-    Composite result = new Composite(parent, SWT.NONE);
-    result.setLayout(new GridLayout());
+    Composite result = Widgets.buildGridContainer(parent, 1);
 
     propEditor = new RelationDisplayTableControl(result);
-    propEditor.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false));
+    propEditor.setLayoutData(Widgets.buildGrabFillData());
 
     Composite saves = setupSaveButtons(result);
-    saves.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false));
+    saves.setLayoutData(Widgets.buildHorzFillData());
   }
 
   @Override
@@ -163,30 +171,20 @@ public class RelationDisplayViewPart extends AbstractViewDocViewPart {
   }
 
   private Composite setupSaveButtons(Composite parent) {
-    Composite result = new Composite(parent, SWT.NONE);
-    GridLayout layout = new GridLayout(2, false);
-    layout.marginWidth = 0;
-    layout.marginHeight = 0;
-    result.setLayout(layout);
+    Composite result = Widgets.buildGridContainer(parent, 2);
 
-    Button saveRels = new Button(result, SWT.PUSH);
-    saveRels.setText("Save selected as an Edge Display resource...");
-    saveRels.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false));
-
-    saveRels.addSelectionListener(new SelectionAdapter() {
+    Button saveProps = Widgets.buildGridPushButton(
+        result, "Save selected as an Edge Display resource...");
+    saveProps.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
         saveSelection();
       }
     });
 
-    Button saveProps = new Button(result, SWT.PUSH);
-    saveProps.setText("Load properties from Edge Display resource...");
-    saveProps.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false));
-
-    saveProps.addSelectionListener(new SelectionAdapter() {
+    Button loadProps = Widgets.buildGridPushButton(
+        result, "Load properties from Edge Display resource...");
+    loadProps.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
         loadSelection();

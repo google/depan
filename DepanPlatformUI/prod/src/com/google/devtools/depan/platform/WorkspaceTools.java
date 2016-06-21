@@ -103,7 +103,10 @@ public final class WorkspaceTools {
    * </ol>
    * In all other cases, return {@code null}.
    *
-   * @param selection current user selection
+   * @param selection current user selection, or {@code null} for something
+   * based on the workspace context (e.g. a singleton project root in the
+   * workspace).
+   *
    * @return best guess of user's intended container,
    *     or {@code null} if no reasonable guess can be made.
    */

@@ -18,22 +18,21 @@ package com.google.devtools.depan.matchers.eclipse.ui.editors;
 
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.registry.RelationRegistry;
-import com.google.devtools.depan.matchers.eclipse.ui.widgets.GraphEdgeMatcherEditorPart;
+import com.google.devtools.depan.matchers.eclipse.ui.widgets.EdgeMatcherEditorControl;
 import com.google.devtools.depan.matchers.eclipse.ui.widgets.ModificationListener;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.matchers.persistence.EdgeMatcherDocXmlPersist;
 import com.google.devtools.depan.model.GraphEdgeMatcher;
 import com.google.devtools.depan.platform.WorkspaceTools;
+import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
@@ -45,14 +44,18 @@ import org.eclipse.ui.dialogs.SaveAsDialog;
 import org.eclipse.ui.part.EditorPart;
 
 /**
+ * An Eclipse Workbench Editor for an {@code EdgeMatcherDocument}.
+ * For historical reasons, {@code EdgeMatcherDocument} is implemented as
+ * the concrete type {@link GraphEdgeMatcherDescriptor}.
+ * 
  * Based on a legacy version of {@code NamedRelationshipEditor}.
  * 
  * @author ycoppel@google.com (Yohann Coppel)
  */
-public class GraphEdgeMatcherEditor extends EditorPart {
+public class EdgeMatcherEditor extends EditorPart {
 
   public static final String ID =
-      "com.google.devtools.depan.matchers.eclipse.ui.editors.GraphEdgeMatcherEditor";
+      "com.google.devtools.depan.matchers.eclipse.ui.editors.EdgeMatcherEditor";
 
   /**
    * EdgeMatcher document that is being edited.
@@ -80,7 +83,10 @@ public class GraphEdgeMatcherEditor extends EditorPart {
   /**
    * Relation editing table for EdgeMatcher.
    */
-  private GraphEdgeMatcherEditorPart edgeMatcherEditor;
+  private EdgeMatcherEditorControl edgeMatcherEditor;
+
+  /////////////////////////////////////
+  // Public methods
 
   @Override
   public void doSave(IProgressMonitor monitor) {
@@ -105,18 +111,6 @@ public class GraphEdgeMatcherEditor extends EditorPart {
     file = saveFile;
     handleDocumentChange();
     persistDocument(null);
-  }
-
-  /**
-   * Use the information in the editor to create new document content,
-   * for external use (e.g. persistence).
-   */
-  private void updateDocument() {
-
-    GraphEdgeMatcher edgeMatcher = edgeMatcherEditor.createEdgeMatcher();
-    GraphEdgeMatcherDescriptor result =
-        new GraphEdgeMatcherDescriptor(matcherName.getText(), edgeMatcher);
-    matcherInfo = result;
   }
 
   /**
@@ -211,24 +205,58 @@ public class GraphEdgeMatcherEditor extends EditorPart {
   }
 
   @Override
+  public void setFocus() {
+    if (matcherName.getText().isEmpty()) {
+      matcherName.setFocus();
+    }
+  }
+
+  @Override
   public void createPartControl(Composite parent) {
     Composite container = new Composite(parent, SWT.NONE);
-    GridLayout layout = new GridLayout();
+    GridLayout layout = Widgets.buildContainerLayout(1);
     layout.horizontalSpacing = 9;
     container.setLayout(layout);
 
     // Name for matcher ..
-    Composite props = new Composite(container, SWT.NONE);
-    props.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false));
-    props.setLayout(new GridLayout(2, false));
+    Composite props = setupProperties(container);
+    props.setLayoutData(Widgets.buildHorzFillData());
 
-    Label label = new Label(props, SWT.NULL);
-    label.setText("&Name:");
+    // relation picker (list of relationships with forward/backward selectors)
+    edgeMatcherEditor = new EdgeMatcherEditorControl(container);
+    edgeMatcherEditor.setLayoutData(Widgets.buildGrabFillData());
 
-    matcherName = new Text(props, SWT.BORDER | SWT.SINGLE);
-    matcherName.setLayoutData(
-        new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+    // listening for changes, so we can set dirtyState.
+    edgeMatcherEditor.registerModificationListener(
+        new ModificationListener<Relation, Boolean>() {
+
+          @Override
+          public void modify(Relation element, String property, Boolean value) {
+            handleModify(element, property, value);
+          }
+        }
+    );
+
+    if (null != matcherInfo) {
+      setInput(matcherInfo);
+    }
+  }
+
+  /////////////////////////////////////
+  // UX Setup
+
+  /**
+   * In a future world, this might provide access to a complete set
+   * of {@code ResourceDocument} properties.
+   */
+  @SuppressWarnings("unused")
+  private Composite setupProperties(Composite parent) {
+    Composite result = Widgets.buildGridContainer(parent, 2);
+
+    Label label = Widgets.buildCompactLabel(result, "&Name:");
+
+    matcherName = new Text(result, SWT.BORDER | SWT.SINGLE);
+    matcherName.setLayoutData(Widgets.buildHorzFillData());
     if (null != matcherInfo) {
       matcherName.setText(matcherInfo.getName());
     }
@@ -242,37 +270,29 @@ public class GraphEdgeMatcherEditor extends EditorPart {
         handleDocumentChange();
       }
     });
+    return result;
+  }
 
-    // relation picker (list of relationships with forward/backward selectors)
-    edgeMatcherEditor = new GraphEdgeMatcherEditorPart();
-    Control edgeMatcherControl = edgeMatcherEditor.getControl(container);
-    edgeMatcherControl.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+  private void setInput(GraphEdgeMatcherDescriptor matcherInfo) {
+    matcherName.setText(matcherInfo.getName());
 
     edgeMatcherEditor.updateTable(RelationRegistry.getRegistryRelations());
     edgeMatcherEditor.updateEdgeMatcher(matcherInfo.getEdgeMatcher());
-
-    // listening for changes, so we can set dirtyState.
-    edgeMatcherEditor.registerModificationListener(
-        new ModificationListener<Relation, Boolean>() {
-
-          @Override
-          public void modify(Relation element, String property, Boolean value) {
-            handleModify(element, property, value);
-          }
-        }
-    );
   }
+
 
   private void handleModify(Relation element, String property, Boolean value) {
     setDirtyState(true);
   }
 
-  private void handleDocumentChange() {
-    updateDocument();
-    setPartName(buildPartName());
+  private GraphEdgeMatcherDescriptor buildEdgeMatcherDocument() {
+    GraphEdgeMatcher edgeMatcher = edgeMatcherEditor.buildEdgeMatcher();
+    GraphEdgeMatcherDescriptor result =
+        new GraphEdgeMatcherDescriptor(matcherName.getText(), edgeMatcher);
+    return result;
   }
-
-  @Override
-  public void setFocus() {
+  private void handleDocumentChange() {
+    matcherInfo = buildEdgeMatcherDocument();
+    setPartName(buildPartName());
   }
 }
