@@ -20,7 +20,7 @@ import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.view_doc.layout.LayoutContext;
 import com.google.devtools.depan.view_doc.layout.LayoutGenerator;
 import com.google.devtools.depan.view_doc.layout.LayoutRunner;
-import com.google.devtools.depan.view_doc.layout.registry.LayoutGeneratorContributor;
+import com.google.devtools.depan.view_doc.layout.plugins.LayoutGeneratorContributor;
 
 import com.google.common.collect.Maps;
 

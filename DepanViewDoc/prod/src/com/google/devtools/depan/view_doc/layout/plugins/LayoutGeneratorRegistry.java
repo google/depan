@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.view_doc.layout.registry;
+package com.google.devtools.depan.view_doc.layout.plugins;
 
 import com.google.devtools.depan.platform.PlatformLogger;
 import com.google.devtools.depan.platform.plugin.ContributionEntry;

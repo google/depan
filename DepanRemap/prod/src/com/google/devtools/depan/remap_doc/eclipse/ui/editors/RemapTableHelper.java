@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.remap_doc.eclipse.ui.editors;
 
-import com.google.devtools.depan.remap_doc.eclipse.ui.registry.RemapRegistry;
+import com.google.devtools.depan.remap_doc.eclipse.ui.plugins.RemapRegistry;
 import com.google.devtools.depan.remap_doc.model.MigrationRule;
 
 import org.eclipse.jface.viewers.ITableLabelProvider;

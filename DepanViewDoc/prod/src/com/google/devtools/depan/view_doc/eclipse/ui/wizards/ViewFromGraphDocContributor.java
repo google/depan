@@ -1,7 +1,7 @@
 package com.google.devtools.depan.view_doc.eclipse.ui.wizards;
 
-import com.google.devtools.depan.graph_doc.eclipse.ui.registry.FromGraphDocContributor;
-import com.google.devtools.depan.graph_doc.eclipse.ui.registry.FromGraphDocWizard;
+import com.google.devtools.depan.graph_doc.eclipse.ui.plugins.FromGraphDocContributor;
+import com.google.devtools.depan.graph_doc.eclipse.ui.plugins.FromGraphDocWizard;
 
 public class ViewFromGraphDocContributor implements FromGraphDocContributor {
 

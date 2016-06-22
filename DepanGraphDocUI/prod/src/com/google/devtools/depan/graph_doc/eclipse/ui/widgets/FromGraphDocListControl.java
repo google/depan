@@ -16,8 +16,8 @@
 
 package com.google.devtools.depan.graph_doc.eclipse.ui.widgets;
 
-import com.google.devtools.depan.graph_doc.eclipse.ui.registry.FromGraphDocContributor;
-import com.google.devtools.depan.graph_doc.eclipse.ui.registry.FromGraphDocRegistry;
+import com.google.devtools.depan.graph_doc.eclipse.ui.plugins.FromGraphDocContributor;
+import com.google.devtools.depan.graph_doc.eclipse.ui.plugins.FromGraphDocRegistry;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.MapChoiceControl;
 
 import org.eclipse.swt.widgets.Composite;

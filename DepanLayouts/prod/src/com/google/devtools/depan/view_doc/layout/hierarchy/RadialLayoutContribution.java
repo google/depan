@@ -17,7 +17,7 @@
 package com.google.devtools.depan.view_doc.layout.hierarchy;
 
 import com.google.devtools.depan.view_doc.layout.LayoutGenerator;
-import com.google.devtools.depan.view_doc.layout.registry.LayoutGeneratorContributor;
+import com.google.devtools.depan.view_doc.layout.plugins.LayoutGeneratorContributor;
 
 /**
  * @author <a href="leeca@pnambic.com">Lee Carver</a>

@@ -29,6 +29,13 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import java.util.List;
 
 /**
+ * Support common plugin pattern with multiple contributions to a single
+ * extension point.
+ * 
+ * Extension points based on this class should reside in an {@code .plugins}
+ * directory for their supporting system. (The {@code .registry} package
+ * suffix is reserved for registry support.)
+ * 
  * @author Lee Carver
  */
 public class RelationRegistry extends

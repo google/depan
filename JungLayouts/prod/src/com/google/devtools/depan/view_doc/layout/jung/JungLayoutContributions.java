@@ -17,7 +17,7 @@
 package com.google.devtools.depan.view_doc.layout.jung;
 
 import com.google.devtools.depan.view_doc.layout.LayoutGenerator;
-import com.google.devtools.depan.view_doc.layout.registry.LayoutGeneratorContributor;
+import com.google.devtools.depan.view_doc.layout.plugins.LayoutGeneratorContributor;
 
 /**
  * Define contributed layout generators based on JUNG algorithms.

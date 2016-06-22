@@ -19,8 +19,8 @@ package com.google.devtools.depan.remap_doc.eclipse.ui.widgets;
 import com.google.common.collect.Maps;
 
 import com.google.devtools.depan.model.Element;
-import com.google.devtools.depan.remap_doc.eclipse.ui.registry.RemapContributor;
-import com.google.devtools.depan.remap_doc.eclipse.ui.registry.RemapRegistry;
+import com.google.devtools.depan.remap_doc.eclipse.ui.plugins.RemapContributor;
+import com.google.devtools.depan.remap_doc.eclipse.ui.plugins.RemapRegistry;
 import com.google.devtools.depan.remap_doc.plugins.ElementEditor;
 import com.google.devtools.depan.view_doc.eclipse.ui.plugins.ElementClassTransformer;
 

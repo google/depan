@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.graph_doc.eclipse.ui.registry;
+package com.google.devtools.depan.graph_doc.eclipse.ui.plugins;
 
 import com.google.devtools.depan.platform.PlatformLogger;
 import com.google.devtools.depan.platform.plugin.ContributionEntry;

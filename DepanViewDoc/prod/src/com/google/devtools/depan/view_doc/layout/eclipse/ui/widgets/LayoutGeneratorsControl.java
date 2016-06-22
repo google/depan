@@ -17,8 +17,8 @@
 package com.google.devtools.depan.view_doc.layout.eclipse.ui.widgets;
 
 import com.google.devtools.depan.platform.eclipse.ui.widgets.MapChoiceControl;
-import com.google.devtools.depan.view_doc.layout.registry.LayoutGeneratorContributor;
-import com.google.devtools.depan.view_doc.layout.registry.LayoutGeneratorRegistry;
+import com.google.devtools.depan.view_doc.layout.plugins.LayoutGeneratorContributor;
+import com.google.devtools.depan.view_doc.layout.plugins.LayoutGeneratorRegistry;
 
 import org.eclipse.swt.widgets.Composite;
 
