@@ -83,6 +83,12 @@ public class Widgets {
     return result;
   }
 
+  public static Text buildGridBoxedText(Composite parent) {
+    Text result = new Text(parent, SWT.BORDER | SWT.SINGLE);
+    result.setLayoutData(buildHorzFillData());
+    return result;
+  }
+
   public static Button buildGridPushButton(Composite parent) {
     Button result = new Button(parent, SWT.PUSH);
     result.setLayoutData(buildHorzFillData());

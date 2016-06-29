@@ -16,9 +16,9 @@
 
 package com.google.devtools.depan.view_doc.eclipse.ui.views;
 
-import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeListViewProvider;
-import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeTreeProviders;
+import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeViewerProvider;
 import com.google.devtools.depan.model.GraphNode;
+import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 import com.google.devtools.depan.view_doc.eclipse.ViewDocResources;
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
 import com.google.devtools.depan.view_doc.eclipse.ui.widgets.NodeDisplayTableControl;
@@ -27,15 +27,10 @@ import com.google.devtools.depan.view_doc.model.NodeDisplayRepository;
 import com.google.devtools.depan.view_doc.model.NodeLocationRepository;
 import com.google.devtools.depan.view_doc.model.ViewPrefsListener;
 
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 import java.awt.geom.Point2D;
-import java.text.MessageFormat;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -200,12 +195,10 @@ public class NodeDisplayViewPart extends AbstractViewDocViewPart {
 
   @Override
   protected void createGui(Composite parent) {
-    Composite result = new Composite(parent, SWT.NONE);
-    result.setLayout(new GridLayout());
+    Composite result = Widgets.buildGridContainer(parent, 1);
 
     propEditor = new NodeDisplayTableControl(result);
-    propEditor.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, true));
+    propEditor.setLayoutData(Widgets.buildGrabFillData());
   }
 
   @Override
@@ -225,15 +218,7 @@ public class NodeDisplayViewPart extends AbstractViewDocViewPart {
     posRepo = new PartNodeLocationRepo(editor);
     propEditor.setNodeRepository(posRepo, propRepo);
 
-    Collection<GraphNode> nodes = editor.getExposedGraph().getNodes();
-    String name = editor.getPartName();
-    String label = MessageFormat.format(
-        "{0} [{1} exposed nodes]", name, nodes.size());
-
-    NodeListViewProvider<GraphNode> provider =
-        new NodeListViewProvider<GraphNode>(label, nodes);
-    provider.setProvider(NodeTreeProviders.GRAPH_NODE_PROVIDER);
-
+    NodeViewerProvider provider = editor.getNodeViewProvider();
     propEditor.setInput(provider);
   }
 

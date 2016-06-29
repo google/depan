@@ -18,6 +18,7 @@ package com.google.devtools.depan.eclipse.ui.nodes.viewers;
 
 import com.google.devtools.depan.eclipse.ui.nodes.NodesUIResources;
 import com.google.devtools.depan.eclipse.ui.nodes.trees.NodeWrapperTreeSorter;
+import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.jface.action.IMenuListener;
@@ -31,7 +32,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ToolBar;
@@ -60,18 +60,23 @@ public class GraphNodeViewer extends Composite {
 
   public GraphNodeViewer(Composite parent) {
     super(parent, SWT.NONE);
-    this.setLayout(new GridLayout(1, false));
+    setLayout(Widgets.buildContainerLayout(1));
 
-    Composite optionsSection = new Composite(this, SWT.NONE);
-    optionsSection.setLayout(new GridLayout(1, false));
-    optionsSection.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-
-    ToolBar rightOptions = createToolBar(optionsSection);
-    rightOptions.setLayoutData(new GridData(SWT.END, SWT.FILL, true, false));
+    Composite optionsSection = setupOptions(this);
+    optionsSection.setLayoutData(Widgets.buildHorzFillData());
 
     treeViewer = createTreeViewer(this);
-    treeViewer.getControl().setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, true));
+    treeViewer.getTree().setLayoutData(Widgets.buildGrabFillData());
+    // treeViewer.getControl().setLayoutData(Widgets.buildGrabFillData());
+  }
+
+  private Composite setupOptions(Composite parent) {
+    Composite result = Widgets.buildGridContainer(parent, 1);
+
+    ToolBar rightOptions = createToolBar(result);
+    rightOptions.setLayoutData(Widgets.buildTrailFillData());
+
+    return result;
   }
 
   public void setNvProvider(NodeViewerProvider nvProvider) {

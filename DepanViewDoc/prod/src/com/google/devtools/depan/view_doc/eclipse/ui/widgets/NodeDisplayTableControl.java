@@ -34,6 +34,7 @@ import com.google.devtools.depan.view_doc.model.NodeDisplayRepository;
 import com.google.devtools.depan.view_doc.model.NodeLocationRepository;
 import com.google.devtools.depan.view_doc.model.Point2dUtils;
 
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CheckboxCellEditor;
@@ -55,6 +56,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.ui.model.IWorkbenchAdapter;
 
 import java.awt.Color;
 import java.awt.geom.Point2D;
@@ -103,9 +105,9 @@ public class NodeDisplayTableControl extends Composite {
     @Override
     protected TreeViewer createTreeViewer(Composite parent) {
       TreeViewer result = super.createTreeViewer(parent);
-      Tree tree = result.getTree();
 
       // Initialize the table.
+      Tree tree = result.getTree();
       tree.setHeaderVisible(true);
       tree.setToolTipText("Node Display Properties");
       EditColTableDef.setupTree(TABLE_DEF, tree);
@@ -124,10 +126,7 @@ public class NodeDisplayTableControl extends Composite {
       result.setCellEditors(cellEditors);
       result.setLabelProvider(new PartLabelProvider());
       result.setColumnProperties(EditColTableDef.getProperties(TABLE_DEF));
-      result.setCellModifier(new EdgeDisplayCellModifier());
-
-      // Configure content last: use updateTable() to render relations
-      // result.setContentProvider(ArrayContentProvider.getInstance());
+      result.setCellModifier(new PartCellModifier());
 
       return result;
     }
@@ -201,7 +200,7 @@ public class NodeDisplayTableControl extends Composite {
     super(parent, SWT.NONE);
     setLayout(Widgets.buildContainerLayout(1));
 
-    propViewer = new ControlGraphNodeViewer(parent);
+    propViewer = new ControlGraphNodeViewer(this);
     propViewer.setLayoutData(Widgets.buildGrabFillData());
     configSorters(propViewer.getTree());
   }
@@ -425,6 +424,15 @@ public class NodeDisplayTableControl extends Composite {
     return null;
   }
 
+  @SuppressWarnings("unchecked")
+  private IWorkbenchAdapter getWorkbenchAdapter(Object element) {
+    if (element instanceof IAdaptable ) {
+      Object result = ((IAdaptable) element).getAdapter(IWorkbenchAdapter.class);
+      return (IWorkbenchAdapter) result;
+    }
+    return null;
+  }
+
   private class PositionSorter extends ViewerSorter {
 
     private final boolean useX;
@@ -492,6 +500,13 @@ public class NodeDisplayTableControl extends Composite {
           return getSizeName(node);
         }
       }
+      IWorkbenchAdapter item = getWorkbenchAdapter(element);
+      if (null != item) {
+        switch (columnIndex) {
+        case INDEX_NAME:
+          return item.getLabel(element);
+        }
+      }
       return null;
     }
 
@@ -504,6 +519,14 @@ public class NodeDisplayTableControl extends Composite {
           return PlatformResources.getOnOff(isVisible(node));
         }
       }
+
+      IWorkbenchAdapter item = getWorkbenchAdapter(element);
+      if (null != item) {
+        switch (columnIndex) {
+        case INDEX_NAME:
+          return null; // TODO: versus - item.getImageDescriptor(element)...
+        }
+      }
       // Fall through and unknown type
       return null;
     }
@@ -512,7 +535,7 @@ public class NodeDisplayTableControl extends Composite {
   /////////////////////////////////////
   // Value provider/modifier for edit cells
 
-  private class EdgeDisplayCellModifier implements ICellModifier{
+  private class PartCellModifier implements ICellModifier{
 
     @Override
     public boolean canModify(Object element, String property) {

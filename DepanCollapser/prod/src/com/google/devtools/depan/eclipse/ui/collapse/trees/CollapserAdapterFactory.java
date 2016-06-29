@@ -14,13 +14,13 @@
  * the License.
  */
 
-package com.google.devtools.depan.eclipse.trees;
+package com.google.devtools.depan.eclipse.ui.collapse.trees;
+
+import com.google.devtools.depan.platform.TypeAdapter;
 
 import com.google.common.collect.Lists;
 
 import org.eclipse.core.runtime.IAdapterFactory;
-import org.eclipse.core.runtime.IAdapterManager;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 
 import java.util.List;
@@ -30,57 +30,28 @@ import java.util.List;
  *
  * @param <E> Type of data associated to each Node<Element>.
  */
-public class NodeViewAdapterFactory<E> implements IAdapterFactory {
-
-  // NodeViewAdapterFactory should be parameterized, but cannot make static
-  // reference to the non-static type E
-  private static NodeViewAdapterFactory<?> instance = null;
-
-  @SuppressWarnings("rawtypes")
-  private static class TypeAdapter {
-    private final Class fromType;
-    private final IWorkbenchAdapter adapter;
-
-    public TypeAdapter(Class fromType, IWorkbenchAdapter adapter) {
-      this.fromType = fromType;
-      this.adapter = adapter;
-    }
-
-    public IWorkbenchAdapter getAdapter(Object adaptableObject) {
-      if (adaptableObject.getClass().isAssignableFrom(fromType)) {
-        return adapter;
-      }
-      return null;
-    }
-
-    public Class getFromType() {
-      // TODO Auto-generated method stub
-      return fromType;
-    }
-  }
+public class CollapserAdapterFactory<E> implements IAdapterFactory {
 
   private static List<TypeAdapter> knownAdapters = buildKnownAdapters();
-  static { buildKnownAdapters(); }
 
   /**
    * Build the list of know adapter types at static initialization time.
    * Registration with platform is deferred until an instance can be created.
    */
-  private static <E> List<TypeAdapter> buildKnownAdapters(List<TypeAdapter> result) {
+  private static <E> List<TypeAdapter> buildKnownAdapters() {
     List<TypeAdapter> result = Lists.newArrayList();
     result.add(new TypeAdapter(
         CollapseDataWrapper.class, new CollapseDataWrapperAdapter<E>()));
     result.add(new TypeAdapter(
         CollapseTreeRoot.class, new CollapseTreeRootAdapter<E>()));
+    return result;
   }
 
   // suppressWarning, because getAdapter have a Class as parameter, but
   // Class should be parameterized. To update if the IAdapterFactory is updated.
   @Override
   @SuppressWarnings("rawtypes")
-  public Object getAdapter(
-      Object adaptableObject,
-      Class adapterType) {
+  public Object getAdapter(Object adaptableObject, Class adapterType) {
     if (adapterType != IWorkbenchAdapter.class) {
       return null;
     }
@@ -97,16 +68,5 @@ public class NodeViewAdapterFactory<E> implements IAdapterFactory {
   @Override
   public Class<?>[] getAdapterList() {
     return new Class[] {IWorkbenchAdapter.class};
-  }
-
-  public static <E> void register() {
-    if (null == instance) {
-      instance = new NodeViewAdapterFactory<E>();
-    }
-
-    IAdapterManager manager = Platform.getAdapterManager();
-    for (TypeAdapter asso : knownAdapters) {
-      manager.registerAdapters(instance, asso.getFromType());
-    }
   }
 }

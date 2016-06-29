@@ -106,20 +106,20 @@ public class NodeFilterViewPart extends AbstractViewDocViewPart {
   }
 
   private Composite setupFilterEditor(Composite parent) {
-    Group result = new Group(parent, SWT.NONE);
-    result.setLayout(new GridLayout());
-    result.setText("Filters");
+    Group result = Widgets.buildGridGroup(parent, "Filters", 1);
     // TODO: Save/Load on top ...
 
     filterControl = new FilterTableEditorControl(result);
-    filterControl.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, true));
+    filterControl.setLayoutData(Widgets.buildGrabFillData());
 
     return result;
   }
 
   private Composite setupNodesPane(Composite parent) {
-    Composite result = Widgets.buildGridContainer(parent, 2);
+    Composite result = new Composite(parent, SWT.NONE);
+    GridLayout layout = Widgets.buildContainerLayout(2);
+    layout.makeColumnsEqualWidth = true;
+    result.setLayout(layout);
 
     Composite sources = setupSourceNodes(result);
     sources.setLayoutData(Widgets.buildGrabFillData());
@@ -131,9 +131,7 @@ public class NodeFilterViewPart extends AbstractViewDocViewPart {
   }
 
   private Composite setupSourceNodes(Composite parent) {
-    Group result = new Group(parent, SWT.NONE);
-    result.setLayout(new GridLayout());
-    result.setText("Source nodes");
+    Group result = Widgets.buildGridGroup(parent, "Source nodes", 1);
 
     sources = new GraphNodeViewer(result);
     sources.setLayoutData(Widgets.buildGrabFillData());
@@ -141,9 +139,7 @@ public class NodeFilterViewPart extends AbstractViewDocViewPart {
   }
 
   private Composite setupResultNodes(Composite parent) {
-    Group result = new Group(parent, SWT.NONE);
-    result.setLayout(new GridLayout());
-    result.setText("Result nodes");
+    Group result = Widgets.buildGridGroup(parent, "Result nodes", 1);
 
     results = new GraphNodeViewer(result);
     results.setLayoutData(Widgets.buildGrabFillData());
@@ -156,7 +152,7 @@ public class NodeFilterViewPart extends AbstractViewDocViewPart {
 
   private Composite setupResolution(Composite parent) {
     Composite result = new Composite(parent, SWT.NONE);
-    GridLayout layout = new GridLayout(2, false);
+    GridLayout layout = Widgets.buildContainerLayout(2);
     layout.horizontalSpacing = 10;
     result.setLayout(layout);
 

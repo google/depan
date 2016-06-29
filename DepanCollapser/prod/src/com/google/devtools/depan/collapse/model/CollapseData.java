@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.view;
+package com.google.devtools.depan.collapse.model;
 
 import com.google.common.collect.Lists;
 
@@ -43,10 +43,7 @@ public class CollapseData {
 
   /**
    * A collection of collapsed nodes include within this collapse.
-   * It would be better if CollapseData was a generic kind of GroupElement,
-   * but that's a bigger change.
    */
-  // TODO(leeca): Make CollapseData a form of GroupElement.
   private final Collection<CollapseData> childrenCollapse;
 
   /**

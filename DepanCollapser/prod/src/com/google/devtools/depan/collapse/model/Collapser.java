@@ -14,20 +14,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.google.devtools.depan.view;
+package com.google.devtools.depan.collapse.model;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import com.google.devtools.depan.edges.trees.SuccessorEdges;
-import com.google.devtools.depan.edges.trees.TopoSortState;
-import com.google.devtools.depan.edges.trees.TreeModel;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.builder.api.GraphBuilder;
 import com.google.devtools.depan.model.builder.api.GraphBuilders;
+import com.google.devtools.depan.nodes.trees.SuccessorEdges;
+import com.google.devtools.depan.nodes.trees.TopoSortState;
+import com.google.devtools.depan.nodes.trees.TreeModel;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -332,5 +332,4 @@ public class Collapser {
     gizmo.addExposedNodes(nodeSet, graph.getNodes());
     return nodeSet;
   }
-
 }

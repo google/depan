@@ -14,7 +14,7 @@
  * the License.
  */
 
-package com.google.devtools.depan.eclipse.trees;
+package com.google.devtools.depan.eclipse.ui.collapse.trees;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.model.IWorkbenchAdapter;

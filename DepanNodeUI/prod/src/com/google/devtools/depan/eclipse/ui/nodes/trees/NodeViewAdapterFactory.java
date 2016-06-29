@@ -48,11 +48,11 @@ public class NodeViewAdapterFactory<E> implements IAdapterFactory {
   private static <E> List<TypeAdapter> buildKnownAdapters() {
     List<TypeAdapter> result = Lists.newArrayList();
     result.add(new TypeAdapter(
-        HierarchyRoot.class, new HierarchyRootAdapter<E>()));
-    result.add(new TypeAdapter(
         NodeWrapper.class, new NodeWrapperAdapter<E>()));
     result.add(new TypeAdapter(
         SolitaryRoot.class, new SolitaryRootAdapter()));
+    result.add(new TypeAdapter(
+        TreeViewerObject.class, new TreeViewerObjectAdapter()));
     result.add(new TypeAdapter(
         ViewerRoot.class, new ViewerRootAdapter()));
     return result;

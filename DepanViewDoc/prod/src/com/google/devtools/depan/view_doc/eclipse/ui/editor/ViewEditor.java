@@ -22,7 +22,10 @@ import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeSize
 import com.google.devtools.depan.eclipse.preferences.PreferencesIds;
 import com.google.devtools.depan.eclipse.ui.nodes.cache.HierarchyCache;
 import com.google.devtools.depan.eclipse.ui.nodes.trees.GraphData;
+import com.google.devtools.depan.eclipse.ui.nodes.trees.TreeViewerObject;
+import com.google.devtools.depan.eclipse.ui.nodes.trees.ViewerRoot;
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeTreeProvider;
+import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeViewerProvider;
 import com.google.devtools.depan.eclipse.visualization.View;
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeColorSupplier;
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeColorSupplier.Monochrome;
@@ -48,8 +51,11 @@ import com.google.devtools.depan.nodes.filters.sequence.SteppingFilter;
 import com.google.devtools.depan.platform.ListenerManager;
 import com.google.devtools.depan.platform.NewEditorHelper;
 import com.google.devtools.depan.platform.WorkspaceTools;
+import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 import com.google.devtools.depan.view_doc.eclipse.ViewDocLogger;
+import com.google.devtools.depan.view_doc.eclipse.ui.trees.NodeCompactor;
+import com.google.devtools.depan.view_doc.eclipse.ui.trees.ViewEditorNodeViewerProvider;
 import com.google.devtools.depan.view_doc.eclipse.ui.views.NodeFilterViewPart;
 import com.google.devtools.depan.view_doc.layout.LayoutContext;
 import com.google.devtools.depan.view_doc.layout.LayoutGenerator;
@@ -77,10 +83,10 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -222,6 +228,53 @@ public class ViewEditor extends MultiPageEditorPart {
    */
   private SteppingFilter nodeFilter;
 
+  private NodeCompactor compactor = new NodeCompactor(this);
+
+  NodeViewerProvider nvProvider =
+      new ViewEditorNodeViewerProvider(this);
+
+  public NodeViewerProvider getNodeViewProvider() {
+    return nvProvider;
+  }
+
+  public ViewerRoot buildViewerRoot() {
+    Collection<GraphNode> nodes = viewInfo.getViewNodes();
+    PlatformObject[] roots = compactor.buildRoots(nodes);
+
+    String label = buildNodeViewerLabel(roots.length, nodes.size());
+
+    TreeViewerObject view = new TreeViewerObject(label, roots);
+    return new ViewerRoot(new Object[] {view});
+  }
+
+  private GraphModel buildExposedGraph() {
+    Collection<GraphNode> nodes = viewInfo.getViewNodes();
+    Collection<GraphNode> exposed = compactor.buildExposedNodes(nodes);
+
+    return compactor.buildExposedGraph(getViewGraph(), exposed);
+  }
+
+  private String buildNodeViewerLabel(int rootCnt, int nodeCnt) {
+    String name = getPartName();
+    if (rootCnt < nodeCnt) {
+      return MessageFormat.format(
+          "{0} [{1} roots, {2} nodes]", name, rootCnt, nodeCnt);
+    }
+
+    // Everything is a root
+    return MessageFormat.format(
+        "{0} [{1} exposed nodes]", name, nodeCnt);
+  }
+
+
+  public void addNodeTreeHierarchy(GraphEdgeMatcherDescriptor matcher) {
+    compactor.addNodeTreeHierarchy(matcher);
+  }
+
+  public void removeNodeTreeHierarchy(GraphEdgeMatcherDescriptor matcher) {
+    compactor.removeNodeTreeHierarchy(matcher);
+  }
+
   /////////////////////////////////////
   // Dispatch errors to go our logger
 
@@ -343,15 +396,11 @@ public class ViewEditor extends MultiPageEditorPart {
 
   private void createDiagramPage() {
     Composite parent = new Composite(getContainer(), SWT.H_SCROLL | SWT.V_SCROLL);
-
-    GridLayout pageLayout = new GridLayout();
-    pageLayout.numColumns = 1;
-    parent.setLayout(pageLayout);
+    parent.setLayout(Widgets.buildContainerLayout(1));
 
     // bottom composite containing main diagram
     renderer = createView(parent);
-    renderer.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, true));
+    renderer.setLayoutData(Widgets.buildGrabFillData());
 
     // Configure the rendering pipe before listening for changes.
     prepareView();
@@ -407,6 +456,7 @@ public class ViewEditor extends MultiPageEditorPart {
     return str;
   }
 
+  @SuppressWarnings("unused")
   private void createDetailsPage() {
     Composite parent = new Composite(getContainer(), SWT.NONE);
     GridLayout layout = new GridLayout();
@@ -414,16 +464,11 @@ public class ViewEditor extends MultiPageEditorPart {
     layout.marginTop = 9;
     parent.setLayout(layout);
 
-    GridData fillGrid = new GridData(SWT.FILL, SWT.FILL, true, false);
+    Label nameLabel = Widgets.buildCompactLabel(parent, "Description");
+    final Text name = Widgets.buildGridBoxedText(parent);
 
-    Label nameLabel = new Label(parent, SWT.NONE);
-    final Text name = new Text(parent, SWT.BORDER | SWT.SINGLE);
-
-    nameLabel.setText("Description");
     String descr = Strings.nullToEmpty(viewInfo.getDescription());
     name.setText(descr);
-
-    name.setLayoutData(fillGrid);
 
     name.addModifyListener(new ModifyListener() {
 
@@ -545,11 +590,6 @@ public class ViewEditor extends MultiPageEditorPart {
     DirectedGraph<GraphNode, GraphEdge> jungGraph =
         LayoutUtil.buildJungGraph(context);
     return new NodeSupplierFactory(nodes, jungGraph);
-  }
-
-  private GraphModel buildExposedGraph() {
-    // TODO : refit with collapser
-    return viewGraph;
   }
 
   /**

@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.eclipse.ui.nodes.trees;
+package com.google.devtools.depan.eclipse.ui.collapse.trees;
 
-import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeTreeProvider;
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeViewerProvider;
-import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.nodes.trees.TreeModel;
 
 import com.google.common.collect.Lists;
 
+import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.ViewerSorter;
 
 import java.util.List;
 import java.util.Set;
@@ -36,22 +35,15 @@ import java.util.Set;
  * Basic {@link NodeViewerProvider} for routine graph elements.
  * 
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
- * @param <E>
  */
-public class GraphNodeViewProvider<T, E> implements NodeViewerProvider {
+// TODO: [Jun 2016] Preserve behaviors re-usable action creation somewhere.
+public class CollapseNodeViewProvider implements NodeViewerProvider {
 
-  /** Category for any unclassified nodes */
-  public static final String SOLITARY_NODES = "Solitary Nodes";
-
-  // Displayed content
-  private GraphModel graph;
-
-  private NodeTreeProvider<T> provider;
-
-  private List<TreeDescr<E>> trees = Lists.newArrayList();
 
   @Override
   public void addMultiActions(IMenuManager manager) {
+    manager.add(new Action("collapse", IAction.AS_PUSH_BUTTON) {
+    });
   }
 
   @Override
@@ -64,21 +56,11 @@ public class GraphNodeViewProvider<T, E> implements NodeViewerProvider {
     });
   }
 
-  @Override
+
   @SuppressWarnings({ "rawtypes", "unchecked" })
-  public ViewerRoot buildViewerRoots() {
-    List<Object> result = Lists.newArrayList();
-    Set<GraphNode> solitaries = graph.getNodesSet();
-
-    for (TreeDescr tree : trees) {
-      result.add(new HierarchyRoot(tree));
-      solitaries.removeAll(tree.computeNodes());
-    }
-
-    TreeModel.Flat model = new TreeModel.Flat(solitaries);
-    GraphData solo = new GraphData(provider, model);
-    result.add(new SolitaryRoot(solo, SOLITARY_NODES));
-    return new ViewerRoot(result.toArray());
+  @Override
+  public PlatformObject buildViewerRoots() {
+    return null;
   }
 
   @Override

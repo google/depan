@@ -20,13 +20,6 @@
    <extension
          point="org.eclipse.core.runtime.adapters">
       <factory
-            adaptableType="com.google.devtools.depan.eclipse.ui.nodes.trees.HierarchyRoot"
-            class="com.google.devtools.depan.eclipse.ui.nodes.trees.NodeViewAdapterFactory">
-         <adapter
-               type="depannodeui.Adapter1">
-         </adapter>
-      </factory>
-      <factory
             adaptableType="com.google.devtools.depan.eclipse.ui.nodes.trees.NodeWrapper"
             class="com.google.devtools.depan.eclipse.ui.nodes.trees.NodeViewAdapterFactory">
          <adapter
@@ -38,6 +31,13 @@
             class="com.google.devtools.depan.eclipse.ui.nodes.trees.NodeViewAdapterFactory">
          <adapter
                type="depannodeui.Adapter5">
+         </adapter>
+      </factory>
+      <factory
+            adaptableType="com.google.devtools.depan.eclipse.ui.nodes.trees.TreeViewerObject"
+            class="com.google.devtools.depan.eclipse.ui.nodes.trees.NodeViewAdapterFactory">
+         <adapter
+               type="depannodeui.Adapter6">
          </adapter>
       </factory>
       <factory

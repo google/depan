@@ -33,7 +33,7 @@ public class SolitaryRoot<E> extends PlatformObject {
   public String getLabel() {
     return label;
   }
-  
+
   public NodeWrapper<E>[] getChildren() {
     if (null == children) {
       children = nodes.computeRootWrappers();

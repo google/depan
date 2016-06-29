@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.view;
+package com.google.devtools.depan.collapse.model;
 
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphNode;

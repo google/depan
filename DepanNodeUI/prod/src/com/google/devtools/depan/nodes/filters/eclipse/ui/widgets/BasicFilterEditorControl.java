@@ -53,11 +53,11 @@ public class BasicFilterEditorControl extends Composite {
     setLayout(Widgets.buildContainerLayout(5));
 
     Label nameLabel = Widgets.buildCompactLabel(this, "Name: ");
-    nameText = Widgets.buildGridText(this);
+    nameText = Widgets.buildGridBoxedText(this);
     updateNameText();
 
     Label summaryLabel = Widgets.buildCompactLabel(this, "Summary: ");
-    summaryText = Widgets.buildGridText(this);
+    summaryText = Widgets.buildGridBoxedText(this);
     updateSummaryText();
 
     Button inferButton = Widgets.buildTrailPushButton(this, "Infer");

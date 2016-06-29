@@ -13,10 +13,9 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.google.devtools.depan.eclipse.trees;
+package com.google.devtools.depan.eclipse.ui.collapse.trees;
 
-import com.google.devtools.depan.eclipse.plugins.SourcePluginRegistry;
-import com.google.devtools.depan.view.CollapseData;
+import com.google.devtools.depan.collapse.model.CollapseData;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.model.IWorkbenchAdapter;
@@ -72,6 +71,8 @@ class CollapseDataWrapperAdapter<E> implements IWorkbenchAdapter {
 
   private ImageDescriptor getImageDescriptor(CollapseDataWrapper<E> wrapper) {
     CollapseData data = wrapper.getCollapseData();
-    return SourcePluginRegistry.getImageDescriptor(data.getMasterNode());
+    return null;
+    // TODO: Lookup node rendering image ..
+    // return SourcePluginRegistry.getImageDescriptor(data.getMasterNode());
   }
 }

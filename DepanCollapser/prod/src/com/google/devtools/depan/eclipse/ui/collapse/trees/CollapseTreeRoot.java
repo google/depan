@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.eclipse.trees;
+package com.google.devtools.depan.eclipse.ui.collapse.trees;
 
-import com.google.devtools.depan.view.CollapseData;
-import com.google.devtools.depan.view.CollapseTreeModel;
+import com.google.devtools.depan.collapse.model.CollapseData;
+import com.google.devtools.depan.collapse.model.CollapseTreeModel;
+import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeTreeProvider;
 
 import org.eclipse.core.runtime.PlatformObject;
 

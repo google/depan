@@ -30,6 +30,7 @@
 
     <!-- App/UI components -->
     <module>../DepanAppMin/prod</module>
+    <module>../DepanCollapser/prod</module>
     <module>../DepanEdgeUI/prod</module>
     <module>../DepanGraphDocUI/prod</module>
     <module>../DepanLayouts/prod</module>

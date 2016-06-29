@@ -14,7 +14,7 @@
  * the License.
  */
 
-package com.google.devtools.depan.eclipse.trees;
+package com.google.devtools.depan.eclipse.ui.collapse.trees;
 
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeSorter;
 import com.google.devtools.depan.model.GraphNode;
