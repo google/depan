@@ -16,6 +16,9 @@
 
 package com.google.devtools.depan.view_doc.eclipse.ui.widgets;
 
+import com.google.devtools.depan.eclipse.ui.nodes.trees.NodeWrapper;
+import com.google.devtools.depan.eclipse.ui.nodes.viewers.GraphNodeViewer;
+import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeViewerProvider;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.platform.AlphabeticSorter;
 import com.google.devtools.depan.platform.Colors;
@@ -32,17 +35,15 @@ import com.google.devtools.depan.view_doc.model.NodeLocationRepository;
 import com.google.devtools.depan.view_doc.model.Point2dUtils;
 
 import org.eclipse.jface.resource.StringConverter;
-import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CheckboxCellEditor;
 import org.eclipse.jface.viewers.ColorCellEditor;
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
 import org.eclipse.jface.viewers.ICellModifier;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
@@ -51,13 +52,12 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeColumn;
+import org.eclipse.swt.widgets.TreeItem;
 
 import java.awt.Color;
 import java.awt.geom.Point2D;
-import java.util.Collection;
 
 /**
  * Show a table of the nodes, with their attributes.  The attributes
@@ -90,6 +90,64 @@ public class NodeDisplayTableControl extends Composite {
     new EditColTableDef(COL_SIZE, true, COL_SIZE, 100),
     new EditColTableDef(COL_COLOR, true, COL_COLOR, 180)
   };
+
+  private class ControlGraphNodeViewer extends GraphNodeViewer {
+
+    /**
+     * @param parent
+     */
+    public ControlGraphNodeViewer(Composite parent) {
+      super(parent);
+    }
+
+    @Override
+    protected TreeViewer createTreeViewer(Composite parent) {
+      TreeViewer result = super.createTreeViewer(parent);
+      Tree tree = result.getTree();
+
+      // Initialize the table.
+      tree.setHeaderVisible(true);
+      tree.setToolTipText("Node Display Properties");
+      EditColTableDef.setupTree(TABLE_DEF, tree);
+
+      // Configure cell editing.
+      CellEditor[] cellEditors = new CellEditor[TABLE_DEF.length];
+      cellEditors[INDEX_NAME] = null;
+      cellEditors[INDEX_XPOS] = new TextCellEditor(tree);
+      cellEditors[INDEX_YPOS] = new TextCellEditor(tree);
+      cellEditors[INDEX_VISIBLE] = new CheckboxCellEditor(tree);
+      cellEditors[INDEX_SIZE] = new ComboBoxCellEditor(tree,
+          NodeDisplayTableControl.toString(
+              NodeDisplayProperty.Size.values(), true));
+      cellEditors[INDEX_COLOR] = new ColorCellEditor(tree);
+
+      result.setCellEditors(cellEditors);
+      result.setLabelProvider(new PartLabelProvider());
+      result.setColumnProperties(EditColTableDef.getProperties(TABLE_DEF));
+      result.setCellModifier(new EdgeDisplayCellModifier());
+
+      // Configure content last: use updateTable() to render relations
+      // result.setContentProvider(ArrayContentProvider.getInstance());
+
+      return result;
+    }
+
+    public Tree getTree() {
+      return (Tree) getTreeViewer().getControl();
+    }
+
+    public ITableLabelProvider getLabelProvider() {
+      return (ITableLabelProvider) getTreeViewer().getLabelProvider();
+    }
+
+    public void setSorter(ViewerSorter sorter) {
+      getTreeViewer().setSorter(sorter);
+    }
+
+    public void updateNodeColumns(GraphNode node, String[] cols) {
+      getTreeViewer().update(node, cols);
+    }
+  }
 
   /////////////////////////////////////
   // NodeDisplayProperty integration
@@ -134,7 +192,7 @@ public class NodeDisplayTableControl extends Composite {
   /////////////////////////////////////
   // UX Elements
 
-  private final TableViewer propViewer;
+  private final ControlGraphNodeViewer propViewer;
 
   /////////////////////////////////////
   // Public methods
@@ -143,41 +201,12 @@ public class NodeDisplayTableControl extends Composite {
     super(parent, SWT.NONE);
     setLayout(Widgets.buildContainerLayout(1));
 
-    propViewer = new TableViewer(this,
-        SWT.FULL_SELECTION | SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
-
-    // Set up layout properties.
-    Table propTableControl = propViewer.getTable();
-    propTableControl.setLayoutData(Widgets.buildGrabFillData());
-
-    // Initialize the table.
-    propTableControl.setHeaderVisible(true);
-    propTableControl.setToolTipText("Node Display Properties");
-    EditColTableDef.setupTable(TABLE_DEF, propTableControl);
-
-    // Configure cell editing.
-    CellEditor[] cellEditors = new CellEditor[TABLE_DEF.length];
-    cellEditors[INDEX_NAME] = null;
-    cellEditors[INDEX_XPOS] = new TextCellEditor(propTableControl);
-    cellEditors[INDEX_YPOS] = new TextCellEditor(propTableControl);
-    cellEditors[INDEX_VISIBLE] = new CheckboxCellEditor(propTableControl);
-    cellEditors[INDEX_SIZE] = new ComboBoxCellEditor(propTableControl,
-        toString(NodeDisplayProperty.Size.values(), true));
-    cellEditors[INDEX_COLOR] = new ColorCellEditor(propTableControl);
-
-    propViewer.setCellEditors(cellEditors);
-    propViewer.setLabelProvider(new PartLabelProvider());
-    propViewer.setColumnProperties(EditColTableDef.getProperties(TABLE_DEF));
-    propViewer.setCellModifier(new EdgeDisplayCellModifier());
-
-    // TODO: Add column sorters, filters?
-    configSorters(propTableControl);
-
-    // Configure content last: use updateTable() to render relations
-    propViewer.setContentProvider(ArrayContentProvider.getInstance());
+    propViewer = new ControlGraphNodeViewer(parent);
+    propViewer.setLayoutData(Widgets.buildGrabFillData());
+    configSorters(propViewer.getTree());
   }
 
-  private String[] toString(Object[] objs, boolean lowercase) {
+  private static String[] toString(Object[] objs, boolean lowercase) {
     String[] s = new String[objs.length];
     int i = 0;
     for (Object o : objs) {
@@ -186,18 +215,10 @@ public class NodeDisplayTableControl extends Composite {
     return s;
   }
 
-  /**
-   * Fill the list with {@link GraphNode}s.
-   * Since rendering depends on propRepo, set input after 
-   * the propRepo is installed.
-   */
-  public void setInput(Collection<GraphNode> nodes) {
-    propViewer.setInput(nodes);
-  }
-
-  public void refresh(boolean refresh) {
-    propViewer.refresh(refresh);
-  }
+  public void setInput(NodeViewerProvider provider) {
+    propViewer.setNvProvider(provider);
+    propViewer.refresh();
+}
 
   public void setNodeRepository(
       NodeLocationRepository posRepo,
@@ -225,7 +246,7 @@ public class NodeDisplayTableControl extends Composite {
   }
 
   private void updateNodeColumns(GraphNode node, String[] cols) {
-    propViewer.update(node, cols);
+    propViewer.updateNodeColumns(node, cols);
   }
 
   /////////////////////////////////////
@@ -333,46 +354,47 @@ public class NodeDisplayTableControl extends Composite {
   /////////////////////////////////////
   // Column sorting
 
-  private void configSorters(Table table) {
+  private void configSorters(Tree tree) {
     int index = 0;
-    for (TableColumn column : table.getColumns()) {
+    for (TreeColumn column : tree.getColumns()) {
       final int colIndex = index++;
 
       column.addSelectionListener(new SelectionAdapter() {
         @Override
         public void widgetSelected(SelectionEvent event) {
-          updateSortColumn((TableColumn) event.widget, colIndex);
+          updateSortColumn((TreeColumn) event.widget, colIndex);
         }
       });
     }
   }
 
-  private void updateSortColumn(TableColumn column, int colIndex) {
+  private void updateSortColumn(TreeColumn column, int colIndex) {
     setSortColumn(column, colIndex, getSortDirection(column));
   }
 
-  private int getSortDirection(TableColumn column) {
-    Table tableControl = (Table) propViewer.getControl();
-    if (column != tableControl.getSortColumn()) {
+  private int getSortDirection(TreeColumn column) {
+    Tree tree = propViewer.getTree();
+    if (column != tree.getSortColumn()) {
       return SWT.DOWN;
     }
     // If it is unsorted (SWT.NONE), assume down sort
-    return (SWT.DOWN == tableControl.getSortDirection())
+    return (SWT.DOWN == tree.getSortDirection())
         ? SWT.UP : SWT.DOWN;
   }
 
   private void setSortColumn(
-      TableColumn column, int colIndex, int direction) {
+      TreeColumn column, int colIndex, int direction) {
 
     ViewerSorter sorter = buildColumnSorter(colIndex);
     if (SWT.UP == direction) {
       sorter = new InverseSorter(sorter);
     }
 
-    Table tableControl = (Table) propViewer.getControl();
+    Tree tree = propViewer.getTree();
+    tree.setSortColumn(column);
+    tree.setSortDirection(direction);
+
     propViewer.setSorter(sorter);
-    tableControl.setSortColumn(column);
-    tableControl.setSortDirection(direction);
   }
 
   private ViewerSorter buildColumnSorter(int colIndex) {
@@ -394,6 +416,15 @@ public class NodeDisplayTableControl extends Composite {
     return result;
   }
 
+  @SuppressWarnings("unchecked")
+  private GraphNode getGraphNode(Object element) {
+    if (element instanceof NodeWrapper<?>) {
+      NodeWrapper<GraphNode> wrap = (NodeWrapper<GraphNode>) element;
+      return wrap.getNode();
+    }
+    return null;
+  }
+
   private class PositionSorter extends ViewerSorter {
 
     private final boolean useX;
@@ -410,10 +441,12 @@ public class NodeDisplayTableControl extends Composite {
     }
 
     private double getPosition(Object item) {
-      if (item instanceof GraphNode) {
-        Point2D position = posRepo.getLocation((GraphNode) item);
+      GraphNode node = getGraphNode(item);
+      if (null != node) {
+        Point2D position = posRepo.getLocation(node);
         return useX ? position.getX() : position.getY();
       }
+
       return 0.0;
     }
   }
@@ -428,8 +461,9 @@ public class NodeDisplayTableControl extends Composite {
     }
 
     private boolean isVisible(Object item) {
-      if (item instanceof GraphNode) {
-        return NodeDisplayTableControl.this.isVisible((GraphNode) item);
+      GraphNode node = getGraphNode(item);
+      if (null != node) {
+        return NodeDisplayTableControl.this.isVisible(node);
       }
       return false;
     }
@@ -443,8 +477,8 @@ public class NodeDisplayTableControl extends Composite {
 
     @Override
     public String getColumnText(Object element, int columnIndex) {
-      if (element instanceof GraphNode) {
-        GraphNode node = (GraphNode) element;
+      GraphNode node = getGraphNode(element);
+      if (null != node) {
         switch (columnIndex) {
         case INDEX_NAME:
           return node.toString();
@@ -463,8 +497,8 @@ public class NodeDisplayTableControl extends Composite {
 
     @Override
     public Image getColumnImage(Object element, int columnIndex) {
-      if (element instanceof GraphNode) {
-        GraphNode node = (GraphNode) element;
+      GraphNode node = getGraphNode(element);
+      if (null != node) {
         switch (columnIndex) {
         case INDEX_VISIBLE:
           return PlatformResources.getOnOff(isVisible(node));
@@ -487,10 +521,11 @@ public class NodeDisplayTableControl extends Composite {
 
     @Override
     public Object getValue(Object element, String property) {
-      if (!(element instanceof GraphNode)) {
+      GraphNode node = getGraphNode(element);
+      if (null == node) {
         return null;
       }
-      GraphNode node = (GraphNode) element;
+
       if (COL_XPOS.equals(property)) {
         return getXPos(node);
       }
@@ -517,15 +552,15 @@ public class NodeDisplayTableControl extends Composite {
 
     @Override
     public void modify(Object element, String property, Object value) {
-      if (!(element instanceof TableItem)) {
+      if (!(element instanceof TreeItem)) {
         return;
       }
-      Object modifiedObject = ((TableItem) element).getData();
-      if (!(modifiedObject instanceof GraphNode)) {
-        return;
-      }
+      Object modifiedObject = ((TreeItem) element).getData();
 
-      GraphNode node = (GraphNode) modifiedObject;
+      GraphNode node = getGraphNode(modifiedObject);
+      if (null == node) {
+        return;
+      }
       if (COL_XPOS.equals(property)) {
         updateLocationX(node, value);
         return;

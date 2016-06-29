@@ -86,6 +86,14 @@ public class GraphNodeViewer extends Composite {
   }
 
   /**
+   * Derived types sometimes need to manipulate the tree, such as
+   * for sorting.
+   */
+  protected TreeViewer getTreeViewer() {
+    return treeViewer;
+  }
+
+  /**
    * Can be overridden to provide a customized tree viewer.
    * For example, the derived type {@link CheckNodeTreeView}
    * uses a {@code CheckboxTreeViewer}.

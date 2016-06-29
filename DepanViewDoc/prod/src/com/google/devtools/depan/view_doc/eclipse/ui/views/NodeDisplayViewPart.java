@@ -16,6 +16,8 @@
 
 package com.google.devtools.depan.view_doc.eclipse.ui.views;
 
+import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeListViewProvider;
+import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeTreeProviders;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.view_doc.eclipse.ViewDocResources;
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
@@ -32,13 +34,14 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 import java.awt.geom.Point2D;
+import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * Tool to set display properties for individual nodes.
+ * Tool to view nodes and set their display properties.
  *
  * @author ycoppel@google.com (Yohann Coppel)
  */
@@ -46,9 +49,9 @@ public class NodeDisplayViewPart extends AbstractViewDocViewPart {
 
   public static final String PART_NAME = "Node Properties";
 
-  /**
-   * The <code>RelationSetEditorControl</code> that controls the UX.
-   */
+  /////////////////////////////////////
+  // UX Elements
+
   private NodeDisplayTableControl propEditor;
 
   /////////////////////////////////////
@@ -183,7 +186,7 @@ public class NodeDisplayViewPart extends AbstractViewDocViewPart {
   }
 
   /////////////////////////////////////
-  //
+  // ViewPart integration
 
   @Override
   public Image getTitleImage() {
@@ -222,10 +225,16 @@ public class NodeDisplayViewPart extends AbstractViewDocViewPart {
     posRepo = new PartNodeLocationRepo(editor);
     propEditor.setNodeRepository(posRepo, propRepo);
 
-    // TODO: Should come from editor
-    Collection<GraphNode> edges = editor.getExposedGraph().getNodes();
-    propEditor.setInput(edges);
-    propEditor.update();
+    Collection<GraphNode> nodes = editor.getExposedGraph().getNodes();
+    String name = editor.getPartName();
+    String label = MessageFormat.format(
+        "{0} [{1} exposed nodes]", name, nodes.size());
+
+    NodeListViewProvider<GraphNode> provider =
+        new NodeListViewProvider<GraphNode>(label, nodes);
+    provider.setProvider(NodeTreeProviders.GRAPH_NODE_PROVIDER);
+
+    propEditor.setInput(provider);
   }
 
   @Override
