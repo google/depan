@@ -16,7 +16,6 @@
 
 package com.google.devtools.depan.eclipse.ui.nodes.trees;
 
-import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeSorter;
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeTreeProvider;
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeViewerProvider;
 import com.google.devtools.depan.model.GraphModel;
@@ -28,7 +27,7 @@ import com.google.common.collect.Lists;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.viewers.ViewerSorter;
+import org.eclipse.jface.viewers.TreeViewer;
 
 import java.util.List;
 import java.util.Set;
@@ -50,11 +49,6 @@ public class GraphNodeViewProvider<T, E> implements NodeViewerProvider {
   private NodeTreeProvider<T> provider;
 
   private List<TreeDescr<E>> trees = Lists.newArrayList();
-
-  @Override
-  public ViewerSorter getViewSorter() {
-    return new NodeSorter();
-  }
 
   @Override
   public void addMultiActions(IMenuManager manager) {
@@ -85,5 +79,9 @@ public class GraphNodeViewProvider<T, E> implements NodeViewerProvider {
     GraphData solo = new GraphData(provider, model);
     result.add(new SolitaryRoot(solo, SOLITARY_NODES));
     return new ViewerRoot(result.toArray());
+  }
+
+  @Override
+  public void updateExpandState(TreeViewer viewer) {
   }
 }

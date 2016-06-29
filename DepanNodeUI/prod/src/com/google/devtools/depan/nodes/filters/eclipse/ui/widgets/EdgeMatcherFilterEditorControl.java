@@ -28,7 +28,6 @@ import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 
 import java.net.URI;
 import java.text.MessageFormat;

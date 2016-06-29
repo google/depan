@@ -117,6 +117,17 @@ public class NodeSupplierFactory {
     return result;
   }
 
+  /**
+   * In a completely disconnected graph, maxRank and maxDegree can both
+   * be zero.  Things should still render properly.
+   */
+  private static float divSafe(float num, float den, float alt) {
+    if (den == 0.0) {
+      return alt;
+    }
+    return num / den;
+  }
+
   /////////////////////////////////////
   // Jung based color supplier
 
@@ -144,8 +155,10 @@ public class NodeSupplierFactory {
   }
 
   public NodeColorSupplier getColorSupplier(GraphNode node) {
-    float voltagePercent = (float) (ranking.get(node) / maxRank);
-    float degreePercent = jungGraph.getPredecessorCount(node) / maxDegree;
+    float voltagePercent = divSafe(
+        ranking.get(node).floatValue(), maxRank.floatValue(), 0.0f);
+    float degreePercent = divSafe(
+        jungGraph.getPredecessorCount(node), maxDegree, 0.0f);
 
     return new JungStatsColorSupplier(voltagePercent, degreePercent);
   };
@@ -178,9 +191,10 @@ public class NodeSupplierFactory {
   }
 
   public NodeSizeSupplier getSizeSupplier(GraphNode node, NodeSize nodeSize) {
-    float voltagePercent = (float) (ranking.get(node) / maxRank);
+    float voltagePercent = divSafe(
+        ranking.get(node).floatValue(), maxRank.floatValue(), 0.0f);
     float inDegree = jungGraph.getPredecessorCount(node);
-    float degreePercent = (float) (inDegree  / maxDegree);
+    float degreePercent = divSafe(inDegree, maxDegree, 0.0f);
     float fixedSize = nodeSize.getSize(voltagePercent, degreePercent);
 
     return new JungStatsSizeSupplier(fixedSize, voltagePercent, degreePercent);
@@ -192,7 +206,7 @@ public class NodeSupplierFactory {
   public NodeRatioSupplier getRatioSupplier(GraphNode node) {
     float inDegree = jungGraph.getPredecessorCount(node);
     float outDegree = jungGraph.getSuccessorCount(node);
-    float ratio = (float) ((inDegree + outDegree) / maxDegree);
+    float ratio = divSafe(inDegree + outDegree, maxDegree, 0.0f);
 
     return new NodeRatioSupplier.Simple(ratio);
   };

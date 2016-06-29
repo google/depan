@@ -17,7 +17,6 @@
 package com.google.devtools.depan.nodes.filters.eclipse.ui.filters;
 
 import com.google.devtools.depan.nodes.filters.eclipse.ui.plugins.ContextualFilterContributor;
-import com.google.devtools.depan.nodes.filters.eclipse.ui.plugins.ContextualFilterWizard;
 import com.google.devtools.depan.nodes.filters.model.ContextualFilter;
 
 import java.text.MessageFormat;

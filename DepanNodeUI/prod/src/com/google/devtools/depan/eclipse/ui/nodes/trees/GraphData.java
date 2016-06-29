@@ -57,7 +57,7 @@ public class GraphData<F> {
   // Cache the root objects, so the root objects are the same one.
   private Collection<GraphNode> rootNodes;
   private NodeWrapper<F>[] rootWrapper;
-  private NodeWrapperRoot<F> hierarchyRoots;
+  private ViewerRoot hierarchyRoots;
 
   /**
    * Comprehensive constructor for GraphData.
@@ -105,9 +105,9 @@ public class GraphData<F> {
   /**
    * @return the hierarchyRoots
    */
-  public NodeWrapperRoot<F> getHierarchyRoots() {
+  public ViewerRoot getHierarchyRoots() {
     if (null == hierarchyRoots) {
-      hierarchyRoots = new NodeWrapperRoot<F>(computeRootWrappers());
+      hierarchyRoots = new ViewerRoot(computeRootWrappers());
     }
     return hierarchyRoots;
   }

@@ -18,25 +18,18 @@ package com.google.devtools.depan.eclipse.ui.nodes.viewers;
 
 import com.google.devtools.depan.eclipse.ui.nodes.trees.GraphData;
 import com.google.devtools.depan.eclipse.ui.nodes.trees.SolitaryRoot;
-import com.google.devtools.depan.eclipse.ui.nodes.trees.TreeDescr;
 import com.google.devtools.depan.eclipse.ui.nodes.trees.ViewerRoot;
-import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeSorter;
-import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeTreeProvider;
-import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeViewerProvider;
-import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.nodes.trees.TreeModel;
 
 import com.google.common.collect.Lists;
 
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IAction;
+import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.viewers.ViewerSorter;
+import org.eclipse.jface.viewers.TreeViewer;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 /**
  * {@link NodeViewerProvider} for node lists (non-hierarchical).
@@ -63,11 +56,6 @@ public class NodeListViewProvider<T> implements NodeViewerProvider {
   }
 
   @Override
-  public ViewerSorter getViewSorter() {
-    return new NodeSorter();
-  }
-
-  @Override
   public void addMultiActions(IMenuManager manager) {
   }
 
@@ -77,12 +65,19 @@ public class NodeListViewProvider<T> implements NodeViewerProvider {
 
   @Override
   @SuppressWarnings({ "rawtypes", "unchecked" })
-  public ViewerRoot buildViewerRoots() {
-    List<Object> result = Lists.newArrayList();
+  public PlatformObject buildViewerRoots() {
+    List<PlatformObject> result = Lists.newArrayList();
 
     TreeModel.Flat model = new TreeModel.Flat(nodes);
     GraphData solo = new GraphData(provider, model);
     result.add(new SolitaryRoot(solo, listLabel));
     return new ViewerRoot(result.toArray());
+  }
+
+  @Override
+  public void updateExpandState(TreeViewer viewer) {
+    if (nodes.size() < NodeViewerProvider.AUTO_EXPAND_LIMIT) {
+      viewer.expandAll();
+    }
   }
 }

@@ -52,8 +52,6 @@ public class NodeViewAdapterFactory<E> implements IAdapterFactory {
     result.add(new TypeAdapter(
         NodeWrapper.class, new NodeWrapperAdapter<E>()));
     result.add(new TypeAdapter(
-        NodeWrapperRoot.class, new NodeWrapperRootAdapter<E>()));
-    result.add(new TypeAdapter(
         SolitaryRoot.class, new SolitaryRootAdapter()));
     result.add(new TypeAdapter(
         ViewerRoot.class, new ViewerRootAdapter()));

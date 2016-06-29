@@ -22,7 +22,10 @@ import com.google.devtools.depan.model.GraphNode;
 
 import com.google.common.collect.Sets;
 
+import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
+import org.eclipse.jface.viewers.ICheckStateListener;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
@@ -32,30 +35,41 @@ import java.util.Set;
 
 /**
  * @author ycoppel@google.com (Yohann Coppel)
- *
- * @param <E> The type of the treeView
  */
-public class CheckNodeTreeView<E> extends NodeTreeView<E> {
+public class CheckNodeTreeView extends GraphNodeViewer {
 
-  public CheckNodeTreeView(Composite parent, int style) {
-    super(parent, style);
+  private CheckboxTreeViewer tree;
+
+  private boolean recursiveTreeSelect;
+
+  public CheckNodeTreeView(Composite parent) {
+    super(parent);
   }
 
   @Override
-  protected void initWidget(Composite parent, int style) {
-    tree = new CheckboxTreeViewer(parent, style);
-    tree.setLabelProvider(new WorkbenchLabelProvider());
-    tree.setContentProvider(new BaseWorkbenchContentProvider());
-    tree.setSorter(new NodeWrapperTreeSorter());
+  protected CheckboxTreeViewer createTreeViewer(Composite parent) {
+    int style = SWT.VIRTUAL | SWT.FULL_SELECTION | SWT.BORDER
+        | SWT.H_SCROLL | SWT.V_SCROLL;
+    CheckboxTreeViewer result = new CheckboxTreeViewer(parent, style);
+    result.setLabelProvider(new WorkbenchLabelProvider());
+    result.setContentProvider(new BaseWorkbenchContentProvider());
+    result.setSorter(new NodeWrapperTreeSorter());
+
+    result.addCheckStateListener(new ICheckStateListener() {
+      @Override
+      public void checkStateChanged(CheckStateChangedEvent event) {
+        if (recursiveTreeSelect) {
+          tree.setSubtreeChecked(event.getElement(), event.getChecked());
+        }
+      }
+    });
+
+    tree = result;
+    return result;
   }
 
-  public CheckboxTreeViewer getCheckboxTreeViewer() {
-    return (CheckboxTreeViewer) tree;
-  }
-
-
-  private Object[] getCheckedElements() {
-    return getCheckboxTreeViewer().getCheckedElements();
+  public void setRecursive(boolean recursiveTreeSelect) {
+    this.recursiveTreeSelect = recursiveTreeSelect;
   }
 
   public GraphNode getFirstNode() {
@@ -77,4 +91,8 @@ public class CheckNodeTreeView<E> extends NodeTreeView<E> {
     }
     return result;
   };
+
+  private Object[] getCheckedElements() {
+    return tree.getCheckedElements();
+  }
 }

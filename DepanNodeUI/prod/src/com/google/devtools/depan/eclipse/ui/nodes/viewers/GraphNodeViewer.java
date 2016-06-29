@@ -18,15 +18,14 @@ package com.google.devtools.depan.eclipse.ui.nodes.viewers;
 
 import com.google.devtools.depan.eclipse.ui.nodes.NodesUIResources;
 import com.google.devtools.depan.eclipse.ui.nodes.trees.NodeWrapperTreeSorter;
-import com.google.devtools.depan.eclipse.ui.nodes.trees.ViewerRoot;
 
+import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -46,8 +45,6 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
  * Provide tree structured viewer for all node lists.
  * 
  * @author <a href='mailto:leeca@pnambic.com'>Lee Carver</a>
- *
- * @param <T>
  */
 public class GraphNodeViewer extends Composite {
 
@@ -56,19 +53,10 @@ public class GraphNodeViewer extends Composite {
 
   private NodeViewerProvider provider;
 
+  /////////////////////////////////////
   // UX Elements
-  /** Provides a tree view of the collapseData. */
+
   private TreeViewer treeViewer;
-
-  public void setNvProvider(NodeViewerProvider nvProvider) {
-    this.provider = nvProvider;
-  }
-
-  public void refresh() {
-    ViewerRoot treeRoots = provider.buildViewerRoots();
-    treeViewer.setInput(treeRoots);
-    treeViewer.refresh();
-  }
 
   public GraphNodeViewer(Composite parent) {
     super(parent, SWT.NONE);
@@ -81,19 +69,34 @@ public class GraphNodeViewer extends Composite {
     ToolBar rightOptions = createToolBar(optionsSection);
     rightOptions.setLayoutData(new GridData(SWT.END, SWT.FILL, true, false));
 
-    ViewerSorter sorter = SORTER; // provider.getViewSorter();
-    treeViewer = createTreeViewer(this, sorter);
+    treeViewer = createTreeViewer(this);
     treeViewer.getControl().setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, true, true));
   }
 
-  private TreeViewer createTreeViewer(Composite parent, ViewerSorter sorter) {
+  public void setNvProvider(NodeViewerProvider nvProvider) {
+    this.provider = nvProvider;
+  }
+
+  public void refresh() {
+    PlatformObject treeRoots = provider.buildViewerRoots();
+    treeViewer.setInput(treeRoots);
+    provider.updateExpandState(treeViewer);
+    treeViewer.refresh();
+  }
+
+  /**
+   * Can be overridden to provide a customized tree viewer.
+   * For example, the derived type {@link CheckNodeTreeView}
+   * uses a {@code CheckboxTreeViewer}.
+   */
+  protected TreeViewer createTreeViewer(Composite parent) {
     int style = SWT.VIRTUAL | SWT.FULL_SELECTION | SWT.BORDER
         | SWT.H_SCROLL | SWT.V_SCROLL;
     TreeViewer result = new TreeViewer(parent, style);
     result.setLabelProvider(new WorkbenchLabelProvider());
     result.setContentProvider(new BaseWorkbenchContentProvider());
-    result.setSorter(sorter);
+    result.setSorter(SORTER);
 
     setupHierarchyMenu(result);
 

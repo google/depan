@@ -17,5 +17,36 @@
             id="com.google.devtools.depan.nodes.filters.eclipse.ui.filters.NodeKindContribution">
       </filter>
    </extension>
+   <extension
+         point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="com.google.devtools.depan.eclipse.ui.nodes.trees.HierarchyRoot"
+            class="com.google.devtools.depan.eclipse.ui.nodes.trees.NodeViewAdapterFactory">
+         <adapter
+               type="depannodeui.Adapter1">
+         </adapter>
+      </factory>
+      <factory
+            adaptableType="com.google.devtools.depan.eclipse.ui.nodes.trees.NodeWrapper"
+            class="com.google.devtools.depan.eclipse.ui.nodes.trees.NodeViewAdapterFactory">
+         <adapter
+               type="depannodeui.Adapter2">
+         </adapter>
+      </factory>
+      <factory
+            adaptableType="com.google.devtools.depan.eclipse.ui.nodes.trees.SolitaryRoot"
+            class="com.google.devtools.depan.eclipse.ui.nodes.trees.NodeViewAdapterFactory">
+         <adapter
+               type="depannodeui.Adapter5">
+         </adapter>
+      </factory>
+      <factory
+            adaptableType="com.google.devtools.depan.eclipse.ui.nodes.trees.ViewerRoot"
+            class="com.google.devtools.depan.eclipse.ui.nodes.trees.NodeViewAdapterFactory">
+         <adapter
+               type="depannodeui.Adapter4">
+         </adapter>
+      </factory>
+   </extension>
 
 </plugin>

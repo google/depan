@@ -17,6 +17,7 @@
 package com.google.devtools.depan.view_doc.eclipse.ui.views;
 
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.GraphNodeViewer;
+import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeListViewProvider;
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeTreeProviders;
 import com.google.devtools.depan.graph_doc.eclipse.ui.plugins.FromGraphDocContributor;
 import com.google.devtools.depan.graph_doc.eclipse.ui.plugins.FromGraphDocWizard;
@@ -43,6 +44,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 
+import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -257,14 +259,27 @@ public class NodeFilterViewPart extends AbstractViewDocViewPart {
 
     filterControl.setInput(editor.getActiveNodeFilter());
 
-    EditorNodeViewProvider<GraphNode> provider =
-        new EditorNodeViewProvider<GraphNode>(
-            editor, NodeTreeProviders.GRAPH_NODE_PROVIDER);
-    sources.setNvProvider(provider);
-    sources.refresh();
+    refreshSources();
 
     listener = new PartViewPrefsListener() ;
     editor.addViewPrefsListener(listener);
+  }
+
+  private void refreshSources() {
+
+    ViewEditor editor = getEditor();
+
+    Collection<GraphNode> nodes = editor.getSelectedNodes();
+    String name = editor.getPartName();
+    String label = MessageFormat.format(
+        "{0} [{1} selected nodes]", name, nodes.size());
+
+    NodeListViewProvider<GraphNode> provider =
+        new NodeListViewProvider<GraphNode>(label, nodes);
+    provider.setProvider(NodeTreeProviders.GRAPH_NODE_PROVIDER);
+
+    sources.setNvProvider(provider);
+    sources.refresh();
   }
 
   @Override
@@ -282,7 +297,7 @@ public class NodeFilterViewPart extends AbstractViewDocViewPart {
     public void selectionChanged(Collection<GraphNode> previous,
         Collection<GraphNode> current, Object author) {
       if (author != this) {
-        sources.refresh();
+        refreshSources();
       }
     }
   }

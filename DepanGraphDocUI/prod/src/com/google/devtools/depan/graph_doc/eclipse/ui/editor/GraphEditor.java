@@ -21,7 +21,7 @@ import com.google.devtools.depan.eclipse.ui.nodes.trees.GraphData;
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.CheckNodeTreeView;
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.HierarchyViewer;
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.HierarchyViewer.HierarchyChangeListener;
-import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeTreeProvider;
+import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeTreeProviders;
 import com.google.devtools.depan.graph_doc.GraphDocLogger;
 import com.google.devtools.depan.graph_doc.eclipse.ui.plugins.FromGraphDocContributor;
 import com.google.devtools.depan.graph_doc.eclipse.ui.plugins.FromGraphDocWizard;
@@ -31,12 +31,10 @@ import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptors;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.platform.ResourceCache;
+import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.viewers.CheckStateChangedEvent;
-import org.eclipse.jface.viewers.CheckboxTreeViewer;
-import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -58,25 +56,29 @@ import java.util.Arrays;
 import java.util.Collection;
 
 /**
+ * Show the entire set of nodes from an analysis tree.  Allow the user
+ * to select interesting subsets for more detailed investigation.
+ * 
  * @author ycoppel@google.com (Yohann Coppel)
  */
-public class GraphEditor
-    extends MultiPageEditorPart
-    implements NodeTreeProvider<GraphNode> {
+public class GraphEditor extends MultiPageEditorPart {
 
   public static final String ID =
       "com.google.devtools.depan.graph_doc.eclipse.ui.editor.GraphEditor";
 
+  private static final boolean RECURSIVE_SELECT_DEFAULT = true;
+
   private IFile file = null;
+
   private GraphDocument graph = null;
 
-  private CheckboxTreeViewer tree = null;
   private List associatedViews = null;
-  private boolean recursiveTreeSelect = true;
-  private CheckNodeTreeView<GraphNode> checkNodeTreeView = null;
 
   /////////////////////////////////////
-  // UX Components
+  // UX Elements
+
+  private CheckNodeTreeView checkNodeTreeView = null;
+
   private FromGraphDocListControl fromGraphDoc;
 
   // TODO(leeca): Figure out how to turn this back on
@@ -87,14 +89,53 @@ public class GraphEditor
   private HierarchyCache<GraphNode> hierarchies;
 
   /////////////////////////////////////
-  // Access state
+  // Public methods
 
-  protected void setRecursiveSelect(boolean state) {
-    this.recursiveTreeSelect = state;
+  @Override
+  public void init(IEditorSite site, IEditorInput input)
+      throws PartInitException {
+    super.init(site, input);
+    if (!(input instanceof IFileEditorInput)) {
+      throw new PartInitException("Invalid Input: Must be IFileEditorInput");
+    }
+
+    // load the graph
+    file = ((IFileEditorInput) input).getFile();
+
+    GraphDocLogger.LOG.info("Reading " + file.getRawLocationURI());
+    graph = ResourceCache.fetchGraphDocument(file);
+    GraphDocLogger.LOG.info("  DONE");
+
+    hierarchies = new HierarchyCache<GraphNode>(
+        NodeTreeProviders.GRAPH_NODE_PROVIDER, graph.getGraph());
+    handleHierarchyChanged();
+
+    // set the title to the filename, excepted the file extension
+    String title = file.getName();
+    title = title.substring(0, title.lastIndexOf('.'));
+    this.setPartName(title);
+  }
+
+  @Override
+  public void doSave(IProgressMonitor monitor) {
+  }
+
+  @Override
+  public void doSaveAs() {
+  }
+
+  @Override
+  public boolean isSaveAsAllowed() {
+    return false;
+  }
+
+  @Override
+  public void dispose() {
+    super.dispose();
   }
 
   /////////////////////////////////////
-  // Create visual controls
+  // UX Setup
 
   @Override
   protected void createPages() {
@@ -125,17 +166,12 @@ public class GraphEditor
     // recursive select options
     final Button recursiveSelect = new Button(top, SWT.CHECK);
     recursiveSelect.setText("Recursive select in tree");
-    recursiveSelect.setSelection(recursiveTreeSelect);
     recursiveSelect.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
         setRecursiveSelect(recursiveSelect.getSelection());
       }
     });
-
-    // TODO: Launch installable sub-editors
-    // Composite layoutRegion = setupLayoutChoice(top);
-    // layoutChoices = setupLayoutChoices(top);
 
     Button create = new Button(top, SWT.PUSH);
     create.setText("Create view");
@@ -157,19 +193,11 @@ public class GraphEditor
     fromGraphDoc = new FromGraphDocListControl(top);
 
     // tree --------------------
-    checkNodeTreeView = new CheckNodeTreeView<GraphNode>(
-        composite, SWT.VIRTUAL | SWT.FULL_SELECTION | SWT.BORDER);
+    checkNodeTreeView = new CheckNodeTreeView(composite);
+    checkNodeTreeView.setLayoutData(Widgets.buildGrabFillData());
 
-    tree = checkNodeTreeView.getCheckboxTreeViewer();
-    tree.getTree().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-    tree.addCheckStateListener(new ICheckStateListener() {
-      @Override
-      public void checkStateChanged(CheckStateChangedEvent event) {
-        if (recursiveTreeSelect) {
-          tree.setSubtreeChecked(event.getElement(), event.getChecked());
-        }
-      }
-    });
+    recursiveSelect.setSelection(RECURSIVE_SELECT_DEFAULT);
+    checkNodeTreeView.setRecursive(recursiveSelect.getSelection());
     handleHierarchyChanged();
 
     int index = addPage(composite);
@@ -191,22 +219,6 @@ public class GraphEditor
         }
       });
     return result;
-  }
-
-  /**
-   * Really should have separate edge matchers from default display
-   * relation.
-   * 
-   * TODO: Separate hierarchy edge matcher from display relation set.
-   */
-  private GraphEdgeMatcherDescriptor getDefaultEdgeMatcher() {
-    return GraphEdgeMatcherDescriptors.FORWARD;
-  }
-
-  private java.util.List<GraphEdgeMatcherDescriptor> getEdgeMatcherChoices() {
-    return Arrays.asList(
-        GraphEdgeMatcherDescriptors.FORWARD,
-        GraphEdgeMatcherDescriptors.EMPTY);
   }
 
   private void createPage1() {
@@ -253,6 +265,51 @@ public class GraphEditor
     setPageText(index, "Opened related Views");
   }
 
+  /////////////////////////////////////
+  // UX Actions
+
+  private void setRecursiveSelect(boolean state) {
+    checkNodeTreeView.setRecursive(state);
+  }
+
+  private void handleHierarchyChanged() {
+    if (null == checkNodeTreeView) {
+      return;
+    }
+    if (null == hierarchyView) {
+      return;
+    }
+
+    GraphDocLogger.LOG.info("Initialize graph...");
+    GraphData<GraphNode> graphData = hierarchyView.getGraphData();
+
+    GraphEditorNodeViewProvider<GraphNode> provider =
+        new GraphEditorNodeViewProvider<GraphNode>(graphData);
+    checkNodeTreeView.setNvProvider(provider);
+    checkNodeTreeView.refresh();
+
+    GraphDocLogger.LOG.info("  DONE");
+  }
+
+  /////////////////////////////////////
+  // Support methods
+
+  /**
+   * Really should have separate edge matchers from default display
+   * relation.
+   * 
+   * TODO: Separate hierarchy edge matcher from display relation set.
+   */
+  private GraphEdgeMatcherDescriptor getDefaultEdgeMatcher() {
+    return GraphEdgeMatcherDescriptors.FORWARD;
+  }
+
+  private java.util.List<GraphEdgeMatcherDescriptor> getEdgeMatcherChoices() {
+    return Arrays.asList(
+        GraphEdgeMatcherDescriptors.FORWARD,
+        GraphEdgeMatcherDescriptors.EMPTY);
+  }
+
   protected void selectView() {
 /* TODO(leeca):  Need richer ReferencedGraphModel
     associatedViews.getSelectionIndices();
@@ -287,11 +344,14 @@ public class GraphEditor
 */
   }
 
+  /////////////////////////////////////
+  // Create Views
+
   /**
    * Create a new Graph Visualization editor from the selected tree elements
    * and other {@code GraphEditor} settings.
    */
-  protected void createViewEditor() {
+  private void createViewEditor() {
     GraphNode topNode = checkNodeTreeView.getFirstNode();
     if (null == topNode) {
       GraphDocLogger.LOG.info("no topNode");
@@ -322,66 +382,5 @@ public class GraphEditor
     Shell shell = getSite().getWorkbenchWindow().getShell();
     WizardDialog dialog = new WizardDialog(shell, wizard);
     dialog.open();
-  }
-
-  @Override
-  public void init(IEditorSite site, IEditorInput input)
-      throws PartInitException {
-    super.init(site, input);
-    if (!(input instanceof IFileEditorInput)) {
-      throw new PartInitException("Invalid Input: Must be IFileEditorInput");
-    }
-
-    // load the graph
-    file = ((IFileEditorInput) input).getFile();
-
-    GraphDocLogger.LOG.info("Reading " + file.getRawLocationURI());
-    graph = ResourceCache.fetchGraphDocument(file);
-    GraphDocLogger.LOG.info("  DONE");
-
-    hierarchies = new HierarchyCache<GraphNode>(this, graph.getGraph());
-    handleHierarchyChanged();
-
-    // set the title to the filename, excepted the file extension
-    String title = file.getName();
-    title = title.substring(0, title.lastIndexOf('.'));
-    this.setPartName(title);
-  }
-
-  @Override
-  public void doSave(IProgressMonitor monitor) {
-  }
-
-  @Override
-  public void doSaveAs() {
-  }
-
-  @Override
-  public boolean isSaveAsAllowed() {
-    return false;
-  }
-
-  @Override
-  public void dispose() {
-    super.dispose();
-  }
-
-  @Override
-  public GraphNode getObject(GraphNode node) {
-    return node;
-  }
-
-  private void handleHierarchyChanged() {
-    if (null == checkNodeTreeView) {
-      return;
-    }
-    if (null == hierarchyView) {
-      return;
-    }
-
-    GraphDocLogger.LOG.info("Initialize graph...");
-    GraphData<GraphNode> graphData = hierarchyView.getGraphData();
-    checkNodeTreeView.updateData(graphData);
-    GraphDocLogger.LOG.info("  DONE");
   }
 }
