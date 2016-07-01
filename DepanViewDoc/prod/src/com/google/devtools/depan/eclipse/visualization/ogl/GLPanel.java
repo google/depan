@@ -244,7 +244,12 @@ public class GLPanel extends GLScene {
 
     renderer.postFrame();
 
+    // Very small diagrams, e.g. a single collapsed node,
+    // consume no drawing space.
     Rectangle2D drawing = renderer.getDrawing().getDrawingBounds();
+    if (null == drawing) {
+      return;
+    }
     Rectangle2D viewport = getOGLViewport();
     getRendererCallback().updateDrawingBounds(drawing, viewport);
     if (isNowStable()) {
@@ -449,6 +454,16 @@ public class GLPanel extends GLScene {
 
   public void updateNodeLocations(Map<GraphNode, Point2D> locations) {
     changeNodeLocations(PositionChangers.DIRECT, locations);
+  }
+
+  public void unCollapse(GraphNode child, GraphNode master) {
+    renderer.getCollapsePlugin().unCollapse(
+        node2property(child), node2property(master));
+  }
+
+  public void collapseUnder(GraphNode child, GraphNode master) {
+    renderer.getCollapsePlugin().collapseUnder(
+        node2property(child), node2property(master));
   }
 
   /////////////////////////////////////

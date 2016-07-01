@@ -161,14 +161,16 @@ public class CollapsePlugin implements NodeRenderingPlugin, EdgeRenderingPlugin 
   }
 
   private static class DeltaCollapse {
+
     float dxAtCollapse = 0f;
     float dyAtCollapse = 0f;
+
     boolean reachedParent = false;
+
     public DeltaCollapse(float dxAtCollapse, float dyAtCollapse) {
       this.dxAtCollapse = dxAtCollapse;
       this.dyAtCollapse = dyAtCollapse;
     }
-
   }
 
 }

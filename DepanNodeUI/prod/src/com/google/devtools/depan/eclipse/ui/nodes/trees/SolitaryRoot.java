@@ -20,13 +20,13 @@ import org.eclipse.core.runtime.PlatformObject;
 
 public class SolitaryRoot<E> extends PlatformObject {
 
-  private final GraphData<E> nodes;
+  private final GraphData<E> data;
   private final String label;
 
   private NodeWrapper<E>[] children;
 
   public SolitaryRoot(GraphData<E> nodes, String label) {
-    this.nodes = nodes;
+    this.data = nodes;
     this.label = label;
   }
 
@@ -36,8 +36,12 @@ public class SolitaryRoot<E> extends PlatformObject {
 
   public NodeWrapper<E>[] getChildren() {
     if (null == children) {
-      children = nodes.computeRootWrappers();
+      children = data.computeRootWrappers();
     }
     return children;
+  }
+
+  protected GraphData<E> getGraphData() {
+    return data;
   }
 }

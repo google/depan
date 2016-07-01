@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.view_doc.eclipse.ui.views;
 
+import com.google.devtools.depan.collapse.model.CollapseData;
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeViewerProvider;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
@@ -31,6 +32,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 
 import java.awt.geom.Point2D;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -49,6 +51,8 @@ public class NodeDisplayViewPart extends AbstractViewDocViewPart {
 
   private NodeDisplayTableControl propEditor;
 
+  private CompactPrefsListener compactListener;
+
   /////////////////////////////////////
   // Display attribute integration
 
@@ -59,7 +63,7 @@ public class NodeDisplayViewPart extends AbstractViewDocViewPart {
 
     private final ViewEditor editor;
 
-    private PartPrefsListener prefsListener;
+    private DisplayPrefsListener prefsListener;
 
     public PartEdgeDisplayRepo(ViewEditor editor) {
       this.editor = editor;
@@ -77,7 +81,7 @@ public class NodeDisplayViewPart extends AbstractViewDocViewPart {
 
     @Override
     public void addChangeListener(ChangeListener listener) {
-      prefsListener = new PartPrefsListener(listener);
+      prefsListener = new DisplayPrefsListener(listener);
       editor.addViewPrefsListener(prefsListener);
     }
 
@@ -89,11 +93,11 @@ public class NodeDisplayViewPart extends AbstractViewDocViewPart {
     }
   }
 
-  private static class PartPrefsListener extends ViewPrefsListener.Simple {
+  private static class DisplayPrefsListener extends ViewPrefsListener.Simple {
 
     private NodeDisplayRepository.ChangeListener listener;
 
-    public PartPrefsListener(NodeDisplayRepository.ChangeListener listener) {
+    public DisplayPrefsListener(NodeDisplayRepository.ChangeListener listener) {
       this.listener = listener;
     }
 
@@ -218,13 +222,41 @@ public class NodeDisplayViewPart extends AbstractViewDocViewPart {
     posRepo = new PartNodeLocationRepo(editor);
     propEditor.setNodeRepository(posRepo, propRepo);
 
-    NodeViewerProvider provider = editor.getNodeViewProvider();
-    propEditor.setInput(provider);
+    updateInput();
+
+    compactListener = new CompactPrefsListener();
+    editor.addViewPrefsListener(compactListener);
   }
 
   @Override
   protected void releaseResources() {
     propEditor.removeNodeRepository(posRepo, propRepo);
     propRepo = null;
+
+    if (null != compactListener) {
+      getEditor().removeViewPrefsListener(compactListener);
+      compactListener = null;
+    }
+  }
+
+  private void updateInput() {
+    NodeViewerProvider provider = getEditor().getNodeViewProvider();
+    propEditor.setInput(provider);
+  }
+
+  private class CompactPrefsListener extends ViewPrefsListener.Simple {
+
+    @Override
+    public void collapseChanged(
+        Collection<CollapseData> created,
+        Collection<CollapseData> removed,
+        Object author) {
+      updateInput();
+    }
+
+    @Override
+    public void nodeTreeChanged() {
+      updateInput();
+    }
   }
 }

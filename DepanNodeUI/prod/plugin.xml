@@ -23,28 +23,28 @@
             adaptableType="com.google.devtools.depan.eclipse.ui.nodes.trees.NodeWrapper"
             class="com.google.devtools.depan.eclipse.ui.nodes.trees.NodeViewAdapterFactory">
          <adapter
-               type="depannodeui.Adapter2">
+               type="org.eclipse.ui.model.IWorkbenchAdapter">
          </adapter>
       </factory>
       <factory
             adaptableType="com.google.devtools.depan.eclipse.ui.nodes.trees.SolitaryRoot"
             class="com.google.devtools.depan.eclipse.ui.nodes.trees.NodeViewAdapterFactory">
          <adapter
-               type="depannodeui.Adapter5">
+               type="org.eclipse.ui.model.IWorkbenchAdapter">
          </adapter>
       </factory>
       <factory
             adaptableType="com.google.devtools.depan.eclipse.ui.nodes.trees.TreeViewerObject"
             class="com.google.devtools.depan.eclipse.ui.nodes.trees.NodeViewAdapterFactory">
          <adapter
-               type="depannodeui.Adapter6">
+               type="org.eclipse.ui.model.IWorkbenchAdapter">
          </adapter>
       </factory>
       <factory
             adaptableType="com.google.devtools.depan.eclipse.ui.nodes.trees.ViewerRoot"
             class="com.google.devtools.depan.eclipse.ui.nodes.trees.NodeViewAdapterFactory">
          <adapter
-               type="depannodeui.Adapter4">
+               type="org.eclipse.ui.model.IWorkbenchAdapter">
          </adapter>
       </factory>
    </extension>

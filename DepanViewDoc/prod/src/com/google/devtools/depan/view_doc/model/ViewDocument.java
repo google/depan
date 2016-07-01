@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.view_doc.model;
 
+import com.google.devtools.depan.collapse.model.Collapser;
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeTreeProvider;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.api.RelationSet;
@@ -25,6 +26,7 @@ import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.builder.api.GraphBuilders;
+import com.google.devtools.depan.nodes.trees.TreeModel;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 
 import com.google.common.collect.ImmutableList;
@@ -33,6 +35,7 @@ import org.eclipse.core.resources.IResource;
 
 import java.awt.geom.Point2D;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -231,6 +234,53 @@ public class ViewDocument {
   }
 
   /////////////////////////////////////
+  // Manage scene preference
+
+  public ScenePreferences getScenePrefs() {
+    return userPrefs.getScenePrefs();
+  }
+
+  public void setScenePrefs(ScenePreferences prefs) {
+    userPrefs.setScenePrefs(prefs);
+  }
+
+  /////////////////////////////////////
+  // Node view compression
+
+  public List<GraphEdgeMatcherDescriptor> getTreeDescriptors() {
+    return userPrefs.getTreeDescriptors();
+  }
+
+  public void addNodeTreeHierarchy(GraphEdgeMatcherDescriptor matcher) {
+    userPrefs.addNodeTreeHierarchy(matcher);
+  }
+
+  public void removeNodeTreeHierarchy(GraphEdgeMatcherDescriptor matcher) {
+    userPrefs.removeNodeTreeHierarchy(matcher);
+  }
+
+  public Collapser getCollapser() {
+    return userPrefs.getCollapser();
+  }
+
+  /**
+   * @param viewGraph
+   * @param treeModel
+   */
+  public void collapseTree(GraphModel viewGraph, TreeModel treeModel) {
+    userPrefs.collapseTree(viewGraph, treeModel);
+  }
+
+  public void collapseNodeList(
+      GraphNode master, Collection<GraphNode> children) {
+    userPrefs.collapseNodeList(master, children);
+  }
+
+    public void uncollapseMasterNode(GraphNode master) {
+    userPrefs.uncollapseMasterNode(master);
+  }
+
+  /////////////////////////////////////
   // Factories for derived instances
 
   /**
@@ -249,17 +299,6 @@ public class ViewDocument {
     ViewPreferences newPrefs =
         ViewPreferences.buildFilteredNodes(userPrefs, newView);
     return new ViewDocument(parentGraph, newView, newPrefs);
-  }
-
-  /////////////////////////////////////
-  // Manage scene preference
-
-  public ScenePreferences getScenePrefs() {
-    return userPrefs.getScenePrefs();
-  }
-
-  public void setScenePrefs(ScenePreferences prefs) {
-    userPrefs.setScenePrefs(prefs);
   }
 
   /////////////////////////////////////

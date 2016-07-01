@@ -16,12 +16,17 @@
 
 package com.google.devtools.depan.view_doc.eclipse.ui.trees;
 
+import com.google.devtools.depan.eclipse.ui.collapse.trees.CollapseDataWrapper;
+import com.google.devtools.depan.eclipse.ui.collapse.trees.CollapseTreeRoot;
 import com.google.devtools.depan.eclipse.ui.nodes.trees.ViewerRoot;
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeViewerProvider;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptors;
+import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
 
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.viewers.TreeViewer;
 
@@ -50,11 +55,17 @@ public class ViewEditorNodeViewerProvider implements NodeViewerProvider {
     if (menuElement instanceof ActionableViewerObject) {
       ((ActionableViewerObject) menuElement).addItemActions(manager, editor);
     }
-  }
 
-  private void addHierarchy() {
-    GraphEdgeMatcherDescriptor matcher = GraphEdgeMatcherDescriptors.FORWARD;
-    editor.addNodeTreeHierarchy(matcher);
+    if (menuElement instanceof CollapseDataWrapper<?>) {
+      CollapseDataWrapper<?> root = (CollapseDataWrapper<?>) menuElement;
+      final GraphNode master = root.getCollapseData().getMasterNode();
+      manager.add(new Action("Uncollapse", IAction.AS_PUSH_BUTTON) {
+        @Override
+        public void run() {
+          editor.uncollapseMasterNode(master);
+        }
+      });
+    }
   }
 
   @Override

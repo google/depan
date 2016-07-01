@@ -16,6 +16,9 @@
 
 package com.google.devtools.depan.view_doc.eclipse.ui.editor;
 
+import com.google.devtools.depan.collapse.model.CollapseData;
+import com.google.devtools.depan.collapse.model.CollapseTreeModel;
+import com.google.devtools.depan.collapse.model.Collapser;
 import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds;
 import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeShape;
 import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeSize;
@@ -48,6 +51,7 @@ import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.RelationSets;
 import com.google.devtools.depan.nodes.filters.model.ContextualFilter;
 import com.google.devtools.depan.nodes.filters.sequence.SteppingFilter;
+import com.google.devtools.depan.nodes.trees.TreeModel;
 import com.google.devtools.depan.platform.ListenerManager;
 import com.google.devtools.depan.platform.NewEditorHelper;
 import com.google.devtools.depan.platform.WorkspaceTools;
@@ -210,13 +214,6 @@ public class ViewEditor extends MultiPageEditorPart {
    */
   private GraphModel viewGraph;
 
-  /**
-   * The subset of {@link GraphNode}s and {@link GraphEdge}s
-   * (from {@link #viewGraph}) that are currently exposed and therefore
-   * being rendered.  The collapser is responsible for these transformations.
-   */
-  private GraphModel exposedGraph;
-
   private NodeSupplierFactory nodeSupplierFactory;
 
   /**
@@ -228,15 +225,48 @@ public class ViewEditor extends MultiPageEditorPart {
    */
   private SteppingFilter nodeFilter;
 
+  /**
+   * Handle details of compact node view, including collapser and
+   * tree hierarchies.
+   */
   private NodeCompactor compactor = new NodeCompactor(this);
 
   NodeViewerProvider nvProvider =
       new ViewEditorNodeViewerProvider(this);
 
+  /////////////////////////////////////
+  // Node view compression
+
+  private void updateExposedGraph() {
+    Collection<GraphNode> nodes = viewInfo.getViewNodes();
+    compactor.updateExposedNodes(nodes);
+  }
+
+  /**
+   * Provide the {@link GraphModel} that is currently being rendered.
+   * Some nodes or edges of the basis graph may be hidden, compressed,
+   * or aliased.
+   */
+  public GraphModel getExposedGraph() {
+    return compactor.getExposedGraph();
+  }
+
+  /**
+   * Provide the {@link GraphNode}s that are currently being rendered.
+   */
+  public Collection<GraphNode> getExposedNodes() {
+    return compactor.getExposedNodes();
+  }
+
   public NodeViewerProvider getNodeViewProvider() {
     return nvProvider;
   }
 
+  /**
+   * Provides the results for the 
+   * {@link ViewEditorNodeViewerProvider#buildViewerRoots()}
+   * this is returned by {@link #getNodeViewProvider()}.
+   */
   public ViewerRoot buildViewerRoot() {
     Collection<GraphNode> nodes = viewInfo.getViewNodes();
     PlatformObject[] roots = compactor.buildRoots(nodes);
@@ -245,13 +275,6 @@ public class ViewEditor extends MultiPageEditorPart {
 
     TreeViewerObject view = new TreeViewerObject(label, roots);
     return new ViewerRoot(new Object[] {view});
-  }
-
-  private GraphModel buildExposedGraph() {
-    Collection<GraphNode> nodes = viewInfo.getViewNodes();
-    Collection<GraphNode> exposed = compactor.buildExposedNodes(nodes);
-
-    return compactor.buildExposedGraph(getViewGraph(), exposed);
   }
 
   private String buildNodeViewerLabel(int rootCnt, int nodeCnt) {
@@ -266,14 +289,63 @@ public class ViewEditor extends MultiPageEditorPart {
         "{0} [{1} exposed nodes]", name, nodeCnt);
   }
 
+  public  List<GraphEdgeMatcherDescriptor> getTreeDescriptors() {
+    return viewInfo.getTreeDescriptors();
+  }
 
   public void addNodeTreeHierarchy(GraphEdgeMatcherDescriptor matcher) {
-    compactor.addNodeTreeHierarchy(matcher);
+    viewInfo.addNodeTreeHierarchy(matcher);
   }
 
   public void removeNodeTreeHierarchy(GraphEdgeMatcherDescriptor matcher) {
-    compactor.removeNodeTreeHierarchy(matcher);
+    viewInfo.removeNodeTreeHierarchy(matcher);
   }
+
+  // TODO: Other tree descriptor operations:
+  // 1) set tree descriptors (handles list reorder, etc.)
+
+  /**
+   * Provide an immutable view of the current {@link Collapser} state.
+   */
+  public CollapseTreeModel getCollapseTreeModel() {
+    return new CollapseTreeModel(viewInfo.getCollapser());
+  }
+
+  public void collapseTreeHierarchy(TreeModel treeModel) {
+    viewInfo.collapseTree(getViewGraph(), treeModel);
+  }
+
+  public void collapseNodeList(
+      GraphNode master, Collection<GraphNode> children) {
+    viewInfo.collapseNodeList(master, children);
+  }
+
+  public void uncollapseMasterNode(GraphNode master) {
+    viewInfo.uncollapseMasterNode(master);
+  }
+
+  private void handleCollapseRendering(
+      Collection<CollapseData> created,
+      Collection<CollapseData> removed) {
+
+      for (CollapseData data : removed) {
+        GraphNode master = data.getMasterNode();
+
+        // uncollapse every children
+        for (GraphNode child : data.getChildrenNodes()) {
+          renderer.unCollapse(child, master);
+        }
+      }
+
+      for (CollapseData data : created) {
+        GraphNode master = data.getMasterNode();
+
+        // collapse each child under the parent
+        for (GraphNode child : data.getChildrenNodes()) {
+          renderer.collapseUnder(child, master);
+        }
+      }
+    }
 
   /////////////////////////////////////
   // Dispatch errors to go our logger
@@ -572,17 +644,17 @@ public class ViewEditor extends MultiPageEditorPart {
 
     viewResources = viewInfo.getGraphResources();
 
-    exposedGraph = buildExposedGraph();
+    updateExposedGraph();
 
     nodeSupplierFactory = buildNodeSupplierFactory();
   }
 
   private NodeSupplierFactory buildNodeSupplierFactory() {
 
-    Collection<GraphNode> nodes = exposedGraph.getNodes();
+    Collection<GraphNode> nodes = getExposedNodes();
 
     LayoutContext context = new LayoutContext();
-    context.setGraphModel(exposedGraph);
+    context.setGraphModel(getExposedGraph());
     context.setMovableNodes(nodes);
     // TODO: Compute ranking based on selected edge matcher
     context.setEdgeMatcher(GraphEdgeMatcherDescriptors.FORWARD);
@@ -591,16 +663,6 @@ public class ViewEditor extends MultiPageEditorPart {
         LayoutUtil.buildJungGraph(context);
     return new NodeSupplierFactory(nodes, jungGraph);
   }
-
-  /**
-   * Provide the {@link GraphModel} that is currently being rendered.
-   * Some nodes or edges of the basis graph may be hidden, compressed,
-   * or aliased.
-   */
-  public GraphModel getExposedGraph() {
-    return exposedGraph;
-  }
-
   /**
    * Release the resource held by the ViewEditor:
    * - ViewModelListener
@@ -1033,7 +1095,7 @@ public class ViewEditor extends MultiPageEditorPart {
    * {@code FactorPlugin}.
    */
   public void scaleToViewport() {
-    scaleToViewport(getExposedGraph().getNodes(), getNodeLocations());
+    scaleToViewport(getExposedNodes(), getNodeLocations());
   }
 
   /**
@@ -1046,7 +1108,7 @@ public class ViewEditor extends MultiPageEditorPart {
     Point2dUtils.Translater translater =
         Point2dUtils.newScaleTranslater(scaleX, scaleY);
     Map<GraphNode, Point2D> changes = Point2dUtils.translateNodes(
-        getExposedGraph().getNodes(), getNodeLocations(),
+        getExposedNodes(), getNodeLocations(),
         translater);
 
     editNodeLocations(changes);
@@ -1095,7 +1157,7 @@ public class ViewEditor extends MultiPageEditorPart {
   private Collection<GraphNode> getLayoutNodes() {
     Collection<GraphNode> picked = getSelectedNodes();
     if (picked.isEmpty()) {
-      return getExposedGraph().getNodes();
+      return getExposedNodes();
     }
 
     return picked;
@@ -1408,7 +1470,7 @@ public class ViewEditor extends MultiPageEditorPart {
   }
 
   private void prepareColorSupplier() {
-    for (GraphNode root : getExposedGraph().getNodes()) {
+    for (GraphNode root : getExposedNodes()) {
       renderer.setNodeColorSupplier(root, nodeSupplierFactory.getColorSupplier(root));
     }
     return;
@@ -1432,13 +1494,13 @@ public class ViewEditor extends MultiPageEditorPart {
 
   private void updateNodeStretchRatio(boolean enable) {
     if (enable) {
-      for (GraphNode node : getExposedGraph().getNodes()) {
+      for (GraphNode node : getExposedNodes()) {
         renderer.setNodeRatioSupplier(node, nodeSupplierFactory.getRatioSupplier(node));
       }
       return;
     }
 
-    for (GraphNode node : getExposedGraph().getNodes()) {
+    for (GraphNode node : getExposedNodes()) {
       renderer.setNodeRatioSupplier(node, NodeRatioSupplier.FULL);
     }
   }
@@ -1450,7 +1512,7 @@ public class ViewEditor extends MultiPageEditorPart {
               NodePreferencesIds.NODE_SIZE,
               NodeSize.getDefault().toString()));
 
-      for (GraphNode node : getExposedGraph().getNodes()) {
+      for (GraphNode node : getExposedNodes()) {
         NodeSizeSupplier supplier =
             nodeSupplierFactory.getSizeSupplier(node, size);
         renderer.setNodeSizeSupplier(node, supplier);
@@ -1458,14 +1520,14 @@ public class ViewEditor extends MultiPageEditorPart {
       return;
     }
 
-    for (GraphNode node : getExposedGraph().getNodes()) {
+    for (GraphNode node : getExposedNodes()) {
       renderer.setNodeSizeSupplier(node, NodeSizeSupplier.STANDARD);
     }
   }
 
   private void updateNodeShape(boolean enable) {
     if (enable) {
-      for (GraphNode node : getExposedGraph().getNodes()) {
+      for (GraphNode node : getExposedNodes()) {
         NodeShape mode = NodeShape.valueOf(
             PreferencesIds.getInstanceNode().get(
                 NodePreferencesIds.NODE_SHAPE,
@@ -1478,7 +1540,7 @@ public class ViewEditor extends MultiPageEditorPart {
       return;
     }
 
-    for (GraphNode node : getExposedGraph().getNodes()) {
+    for (GraphNode node : getExposedNodes()) {
       renderer.setNodeShapeSupplier(node, NodeShapeSupplier.STANDARD);
     }
   }
@@ -1552,19 +1614,6 @@ public class ViewEditor extends MultiPageEditorPart {
       markDirty();
     }
 
-/* TODO
-    @Override
-    public void collapseChanged(
-        Collection<CollapseData> created,
-        Collection<CollapseData> removed,
-        Object author) {
-      updateSelectedNodes(removed, author);
-      updateExposedGraph();
-      renderer.updateCollapseChanges(created, removed);
-      markDirty();
-    }
-*/
-
     @Override
     public void nodeLocationsSet(Map<GraphNode, Point2D> newLocations) {
       renderer.editNodeLocations(newLocations);
@@ -1594,6 +1643,34 @@ public class ViewEditor extends MultiPageEditorPart {
     @Override
     public void optionChanged(String optionId, String value) {
       handleOptionChange(optionId, value);
+    }
+
+
+/* TODO
+    @Override
+    public void collapseChanged(
+        Collection<CollapseData> created,
+        Collection<CollapseData> removed,
+        Object author) {
+      updateSelectedNodes(removed, author);
+      updateExposedGraph();
+      renderer.updateCollapseChanges(created, removed);
+      markDirty();
+    }
+*/
+
+    @Override
+    public void collapseChanged(Collection<CollapseData> created,
+        Collection<CollapseData> removed, Object author) {
+      updateExposedGraph();
+      handleCollapseRendering(created, removed);
+      markDirty();
+    }
+
+    @Override
+    public void nodeTreeChanged() {
+      // Open views should register their own listener.
+      markDirty();
     }
   }
 

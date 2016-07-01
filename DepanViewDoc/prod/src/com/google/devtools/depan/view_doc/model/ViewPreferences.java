@@ -16,6 +16,8 @@
 
 package com.google.devtools.depan.view_doc.model;
 
+import com.google.devtools.depan.collapse.model.CollapseData;
+import com.google.devtools.depan.collapse.model.Collapser;
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeTreeProvider;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.api.RelationSet;
@@ -25,6 +27,7 @@ import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.RelationSets;
+import com.google.devtools.depan.nodes.trees.TreeModel;
 import com.google.devtools.depan.platform.ListenerManager;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 
@@ -35,6 +38,8 @@ import com.google.common.collect.Sets;
 
 import java.awt.geom.Point2D;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -109,6 +114,10 @@ public class ViewPreferences {
    * specified.
    */
   private GraphEdgeMatcherDescriptor layoutEdgeMatcher;
+
+  private List<GraphEdgeMatcherDescriptor> treeDescriptors;
+
+  private Collapser collapser;
 
   /**
    * Defines the edge matcher used to define the view hierarchy
@@ -229,6 +238,12 @@ public class ViewPreferences {
     }
     if (null == options) {
       options = OptionPreferences.getDefaultOptions();
+    }
+    if (null == treeDescriptors) {
+      treeDescriptors = Lists.newArrayList();
+    }
+    if (null == collapser) {
+      collapser = new Collapser();
     }
   }
 
@@ -584,7 +599,7 @@ public class ViewPreferences {
   }
 
   /////////////////////////////////////
-  // Manipulate the collapsed state
+  // Manipulate the compacted node view state
 
   /**
    * Based on the collapsing preferences, compute the set of nodes and
@@ -597,5 +612,76 @@ public class ViewPreferences {
     return graph;
     // TODO
     // return collapser.buildExposedGraph(graph);
+  }
+
+  public List<GraphEdgeMatcherDescriptor> getTreeDescriptors() {
+    return ImmutableList.copyOf(treeDescriptors);
+  }
+
+  public void addNodeTreeHierarchy(GraphEdgeMatcherDescriptor matcher) {
+    treeDescriptors.add(matcher);
+
+    listeners.fireEvent(new SimpleDispatcher() {
+      @Override
+     public void dispatch(ViewPrefsListener listener) {
+        listener.nodeTreeChanged();
+      }
+    });
+  }
+
+  public void removeNodeTreeHierarchy(GraphEdgeMatcherDescriptor matcher) {
+    treeDescriptors.remove(matcher);
+
+    listeners.fireEvent(new SimpleDispatcher() {
+      @Override
+     public void dispatch(ViewPrefsListener listener) {
+        listener.nodeTreeChanged();
+      }
+    });
+  }
+
+  public Collapser getCollapser() {
+    return collapser;
+  }
+
+  public void collapseTree(GraphModel viewGraph, TreeModel treeModel) {
+    final Collection<CollapseData> delta =
+        collapser.collapseTree(viewGraph, treeModel);
+
+    listeners.fireEvent(new SimpleDispatcher() {
+      @Override
+      public void dispatch(ViewPrefsListener listener) {
+        listener.collapseChanged(
+            delta, Collections.<CollapseData> emptyList(), null);
+      }
+    });
+  }
+
+  public void collapseNodeList(
+      GraphNode master, Collection<GraphNode> children) {
+    CollapseData data = collapser.collapse(master, children, false);
+
+    final List<CollapseData> delta = Collections.singletonList(data);
+    listeners.fireEvent(new SimpleDispatcher() {
+      @Override
+      public void dispatch(ViewPrefsListener listener) {
+        listener.collapseChanged(
+            delta, Collections.<CollapseData> emptyList(), null);
+      }
+    });
+  }
+
+  public void uncollapseMasterNode(GraphNode master) {
+    CollapseData data = collapser.getCollapseData(master);
+    collapser.uncollapse(master);
+
+    final List<CollapseData> delta = Collections.singletonList(data);
+    listeners.fireEvent(new SimpleDispatcher() {
+      @Override
+      public void dispatch(ViewPrefsListener listener) {
+        listener.collapseChanged(
+            Collections.<CollapseData> emptyList(), delta, null);
+      }
+    });
   }
 }

@@ -21,8 +21,6 @@ import com.google.devtools.depan.platform.TypeAdapter;
 import com.google.common.collect.Lists;
 
 import org.eclipse.core.runtime.IAdapterFactory;
-import org.eclipse.core.runtime.IAdapterManager;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 
 import java.util.List;
@@ -34,12 +32,7 @@ import java.util.List;
  */
 public class NodeViewAdapterFactory<E> implements IAdapterFactory {
 
-  // NodeViewAdapterFactory should be parameterized, but cannot make static
-  // reference to the non-static type E
-  private static NodeViewAdapterFactory<?> instance = null;
-
   private static List<TypeAdapter> knownAdapters = buildKnownAdapters();
-  static { buildKnownAdapters(); }
 
   /**
    * Build the list of know adapter types at static initialization time.
@@ -62,9 +55,7 @@ public class NodeViewAdapterFactory<E> implements IAdapterFactory {
   // Class should be parameterized. To update if the IAdapterFactory is updated.
   @Override
   @SuppressWarnings("rawtypes")
-  public Object getAdapter(
-      Object adaptableObject,
-      Class adapterType) {
+  public Object getAdapter(Object adaptableObject, Class adapterType) {
     if (adapterType != IWorkbenchAdapter.class) {
       return null;
     }
@@ -81,16 +72,5 @@ public class NodeViewAdapterFactory<E> implements IAdapterFactory {
   @Override
   public Class<?>[] getAdapterList() {
     return new Class[] {IWorkbenchAdapter.class};
-  }
-
-  public static <E> void register() {
-    if (null == instance) {
-      instance = new NodeViewAdapterFactory<E>();
-    }
-
-    IAdapterManager manager = Platform.getAdapterManager();
-    for (TypeAdapter asso : knownAdapters) {
-      manager.registerAdapters(instance, asso.getFromType());
-    }
   }
 }

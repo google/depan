@@ -16,13 +16,14 @@
 
 package com.google.devtools.depan.view_doc.eclipse.ui.trees;
 
+import com.google.devtools.depan.collapse.model.CollapseData;
 import com.google.devtools.depan.collapse.model.CollapseTreeModel;
-import com.google.devtools.depan.collapse.model.Collapser;
 import com.google.devtools.depan.eclipse.ui.collapse.trees.CollapseTreeRoot;
 import com.google.devtools.depan.eclipse.ui.nodes.trees.GraphData;
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeTreeProviders;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptors;
+import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.builder.api.GraphBuilders;
@@ -51,29 +52,35 @@ public class NodeCompactor {
 
   private final ViewEditor editor;
 
-  private Collapser collapser = new Collapser();
+  /**
+   * The subset of {@link GraphNode}s (from {@link #viewGraph}) that are
+   * currently exposed and therefore being rendered.  The {@link #exposedGraph}
+   * is based on this collection of {@link GraphNode}s.
+   */
+  private Collection<GraphNode> exposedNodes;
 
-  private List<GraphEdgeMatcherDescriptor> treeMatchers = Lists.newArrayList();
+  /**
+   * The subset of {@link GraphNode}s and {@link GraphEdge}s
+   * (from {@link #viewGraph}) that are currently exposed and therefore
+   * being rendered.  The collapser is responsible for these transformations.
+   */
+  private GraphModel exposedGraph;
 
   public NodeCompactor(ViewEditor viewEditor) {
     editor = viewEditor;
   }
 
-  /////////////////////////////////////
-  // Mutators
-
-  /**
-   * @param matcher
-   */
-  public void addNodeTreeHierarchy(GraphEdgeMatcherDescriptor matcher) {
-    treeMatchers.add(matcher);
+  public Collection<GraphNode> getExposedNodes() {
+    return exposedNodes;
   }
 
-  /**
-   * @param matcher
-   */
-  public void removeNodeTreeHierarchy(GraphEdgeMatcherDescriptor matcher) {
-    treeMatchers.remove(matcher);
+  public GraphModel getExposedGraph() {
+    return exposedGraph;
+  }
+
+  public void updateExposedNodes(Collection<GraphNode> nodes) {
+    exposedNodes = buildExposedNodes(nodes);
+    exposedGraph = buildExposedGraph(editor.getViewGraph(), exposedNodes);
   }
 
   /////////////////////////////////////
@@ -86,6 +93,7 @@ public class NodeCompactor {
   public Collection<GraphNode> buildExposedNodes(
       Collection<GraphNode> nodes) {
     Collection<GraphNode> result = Sets.newHashSet(nodes);
+    CollapseTreeModel collapser = getCollapseTreeModel();
     result.removeAll(collapser.computeNodes());
     result.addAll(collapser.getMasterNodeSet());
     return result;
@@ -96,19 +104,30 @@ public class NodeCompactor {
     return GraphBuilders.buildFromNodes(master, nodes);
   }
 
+  /////////////////////////////////////
+  //
+
+  private CollapseTreeModel getCollapseTreeModel() {
+    return editor.getCollapseTreeModel();
+  }
+
+  private List<GraphEdgeMatcherDescriptor> getTreeDescriptors() {
+    return editor.getTreeDescriptors();
+  }
+
   private PlatformObject[] buildHierarchyRoots(
       GraphModel master, Collection<GraphNode> nodes) {
     List<PlatformObject> staging = Lists.newArrayList();
 
     List<GraphNode> remains = Lists.newArrayList(nodes);
 
-    Collection<GraphNode> collapseNodes = collapser.computeNodes();
+    Collection<GraphNode> collapseNodes = getCollapseTreeModel().computeNodes();
     if (!collapseNodes.isEmpty()) {
       staging.add(buildCollapseRoot());
       remains.removeAll(collapseNodes);
     }
 
-    for (GraphEdgeMatcherDescriptor matcher : treeMatchers) {
+    for (GraphEdgeMatcherDescriptor matcher : getTreeDescriptors()) {
       staging.add(buildTreeRoot(master, remains, matcher));
     }
 
@@ -120,9 +139,8 @@ public class NodeCompactor {
   private PlatformObject buildCollapseRoot() {
     String label = MessageFormat.format(
         "{0} Collapse nodes", editor.getPartName());
-    CollapseTreeModel tree = new CollapseTreeModel(collapser);
     return CollapseTreeRoot.build(
-        tree, NodeTreeProviders.GRAPH_NODE_PROVIDER, label);
+        getCollapseTreeModel(), NodeTreeProviders.GRAPH_NODE_PROVIDER, label);
   }
 
   /**
@@ -157,16 +175,16 @@ public class NodeCompactor {
   }
 
   /////////////////////////////////////
-  // Customize actions for tree roots
+  // Customized actions for tree roots
 
   private static class ActionTreeRoot extends ActionSolitaryRoot {
 
     private final GraphEdgeMatcherDescriptor matcher;
 
     public ActionTreeRoot(
-        GraphData<GraphNode> nodes, String label,
+        GraphData<GraphNode> data, String label,
         GraphEdgeMatcherDescriptor matcher) {
-      super(nodes, label);
+      super(data, label);
       this.matcher = matcher;
     }
 
@@ -182,11 +200,17 @@ public class NodeCompactor {
           editor.removeNodeTreeHierarchy(matcher);
         }
       });
+      manager.add(new Action("Collapse hierarchy..", IAction.AS_PUSH_BUTTON) {
+        @Override
+        public void run() {
+          editor.collapseTreeHierarchy(getGraphData().getTreeModel());
+        }
+      });
     }
   }
 
   /////////////////////////////////////
-  // Customize actions for tree roots
+  // Customized actions for tree roots
 
   private static class ActionRemainsRoot extends ActionSolitaryRoot {
 

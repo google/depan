@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.view_doc.model;
 
+import com.google.devtools.depan.collapse.model.CollapseData;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.api.RelationSet;
 import com.google.devtools.depan.model.GraphEdge;
@@ -60,13 +61,6 @@ public interface ViewPrefsListener {
         GraphNode node, NodeDisplayProperty newProperty) {
     }
 
-/* TODO
-    @Override
-    public void collapseChanged(Collection<CollapseData> created,
-        Collection<CollapseData> removed, Object author) {
-    }
-*/
-
     @Override
     public void nodeLocationsChanged(
         Map<GraphNode, Point2D> newLocations, Object author) {
@@ -83,6 +77,15 @@ public interface ViewPrefsListener {
 
     @Override
     public void optionChanged(String option, String value) {
+    }
+
+    @Override
+    public void collapseChanged(Collection<CollapseData> created,
+        Collection<CollapseData> removed, Object author) {
+    }
+
+    @Override
+    public void nodeTreeChanged() {
     }
   }
 
@@ -128,21 +131,6 @@ public interface ViewPrefsListener {
       Map<GraphNode, Point2D> newLocations, Object author);
 
   /**
-   * Callback when nodes collapsing changes.
-   * 
-   * @param created Collection of new collapsed nodes
-   * @param removed Collection of now un-collapsed nodes
-   * @param author the initiator of the change
-   */
-
-/* TODO
-  void collapseChanged(
-      Collection<CollapseData> created,
-      Collection<CollapseData> removed,
-      Object author);
-*/
-
-  /**
    * Callback for changes to the selected nodes.
    * 
    * @param created Collection of new collapsed nodes.
@@ -158,4 +146,25 @@ public interface ViewPrefsListener {
    * An option changed.
    */
   void optionChanged(String optionId, String value);
+
+  /**
+   * Callback when nodes collapsing changes.
+   * 
+   * @param created Collection of new collapsed nodes
+   * @param removed Collection of now un-collapsed nodes
+   * @param author the initiator of the change
+   */
+  void collapseChanged(
+      Collection<CollapseData> created,
+      Collection<CollapseData> removed,
+      Object author);
+
+  /**
+   * The user's structured view of interesting nodes has changed.
+   * Interested parties should use
+   * {@link ViewPreferences#getTreeDescriptors()} to obtain the current
+   * groupings.
+   */
+  void nodeTreeChanged();
+
 }

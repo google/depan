@@ -392,4 +392,12 @@ public class View {
   public void setNodeNeighbors(Graph<GraphNode, GraphEdge> jungGraph) {
     glPanel.setNodeNeighbors(jungGraph);
   }
+
+  public void unCollapse(GraphNode child, GraphNode master) {
+    glPanel.unCollapse(child, master);
+  }
+
+  public void collapseUnder(GraphNode child, GraphNode master) {
+    glPanel.collapseUnder(child, master);
+  }
 }

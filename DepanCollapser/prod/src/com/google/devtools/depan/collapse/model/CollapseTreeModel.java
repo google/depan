@@ -42,6 +42,10 @@ public class CollapseTreeModel {
     return collapser.computeRoots();
   }
 
+  public Collection<GraphNode> getMasterNodeSet() {
+    return collapser.getMasterNodeSet();
+  }
+
   /**
    * Provide complete set of nodes in this model.
    */

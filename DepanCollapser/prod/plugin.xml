@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="com.google.devtools.depan.eclipse.ui.collapse.trees.CollapseDataWrapper"
+            class="com.google.devtools.depan.eclipse.ui.collapse.trees.CollapserAdapterFactory">
+         <adapter
+               type="org.eclipse.ui.model.IWorkbenchAdapter">
+         </adapter>
+      </factory>
+      <factory
+            adaptableType="com.google.devtools.depan.eclipse.ui.collapse.trees.CollapseTreeRoot"
+            class="com.google.devtools.depan.eclipse.ui.collapse.trees.CollapserAdapterFactory">
+         <adapter
+               type="org.eclipse.ui.model.IWorkbenchAdapter">
+         </adapter>
+      </factory>
+   </extension>
+
+</plugin>
