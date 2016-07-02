@@ -48,6 +48,10 @@ public class NodeSupplierFactory {
     maxRank = calcMaxRank();
   }
 
+  public Collection<GraphNode> getNodes() {
+    return nodes;
+  };
+
   public Graph<GraphNode, GraphEdge> getJungGraph() {
     return jungGraph;
   };

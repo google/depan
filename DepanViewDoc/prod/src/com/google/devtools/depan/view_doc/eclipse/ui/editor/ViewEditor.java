@@ -651,10 +651,12 @@ public class ViewEditor extends MultiPageEditorPart {
 
   private NodeSupplierFactory buildNodeSupplierFactory() {
 
-    Collection<GraphNode> nodes = getExposedNodes();
+    // Setup factory for all nodes in view.
+    GraphModel graph = getViewGraph();
+    Collection<GraphNode> nodes = graph.getNodes();
 
     LayoutContext context = new LayoutContext();
-    context.setGraphModel(getExposedGraph());
+    context.setGraphModel(graph);
     context.setMovableNodes(nodes);
     // TODO: Compute ranking based on selected edge matcher
     context.setEdgeMatcher(GraphEdgeMatcherDescriptors.FORWARD);
@@ -663,6 +665,7 @@ public class ViewEditor extends MultiPageEditorPart {
         LayoutUtil.buildJungGraph(context);
     return new NodeSupplierFactory(nodes, jungGraph);
   }
+
   /**
    * Release the resource held by the ViewEditor:
    * - ViewModelListener
@@ -1470,7 +1473,7 @@ public class ViewEditor extends MultiPageEditorPart {
   }
 
   private void prepareColorSupplier() {
-    for (GraphNode root : getExposedNodes()) {
+    for (GraphNode root : nodeSupplierFactory.getNodes()) {
       renderer.setNodeColorSupplier(root, nodeSupplierFactory.getColorSupplier(root));
     }
     return;
@@ -1494,13 +1497,13 @@ public class ViewEditor extends MultiPageEditorPart {
 
   private void updateNodeStretchRatio(boolean enable) {
     if (enable) {
-      for (GraphNode node : getExposedNodes()) {
+      for (GraphNode node : nodeSupplierFactory.getNodes()) {
         renderer.setNodeRatioSupplier(node, nodeSupplierFactory.getRatioSupplier(node));
       }
       return;
     }
 
-    for (GraphNode node : getExposedNodes()) {
+    for (GraphNode node : nodeSupplierFactory.getNodes()) {
       renderer.setNodeRatioSupplier(node, NodeRatioSupplier.FULL);
     }
   }
@@ -1512,7 +1515,7 @@ public class ViewEditor extends MultiPageEditorPart {
               NodePreferencesIds.NODE_SIZE,
               NodeSize.getDefault().toString()));
 
-      for (GraphNode node : getExposedNodes()) {
+      for (GraphNode node : nodeSupplierFactory.getNodes()) {
         NodeSizeSupplier supplier =
             nodeSupplierFactory.getSizeSupplier(node, size);
         renderer.setNodeSizeSupplier(node, supplier);
@@ -1520,14 +1523,14 @@ public class ViewEditor extends MultiPageEditorPart {
       return;
     }
 
-    for (GraphNode node : getExposedNodes()) {
+    for (GraphNode node : nodeSupplierFactory.getNodes()) {
       renderer.setNodeSizeSupplier(node, NodeSizeSupplier.STANDARD);
     }
   }
 
   private void updateNodeShape(boolean enable) {
     if (enable) {
-      for (GraphNode node : getExposedNodes()) {
+      for (GraphNode node : nodeSupplierFactory.getNodes()) {
         NodeShape mode = NodeShape.valueOf(
             PreferencesIds.getInstanceNode().get(
                 NodePreferencesIds.NODE_SHAPE,
@@ -1540,11 +1543,10 @@ public class ViewEditor extends MultiPageEditorPart {
       return;
     }
 
-    for (GraphNode node : getExposedNodes()) {
+    for (GraphNode node : nodeSupplierFactory.getNodes()) {
       renderer.setNodeShapeSupplier(node, NodeShapeSupplier.STANDARD);
     }
   }
-
 
   private void updateNodeStrokeHighlight(boolean enable) {
     renderer.activateNodeStroke(enable);

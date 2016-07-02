@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.view_doc.eclipse.ui.widgets;
 
+import com.google.devtools.depan.eclipse.ui.collapse.trees.CollapseDataWrapper;
 import com.google.devtools.depan.eclipse.ui.nodes.trees.NodeWrapper;
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.GraphNodeViewer;
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeViewerProvider;
@@ -421,10 +422,13 @@ public class NodeDisplayTableControl extends Composite {
       NodeWrapper<GraphNode> wrap = (NodeWrapper<GraphNode>) element;
       return wrap.getNode();
     }
+    if (element instanceof CollapseDataWrapper<?>) {
+      CollapseDataWrapper<GraphNode> wrap = (CollapseDataWrapper<GraphNode>) element;
+      return wrap.getCollapseData().getMasterNode();
+    }
     return null;
   }
 
-  @SuppressWarnings("unchecked")
   private IWorkbenchAdapter getWorkbenchAdapter(Object element) {
     if (element instanceof IAdaptable ) {
       Object result = ((IAdaptable) element).getAdapter(IWorkbenchAdapter.class);
