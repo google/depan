@@ -18,15 +18,31 @@
    </license>
 
    <requires>
+      <import plugin="org.eclipse.core.resources"/>
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="com.google.devtools.depan.core"/>
-      <import plugin="com.google.devtools.depan.builder"/>
-      <import plugin="com.google.devtools.depan.persistence"/>
-      <import plugin="com.google.devtools.depan.graph_doc"/>
-      <import plugin="depan-xstream-library"/>
-      <import plugin="com.google.guava"/>
       <import plugin="com.google.devtools.depan.platform"/>
+      <import plugin="com.google.devtools.depan.persistence"/>
+      <import plugin="depan-xstream-library"/>
+      <import plugin="com.google.devtools.depan.builder"/>
+      <import plugin="depan-asm-library"/>
+      <import plugin="com.google.devtools.depan.graph_doc"/>
+      <import plugin="com.google.guava"/>
    </requires>
+
+   <plugin
+         id="com.google.devtools.depan.java"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.google.devtools.depan.java.bytecode"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
 
    <plugin
          id="com.google.devtools.depan.filesystem"

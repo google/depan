@@ -21,5 +21,6 @@ Require-Bundle: org.eclipse.core.runtime,
  com.google.guava,
  com.google.devtools.depan.platform,
  com.google.devtools.depan.remap,
- com.google.devtools.depan.persistence
-Import-Package: com.google.devtools.depan.eclipse.ui.nodes.plugins
+ com.google.devtools.depan.persistence,
+ com.google.devtools.depan.nodes.ui
+Export-Package: com.google.devtools.depan.filesystem.editors

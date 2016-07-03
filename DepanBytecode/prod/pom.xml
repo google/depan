@@ -10,10 +10,10 @@
 
   <artifactId>com.google.devtools.depan.java.bytecode</artifactId>
   <packaging>eclipse-plugin</packaging>
-  <version>1.0.4-SNAPSHOT</version>
+  <version>2.0.0-SNAPSHOT</version>
 
-  <name>DepAn Bytecode Plugin</name>
-  <description>Bytecode analyzer and graph builder for DepAn</description>
+  <name>DepAn Bytecode Analyzer</name>
+  <description>Bytecode analyzer and graph builder for DepAn.</description>
 
   <build>
     <sourceDirectory>src</sourceDirectory>
@@ -26,11 +26,6 @@
       <artifactId>guava</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>com.pnambic.depan</groupId>
-      <artifactId>depan-jogl-library</artifactId>
-    </dependency>
-
     <!-- DepAn Packaged libraries -->
     <dependency>
       <groupId>com.pnambic.depan</groupId>
@@ -41,15 +36,14 @@
     <dependency>
       <groupId>com.pnambic.depan</groupId>
       <artifactId>com.google.devtools.depan.core</artifactId>
-      <version>1.0.5-SNAPSHOT</version>
+      <version>2.0.0-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>com.pnambic.depan</groupId>
-      <artifactId>com.google.devtools.depan.filesystem</artifactId>
-      <version>1.0.4-SNAPSHOT</version>
+      <artifactId>com.google.devtools.depan.java</artifactId>
+      <version>2.0.0-SNAPSHOT</version>
     </dependency>
-
   </dependencies>
 
 </project>

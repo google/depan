@@ -2,25 +2,19 @@
 <?eclipse version="3.2"?>
 <plugin>
    <extension
-         point="com.google.devtools.depan.eclipse.sourceplugin">
-      <languagespecific
-            class="com.google.devtools.depan.java.JavaPlugin"
-            description="Graph elements for Java dependency analysis."
-            id="com.google.devtools.depan.java"
-            source="Java"/>
+         point="com.google.devtools.depan.graph.registry.relation">
+      <relation_contibutor
+            class="com.google.devtools.depan.java.JavaRelationContributor"
+            id="com.google.devtools.depan.java.JavaRelationContributor">
+      </relation_contibutor>
+   </extension>
+   <extension
+         point="com.google.devtools.depan.persistence.xstream.config">
+      <xstream_config
+            class="com.google.devtools.depan.java.JavaXStreamConfig"
+            id="com.google.devtools.depan.java.JavaXStreamConfig">
+      </xstream_config>
    </extension>
 
    <!-- ================ PREFERENCES =============== -->
-   <extension
-         point="org.eclipse.ui.preferencePages">
-      <page
-            class="com.google.devtools.depan.java.eclipse.preferences.ColorPreferencesPage"
-            id="com.google.devtools.depan.java.eclipse.nodecolors"
-            name="Java Node Colors"
-            category="com.google.devtools.depan.eclipse.preferences.colors"/>
-   </extension>
-   <extension
-         point="org.eclipse.core.runtime.preferences">
-      <initializer class="com.google.devtools.depan.java.eclipse.preferences.ColorPreferencesInitializer"/>
-   </extension>
 </plugin>

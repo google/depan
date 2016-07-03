@@ -33,4 +33,8 @@
          id="com.pnambic.depan.graph.feature"
          version="0.0.0"/>
 
+   <includes
+         id="com.pnambic.depan.java.feature"
+         version="0.0.0"/>
+
 </feature>

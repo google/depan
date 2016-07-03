@@ -44,11 +44,17 @@
     <module>../DepanFileSystem/prod</module>
     <module>../DepanFileSystemUI/prod</module>
 
+    <module>../DepanJava/prod</module>
+    <module>../DepanJavaUI/prod</module>
+    <module>../DepanBytecode/prod</module>
+    <module>../DepanBytecodeUI/prod</module>
+
     <!-- Features -->
     <module>../depan-app-feature</module>
     <module>../depan-analyzers-feature</module>
     <module>../depan-graph-feature</module>
     <module>../depan-filesystem-feature</module>
+    <module>../depan-java-feature</module>
 
     <!-- Release -->
     <module>../depan-min-win64-feature</module>

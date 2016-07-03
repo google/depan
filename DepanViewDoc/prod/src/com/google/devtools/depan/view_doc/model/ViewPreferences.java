@@ -96,11 +96,6 @@ public class ViewPreferences {
    */
   private RelationSetDescriptor edgeDisplayRelationSet;
 
-  /**
-   * Manager object for handling all collapsed nodes.
-   */
-  // TODO : private Collapser collapser;
-
   private Collection<GraphNode> selectedNodes = ImmutableList.of();
 
   private String selectedLayout;
@@ -117,6 +112,9 @@ public class ViewPreferences {
 
   private List<GraphEdgeMatcherDescriptor> treeDescriptors;
 
+  /**
+   * Manager object for handling all collapsed nodes.
+   */
   private Collapser collapser;
 
   /**
@@ -134,11 +132,6 @@ public class ViewPreferences {
    * unmarshalling does not set this.
    */
   private transient ListenerManager<ViewPrefsListener> listeners;
-
-  /**
-   * Cached "read-only" version of Collapser
-   */
-  // TODO : private transient CollapseTreeModel collapseTree;
 
   /////////////////////////////////////
   // Listeners for structures changes
@@ -175,7 +168,9 @@ public class ViewPreferences {
         Maps.<GraphEdge, EdgeDisplayProperty>newHashMap(),
         Maps.<Relation, EdgeDisplayProperty>newHashMap(),
         ImmutableList.<GraphNode>of(),
-        OptionPreferences.getDefaultOptions());
+        OptionPreferences.getDefaultOptions(),
+        new Collapser(),
+        Lists.<GraphEdgeMatcherDescriptor>newArrayList());
   }
 
   public ViewPreferences(
@@ -186,10 +181,12 @@ public class ViewPreferences {
       Map<GraphEdge, EdgeDisplayProperty> newEdgeProperties,
       Map<Relation, EdgeDisplayProperty> newRelationProperties,
       Collection<GraphNode> newSelectedNodes,
-      OptionPreference options) {
+      OptionPreference options,
+      Collapser collapser,
+      List<GraphEdgeMatcherDescriptor> treeDescriptors) {
     initTransients();
-    // TODO
-    // collapser = new Collapser();
+    this.collapser = collapser;
+    this.treeDescriptors = treeDescriptors;
 
     this.scenePrefs = gripPrefs;
     this.nodeLocations = newNodeLocations;
@@ -302,7 +299,8 @@ public class ViewPreferences {
         ScenePreferences.getDefaultScenePrefs(),
         newNodeLocations, newNodeProperties,
         source.visibleRelationSet, newEdgeProperties, newRelationProps,
-        newSelectedNodes, newOptions);
+        newSelectedNodes, newOptions, new Collapser(),
+        source.getTreeDescriptors());
 
     return result;
   }

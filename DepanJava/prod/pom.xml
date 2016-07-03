@@ -10,9 +10,9 @@
 
   <artifactId>com.google.devtools.depan.java</artifactId>
   <packaging>eclipse-plugin</packaging>
-  <version>1.0.4-SNAPSHOT</version>
+  <version>2.0.0-SNAPSHOT</version>
 
-  <name>DepAn Java Analysis Definitions</name>
+  <name>DepAn Java Analysis</name>
   <description>Java analysis definitions for DepAn</description>
 
   <build>
@@ -34,14 +34,8 @@
     <!-- DepAn dependencies -->
     <dependency>
       <groupId>com.pnambic.depan</groupId>
-      <artifactId>com.google.devtools.depan</artifactId>
-      <version>0.0.8-SNAPSHOT</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.pnambic.depan</groupId>
       <artifactId>com.google.devtools.depan.core</artifactId>
-      <version>1.0.5-SNAPSHOT</version>
+      <version>2.0.0-SNAPSHOT</version>
     </dependency>
   </dependencies>
 </project>
