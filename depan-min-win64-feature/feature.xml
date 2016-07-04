@@ -41,4 +41,8 @@
          id="com.pnambic.depan.javascript.feature"
          version="0.0.0"/>
 
+   <includes
+         id="com.pnambic.depan.ruby.feature"
+         version="0.0.0"/>
+
 </feature>

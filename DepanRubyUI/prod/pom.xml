@@ -8,12 +8,12 @@
     <relativePath>../../depan-luna-parent</relativePath>
   </parent>
 
-  <artifactId>com.google.devtools.depan.ruby</artifactId>
+  <artifactId>com.google.devtools.depan.ruby.ui</artifactId>
   <packaging>eclipse-plugin</packaging>
   <version>2.0.0-SNAPSHOT</version>
 
-  <name>DepAn Ruby</name>
-  <description>Ruby analysis definitions for DepAn</description>
+  <name>DepAn Ruby UI</name>
+  <description>User interface components for DepAn's Ruby analyzes.</description>
 
   <build>
     <sourceDirectory>src</sourceDirectory>
@@ -25,7 +25,13 @@
     <!-- DepAn dependencies -->
     <dependency>
       <groupId>com.pnambic.depan</groupId>
-      <artifactId>com.google.devtools.depan.persistence</artifactId>
+      <artifactId>com.google.devtools.depan.ruby</artifactId>
+      <version>2.0.0-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.pnambic.depan</groupId>
+      <artifactId>com.google.devtools.depan.remap</artifactId>
       <version>2.0.0-SNAPSHOT</version>
     </dependency>
   </dependencies>

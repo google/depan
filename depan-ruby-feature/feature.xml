@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="com.pnambic.depan.analyzers.feature"
-      label="DepAn Analyzers Feature"
+      id="com.pnambic.depan.ruby.feature"
+      label="DepAn Ruby Analysis Feature"
       version="2.0.0.qualifier"
       provider-name="Pnambic Computing">
 
    <description url="http://www.example.com/description">
-      Packaging of DepAn dependency analyzers without any UI components.
+      DepAn Ruby Analysis Feature
    </description>
 
    <copyright url="http://www.example.com/copyright">
@@ -18,38 +18,24 @@
    </license>
 
    <requires>
-      <import plugin="org.eclipse.core.resources"/>
-      <import plugin="org.eclipse.core.runtime"/>
       <import plugin="com.google.devtools.depan.core"/>
       <import plugin="com.google.devtools.depan.platform"/>
+      <import plugin="org.eclipse.osgi"/>
       <import plugin="com.google.devtools.depan.persistence"/>
       <import plugin="depan-xstream-library"/>
-      <import plugin="com.google.devtools.depan.builder"/>
-      <import plugin="depan-asm-library"/>
-      <import plugin="com.google.devtools.depan.graph_doc"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.jface"/>
+      <import plugin="org.eclipse.ui.workbench"/>
+      <import plugin="com.google.devtools.depan.view_doc"/>
+      <import plugin="com.google.devtools.depan.filesystem"/>
+      <import plugin="com.google.devtools.depan.java"/>
+      <import plugin="com.google.devtools.depan.platform.ui"/>
+      <import plugin="com.google.devtools.depan.edges.ui"/>
+      <import plugin="com.google.devtools.depan.remap"/>
+      <import plugin="com.google.devtools.depan.filesystem.ui"/>
+      <import plugin="com.google.devtools.depan.java.ui"/>
       <import plugin="com.google.guava"/>
    </requires>
-
-   <plugin
-         id="com.google.devtools.depan.java"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="com.google.devtools.depan.java.bytecode"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="com.google.devtools.depan.filesystem"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
 
    <plugin
          id="com.google.devtools.depan.javascript"
@@ -59,7 +45,7 @@
          unpack="false"/>
 
    <plugin
-         id="com.google.devtools.depan.ruby"
+         id="com.google.devtools.depan.javascript.ui"
          download-size="0"
          install-size="0"
          version="0.0.0"

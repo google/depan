@@ -12,8 +12,8 @@
   <packaging>eclipse-plugin</packaging>
   <version>2.0.0-SNAPSHOT</version>
 
-  <name>DepAn Java Analysis UI</name>
-  <description>Java analysis user interface components for DepAn</description>
+  <name>DepAn Java UI</name>
+  <description>Java analysis user interface components for DepAn.</description>
 
   <build>
     <sourceDirectory>src</sourceDirectory>

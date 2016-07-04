@@ -36,7 +36,7 @@ import org.osgi.framework.BundleContext;
 public class JavaScriptActivator extends AbstractUIPlugin {
 
   /** Plug-in ID used to identify this plug-in. */
-  public static final String PLUGIN_ID = "com.google.devtools.depan.javascript";
+  public static final String PLUGIN_ID = "com.google.devtools.depan.javascript.ui";
 
   /**
    * Bundle that is responsible for storing the resources for this plug-in.

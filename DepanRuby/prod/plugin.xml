@@ -2,41 +2,17 @@
 <?eclipse version="3.2"?>
 <plugin>
    <extension
-         point="com.google.devtools.depan.eclipse.sourceplugin">
-      <languagespecific
-            class="com.google.devtools.depan.ruby.RubyPlugin"
-            description="Graph elements for Ruby dependency analysis."
-            id="com.google.devtools.depan.ruby"
-            source="Ruby">
-      </languagespecific>
+         point="com.google.devtools.depan.graph.registry.relation">
+      <relation_contibutor
+            class="com.google.devtools.depan.ruby.RubyRelationContributor"
+            id="com.google.devtools.depan.ruby.RubyRelationContributor">
+      </relation_contibutor>
    </extension>
    <extension
-         point="org.eclipse.core.runtime.preferences">
-      <initializer
-            class="com.google.devtools.depan.ruby.eclipse.preferences.AnalysisPreferencesInitializer">
-      </initializer>
-   </extension>
-   <extension
-         point="org.eclipse.ui.preferencePages">
-      <page
-            class="com.google.devtools.depan.ruby.eclipse.preferences.AnalysisPreferencesPage"
-            id="com.google.devtools.depan.ruby.eclipse.preferences.analysis"
-            name="Ruby Analysis">
-      </page>
-   </extension>
-   <extension
-         point="org.eclipse.ui.preferencePages">
-      <page
-            category="com.google.devtools.depan.eclipse.preferences.colors"
-            class="com.google.devtools.depan.ruby.eclipse.preferences.ColorPreferencesPage"
-            id="com.google.devtools.depan.ruby.eclipse.nodecolors"
-            name="Ruby Node Colors">
-      </page>
-   </extension>
-   <extension
-         point="org.eclipse.core.runtime.preferences">
-      <initializer
-            class="com.google.devtools.depan.ruby.eclipse.preferences.ColorPreferencesInitializer">
-      </initializer>
+         point="com.google.devtools.depan.persistence.xstream.config">
+      <xstream_config
+            class="com.google.devtools.depan.ruby.RubyXStreamConfig"
+            id="com.google.devtools.depan.ruby.RubyXStreamConfig">
+      </xstream_config>
    </extension>
 </plugin>
