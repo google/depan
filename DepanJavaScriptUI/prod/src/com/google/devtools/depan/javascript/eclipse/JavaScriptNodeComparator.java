@@ -21,11 +21,11 @@ import com.google.devtools.depan.java.eclipse.JavaNodeComparator;
 import com.google.devtools.depan.javascript.graph.JavaScriptBuiltinElement;
 import com.google.devtools.depan.javascript.graph.JavaScriptClassElement;
 import com.google.devtools.depan.javascript.graph.JavaScriptElement;
+import com.google.devtools.depan.javascript.graph.JavaScriptElementDispatcher;
 import com.google.devtools.depan.javascript.graph.JavaScriptEnumElement;
 import com.google.devtools.depan.javascript.graph.JavaScriptFieldElement;
 import com.google.devtools.depan.javascript.graph.JavaScriptFunctionElement;
 import com.google.devtools.depan.javascript.graph.JavaScriptVariableElement;
-import com.google.devtools.depan.javascript.integration.JavaScriptElementDispatcher;
 import com.google.devtools.depan.model.Element;
 
 import java.util.Comparator;
@@ -37,7 +37,7 @@ import java.util.Comparator;
  * 
  * @author <a href="leeca@google.com">Lee Carver</a>
  */
-public class NodeComparator implements Comparator<Element> {
+public class JavaScriptNodeComparator implements Comparator<Element> {
 
   private static final class JavaScriptCategoryDispatcher extends
       JavaScriptElementDispatcher<Integer> {

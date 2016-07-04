@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.javascript.integration;
+package com.google.devtools.depan.javascript;
 
 import com.google.common.collect.Lists;
-import com.google.devtools.depan.eclipse.persist.XStreamFactory.Config;
+
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.javascript.graph.JavaScriptBuiltinElement;
 import com.google.devtools.depan.javascript.graph.JavaScriptClassElement;
@@ -27,8 +27,7 @@ import com.google.devtools.depan.javascript.graph.JavaScriptFunctionElement;
 import com.google.devtools.depan.javascript.graph.JavaScriptRelation;
 import com.google.devtools.depan.javascript.graph.JavaScriptVariableElement;
 import com.google.devtools.depan.model.Element;
-
-import com.thoughtworks.xstream.XStream;
+import com.google.devtools.depan.persistence.XStreamConfig;
 
 import java.util.Collection;
 
@@ -49,11 +48,6 @@ public class JavaScriptDefinitions {
    */
   private static final Collection<Relation> RELATIONS;
 
-  /**
-   * Define the XML serialization options used for JavaScript graph components.
-   */
-  private static final Config CONFIG_XML_PERSIST;
-
   static {
     CLASSES = Lists.newArrayList();
     CLASSES.add(JavaScriptBuiltinElement.class);
@@ -68,20 +62,6 @@ public class JavaScriptDefinitions {
       RELATIONS.add(r);
     }
 
-    // Define XML serialization
-    CONFIG_XML_PERSIST = new Config() {
-
-      @Override
-      public void  config(XStream xstream) {
-        xstream.alias("js-builtin", JavaScriptBuiltinElement.class);
-        xstream.alias("js-class", JavaScriptClassElement.class);
-        xstream.alias("js-enum", JavaScriptEnumElement.class);
-        xstream.alias("js-field", JavaScriptFieldElement.class);
-        xstream.alias("js-function", JavaScriptFunctionElement.class);
-        xstream.alias("js-variable", JavaScriptVariableElement.class);
-        xstream.alias("js-relation", JavaScriptRelation.class);
-      }
-    };
   }
 
   /**
@@ -116,7 +96,7 @@ public class JavaScriptDefinitions {
    * 
    * @return XStream configuration object
    */
-  public static Config getXMLConfig() {
-    return CONFIG_XML_PERSIST;
+  public static XStreamConfig getXMLConfig() {
+    return null; // CONFIG_XML_PERSIST;
   }
 }

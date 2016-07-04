@@ -16,6 +16,8 @@
 
 package com.google.devtools.depan.java.graph;
 
+import com.google.devtools.depan.platform.DottedNameTools;
+
 /**
  * Element representing a type. Fully qualified name is used as unique ID.
  * 

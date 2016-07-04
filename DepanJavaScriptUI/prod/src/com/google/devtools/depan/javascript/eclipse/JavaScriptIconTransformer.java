@@ -16,61 +16,63 @@
 
 package com.google.devtools.depan.javascript.eclipse;
 
-import com.google.devtools.depan.java.JavaPluginActivator;
+import com.google.devtools.depan.java.eclipse.JavaActivator;
 import com.google.devtools.depan.javascript.graph.JavaScriptBuiltinElement;
 import com.google.devtools.depan.javascript.graph.JavaScriptClassElement;
+import com.google.devtools.depan.javascript.graph.JavaScriptElementDispatcher;
 import com.google.devtools.depan.javascript.graph.JavaScriptEnumElement;
 import com.google.devtools.depan.javascript.graph.JavaScriptFieldElement;
 import com.google.devtools.depan.javascript.graph.JavaScriptFunctionElement;
 import com.google.devtools.depan.javascript.graph.JavaScriptVariableElement;
-import com.google.devtools.depan.javascript.integration.JavaScriptElementDispatcher;
 import com.google.devtools.depan.model.Element;
 import com.google.devtools.depan.model.ElementTransformer;
 
-import org.eclipse.swt.graphics.Image;
+import org.eclipse.jface.resource.ImageDescriptor;
 
 /**
- * Responsible for returning the correct image for each given node.
- * In this implementation, all image resources are "borrowed" from the
- * Java graph elements plugin.
+ * Responsible for returning correct icon for a given element.
  * 
+ * In this implementation, all image descriptors are "borrowed" from the
+ * Java graph elements plugin.
+ *
  * @author <a href="leeca@google.com">Lee Carver</a>
  */
-public class ImageTransformer extends JavaScriptElementDispatcher<Image>
-    implements ElementTransformer<Image> {
+public class JavaScriptIconTransformer
+    extends JavaScriptElementDispatcher<ImageDescriptor>
+    implements ElementTransformer<ImageDescriptor> {
 
   @Override
-  public Image match(JavaScriptBuiltinElement builtinElement) {
-    return JavaPluginActivator.IMAGE_FIELD;
+  public ImageDescriptor match(JavaScriptBuiltinElement builtinElement) {
+    return JavaActivator.IMAGE_DESC_FIELD;
   }
 
   @Override
-  public Image match(JavaScriptClassElement classElement) {
-    return JavaPluginActivator.IMAGE_TYPE;
+  public ImageDescriptor match(JavaScriptClassElement classElement) {
+    return JavaActivator.IMAGE_DESC_TYPE;
   }
 
   @Override
-  public Image match(JavaScriptEnumElement enumElement) {
-    return JavaPluginActivator.IMAGE_TYPE;
+  public ImageDescriptor match(JavaScriptEnumElement enumElement) {
+    return JavaActivator.IMAGE_DESC_TYPE;
   }
 
   @Override
-  public Image match(JavaScriptFieldElement fieldElement) {
-    return JavaPluginActivator.IMAGE_FIELD;
+  public ImageDescriptor match(JavaScriptFieldElement fieldElement) {
+    return JavaActivator.IMAGE_DESC_FIELD;
   }
 
   @Override
-  public Image match(JavaScriptFunctionElement functionElement) {
-    return JavaPluginActivator.IMAGE_METHOD;
+  public ImageDescriptor match(JavaScriptFunctionElement functionElement) {
+    return JavaActivator.IMAGE_DESC_METHOD;
   }
 
   @Override
-  public Image match(JavaScriptVariableElement variableElement) {
-    return JavaPluginActivator.IMAGE_FIELD;
+  public ImageDescriptor match(JavaScriptVariableElement variableElement) {
+    return JavaActivator.IMAGE_DESC_FIELD;
   }
 
   @Override
-  public Image transform(Element element) {
+  public ImageDescriptor transform(Element element) {
     return match(element);
   }
 }

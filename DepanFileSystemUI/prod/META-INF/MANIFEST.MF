@@ -23,4 +23,5 @@ Require-Bundle: org.eclipse.core.runtime,
  com.google.devtools.depan.remap,
  com.google.devtools.depan.persistence,
  com.google.devtools.depan.nodes.ui
-Export-Package: com.google.devtools.depan.filesystem.editors
+Export-Package: com.google.devtools.depan.filesystem.eclipse,
+ com.google.devtools.depan.filesystem.editors

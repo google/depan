@@ -26,6 +26,9 @@ import org.osgi.framework.BundleContext;
 /**
  * The activator class controls the plug-in life cycle.
  * 
+ * Note that the JavaScript plugin borrows the images used for Java
+ * entities.
+ * 
  * @author <a href="mailto:leeca@pnambic.com">Lee Carver</a>
  */
 public class JavaActivator extends AbstractUIPlugin {

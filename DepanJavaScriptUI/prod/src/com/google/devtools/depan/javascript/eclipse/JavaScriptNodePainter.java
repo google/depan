@@ -16,15 +16,15 @@
 
 package com.google.devtools.depan.javascript.eclipse;
 
-import com.google.devtools.depan.eclipse.utils.Tools;
 import com.google.devtools.depan.javascript.eclipse.preferences.ColorPreferencesIds;
 import com.google.devtools.depan.javascript.graph.JavaScriptBuiltinElement;
 import com.google.devtools.depan.javascript.graph.JavaScriptClassElement;
+import com.google.devtools.depan.javascript.graph.JavaScriptElementDispatcher;
 import com.google.devtools.depan.javascript.graph.JavaScriptEnumElement;
 import com.google.devtools.depan.javascript.graph.JavaScriptFieldElement;
 import com.google.devtools.depan.javascript.graph.JavaScriptFunctionElement;
 import com.google.devtools.depan.javascript.graph.JavaScriptVariableElement;
-import com.google.devtools.depan.javascript.integration.JavaScriptElementDispatcher;
+import com.google.devtools.depan.platform.Colors;
 import com.google.devtools.depan.model.Element;
 import com.google.devtools.depan.model.ElementTransformer;
 
@@ -41,7 +41,7 @@ import java.awt.Color;
  *
  * @author <a href="leeca@google.com">Lee Carver</a>
  */
-public class NodePainter extends JavaScriptElementDispatcher<Color>
+public class JavaScriptNodePainter extends JavaScriptElementDispatcher<Color>
     implements ElementTransformer<Color> {
 
   private static IPreferenceStore prefs =
@@ -53,7 +53,7 @@ public class NodePainter extends JavaScriptElementDispatcher<Color>
       return Color.BLACK;
     }
 
-    return Tools.getRgb(colorTxt);
+    return Colors.getRgb(colorTxt);
   }
 
   @Override

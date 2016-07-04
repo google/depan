@@ -2,7 +2,7 @@
 <feature
       id="com.pnambic.depan.javascript.feature"
       label="DepAn JavaScript Analysis Feature"
-      version="1.0.0.qualifier"
+      version="2.0.0.qualifier"
       provider-name="Pnambic Computing">
 
    <description url="http://www.example.com/description">
@@ -18,14 +18,31 @@
    </license>
 
    <requires>
-      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="com.google.devtools.depan.core"/>
+      <import plugin="com.google.devtools.depan.platform"/>
+      <import plugin="org.eclipse.osgi"/>
+      <import plugin="com.google.devtools.depan.persistence"/>
+      <import plugin="depan-xstream-library"/>
+      <import plugin="com.google.devtools.depan.edges.ui"/>
+      <import plugin="com.google.devtools.depan.remap"/>
+      <import plugin="org.eclipse.jface"/>
+      <import plugin="com.google.devtools.depan.view_doc"/>
+      <import plugin="com.google.devtools.depan.java"/>
+      <import plugin="com.google.devtools.depan.java.ui"/>
+      <import plugin="org.eclipse.ui.workbench"/>
       <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="org.eclipse.jface.text"/>
-      <import plugin="org.eclipse.ui"/>
+      <import plugin="com.google.devtools.depan.filesystem.ui"/>
    </requires>
 
    <plugin
          id="com.google.devtools.depan.javascript"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.google.devtools.depan.javascript.ui"
          download-size="0"
          install-size="0"
          version="0.0.0"

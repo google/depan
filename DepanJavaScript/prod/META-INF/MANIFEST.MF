@@ -2,19 +2,13 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: DepanJavaScript
 Bundle-SymbolicName: com.google.devtools.depan.javascript;singleton:=true
-Bundle-Version: 0.0.3.qualifier
+Bundle-Version: 2.0.0.qualifier
 Bundle-Vendor: Pnambic Computing
-Require-Bundle: com.google.devtools.depan,
- com.google.devtools.depan.core,
- com.google.devtools.depan.filesystem,
- com.google.devtools.depan.java,
- org.eclipse.jface,
- org.eclipse.core.runtime,
- com.google.guava,
- depan-xstream-library,
- org.eclipse.ui.workbench,
- com.google.devtools.depan.platform.ui
-Export-Package: com.google.devtools.depan.javascript,
- com.google.devtools.depan.javascript.graph
 Bundle-ActivationPolicy: lazy
-Bundle-Activator: com.google.devtools.depan.javascript.eclipse.JavaScriptActivator
+Bundle-Activator: com.google.devtools.depan.javascript.JavaScriptPluginActivator
+Require-Bundle: com.google.devtools.depan.core,
+ com.google.devtools.depan.platform,
+ org.eclipse.osgi,
+ com.google.devtools.depan.persistence,
+ depan-xstream-library
+Export-Package: com.google.devtools.depan.javascript.graph

@@ -14,15 +14,8 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.javascript.integration;
+package com.google.devtools.depan.javascript.graph;
 
-import com.google.devtools.depan.javascript.graph.JavaScriptBuiltinElement;
-import com.google.devtools.depan.javascript.graph.JavaScriptClassElement;
-import com.google.devtools.depan.javascript.graph.JavaScriptEnumElement;
-import com.google.devtools.depan.javascript.graph.JavaScriptFieldElement;
-import com.google.devtools.depan.javascript.graph.JavaScriptFunctionElement;
-import com.google.devtools.depan.javascript.graph.JavaScriptVariableElement;
-import com.google.devtools.depan.javascript.graph.JavaScriptElementVisitor;
 import com.google.devtools.depan.model.Element;
 
 /**

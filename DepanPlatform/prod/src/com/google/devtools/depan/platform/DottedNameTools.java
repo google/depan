@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.java.graph;
+package com.google.devtools.depan.platform;
 
 /**
  * Collection of static methods for manipulating the dotted names,

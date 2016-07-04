@@ -16,9 +16,9 @@
 
 package com.google.devtools.depan.javascript.graph;
 
-import com.google.devtools.depan.eclipse.utils.DottedNameTools;
 import com.google.devtools.depan.model.ElementVisitor;
 import com.google.devtools.depan.model.GraphNode;
+import com.google.devtools.depan.platform.DottedNameTools;
 
 /**
  * Provide a marker-type for JavaScript graph elements, and define the

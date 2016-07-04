@@ -20,11 +20,11 @@ import com.google.devtools.depan.eclipse.visualization.ogl.GLEntity;
 import com.google.devtools.depan.eclipse.visualization.ogl.ShapeFactory;
 import com.google.devtools.depan.javascript.graph.JavaScriptBuiltinElement;
 import com.google.devtools.depan.javascript.graph.JavaScriptClassElement;
+import com.google.devtools.depan.javascript.graph.JavaScriptElementDispatcher;
 import com.google.devtools.depan.javascript.graph.JavaScriptEnumElement;
 import com.google.devtools.depan.javascript.graph.JavaScriptFieldElement;
 import com.google.devtools.depan.javascript.graph.JavaScriptFunctionElement;
 import com.google.devtools.depan.javascript.graph.JavaScriptVariableElement;
-import com.google.devtools.depan.javascript.integration.JavaScriptElementDispatcher;
 import com.google.devtools.depan.model.Element;
 import com.google.devtools.depan.model.ElementTransformer;
 
@@ -35,7 +35,7 @@ import com.google.devtools.depan.model.ElementTransformer;
  * 
  * @author <a href="leeca@google.com">Lee Carver</a>
  */
-public class ShapeTransformer
+public class JavaScriptShapeTransformer
     extends JavaScriptElementDispatcher<GLEntity>
     implements ElementTransformer<GLEntity> {
 

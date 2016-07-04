@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.javascript.integration;
+package com.google.devtools.depan.javascript;
 
 import com.google.devtools.depan.filesystem.graph.FileSystemRelation;
 import com.google.devtools.depan.javascript.graph.JavaScriptRelation;
-import com.google.devtools.depan.relations.RelationSetDescriptor;
-import com.google.devtools.depan.relations.RelationSetDescriptor.Builder;
+import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 
 import com.google.common.collect.Lists;
 
@@ -58,8 +57,8 @@ public class JavaScriptRelationSets {
 
   static {
     // container relationships
-    Builder lexBuilder = RelationSetDescriptor.createBuilder(
-        "JavaScript Lexical Containment");
+    RelationSetDescriptor.Builder lexBuilder =
+        RelationSetDescriptor.createBuilder("JavaScript Lexical Containment");
     lexBuilder.addRelation(FileSystemRelation.CONTAINS_DIR);
     lexBuilder.addRelation(FileSystemRelation.CONTAINS_FILE);
     lexBuilder.addRelation(FileSystemRelation.SYMBOLIC_LINK);
@@ -68,8 +67,8 @@ public class JavaScriptRelationSets {
     lexBuilder.addRelation(JavaScriptRelation.BINDS_ELEMENT);
     LEXICAL_CONTAINMENT = lexBuilder.build();
 
-    Builder bindBuilder = RelationSetDescriptor.createBuilder(
-        "JavaScript Binding Containment");
+    RelationSetDescriptor.Builder bindBuilder =
+        RelationSetDescriptor.createBuilder("JavaScript Binding Containment");
     bindBuilder.addRelation(JavaScriptRelation.BINDS_ELEMENT);
     BINDING_CONTAINMENT = bindBuilder.build();
 

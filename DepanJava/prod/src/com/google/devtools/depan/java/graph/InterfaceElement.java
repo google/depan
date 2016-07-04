@@ -16,6 +16,8 @@
 
 package com.google.devtools.depan.java.graph;
 
+import com.google.devtools.depan.platform.DottedNameTools;
+
 /**
  * Element representing an interface in the code source. Use the fully qualified
  * name to inuquely identify this element.
