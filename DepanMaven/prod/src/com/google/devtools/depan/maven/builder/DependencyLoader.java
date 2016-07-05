@@ -15,9 +15,9 @@
  */
 
 package com.google.devtools.depan.maven.builder;
-import com.google.devtools.depan.eclipse.wizards.PushDownXmlHandler.ElementHandler;
-import com.google.devtools.depan.eclipse.wizards.PushDownXmlHandler.NestingElementHandler;
-import com.google.devtools.depan.eclipse.wizards.PushDownXmlHandler.TextElementHandler;
+import com.google.devtools.depan.pushxml.PushDownXmlHandler.ElementHandler;
+import com.google.devtools.depan.pushxml.PushDownXmlHandler.NestingElementHandler;
+import com.google.devtools.depan.pushxml.PushDownXmlHandler.TextElementHandler;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.maven.graph.MavenRelation;
 import com.google.devtools.depan.model.GraphEdge;

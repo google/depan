@@ -21,6 +21,7 @@ import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.builder.chain.DependenciesListener;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * The common shared context for the analysis of a Maven POM definition.
@@ -33,9 +34,19 @@ public class MavenContext {
 
   private final File mavenDir;
 
-  public MavenContext(DependenciesListener builder, File mavenDir) {
+  private final String javaHome;
+
+  private final String mavenExe;
+
+  private final String effPomCmd;
+
+  public MavenContext(DependenciesListener builder, File mavenDir,
+      String javaHome, String mavenExe, String effPomCmd) {
     this.builder = builder;
     this.mavenDir = mavenDir;
+    this.javaHome = javaHome;
+    this.mavenExe = mavenExe;
+    this.effPomCmd = effPomCmd;
   }
 
   public File getMavenDir() {
@@ -43,7 +54,7 @@ public class MavenContext {
   }
 
   public File getModuleFile(String modulePath) {
-    return Tools.getPomFile(new File(mavenDir, modulePath));
+    return PomTools.getPomFile(new File(mavenDir, modulePath));
   }
 
   public GraphNode lookup(GraphNode node) {
@@ -53,5 +64,13 @@ public class MavenContext {
   public void newDep(
       GraphNode head, GraphNode tail, Relation relation) {
     builder.newDep(head, tail, relation);
+  }
+
+  /**
+   * Provide an executor that will import the POM for the supplied
+   * {@code moduleFile}.
+   */
+  public MavenExecutor build(File moduleFile) throws IOException {
+    return MavenExecutor.build(moduleFile, javaHome, mavenExe, effPomCmd);
   }
 }

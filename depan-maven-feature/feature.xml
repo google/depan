@@ -2,7 +2,7 @@
 <feature
       id="com.pnambic.depan.maven.feature"
       label="DepAn Maven POM Feature"
-      version="1.0.0.qualifier"
+      version="2.0.0.qualifier"
       provider-name="Pnambic Computing">
 
    <description url="http://www.example.com/description">
@@ -18,19 +18,41 @@
    </license>
 
    <requires>
-      <import plugin="com.google.devtools.depan"/>
       <import plugin="com.google.devtools.depan.core"/>
-      <import plugin="org.eclipse.core.resources"/>
-      <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="org.eclipse.jface.text"/>
-      <import plugin="org.eclipse.ui"/>
-      <import plugin="com.google.guava"/>
-      <import plugin="depan-jogl-library"/>
+      <import plugin="com.google.devtools.depan.platform"/>
       <import plugin="depan-xstream-library"/>
+      <import plugin="org.eclipse.osgi"/>
+      <import plugin="com.google.devtools.depan.persistence"/>
+      <import plugin="com.google.guava"/>
+      <import plugin="com.google.devtools.depan.builder"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="org.eclipse.jface"/>
+      <import plugin="org.eclipse.ui.workbench"/>
+      <import plugin="com.google.devtools.depan.graph_doc"/>
+      <import plugin="com.google.devtools.depan.platform.ui"/>
+      <import plugin="com.google.devtools.depan.edges.ui"/>
+      <import plugin="com.google.devtools.depan.graph_doc.ui"/>
+      <import plugin="com.google.devtools.depan.view_doc"/>
+      <import plugin="com.google.devtools.depan.remap"/>
    </requires>
 
    <plugin
          id="com.google.devtools.depan.maven"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.google.devtools.depan.maven.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.google.devtools.depan.graphml"
          download-size="0"
          install-size="0"
          version="0.0.0"

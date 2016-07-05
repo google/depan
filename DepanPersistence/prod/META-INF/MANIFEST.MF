@@ -12,4 +12,5 @@ Require-Bundle: org.eclipse.core.runtime,
  depan-xstream-library
 Bundle-ClassPath: .
 Export-Package: com.google.devtools.depan.persistence,
- com.google.devtools.depan.persistence.plugins
+ com.google.devtools.depan.persistence.plugins,
+ com.google.devtools.depan.pushxml

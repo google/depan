@@ -10,9 +10,9 @@
 
   <artifactId>com.google.devtools.depan.maven</artifactId>
   <packaging>eclipse-plugin</packaging>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>2.0.0-SNAPSHOT</version>
 
-  <name>DepAn Maven POM Analysis Definitions</name>
+  <name>DepAn Maven</name>
   <description>Maven POM analysis definitions for DepAn</description>
 
   <build>
@@ -21,27 +21,18 @@
 
   <dependencies>
     <!-- Third party dependencies -->
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.pnambic.depan</groupId>
-      <artifactId>depan-xstream-library</artifactId>
-    </dependency>
 
     <!-- DepAn dependencies -->
     <dependency>
       <groupId>com.pnambic.depan</groupId>
-      <artifactId>com.google.devtools.depan</artifactId>
-      <version>0.0.8-SNAPSHOT</version>
+      <artifactId>com.google.devtools.depan.core</artifactId>
+      <version>2.0.0-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>com.pnambic.depan</groupId>
-      <artifactId>com.google.devtools.depan.core</artifactId>
-      <version>1.0.5-SNAPSHOT</version>
+      <artifactId>com.google.devtools.depan.persistence</artifactId>
+      <version>2.0.0-SNAPSHOT</version>
     </dependency>
   </dependencies>
 </project>

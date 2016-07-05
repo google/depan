@@ -4,7 +4,7 @@ Bundle-Name: DepanRuby
 Bundle-SymbolicName: com.google.devtools.depan.ruby;singleton:=true
 Bundle-Version: 2.0.0.qualifier
 Bundle-Vendor: Pnambic Computing
-Bundle-Activator: com.google.devtools.depan.ruby.eclipse.RubyActivator
+Bundle-Activator: com.google.devtools.depan.ruby.RubyPluginActivator
 Bundle-ActivationPolicy: lazy
 Require-Bundle: com.google.devtools.depan.core,
  com.google.devtools.depan.persistence,

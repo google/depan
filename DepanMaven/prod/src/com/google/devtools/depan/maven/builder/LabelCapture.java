@@ -16,8 +16,8 @@
 
 package com.google.devtools.depan.maven.builder;
 
-import com.google.devtools.depan.eclipse.wizards.PushDownXmlHandler.ElementHandler;
-import com.google.devtools.depan.eclipse.wizards.PushDownXmlHandler.TextElementHandler;
+import com.google.devtools.depan.pushxml.PushDownXmlHandler.ElementHandler;
+import com.google.devtools.depan.pushxml.PushDownXmlHandler.TextElementHandler;
 import com.google.devtools.depan.maven.graph.ArtifactElement;
 import com.google.devtools.depan.model.GraphNode;
 

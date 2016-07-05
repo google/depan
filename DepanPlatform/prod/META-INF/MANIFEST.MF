@@ -10,4 +10,5 @@ Require-Bundle: com.google.guava,
 Bundle-ClassPath: .
 Export-Package: com.google.devtools.depan.graph.registry,
  com.google.devtools.depan.platform,
- com.google.devtools.depan.platform.plugin
+ com.google.devtools.depan.platform.plugin,
+ com.google.devtools.depan.platform.process

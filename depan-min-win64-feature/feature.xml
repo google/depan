@@ -45,4 +45,8 @@
          id="com.pnambic.depan.ruby.feature"
          version="0.0.0"/>
 
+   <includes
+         id="com.pnambic.depan.maven.feature"
+         version="0.0.0"/>
+
 </feature>

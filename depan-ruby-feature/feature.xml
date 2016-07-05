@@ -38,14 +38,14 @@
    </requires>
 
    <plugin
-         id="com.google.devtools.depan.javascript"
+         id="com.google.devtools.depan.ruby"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="com.google.devtools.depan.javascript.ui"
+         id="com.google.devtools.depan.ruby.ui"
          download-size="0"
          install-size="0"
          version="0.0.0"

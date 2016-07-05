@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.ui.newWizards">
       <wizard
-            category="com.google.devtools.depan"
+            category="com.google.devtools.depan.eclipse.ui.wizards"
             class="com.google.devtools.depan.java.bytecode.eclipse.NewGraphWizard"
             finalPerspective="com.google.devtools.depan.eclipse.perspective"
             icon="icons/eclipse/jcu_obj.png"

@@ -52,7 +52,11 @@
     <module>../DepanJavaScript/prod</module>
     <module>../DepanJavaScriptUI/prod</module>
 
+    <module>../DepanMaven/prod</module>
+    <module>../DepanMavenUI/prod</module>
+
     <module>../DepanRuby/prod</module>
+    <module>../DepanGraphML/prod</module>
     <module>../DepanRubyUI/prod</module>
 
     <!-- Features -->
@@ -62,6 +66,7 @@
     <module>../depan-filesystem-feature</module>
     <module>../depan-java-feature</module>
     <module>../depan-javascript-feature</module>
+    <module>../depan-maven-feature</module>
     <module>../depan-ruby-feature</module>
 
     <!-- Release -->

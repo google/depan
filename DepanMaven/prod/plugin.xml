@@ -2,52 +2,17 @@
 <?eclipse version="3.2"?>
 <plugin>
    <extension
-         point="com.google.devtools.depan.eclipse.sourceplugin">
-      <languagespecific
-            class="com.google.devtools.depan.maven.MavenPlugin"
-            description="Graph elements for Maven POM dependency analysis."
-            id="com.google.devtools.depan.maven"
-            source="Maven POM">
-      </languagespecific>
+         point="com.google.devtools.depan.graph.registry.relation">
+      <relation_contibutor
+            class="com.google.devtools.depan.maven.MavenRelationContributor"
+            id="com.google.devtools.depan.maven.MavenRelationContributor">
+      </relation_contibutor>
    </extension>
    <extension
-         point="org.eclipse.ui.newWizards">
-      <wizard
-            category="com.google.devtools.depan"
-            class="com.google.devtools.depan.maven.eclipse.NewMavenPomWizard"
-            finalPerspective="com.google.devtools.depan.eclipse.perspective"
-            icon="icons/eclipse/maven_icon.png"
-            id="com.google.devtools.depan.maven.eclipse.NewMavenWizard"
-            name="New Maven POM Analysis">
-      </wizard>
-   </extension>
-   <extension
-         point="org.eclipse.core.runtime.preferences">
-      <initializer
-            class="com.google.devtools.depan.maven.eclipse.preferences.AnalysisPreferencesInitializer">
-      </initializer>
-   </extension>
-   <extension
-         point="org.eclipse.ui.preferencePages">
-      <page
-            class="com.google.devtools.depan.maven.eclipse.preferences.AnalysisPreferencesPage"
-            id="com.google.devtools.depan.maven.eclipse.preferences.analysis"
-            name="Maven POM Analysis">
-      </page>
-   </extension>
-   <extension
-         point="org.eclipse.ui.preferencePages">
-      <page
-            category="com.google.devtools.depan.eclipse.preferences.colors"
-            class="com.google.devtools.depan.maven.eclipse.preferences.ColorPreferencesPage"
-            id="com.google.devtools.depan.maven.eclipse.nodecolors"
-            name="Maven Node Colors">
-      </page>
-   </extension>
-   <extension
-         point="org.eclipse.core.runtime.preferences">
-      <initializer
-            class="com.google.devtools.depan.maven.eclipse.preferences.ColorPreferencesInitializer">
-      </initializer>
+         point="com.google.devtools.depan.persistence.xstream.config">
+      <xstream_config
+            class="com.google.devtools.depan.maven.MavenXStreamConfig"
+            id="com.google.devtools.depan.maven.MavenXStreamConfig">
+      </xstream_config>
    </extension>
 </plugin>

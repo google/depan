@@ -135,7 +135,7 @@ public class GraphMLContext {
   private void logBadEdge(String source, String target, String edgeLabel) {
     String dbgSource = getDbgLabel(source);
     String dbgTarget = getDbgLabel(target);
-    Tools.LOG.warning("Unable to build edge for " + edgeLabel
+    GraphMLLogger.LOG.warning("Unable to build edge for " + edgeLabel
         + " from " + dbgSource + " to " + dbgTarget + ".");
   }
 

@@ -16,8 +16,8 @@
 
 package com.google.devtools.depan.graphml.builder;
 
-import com.google.devtools.depan.eclipse.wizards.PushDownXmlHandler.ElementHandler;
-import com.google.devtools.depan.eclipse.wizards.PushDownXmlHandler.NestingElementHandler;
+import com.google.devtools.depan.pushxml.PushDownXmlHandler.ElementHandler;
+import com.google.devtools.depan.pushxml.PushDownXmlHandler.NestingElementHandler;
 
 /**
  * Interpret GraphML elements, and create appropriate DepAn

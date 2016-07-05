@@ -16,9 +16,10 @@
 
 package com.google.devtools.depan.maven.builder;
 
-import com.google.devtools.depan.eclipse.wizards.PushDownXmlHandler.ElementHandler;
-import com.google.devtools.depan.eclipse.wizards.PushDownXmlHandler.NestingElementHandler;
-import com.google.devtools.depan.eclipse.wizards.PushDownXmlHandler.TextElementHandler;
+import com.google.devtools.depan.pushxml.PushDownXmlHandler.ElementHandler;
+import com.google.devtools.depan.pushxml.PushDownXmlHandler.NestingElementHandler;
+import com.google.devtools.depan.pushxml.PushDownXmlHandler.TextElementHandler;
+import com.google.devtools.depan.maven.MavenLogger;
 import com.google.devtools.depan.maven.graph.MavenRelation;
 import com.google.devtools.depan.model.GraphNode;
 
@@ -70,7 +71,7 @@ public class ModulesLoader extends NestingElementHandler {
       try {
         processModule(context, master, modulePath);
       } catch (Exception err) {
-        Tools.warnThrown(
+        MavenLogger.logException(
             "Unable to process dependent module " + modulePath, err);
       }
     }
@@ -80,10 +81,10 @@ public class ModulesLoader extends NestingElementHandler {
       MavenContext context, GraphNode master, String modulePath)
       throws Exception {
     File docFile = context.getModuleFile(modulePath);
-    InputSource docSource = Tools.loadEffectivePom(docFile, context);
+    InputSource docSource = PomTools.loadEffectivePom(docFile, context);
 
     MavenDocumentHandler pomLoader = new MavenDocumentHandler(context);
-    Tools.loadModule(pomLoader, docSource);
+    PomTools.loadModule(pomLoader, docSource);
     context.newDep(
         master, pomLoader.getProjectNode(), MavenRelation.MODULE_DEPEND);
   }

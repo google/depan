@@ -16,11 +16,8 @@
 
 package com.google.devtools.depan.maven.builder;
 
-import com.google.devtools.depan.maven.eclipse.MavenActivator;
-import com.google.devtools.depan.maven.eclipse.preferences.AnalysisPreferenceIds;
+import com.google.devtools.depan.maven.builder.MavenContext;
 import com.google.devtools.depan.platform.process.ProcessExecutor;
-
-import org.eclipse.jface.preference.IPreferenceStore;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,20 +44,37 @@ public class MavenExecutor extends ProcessExecutor {
 
   private final String projectLabel;
 
+  // How to run Maven
+  private final String javaHome;
+
+  private final String mavenExe;
+
+  private final String effPomCmd;
+
+  // Intermediate data for analysis
   private String effPomText;
 
-  public MavenExecutor(String projectPom, File projectDir, String projectLabel) {
+  public MavenExecutor(
+      String projectPom, File projectDir, String projectLabel,
+      String javaHome, String mavenExe, String effPomCmd) {
     this.projectPom = projectPom;
     this.projectDir = projectDir;
     this.projectLabel = projectLabel;
+    this.javaHome = javaHome;
+    this.mavenExe = mavenExe;
+    this.effPomCmd = effPomCmd;
   }
 
-  public static MavenExecutor build(File pomFile) throws IOException {
+  public static MavenExecutor build(
+      File pomFile, String javaHome, String mavenExe, String effPomCmd)
+      throws IOException {
     File canonicalFile = pomFile.getCanonicalFile();
     String projectPom = canonicalFile.getName();
     File projectDir = canonicalFile.getParentFile();
     String projectLabel = buildProjectLabel(projectPom, projectDir);
-    return new MavenExecutor(projectPom, projectDir, projectLabel);
+    return new MavenExecutor(
+        projectPom, projectDir, projectLabel,
+        javaHome, mavenExe, effPomCmd);
   }
 
   private static String buildProjectLabel(String projectPom, File projectDir) {
@@ -88,11 +102,6 @@ public class MavenExecutor extends ProcessExecutor {
    */
   public void evalEffectivePom(MavenContext context)
       throws IOException, InterruptedException {
-    IPreferenceStore prefs = MavenActivator.getDefault().getPreferenceStore();
-    String mavenExe = prefs.getString(AnalysisPreferenceIds.MVN_ANALYSIS_EXECUTABLE);
-    String effPomCmd = prefs.getString(AnalysisPreferenceIds.MVN_ANALYSIS_EFFECTIVEPOM);
-    String javaHome = getJavaHome(prefs);
-
     File effPomFile = File.createTempFile("depan-effpom", ".xml");
 
     ProcessBuilder builder = new ProcessBuilder(
@@ -105,14 +114,6 @@ public class MavenExecutor extends ProcessExecutor {
     execProcess(builder);
 
     effPomText = loadFile(effPomFile);
-  }
-
-  private String getJavaHome(IPreferenceStore prefs) {
-    boolean useSystemJava = prefs.getBoolean(AnalysisPreferenceIds.MVN_ANALYSIS_SYSTEMJAVA);
-    if (useSystemJava) {
-      return System.getProperty("java.home");
-    }
-    return prefs.getString(AnalysisPreferenceIds.MVN_ANALYSIS_JAVAHOME);
   }
 
   private String loadFile(File source) throws IOException {

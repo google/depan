@@ -28,6 +28,7 @@
       <import plugin="depan-asm-library"/>
       <import plugin="com.google.devtools.depan.graph_doc"/>
       <import plugin="com.google.guava"/>
+      <import plugin="org.eclipse.osgi"/>
    </requires>
 
    <plugin
@@ -60,6 +61,13 @@
 
    <plugin
          id="com.google.devtools.depan.ruby"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.google.devtools.depan.graphml"
          download-size="0"
          install-size="0"
          version="0.0.0"
