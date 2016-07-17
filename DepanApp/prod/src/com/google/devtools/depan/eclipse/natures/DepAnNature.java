@@ -28,7 +28,7 @@ public class DepAnNature implements IProjectNature {
   public static final String DEPAN_ID =
       "com.google.devtools.depan.DepAnNature";
 
-  private IProject current;
+  private IProject project;
 
   @Override
   public void configure() throws CoreException {
@@ -42,11 +42,11 @@ public class DepAnNature implements IProjectNature {
 
   @Override
   public IProject getProject() {
-    return current;
+    return project;
   }
 
   @Override
   public void setProject(IProject project) {
-    this.current = project;
+    this.project = project;
   }
 }

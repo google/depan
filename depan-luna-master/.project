@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
 	<name>depan-luna-master</name>
-	<comment></comment>
+	<comment>Master project for DepAn Luna builds</comment>
 	<projects>
 	</projects>
 	<buildSpec>

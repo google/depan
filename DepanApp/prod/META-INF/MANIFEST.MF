@@ -2,34 +2,17 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: DepAn
 Bundle-SymbolicName: com.google.devtools.depan;singleton:=true
-Bundle-Version: 0.0.8.qualifier
+Bundle-Version: 2.0.0.qualifier
 Bundle-Vendor: Pnambic Computing
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.ui,
+ org.eclipse.equinox.app,
+ org.eclipse.swt,
+ org.eclipse.jface,
  org.eclipse.core.resources,
+ org.eclipse.ui,
  org.eclipse.ui.ide,
- org.eclipse.ui.views,
- org.eclipse.jface.text,
- org.eclipse.ui.navigator.resources,
- org.eclipse.ui.navigator,
- org.eclipse.ui.editors,
- org.eclipse.ui.workbench.texteditor,
  com.google.devtools.depan.core,
- com.google.guava,
- depan-jogl-library,
- depan-jung-library,
- depan-xstream-library,
- com.google.devtools.depan.core,
- com.google.devtools.depan.builder,
- com.google.devtools.depan.edges,
- com.google.devtools.depan.platform.ui,
- com.google.devtools.depan.edges.ui
- com.google.devtools.depan.graph_doc.ui,
+ com.google.guava
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
-Export-Package: com.google.devtools.depan.eclipse.editors,
- com.google.devtools.depan.eclipse.persist,
- com.google.devtools.depan.eclipse.plugins,
- com.google.devtools.depan.eclipse.utils,
- com.google.devtools.depan.eclipse.wizards

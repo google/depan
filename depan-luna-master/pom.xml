@@ -19,26 +19,58 @@
     <module>../depan-luna-parent</module>
 
     <!-- Plugins -->
+    <!-- Platform components -->
+    <module>../DepanBuilder/prod</module>
     <module>../DepanCore/prod</module>
-    <module>../DepanApp/prod</module>
+    <module>../DepanEdge/prod</module>
+    <module>../DepanGraphDoc/prod</module>
+    <module>../DepanNode/prod</module>
+    <module>../DepanPersistence/prod</module>
+    <module>../DepanPlatform/prod</module>
 
-    <module>../DepanBytecode/prod</module>
+    <!-- App/UI components -->
+    <module>../DepanApp/prod</module>
+    <module>../DepanCollapser/prod</module>
+    <module>../DepanEdgeUI/prod</module>
+    <module>../DepanGraphDocUI/prod</module>
+    <module>../DepanLayouts/prod</module>
+    <module>../DepanNodeUI/prod</module>
+    <module>../DepanPlatformUI/prod</module>
+    <module>../DepanRemap/prod</module>
+    <module>../DepanViewDoc/prod</module>
+    <module>../JungLayouts/prod</module>
+
+    <!-- Dependency modeling components-->
     <module>../DepanFileSystem/prod</module>
-    <module>../DepanGraphML/prod</module>
+    <module>../DepanFileSystemUI/prod</module>
+
     <module>../DepanJava/prod</module>
+    <module>../DepanJavaUI/prod</module>
+    <module>../DepanBytecode/prod</module>
+    <module>../DepanBytecodeUI/prod</module>
+
     <module>../DepanJavaScript/prod</module>
+    <module>../DepanJavaScriptUI/prod</module>
+
     <module>../DepanMaven/prod</module>
+    <module>../DepanMavenUI/prod</module>
+
+    <module>../DepanRuby/prod</module>
+    <module>../DepanGraphML/prod</module>
+    <module>../DepanRubyUI/prod</module>
 
     <!-- Features -->
+    <module>../depan-app-feature</module>
+    <module>../depan-analyzers-feature</module>
+    <module>../depan-graph-feature</module>
     <module>../depan-filesystem-feature</module>
-    <module>../depan-graphml-feature</module>
     <module>../depan-java-feature</module>
     <module>../depan-javascript-feature</module>
     <module>../depan-maven-feature</module>
-    <module>../depan-platform-feature</module>
-    <module>../depan-win64-feature</module>
+    <module>../depan-ruby-feature</module>
 
     <!-- Release -->
+    <module>../depan-win64-feature</module>
     <module>../depan-win64-release</module>
   </modules>
 </project>

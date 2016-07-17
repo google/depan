@@ -2,7 +2,7 @@
 <feature
       id="com.pnambic.depan.win64.feature"
       label="DepAn Win64 Release Feature"
-      version="1.0.0.qualifier"
+      version="2.0.0.qualifier"
       provider-name="Pnambic Computing">
 
    <description url="http://www.example.com/description">
@@ -18,7 +18,11 @@
    </license>
 
    <includes
-         id="com.pnambic.depan.platform"
+         id="com.pnambic.depan.analyzers.feature"
+         version="0.0.0"/>
+
+   <includes
+         id="com.pnambic.depan.app.feature"
          version="0.0.0"/>
 
    <includes
@@ -26,15 +30,23 @@
          version="0.0.0"/>
 
    <includes
+         id="com.pnambic.depan.graph.feature"
+         version="0.0.0"/>
+
+   <includes
          id="com.pnambic.depan.java.feature"
          version="0.0.0"/>
 
    <includes
-         id="com.pnambic.depan.maven.feature"
+         id="com.pnambic.depan.javascript.feature"
          version="0.0.0"/>
 
    <includes
-         id="com.pnambic.depan.javascript.feature"
+         id="com.pnambic.depan.ruby.feature"
+         version="0.0.0"/>
+
+   <includes
+         id="com.pnambic.depan.maven.feature"
          version="0.0.0"/>
 
 </feature>

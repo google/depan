@@ -17,9 +17,6 @@
 package com.google.devtools.depan.eclipse;
 
 import com.google.devtools.depan.eclipse.natures.NewDepanProjectWizard;
-import com.google.devtools.depan.eclipse.plugins.SourcePlugin;
-import com.google.devtools.depan.eclipse.plugins.SourcePluginRegistry;
-import com.google.devtools.depan.eclipse.views.Tools;
 
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
@@ -37,26 +34,13 @@ public class Perspective implements IPerspectiveFactory {
   @Override
   public void createInitialLayout(IPageLayout layout) {
     // Define shortcuts for DepAn perspective
-    layout.addShowViewShortcut(Tools.VIEW_ID);
-    layout.addNewWizardShortcut(NewDepanProjectWizard.WIZARD_ID);
-    addSourceAnalysisWizards(layout);
+    // TODO: layout.addShowViewShortcut(Tools.VIEW_ID);
+    // layout.addNewWizardShortcut(NewDepanProjectWizard.WIZARD_ID);
 
     // Define screen regions for DepAn perspective
     IFolderLayout folder = layout.createFolder("views",
         IPageLayout.RIGHT, 0.7F, layout.getEditorArea());
     folder.addView(IPageLayout.ID_RES_NAV);
-    folder.addView(Tools.VIEW_ID);
-  }
-
-  /**
-   * Add all the new dependency analysis wizards from all the
-   * source plugins.
-   */
-  private void addSourceAnalysisWizards(IPageLayout layout) {
-    for (SourcePlugin sourcePlugin : SourcePluginRegistry.getInstances()) {
-      for (String newAnalysisId : sourcePlugin.getNewAnalysisIds()) {
-        layout.addNewWizardShortcut(newAnalysisId);
-      }
-    }
+    // TODO: folder.addView(Tools.VIEW_ID);
   }
 }

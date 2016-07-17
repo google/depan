@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>com.pnambic.depan.win64.release</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>2.0.0-SNAPSHOT</version>
   <packaging>eclipse-repository</packaging>
 
   <name>DepAn [Win64]</name>
@@ -19,39 +19,10 @@
     <!-- DepAn dependencies -->
     <dependency>
       <groupId>com.pnambic.depan</groupId>
-      <artifactId>com.pnambic.depan.filesystem.feature</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <artifactId>com.pnambic.depan.win64.feature</artifactId>
+      <version>2.0.0-SNAPSHOT</version>
     </dependency>
 
-    <dependency>
-      <groupId>com.pnambic.depan</groupId>
-      <artifactId>com.pnambic.depan.graphml.feature</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.pnambic.depan</groupId>
-      <artifactId>com.pnambic.depan.java.feature</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.pnambic.depan</groupId>
-      <artifactId>com.pnambic.depan.javascript.feature</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.pnambic.depan</groupId>
-      <artifactId>com.pnambic.depan.maven.feature</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.pnambic.depan</groupId>
-      <artifactId>com.pnambic.depan.platform</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
-    </dependency>
   </dependencies>
 
   <build>
