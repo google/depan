@@ -6,8 +6,7 @@ Bundle-Version: 2.0.0.qualifier
 Bundle-Vendor: Pnambic Computing
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: com.google.devtools.depan.javascript.eclipse.JavaScriptActivator
-Require-Bundle: org.eclipse.osgi,
- org.eclipse.core.runtime,
+Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jface,
  org.eclipse.ui.workbench,
  com.google.devtools.depan.core,

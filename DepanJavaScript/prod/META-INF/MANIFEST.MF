@@ -6,9 +6,9 @@ Bundle-Version: 2.0.0.qualifier
 Bundle-Vendor: Pnambic Computing
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: com.google.devtools.depan.javascript.JavaScriptPluginActivator
-Require-Bundle: com.google.devtools.depan.core,
+Require-Bundle: org.eclipse.core.runtime,
+ com.google.devtools.depan.core,
  com.google.devtools.depan.platform,
- org.eclipse.osgi,
  com.google.devtools.depan.persistence,
  depan-xstream-library
 Export-Package: com.google.devtools.depan.javascript.graph
