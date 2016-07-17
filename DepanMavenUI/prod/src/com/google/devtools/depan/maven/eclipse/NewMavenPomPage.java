@@ -17,6 +17,7 @@
 package com.google.devtools.depan.maven.eclipse;
 
 import com.google.devtools.depan.graph_doc.eclipse.ui.wizards.AbstractAnalysisPage;
+import com.google.devtools.depan.maven.builder.PomProcessing;
 
 import com.google.common.base.Strings;
 

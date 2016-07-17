@@ -10,6 +10,7 @@ Require-Bundle: org.eclipse.core.resources,
  com.google.devtools.depan.filesystem,
  depan-asm-library,
  com.google.devtools.depan.java,
- com.google.devtools.depan.core
+ com.google.devtools.depan.core,
+ com.google.guava
 Bundle-Vendor: Pnambic Computing
 Export-Package: com.google.devtools.depan.java.bytecode.eclipse

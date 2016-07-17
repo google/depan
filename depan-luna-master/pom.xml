@@ -69,9 +69,15 @@
     <module>../depan-maven-feature</module>
     <module>../depan-ruby-feature</module>
 
-    <!-- Release -->
+    <!-- Win64 Release -->
     <module>../depan-win64-feature</module>
     <module>../depan-win64-release</module>
+
+    <!-- CLI Release -->
+    <module>../DepanCmd/prod</module>
+    <module>../depan-cmd-feature</module>
+    <module>../depan-cli-feature</module>
+    <module>../depan-cli-release</module>
   </modules>
 </project>
 

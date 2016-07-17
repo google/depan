@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
 	<name>depan-win64-release</name>
-	<comment>iDepAn release for Win64</comment>
+	<comment>DepAn release for Win64</comment>
 	<projects>
 	</projects>
 	<buildSpec>

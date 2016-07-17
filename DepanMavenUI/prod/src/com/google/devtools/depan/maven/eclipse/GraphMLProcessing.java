@@ -17,6 +17,7 @@
 package com.google.devtools.depan.maven.eclipse;
 
 import com.google.devtools.depan.graphml.builder.GraphFactory;
+import com.google.devtools.depan.maven.graphml.MavenGraphFactory;
 
 /**
  * Define the GraphML interpretation options, primarily for user

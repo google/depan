@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.maven.eclipse;
+package com.google.devtools.depan.maven.graphml;
 
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graphml.builder.GraphFactory;

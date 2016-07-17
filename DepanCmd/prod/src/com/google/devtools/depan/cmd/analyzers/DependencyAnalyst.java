@@ -14,28 +14,16 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.maven.eclipse;
+package com.google.devtools.depan.cmd.analyzers;
+
+import com.google.devtools.depan.graph_doc.model.GraphDocument;
+
+import java.io.IOException;
 
 /**
- * Define the set of processing options for the main POM file.
- * 
- * @author <a href="mailto:leeca@pnambic.com">Lee Carver</a>
+ * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public enum PomProcessing {
-  NONE("as is"), EFFECTIVE("compute");
+public interface DependencyAnalyst {
 
-  public final String label;
-  
-  private PomProcessing(String label) {
-    this.label = label;
-  }
-
-  public static PomProcessing getPomProcessing(String choice) {
-    for (PomProcessing item : PomProcessing.values()) {
-      if (item.label.equals(choice)) {
-        return item;
-      }
-    }
-    return null;
-  }
+  GraphDocument runAnalysis() throws IOException;
 }

@@ -103,8 +103,7 @@ public class NewGraphWizard extends AbstractAnalysisWizard {
     String packageFilter = page.getPackageFilter();
 
     // TODO(leeca): Extend UI to allow lists of packages.
-    Collection<String> packageWhitelist = splitFilter(packageFilter);
-    ElementFilter filter = new DefaultElementFilter(packageWhitelist);
+    ElementFilter filter = DefaultElementFilter.build(packageFilter);
 
     GraphBuilder graphBuilder = GraphBuilders.createGraphModelBuilder();
     DependenciesListener builder =

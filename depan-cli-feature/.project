@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>depan-win64-feature</name>
-	<comment>DepAn Win64 Release Feature</comment>
+	<name>depan-cli-feature</name>
+	<comment>DepAn Command Line Release Feature</comment>
 	<projects>
 	</projects>
 	<buildSpec>

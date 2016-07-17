@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.maven.eclipse;
-import com.google.devtools.depan.graph_doc.eclipse.ui.wizards.AbstractAnalysisWizard;
+package com.google.devtools.depan.cmd.analyzers;
+
+import com.google.devtools.depan.cmd.CmdLogger;
 import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.graph_doc.model.GraphDocument;
-import com.google.devtools.depan.maven.MavenLogger;
 import com.google.devtools.depan.maven.MavenRelationContributor;
+import com.google.devtools.depan.maven.builder.MavenAnalysisProperties;
 import com.google.devtools.depan.maven.builder.MavenContext;
 import com.google.devtools.depan.maven.builder.MavenDocumentHandler;
 import com.google.devtools.depan.maven.builder.MavenGraphResolver;
+import com.google.devtools.depan.maven.builder.PomProcessing;
 import com.google.devtools.depan.maven.builder.PomTools;
-import com.google.devtools.depan.maven.eclipse.preferences.AnalysisPreferenceIds;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.builder.api.GraphBuilder;
 import com.google.devtools.depan.model.builder.api.GraphBuilders;
@@ -32,72 +33,26 @@ import com.google.devtools.depan.model.builder.chain.DependenciesDispatcher;
 import com.google.devtools.depan.model.builder.chain.DependenciesListener;
 import com.google.devtools.depan.pushxml.PushDownXmlHandler.DocumentHandler;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.xml.sax.InputSource;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 
 /**
- * Wizard for converting a Maven POM file into a DepAn analysis graph.
- * 
- * @author <a href="mailto:leeca@pnambic.com">Lee Carver</a>
+ * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public class NewMavenPomWizard extends AbstractAnalysisWizard {
+public class MavenAnalyst implements DependencyAnalyst {
 
-  /**
-   * Eclipse extension identifier for this wizard.
-   */
-  public static final String ANALYSIS_WIZARD_ID =
-      "com.google.devtools.depan.maven.eclipse.NewMavenPomWizard";
+  private final String mavenPath;
+  private final PomProcessing processing;
 
-  public NewMavenPomPage page;
-
-  /**
-   * Constructor for FileSystem wizard.
-   */
-  public NewMavenPomWizard() {
-    super();
-    setNeedsProgressMonitor(true);
-  }
-
-  /**
-   * Adding the page to the wizard.
-   */
-  @Override
-  public void addPages() {
-    page = new NewMavenPomPage(getSelection());
-    addPage(page);
+  public MavenAnalyst(String mavenPath, PomProcessing processing) {
+    this.mavenPath = mavenPath;
+    this.processing = processing;
   }
 
   @Override
-  protected String getOutputFileName() {
-    return page.getOutputFileName();
-  }
-
-  @Override
-  protected IFile getOutputFile() throws CoreException {
-    return page.getOutputFile();
-  }
-
-  @Override
-  protected int countAnalysisWork() {
-    return 3;
-  }
-
-  /**
-   * Create an analysis graph by traversing the file system tree from
-   * the named starting point.
-   *
-   * Note that this generates two (2) monitor.worked() calls.
-   */
-  @Override
-  protected GraphDocument generateAnalysisDocument(IProgressMonitor monitor)
-      throws IOException {
+  public GraphDocument runAnalysis() throws IOException {
 
     // Step 1) Create the GraphModel to hold the analysis results
     // TODO(leeca): Add filters, etc.
@@ -106,41 +61,38 @@ public class NewMavenPomWizard extends AbstractAnalysisWizard {
     GraphBuilder graphBuilder = GraphBuilders.createGraphModelBuilder();
     DependenciesListener builder = new DependenciesDispatcher(graphBuilder);
 
-    monitor.worked(1);
-
-    // Step 2) Read through the file system to build the analysis graph
-    monitor.setTaskName("Loading Maven POM...");
-
     try {
-      processModule(builder, page.getPathFile());
+      processModule(builder);
     } catch (Exception err) {
-      MavenLogger.logException(
-          "Unable to analyze Maven POM at " + page.getPathText(), err);
+      CmdLogger.logException(
+          "Unable to analyze Maven POM at " + getPathText(), err);
     }
-
-    monitor.worked(1);
-
-    // Step 3) Resolve artifact references to matching artifact definitions.
-    monitor.setTaskName("Resolving references...");
 
     GraphModel analysisGraph = graphBuilder.createGraphModel();
     MavenGraphResolver resolver = new MavenGraphResolver();
     GraphModel resultGraph = resolver.resolveReferences(analysisGraph);
-    monitor.worked(1);
 
     DependencyModel.Builder modelBuilder = new DependencyModel.Builder();
     modelBuilder.addRelationContrib(MavenRelationContributor.ID);
     return new GraphDocument(modelBuilder.build(), resultGraph);
   }
 
-  private void processModule(DependenciesListener builder, File moduleFile)
+  private String getPathText() {
+    return mavenPath;
+  }
+
+  private File getPathFile() {
+    return new File(mavenPath);
+  }
+
+  private void processModule(DependenciesListener builder)
       throws Exception {
+    File moduleFile = getPathFile();
     File pomFile = PomTools.getPomFile(moduleFile);
     File mavenDir = pomFile.getParentFile();
     MavenContext context = buildMavenContext(builder, mavenDir);
 
-    InputSource pomSource =
-        PomTools.getPomSource(pomFile, context, page.getProcessing());
+    InputSource pomSource = PomTools.getPomSource(pomFile, context, processing);
 
     // TODO: Improve error handling ?? Add err state to context?
     if (null == pomSource) {
@@ -156,19 +108,14 @@ public class NewMavenPomWizard extends AbstractAnalysisWizard {
     File pomFile = PomTools.getPomFile(moduleFile);
     File mavenDir = pomFile.getParentFile();
 
-    IPreferenceStore prefs = MavenActivator.getDefault().getPreferenceStore();
-    String mavenExe = prefs.getString(AnalysisPreferenceIds.MVN_ANALYSIS_EXECUTABLE);
-    String effPomCmd = prefs.getString(AnalysisPreferenceIds.MVN_ANALYSIS_EFFECTIVEPOM);
-    String javaHome = getJavaHome(prefs);
+    String mavenExe = MavenAnalysisProperties.MVN_ANALYSIS_EXECUTABLE;
+    String effPomCmd = MavenAnalysisProperties.MVN_ANALYSIS_EFFECTIVEPOM;
+    String javaHome = getJavaHome();
 
     return new MavenContext(builder, mavenDir, javaHome, mavenExe, effPomCmd);
   }
 
-  private String getJavaHome(IPreferenceStore prefs) {
-    boolean useSystemJava = prefs.getBoolean(AnalysisPreferenceIds.MVN_ANALYSIS_SYSTEMJAVA);
-    if (useSystemJava) {
-      return System.getProperty("java.home");
-    }
-    return prefs.getString(AnalysisPreferenceIds.MVN_ANALYSIS_JAVAHOME);
+  private String getJavaHome() {
+    return System.getProperty("java.home");
   }
 }

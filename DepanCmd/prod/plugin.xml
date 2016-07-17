@@ -3,26 +3,25 @@
 <plugin>
    <extension
          id="application"
-         name="DepAn App"
+         name="DepAn CLI"
          point="org.eclipse.core.runtime.applications">
-      <application
-            icon="icons/branding/depan-icon-16x16.gif">
+      <application>
          <run
-               class="com.google.devtools.depan.eclipse.Application">
+               class="com.google.devtools.depan.cmd.Application">
          </run>
       </application>
    </extension>
    <extension
-         id="com.google.devtools.depan.app"
-         name="DepAn [Win64]"
+         id="com.google.devtools.depan.cli"
+         name="DepAn [CLI]"
          point="org.eclipse.core.runtime.products">
       <product
-            application="com.google.devtools.depan.application"
-            description="DepAn Product"
-            name="DepAn [Win64]">
+            application="com.google.devtools.depan.cmd.application"
+            description="DepAn Command Line Interface"
+            name="DepAn [CLI]">
          <property
                name="appName"
-               value="DepAn [Win64]">
+               value="DepAn [CLI]">
          </property>
          <property
                name="aboutImage"
@@ -31,10 +30,6 @@
          <property
                name="aboutText"
                value="DepAn - A direct manipulation tool for the visualization, analysis, and refactoring of dependencies in large applications.">
-         </property>
-         <property
-               name="application"
-               value="com.google.devtools.depan.application">
          </property>
          <property
                name="windowImages"
@@ -59,14 +54,5 @@
       </product>
    </extension>
 
-   <extension
-         point="org.eclipse.ui.perspectives">
-      <perspective
-            class="com.google.devtools.depan.eclipse.Perspective"
-            icon="icons/branding/depan-icon-16x16.gif"
-            id="com.google.devtools.depan.eclipse.perspective"
-            name="DepAn Perspective">
-      </perspective>
-   </extension>
 
 </plugin>

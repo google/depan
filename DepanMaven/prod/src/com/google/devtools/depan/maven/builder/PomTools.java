@@ -26,6 +26,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
@@ -97,4 +98,18 @@ public class PomTools {
     StringReader reader = new StringReader(effPom);
     return new InputSource(reader);
   }
-}
+
+  public static InputSource getPomSource(
+      File pomFile, MavenContext context, PomProcessing processing)
+      throws IOException, InterruptedException {
+    switch (processing) {
+    case EFFECTIVE:
+      return PomTools.loadEffectivePom(pomFile, context);
+    case NONE:
+      FileInputStream stream = new FileInputStream(pomFile);
+      return new InputSource(stream);
+    }
+
+    MavenLogger.LOG.warning("Unexpected processing for " + pomFile.getPath());
+    return null;
+  }}

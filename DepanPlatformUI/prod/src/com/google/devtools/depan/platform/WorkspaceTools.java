@@ -235,4 +235,5 @@ public final class WorkspaceTools {
       }
       persist.logSaveException(location, err);
     }
-  }}
+  }
+}

@@ -14,7 +14,7 @@
  * the License.
  */
 
-package com.google.devtools.depan.maven.eclipse;
+package com.google.devtools.depan.maven.builder;
 
 import com.google.devtools.depan.maven.graph.ArtifactElement;
 import com.google.devtools.depan.model.GraphEdge;

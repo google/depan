@@ -28,6 +28,8 @@ import com.google.devtools.depan.model.ElementTransformer;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.builder.chain.ElementFilter;
 
+import com.google.common.collect.Lists;
+
 import java.util.Collection;
 
 /**
@@ -125,5 +127,38 @@ public class DefaultElementFilter extends JavaElementDispatcher<Boolean>
       return true;
     }
     return match(element);
+  }
+
+  /**
+   * For now, split a filter input line into a filter whitelist.  In the future
+   * a better UI would be appropriate.
+   *
+   * Split the input line on spaces, and build up the whitelist from the split()
+   * results.  If the generated whitelist is empty, add on empty string to the
+   * whitelist so that it matches all packages or directories.
+   *
+   * @param formFilter user input with possibly multiple patterns
+   *     for a whitelist
+   * @return Collection of Strings suitable for a whitelist.
+   */
+  private static Collection<String> splitFilter(String formFilter) {
+    Collection<String> result = Lists.newArrayList();
+    for (String filter : formFilter.split("\\p{Space}+")) {
+      if ((filter != null) && (!filter.isEmpty())) {
+        result.add(filter);
+      }
+    }
+
+    // If the constructed filter wound up empty, make it accept everything
+    if (result.size() <= 0) {
+      result.add("");
+    }
+    return result;
+  }
+
+  public static DefaultElementFilter build(String packageFilter) {
+    Collection<String> packageWhitelist = splitFilter(packageFilter);
+    return new DefaultElementFilter(packageWhitelist);
+    
   }
 }
