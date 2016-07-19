@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.view_doc.eclipse.ui.editor;
 
+import com.google.devtools.depan.platform.NewEditorHelper;
 import com.google.devtools.depan.view_doc.eclipse.ViewDocResources;
 import com.google.devtools.depan.view_doc.layout.LayoutGenerator;
 import com.google.devtools.depan.view_doc.model.ViewDocument;
@@ -29,11 +30,15 @@ import org.eclipse.ui.IPersistableElement;
  */
 public class ViewEditorInput implements IEditorInput {
 
+  private static final String NEW_VIEW = "New View";
+
   private final ViewDocument viewInfo;
 
   private final String baseName;
 
   private LayoutGenerator initialLayout;
+
+  private String displayName;
 
   public ViewEditorInput(ViewDocument viewInfo, String baseName) {
     this.viewInfo = viewInfo;
@@ -42,6 +47,16 @@ public class ViewEditorInput implements IEditorInput {
 
   public String getBaseName() {
     return baseName;
+  }
+
+  private String calcDisplayName() {
+    if (null == baseName) {
+      return NEW_VIEW;
+    }
+    if (baseName.isEmpty()) {
+      return NEW_VIEW;
+    }
+    return NewEditorHelper.newEditorLabel(baseName + " - " + NEW_VIEW);
   }
 
   public ViewDocument getViewDocument() {
@@ -75,7 +90,10 @@ public class ViewEditorInput implements IEditorInput {
 
   @Override
   public String getName() {
-    return viewInfo.getGraphModelLocation().getName();
+    if (null == displayName) {
+      displayName = calcDisplayName();
+    }
+    return displayName;
   }
 
   @Override
@@ -85,7 +103,9 @@ public class ViewEditorInput implements IEditorInput {
 
   @Override
   public String getToolTipText() {
-    return viewInfo.getGraphModelLocation().getFullPath().toString();
+    // Any distinction provided by NewEditorHelper in
+    // calcDisplayName()
+    return getName();
   }
 
   @Override

@@ -2,15 +2,13 @@ package com.google.devtools.depan.view_doc.eclipse.ui.wizards;
 
 import com.google.devtools.depan.graph_doc.eclipse.ui.plugins.FromGraphDocWizard;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.platform.NewEditorHelper;
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditorInput;
 import com.google.devtools.depan.view_doc.layout.LayoutGenerator;
+import com.google.devtools.depan.view_doc.layout.grid.GridLayoutGenerator;
 import com.google.devtools.depan.view_doc.model.GraphModelReference;
 import com.google.devtools.depan.view_doc.model.ViewDocument;
 import com.google.devtools.depan.view_doc.model.ViewPreferences;
-
-import org.eclipse.core.resources.IContainer;
 
 import java.text.MessageFormat;
 
@@ -20,13 +18,47 @@ public class ViewFromGraphDocWizard extends FromGraphDocWizard {
 
   @Override
   public void addPages() {
-    String filename = getName() + '.' + ViewDocument.EXTENSION;
-    IContainer defaultContainer = getGraphFile().getParent();
-    page = new ViewFromGraphDocPage(defaultContainer, filename);
+    page = new ViewFromGraphDocPage();
     addPage(page);
   }
 
-  private String getName() {
+  @Override
+  public boolean performFinish() {
+    ViewEditorInput viewInput = buildViewInput();
+    ViewEditor.startViewEditor(viewInput);
+    return true;
+  }
+
+  /**
+   * Unpack wizard page controls into a {@link ViewEditorInput}.
+   */
+  private ViewEditorInput buildViewInput() {
+    String basename = calcName();
+
+    // Create ViewDocument elements
+    GraphModelReference graphRef =
+        new GraphModelReference(getGraphFile(), getGraphDoc());
+
+    ViewPreferences userPrefs = new ViewPreferences();
+    // userPrefs.setLayoutFinder(layoutEdgeMatcher);
+
+    ViewDocument viewInfo = new ViewDocument(graphRef, getNodes(), userPrefs);
+
+    ViewEditorInput result = new ViewEditorInput(viewInfo, basename);
+    result.setInitialLayout(calcInitialLayout());
+
+    return result;
+  }
+
+  private LayoutGenerator calcInitialLayout() {
+    LayoutGenerator layout = page.getLayoutGenerator();
+    if (null != layout) {
+      return layout;
+    }
+    return new GridLayoutGenerator();
+  }
+
+  private String calcName() {
     String srcBase = getSourceBase();
     if (entireGraph()) {
       return srcBase;
@@ -36,11 +68,11 @@ public class ViewFromGraphDocWizard extends FromGraphDocWizard {
       return "Empty Graph";
     }
 
-    String detail = getDetailName(node);
+    String detail = calcDetailName(node);
     return MessageFormat.format("{0}_{1}", srcBase, detail);
   }
 
-  private String getDetailName(GraphNode node) {
+  private String calcDetailName(GraphNode node) {
     String baseName = node.friendlyString();
     int period = baseName.lastIndexOf('.');
     if (period > 0) {
@@ -75,37 +107,5 @@ public class ViewFromGraphDocWizard extends FromGraphDocWizard {
     }
     // remove period and extension from end
     return name.substring(0, name.length() - 1 - ext.length());
-  }
-
-  @Override
-  public boolean performFinish() {
-    ViewEditorInput viewInput = buildViewInput();
-    ViewEditor.startViewEditor(viewInput);
-    return true;
-  }
-
-  /**
-   * Unpack wizard page controls into a {@link ViewEditorInput}.
-   */
-  private ViewEditorInput buildViewInput() {
-
-    String baseName = NewEditorHelper.newEditorLabel(
-        page.getFilename() + " - New View");
-
-    // Create ViewDocument elements
-    GraphModelReference graphRef =
-        new GraphModelReference(getGraphFile(), getGraphDoc());
-
-    ViewPreferences userPrefs = new ViewPreferences();
-    // userPrefs.setLayoutFinder(layoutEdgeMatcher);
-
-    ViewDocument viewInfo = new ViewDocument(graphRef, getNodes(), userPrefs);
-
-    ViewEditorInput result = new ViewEditorInput(viewInfo, baseName);
-    LayoutGenerator layout = page.getLayoutGenerator();
-    if (null != layout) {
-      result.setInitialLayout(layout);
-    }
-    return result;
   }
 }

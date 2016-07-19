@@ -1,14 +1,9 @@
 package com.google.devtools.depan.view_doc.eclipse.ui.wizards;
 
-import com.google.devtools.depan.graph_doc.eclipse.ui.wizards.AnalysisOutputPart;
-import com.google.devtools.depan.platform.WorkspaceTools;
 import com.google.devtools.depan.view_doc.layout.LayoutGenerator;
 import com.google.devtools.depan.view_doc.layout.eclipse.ui.widgets.LayoutGeneratorsControl;
 import com.google.devtools.depan.view_doc.layout.plugins.LayoutGeneratorContributor;
 
-import org.eclipse.core.resources.IContainer;
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -24,20 +19,10 @@ public class ViewFromGraphDocPage extends WizardPage {
   public static final String PAGE_DESCRIPTION =
       "Setup initial View Editor state";
 
-  private AnalysisOutputPart outputPart;
-
-  private IContainer defaultContainer;
-
-  private String defaultFilename;
-
   private LayoutGeneratorsControl layoutChoice;
 
-  protected ViewFromGraphDocPage(
-      IContainer defaultContainer, String defaultFilename) {
+  protected ViewFromGraphDocPage() {
     super(PAGE_NAME);
-    this.defaultContainer = defaultContainer;
-    this.defaultFilename = defaultFilename;
-
     setTitle(PAGE_NAME);
     setDescription(PAGE_DESCRIPTION);
  }
@@ -50,14 +35,6 @@ public class ViewFromGraphDocPage extends WizardPage {
     layout.marginWidth = 0;
     layout.verticalSpacing = 9;
     result.setLayout(layout);
-
-    String outputFilename = WorkspaceTools.guessNewFilename(
-        defaultContainer, defaultFilename, 1, 10);
-
-    outputPart = new AnalysisOutputPart(
-        this, defaultContainer, outputFilename);
-    Composite outputGroup = outputPart.createControl(result);
-    outputGroup.setLayoutData(createHorzFillData());
 
     Composite optionsGroup = setupOptions(result);
     optionsGroup.setLayoutData(createHorzFillData());
@@ -91,10 +68,6 @@ public class ViewFromGraphDocPage extends WizardPage {
   }
 
   protected String getPageErrorMsg() {
-    String result = outputPart.getErrorMsg();
-    if (null != result) {
-      return result;
-    }
     LayoutGeneratorContributor layout = layoutChoice.getChoice();
     if (null == layout) {
       return "Initial layout must be specified";
@@ -105,14 +78,6 @@ public class ViewFromGraphDocPage extends WizardPage {
   protected void updateStatus(String message) {
     setErrorMessage(message);
     setPageComplete(isPageComplete());
-  }
-
-  public String getFilename() {
-    return outputPart.getFileName();
-  }
-
-  public IFile getOutputFile() throws CoreException {
-    return outputPart.getOutputFile();
   }
 
   public LayoutGenerator getLayoutGenerator() {

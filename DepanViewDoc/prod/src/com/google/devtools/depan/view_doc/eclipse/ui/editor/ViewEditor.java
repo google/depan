@@ -53,7 +53,6 @@ import com.google.devtools.depan.nodes.filters.model.ContextualFilter;
 import com.google.devtools.depan.nodes.filters.sequence.SteppingFilter;
 import com.google.devtools.depan.nodes.trees.TreeModel;
 import com.google.devtools.depan.platform.ListenerManager;
-import com.google.devtools.depan.platform.NewEditorHelper;
 import com.google.devtools.depan.platform.WorkspaceTools;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
@@ -80,13 +79,12 @@ import com.google.common.collect.Lists;
 
 import edu.uci.ics.jung.graph.DirectedGraph;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -106,6 +104,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.SaveAsDialog;
+import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.MultiPageEditorPart;
 
 import java.awt.Color;
@@ -132,9 +131,8 @@ public class ViewEditor extends MultiPageEditorPart {
       "com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor";
 
   // TODO: Expected to evolve ..
-  private static final LayoutGenerator[] OGL_LAYOUTS = new LayoutGenerator[] {
-    new GridLayoutGenerator(),
-  };
+  private static final LayoutGenerator[] OGL_LAYOUTS =
+      new LayoutGenerator[] { new GridLayoutGenerator() };
 
   // TODO: Could be user option
   public static final double ZOOM_IN_FACTOR = 1.1;
@@ -148,9 +146,6 @@ public class ViewEditor extends MultiPageEditorPart {
   /** State of the view.  Only this data is saved. */
   private ViewDocument viewInfo;
 
-  /** Persistent location for the viewInfo. */
-  private IFile viewFile;
-
   /**
    * Standard resources for manipulating this graphs and its set of nodes
    * and relations.
@@ -159,7 +154,8 @@ public class ViewEditor extends MultiPageEditorPart {
 
   /**
    * Base name to use for created files. Typically set through the
-   * {@link ViewEditorInput} supplied at editor startup.
+   * {@link ViewEditorInput} supplied at editor startup. It does
+   * not include the extension for {@link ViewDocument}s.
    */
   private String baseName;
 
@@ -604,22 +600,22 @@ public class ViewEditor extends MultiPageEditorPart {
   private void initFromInput(IEditorInput input) throws PartInitException {
     if (input instanceof ViewEditorInput) {
       ViewEditorInput editorInput = (ViewEditorInput) input;
-      viewFile = null; // not yet saved
       baseName = editorInput.getBaseName();
-      viewInfo = editorInput.getViewDocument();
       initialLayout = editorInput.getInitialLayout();
-      setPartName(calcPartName());
+      setPartName(input.getName());
+
+      viewInfo = editorInput.getViewDocument();
       markDirty();
     } else if (input instanceof IFileEditorInput) {
+      IFile viewFile = ((IFileEditorInput) input).getFile();
+      baseName = buildFileInputBaseName(viewFile);
+      initialLayout = null;
+      setPartName(input.getName());
+
       try {
-        viewFile = ((IFileEditorInput) input).getFile();
-        baseName = viewFile.getName();
         viewInfo = loadViewDocument(viewFile);
-        initialLayout = null;
-        setPartName(calcPartName());
         setDirtyState(false);
       } catch (RuntimeException e) {
-        viewFile = null;
         viewInfo = null;
         throw new PartInitException(
             "Unable to load view from " + viewFile.getFullPath().toString());
@@ -628,6 +624,13 @@ public class ViewEditor extends MultiPageEditorPart {
       throw new PartInitException(
           "Input for editor is not suitable for the ViewEditor");
     }
+  }
+
+  private String buildFileInputBaseName(IFile file) {
+    String name = file.getName();
+    IPath result = Path.fromOSString(name);
+    result.removeFileExtension();
+    return result.toOSString();
   }
 
   /**
@@ -768,20 +771,21 @@ public class ViewEditor extends MultiPageEditorPart {
   /**
    * Load a view document from a file.
    */
-  private static ViewDocument loadViewDocument(IFile viewFile) {
+  private static ViewDocument loadViewDocument(IFile file) {
     ViewDocXmlPersist loader = ViewDocXmlPersist.build(true, "load");
-    return loader.load(viewFile.getLocationURI());
+    return loader.load(file.getLocationURI());
   }
 
   @Override
   public void doSave(IProgressMonitor monitor) {
     // If there are any file problems, do this as a Save As ..
-    if (null == viewFile) {
+    IFile infoFile = getInputFile();
+    if (null == infoFile) {
       doSaveAs();
       return;
     }
 
-    saveFile(viewFile, monitor, "save");
+    saveFile(infoFile, monitor, "save");
     if (null != monitor) {
       monitor.done();
     }
@@ -790,8 +794,9 @@ public class ViewEditor extends MultiPageEditorPart {
   @Override
   public void doSaveAs() {
     SaveAsDialog saveas = new SaveAsDialog(getSite().getShell());
-    saveas.setOriginalFile(getSaveAsFile());
-    saveas.setOriginalName(calcSaveAsName());
+    IFile saveAs = getSaveAsFile();
+    saveas.setOriginalFile(saveAs);
+    saveas.setOriginalName(saveAs.getName());
     if (saveas.open() != SaveAsDialog.OK) {
       return;
     }
@@ -801,60 +806,50 @@ public class ViewEditor extends MultiPageEditorPart {
     // TODO: set up a progress monitor
     saveFile(saveFile, null, "saveAs");
 
-    viewFile = saveFile;
-    setPartName(viewFile.getName());
-    }
+    baseName = buildFileInputBaseName(saveFile);
+    setPartName(saveFile.getName());
 
-  private IFile getSaveAsFile() {
-    if (null != viewFile) {
-      return viewFile;
-    }
-
-    IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-    IProject[] projs = root.getProjects();
-
-    // Propose a name only if there is exactly one project.
-    if (projs.length != 1) {
-      return null;
-    }
-
-    IProject proj = projs[0];
-    String name = calcSaveAsName();
-    return proj.getFile(name);
+    FileEditorInput effInput = new FileEditorInput(saveFile);
+    setInputWithNotify(effInput);
   }
 
+  private IFile getSaveAsFile() {
+    IFile infoFile = getInputFile();
+    if (null != infoFile) {
+      return infoFile;
+    }
+
+    IContainer parent = viewInfo.getGraphModelLocation().getParent();
+    String filebase = baseName + '.' + ViewDocument.EXTENSION;
+    String filename = WorkspaceTools.guessNewFilename(
+        parent, filebase, 1, 10);
+
+    IPath filePath = Path.fromOSString(filename);
+    return parent.getFile(filePath);
+  }
+
+  /**
+   * For unsaved ViewDocuments, the suggested creation name.
+   * 
+   * For saved ViewDocuments, the last segment of the file name
+   * without the extension.
+   */
   public String getBaseName() {
     return baseName;
   }
 
   /**
-   * Provide a likely file name for this view editor's contents.
+   * Provide the file association with the editor input, if any.
+   * @return 
    */
-  private String calcSaveAsName() {
-    // Basename can be null (on initialization, etc.).
-    // Rare, but cope with it.
-    if (null != baseName && !baseName.isEmpty()) {
-      return baseName;
+  private IFile getInputFile() {
+    // If there are any file problems, do this as a Save As ..
+    IEditorInput input = getEditorInput();
+    if (input instanceof IFileEditorInput) {
+      return ((IFileEditorInput) input).getFile();
     }
 
-    String graphName = viewInfo.getGraphModelLocation().getName();
-    String label = NewEditorHelper.newEditorLabel(graphName);
-    baseName = label;
-    return label;
-  }
-
-  /**
-   * Provide a tab name for this editor./
-   */
-  private String calcPartName() {
-    if (null != baseName && !baseName.isEmpty()) {
-      return baseName;
-    }
-
-    // TODO: Also set baseName .. see getSaveAsName()
-    String graphName = viewInfo.getGraphModelLocation().getName();
-    return NewEditorHelper.newEditorLabel(
-        graphName + " - New View");
+    return null;
   }
 
   /**
