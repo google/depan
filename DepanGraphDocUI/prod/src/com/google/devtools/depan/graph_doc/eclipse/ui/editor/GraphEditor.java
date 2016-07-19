@@ -25,10 +25,12 @@ import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeTreeProviders;
 import com.google.devtools.depan.graph_doc.GraphDocLogger;
 import com.google.devtools.depan.graph_doc.eclipse.ui.plugins.FromGraphDocContributor;
 import com.google.devtools.depan.graph_doc.eclipse.ui.plugins.FromGraphDocWizard;
+import com.google.devtools.depan.graph_doc.eclipse.ui.resources.AnalysisResources;
+import com.google.devtools.depan.graph_doc.eclipse.ui.resources.GraphResources;
 import com.google.devtools.depan.graph_doc.eclipse.ui.widgets.FromGraphDocListControl;
+import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.graph_doc.model.GraphDocument;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
-import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptors;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.platform.ResourceCache;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
@@ -52,7 +54,6 @@ import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.MultiPageEditorPart;
 
-import java.util.Arrays;
 import java.util.Collection;
 
 /**
@@ -88,6 +89,8 @@ public class GraphEditor extends MultiPageEditorPart {
 
   private HierarchyCache<GraphNode> hierarchies;
 
+  private GraphResources graphResources;
+
   /////////////////////////////////////
   // Public methods
 
@@ -109,6 +112,9 @@ public class GraphEditor extends MultiPageEditorPart {
     hierarchies = new HierarchyCache<GraphNode>(
         NodeTreeProviders.GRAPH_NODE_PROVIDER, graph.getGraph());
     handleHierarchyChanged();
+
+    DependencyModel model = graph.getDependencyModel();
+    graphResources = AnalysisResources.buildAnalysisResources(model);
 
     // set the title to the filename, excepted the file extension
     String title = file.getName();
@@ -205,7 +211,8 @@ public class GraphEditor extends MultiPageEditorPart {
   }
 
   private HierarchyViewer<GraphNode> createHierarchyViewer(Composite parent) {
-    HierarchyViewer<GraphNode> result = new HierarchyViewer<GraphNode>(parent, false);
+    HierarchyViewer<GraphNode> result = 
+        new HierarchyViewer<GraphNode>(parent, false);
 
     GraphEdgeMatcherDescriptor selectedRelSet = getDefaultEdgeMatcher();
     java.util.List<GraphEdgeMatcherDescriptor> choices = getEdgeMatcherChoices();
@@ -301,13 +308,11 @@ public class GraphEditor extends MultiPageEditorPart {
    * TODO: Separate hierarchy edge matcher from display relation set.
    */
   private GraphEdgeMatcherDescriptor getDefaultEdgeMatcher() {
-    return GraphEdgeMatcherDescriptors.FORWARD;
+    return graphResources.getDefaultEdgeMatcher();
   }
 
   private java.util.List<GraphEdgeMatcherDescriptor> getEdgeMatcherChoices() {
-    return Arrays.asList(
-        GraphEdgeMatcherDescriptors.FORWARD,
-        GraphEdgeMatcherDescriptors.EMPTY);
+    return graphResources.getEdgeMatcherChoices();
   }
 
   protected void selectView() {

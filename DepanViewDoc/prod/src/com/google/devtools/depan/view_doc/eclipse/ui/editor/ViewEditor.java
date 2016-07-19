@@ -645,7 +645,7 @@ public class ViewEditor extends MultiPageEditorPart {
         getNodeDisplayPropertyProvider(),
         getViewGraph());
 
-    viewResources = viewInfo.getGraphResources();
+    viewResources = viewInfo.buildGraphResources();
 
     updateExposedGraph();
 
