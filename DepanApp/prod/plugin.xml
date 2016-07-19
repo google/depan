@@ -68,5 +68,21 @@
             name="DepAn Perspective">
       </perspective>
    </extension>
+   <extension
+         id="cli"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="com.google.devtools.depan.cmd.application"
+            name="DepAn [CLI]">
+         <property
+               name="aboutText"
+               value="DepAn - A direct manipulation tool for the visualization, analysis, and refactoring of dependencies in large applications.">
+         </property>
+         <property
+               name="appName"
+               value="DepAn [CLI]">
+         </property>
+      </product>
+   </extension>
 
 </plugin>

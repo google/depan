@@ -39,7 +39,11 @@ public class Application implements IApplication {
     CommandDispatch cli = new CommandDispatch();
     cli.dispatch(Arrays.asList(appArgs));
 
-    return cli.getResult();
+    Object result = cli.getResult();
+    if (IApplication.EXIT_OK != result) {
+      CmdLogger.LOG.warning("Depan Cmd failure with result: " + result);
+    }
+    return result;
   }
 
   @Override

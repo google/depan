@@ -26,4 +26,6 @@ public interface CommandExec {
   void setArgs(List<String> args);
 
   void exec();
+
+  Object getResult();
 }

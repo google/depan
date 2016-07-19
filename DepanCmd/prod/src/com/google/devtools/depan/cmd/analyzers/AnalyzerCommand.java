@@ -57,7 +57,7 @@ public class AnalyzerCommand extends AbstractCommandExec {
     }
     String msg = MessageFormat.format(
         "Unknown analysis type {0}.", analyzer);
-    CmdLogger.LOG.warning(msg);
+    failWithMessage(msg);
   }
 
   private void analyzeFileSystem() {

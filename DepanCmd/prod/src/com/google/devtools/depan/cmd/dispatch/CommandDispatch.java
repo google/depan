@@ -16,6 +16,8 @@
 
 package com.google.devtools.depan.cmd.dispatch;
 
+import com.google.devtools.depan.cmd.CmdLogger;
+
 import org.eclipse.equinox.app.IApplication;
 
 import java.util.List;
@@ -25,16 +27,26 @@ import java.util.List;
  */
 public class CommandDispatch {
 
+  private CommandExec exec;
+
   public void dispatch(List<String> args) {
-    CommandExec exec = CommandDef.lookup(args.get(0));
+    exec = buildExec(args);
     exec.setArgs(args);
     exec.exec();
+  }
+
+  private CommandExec buildExec(List<String> args) {
+    if (args.isEmpty()) {
+      return new UnrecognizedCommand();
+    }
+
+    return CommandDef.lookup(args.get(0));
   }
 
   /**
    * @return
    */
-  public Integer getResult() {
-    return IApplication.EXIT_OK;
+  public Object getResult() {
+    return exec.getResult();
   }
 }

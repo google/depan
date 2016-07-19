@@ -16,6 +16,10 @@
 
 package com.google.devtools.depan.cmd.dispatch;
 
+import com.google.devtools.depan.cmd.CmdLogger;
+
+import org.eclipse.equinox.app.IApplication;
+
 import java.util.List;
 
 /**
@@ -25,9 +29,16 @@ public abstract class AbstractCommandExec implements CommandExec {
 
   private List<String> args;
 
+  private Object result =  IApplication.EXIT_OK;
+
   @Override
   public void setArgs(List<String> args) {
     this.args = args;
+  }
+
+  @Override
+  public Object getResult() {
+    return result;
   }
 
   protected List<String> getArgs() {
@@ -66,5 +77,13 @@ public abstract class AbstractCommandExec implements CommandExec {
       return result;
     }
     return def;
+  }
+
+  /**
+   * @param msg
+   */
+  protected void failWithMessage(String msg) {
+    result = new Integer(1);
+    CmdLogger.LOG.warning(msg);
   }
 }

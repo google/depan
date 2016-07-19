@@ -4,6 +4,7 @@ import com.google.devtools.depan.graph_doc.eclipse.ui.wizards.AnalysisOutputPart
 import com.google.devtools.depan.platform.WorkspaceTools;
 import com.google.devtools.depan.view_doc.layout.LayoutGenerator;
 import com.google.devtools.depan.view_doc.layout.eclipse.ui.widgets.LayoutGeneratorsControl;
+import com.google.devtools.depan.view_doc.layout.plugins.LayoutGeneratorContributor;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -93,6 +94,10 @@ public class ViewFromGraphDocPage extends WizardPage {
     String result = outputPart.getErrorMsg();
     if (null != result) {
       return result;
+    }
+    LayoutGeneratorContributor layout = layoutChoice.getChoice();
+    if (null == layout) {
+      return "Initial layout must be specified";
     }
     return null;
   }

@@ -4,7 +4,6 @@
 <product name="DepAn [CLI]" uid="com.pnambic.depan.cli.release" id="com.google.devtools.depan.cli" application="com.google.devtools.depan.cmd.application" version="2.0.0.qualifier" useFeatures="true" includeLaunchers="true">
 
    <aboutInfo>
-      <image path="/DepanApp/icons/branding/depan-icon-250x250.gif"/>
       <text>
          DepAn - A direct manipulation tool for the visualization, analysis, and refactoring of dependencies in large applications.
       </text>
@@ -14,28 +13,28 @@
    </configIni>
 
    <launcherArgs>
+      <programArgs>-nosplash
+      </programArgs>
       <vmArgs>-Dosgi.requiredJavaVersion=1.6 -Xms40m -Xmx512m
       </vmArgs>
       <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts
       </vmArgsMac>
    </launcherArgs>
 
-   <windowImages i16="/DepanAppMin/icons/branding/depan-icon-16x16.gif" i32="/DepanAppMin/icons/branding/depan-icon-32x32.gif" i48="/DepanAppMin/icons/branding/depan-icon-48x48.gif" i64="/DepanAppMin/icons/branding/depan-icon-64x64.gif"/>
+   <windowImages/>
 
-   <splash
-      location="com.google.devtools.depan_min"
-      startupProgressRect="5,275,445,15"
-      startupMessageRect="7,252,445,20"
-      startupForegroundColor="000000" />
-   <launcher name="DepAn">
+
+   <launcher name="DepAnCmd">
       <solaris/>
       <win useIco="false">
          <bmp/>
       </win>
    </launcher>
 
+
    <vm>
    </vm>
+
 
    <plugins>
    </plugins>

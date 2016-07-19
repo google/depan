@@ -31,6 +31,11 @@ public class UnrecognizedCommand extends AbstractCommandExec {
     CmdLogger.LOG.warning(buildMessage());
   }
 
+  @Override
+  public Object getResult() {
+    return new Integer(1);
+  }
+
   public String buildMessage() {
     List<String> args = getArgs();
     if (null == args) {
