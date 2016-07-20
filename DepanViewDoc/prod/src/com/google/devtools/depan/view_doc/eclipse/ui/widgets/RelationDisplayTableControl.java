@@ -17,6 +17,7 @@
 package com.google.devtools.depan.view_doc.eclipse.ui.widgets;
 
 import com.google.devtools.depan.graph.api.Relation;
+import com.google.devtools.depan.graph.registry.RelationRegistry;
 import com.google.devtools.depan.platform.AlphabeticSorter;
 import com.google.devtools.depan.platform.Colors;
 import com.google.devtools.depan.platform.InverseSorter;
@@ -81,12 +82,12 @@ public class RelationDisplayTableControl extends Composite {
   public static final int INDEX_ARROWHEAD = 4;
 
   private static final EditColTableDef[] TABLE_DEF = new EditColTableDef[] {
-    new EditColTableDef(COL_NAME, false, COL_NAME, 180),
-    new EditColTableDef(COL_SOURCE, false, COL_SOURCE, 80),
+    new EditColTableDef(COL_NAME, false, COL_NAME, 320),
+    new EditColTableDef(COL_SOURCE, false, COL_SOURCE, 160),
     new EditColTableDef(COL_COLOR, true, COL_COLOR, 80),
 //    new EditColTableDef(COL_WIDTH, false, COL_WIDTH, 180),
-    new EditColTableDef(COL_STYLE, true, COL_STYLE, 60),
-    new EditColTableDef(COL_ARROWHEAD, true, COL_ARROWHEAD, 110),
+    new EditColTableDef(COL_STYLE, true, COL_STYLE, 120),
+    new EditColTableDef(COL_ARROWHEAD, true, COL_ARROWHEAD, 160),
 //    new EditColTableDef(COL_SHAPE, false, COL_SHAPE, 180),
   };
 
@@ -346,17 +347,7 @@ public class RelationDisplayTableControl extends Composite {
     }
 
     private String getSourceLabelForRelation(Relation relation) {
-      ClassLoader loader = relation.getClass().getClassLoader();
-      String result = loader.toString();
-      int bound = result.length();
-      int start = Math.max(0, bound - 12);
-      return result.substring(start);
-
-      // TODO: More like this, with an relation registry
-      // SourcePlugin plugin = relPlugin.get(relation);
-      // SourcePluginRegistry registry = SourcePluginRegistry.getInstance();
-      // String sourceId = registry.getPluginId(plugin);
-      // return registry.getSourcePluginEntry(sourceId).getSource();
+      return RelationRegistry.getRegistryRelationSource(relation);
     }
 
     private String getColorName(EdgeDisplayProperty prop) {

@@ -284,8 +284,7 @@ public class RelationDisplayViewPart extends AbstractViewDocViewPart {
     propRepo = new PartRelationDisplayRepo(editor);
     propEditor.setEdgeDisplayRepository(propRepo);
 
-    // TODO: Should come from editor
-    propEditor.setInput(RelationRegistry.getRegistryRelations());
+    propEditor.setInput(editor.getDisplayRelations());
     propEditor.update();
   }
 

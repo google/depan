@@ -9,8 +9,15 @@ import java.util.Collection;
 
 public class MavenRelationContributor implements RelationContributor {
 
+  public static final String LABEL = "Maven";
+
   public static final String ID =
-      "com.google.devtools.depan.java.JavaRelationContributor";
+      "com.google.devtools.depan.java.MavenRelationContributor";
+
+  @Override
+  public String getLabel() {
+    return LABEL;
+  }
 
   @Override
   public Collection<? extends Relation> getRelations() {

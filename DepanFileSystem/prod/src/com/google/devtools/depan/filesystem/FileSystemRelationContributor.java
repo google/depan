@@ -9,8 +9,15 @@ import java.util.Collection;
 
 public class FileSystemRelationContributor implements RelationContributor {
 
+  public static final String LABEL = "File System";
+
   public static final String ID =
       "com.google.devtools.depan.filesystem.FileSystemRelationContributor";
+
+  @Override
+  public String getLabel() {
+    return LABEL;
+  }
 
   @Override
   public Collection<? extends Relation> getRelations() {

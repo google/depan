@@ -18,6 +18,7 @@ package com.google.devtools.depan.relations.eclipse.ui.widgets;
 
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.api.RelationSet;
+import com.google.devtools.depan.graph.registry.RelationRegistry;
 import com.google.devtools.depan.platform.AlphabeticSorter;
 import com.google.devtools.depan.platform.InverseSorter;
 import com.google.devtools.depan.platform.LabelProviderToString;
@@ -26,7 +27,6 @@ import com.google.devtools.depan.platform.eclipse.ui.tables.EditColTableDef;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 import com.google.devtools.depan.relations.models.RelationSetRepository;
 
-import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 
@@ -52,11 +52,8 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
-import java.text.MessageFormat;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * Show a table of {@link Relation}s, marked visible/included.  The
@@ -381,21 +378,7 @@ public class RelationSetTableControl extends Composite {
     }
 
     private String getSourceLabelForRelation(Relation relation) {
-      // [Jun-2016] Stop-gap until better resource management is invented
-      String pkgName = relation.getClass().getPackage().getName();
-      List<String> pkgs = Splitter.on(".").splitToList(pkgName);
-      while(!pkgs.isEmpty()) {
-        int last = pkgs.size() - 1;
-        String tail = pkgs.get(last);
-        if ("graph".equals(tail)) {
-          pkgs = pkgs.subList(0, last);
-        } else
-          return tail;
-      }
-
-      String msg = MessageFormat.format(
-          "- unsrcd {0} -", relation.getForwardName());
-      return msg;
+      return RelationRegistry.getRegistryRelationSource(relation);
     }
 
     @Override

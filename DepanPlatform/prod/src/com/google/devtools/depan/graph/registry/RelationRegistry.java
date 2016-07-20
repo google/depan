@@ -22,12 +22,15 @@ import com.google.devtools.depan.platform.plugin.ContributionEntry;
 import com.google.devtools.depan.platform.plugin.ContributionRegistry;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 
+import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Support common plugin pattern with multiple contributions to a single
@@ -66,6 +69,9 @@ public class RelationRegistry extends
     }
   }
 
+  private Map<Relation, RelationContributor> relationToContrib =
+      Maps.newHashMap();
+
   /**
    * Singleton class: private constructor to prevent instantiation.
    */
@@ -82,6 +88,22 @@ public class RelationRegistry extends
   protected void reportException(String entryId, Exception err) {
     PlatformLogger.logException(
         "Relation registry load failure for " + entryId, err);
+  }
+
+  @Override
+  protected void load(String extensionId) {
+    super.load(extensionId);
+    deriveDetails();
+  }
+
+  private void deriveDetails() {
+    // Build reverse map from relation to contributor
+    for (ContributionEntry<RelationContributor> entry : getContributions()) {
+      RelationContributor contrib = entry.getInstance();
+      for (Relation relation : contrib.getRelations()) {
+        relationToContrib .put(relation, contrib);
+      }
+    }
   }
 
   /////////////////////////////////////
@@ -103,6 +125,17 @@ public class RelationRegistry extends
       result.addAll(entry.getInstance().getRelations());
     }
     return result;
+  }
+
+  private String getRelationSource(Relation relation) {
+    RelationContributor result = relationToContrib.get(relation);
+    if (null != result) {
+      return result.getLabel();
+    }
+
+    String msg = MessageFormat.format(
+        "- unsrcd {0} -", relation.getForwardName());
+    return msg;
   }
 
   /////////////////////////////////////
@@ -127,5 +160,10 @@ public class RelationRegistry extends
   public static Collection<Relation> getRegistryRelations(
       Collection<String> contribIds) {
     return getInstance().getRelations(contribIds);
+  }
+
+  public static String getRegistryRelationSource(
+      Relation relation) {
+    return getInstance().getRelationSource(relation);
   }
 }

@@ -9,8 +9,15 @@ import java.util.Collection;
 
 public class JavaScriptRelationContributor implements RelationContributor {
 
+  public static final String LABEL = "JavaScript";
+
   public static final String ID =
-      "com.google.devtools.depan.filesystem.FileSystemRelationContributor";
+      "com.google.devtools.depan.filesystem.JavaScriptRelationContributor";
+
+  @Override
+  public String getLabel() {
+    return LABEL;
+  }
 
   @Override
   public Collection<? extends Relation> getRelations() {
