@@ -26,9 +26,11 @@ import com.google.devtools.depan.platform.resources.ResourceContainer;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 import com.google.devtools.depan.relations.models.RelationSetDescriptors;
 
+import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Lists;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
@@ -45,11 +47,11 @@ public class GraphResourceBuilder {
   private List<RelationSetDescriptor> knownRelSets =
       Lists.newArrayList();
 
-  private List<GraphEdgeMatcherDescriptor> defMatchers =
-      Lists.newArrayList();
+  private LinkedHashMultimap<String, GraphEdgeMatcherDescriptor> defMatchers =
+      LinkedHashMultimap.create();
 
-  private List<RelationSetDescriptor> defRelSets =
-      Lists.newArrayList();
+  private LinkedHashMultimap<String, RelationSetDescriptor> defRelSets =
+      LinkedHashMultimap.create();
 
   public GraphResourceBuilder(
       ResourceContainer root, DependencyModel model) {
@@ -73,9 +75,9 @@ public class GraphResourceBuilder {
   }
 
   private GraphEdgeMatcherDescriptor calcDefMatcher() {
-    // TODO: Alternatives when there is more then one apparent default
-    if (!defMatchers.isEmpty()) {
-      return defMatchers.get(0);
+    GraphEdgeMatcherDescriptor bestMatcher = getBestMatcher();
+    if (null != bestMatcher) {
+      return bestMatcher;
     }
     if (!knownMatchers.isEmpty()) {
       return knownMatchers.get(0);
@@ -83,15 +85,51 @@ public class GraphResourceBuilder {
     return GraphEdgeMatcherDescriptors.FORWARD;
   }
 
+  private GraphEdgeMatcherDescriptor getBestMatcher() {
+    if (defMatchers.isEmpty()) {
+      return null;
+    }
+    // Check the contributions in priority order the default matcher.
+    for (String contribs : model.getRelationContribs()) {
+      Set<GraphEdgeMatcherDescriptor> matchers = defMatchers.get(contribs);
+      if (null == matchers) {
+        continue;
+      }
+      if (matchers.isEmpty()) {
+        continue;
+      }
+      return matchers.iterator().next();
+    }
+    return null;
+  }
+
   private RelationSetDescriptor calcDefRelSet() {
-    // TODO: Alternatives when there is more then one apparent default
-    if (!defRelSets.isEmpty()) {
-      return defRelSets.get(0);
+    RelationSetDescriptor bestRelSet = getBestRelSet();
+    if (null != bestRelSet) {
+      return bestRelSet;
     }
     if (!knownRelSets.isEmpty()) {
       return knownRelSets.get(0);
     }
     return RelationSetDescriptors.EMPTY;
+  }
+
+  private RelationSetDescriptor getBestRelSet() {
+    if (defRelSets.isEmpty()) {
+      return null;
+    }
+    // Check the contributions in priority order the default relset.
+    for (String contribs : model.getRelationContribs()) {
+      Set<RelationSetDescriptor> relSets = defRelSets.get(contribs);
+      if (null == relSets) {
+        continue;
+      }
+      if (relSets.isEmpty()) {
+        continue;
+      }
+      return relSets.iterator().next();
+    }
+    return null;
   }
 
   @SuppressWarnings("unchecked")
@@ -104,8 +142,9 @@ public class GraphResourceBuilder {
         if (checkRes.forModel(model)) {
           RelationSetDescriptor info = checkRes.getInfo();
           knownRelSets.add(info);
-          if (isDefault(resource)) {
-            defRelSets.add(info);
+          String defModel = getDefault(resource);
+          if (null != defModel) {
+            defRelSets.put(defModel, info);
           }
         }
       }
@@ -123,24 +162,27 @@ public class GraphResourceBuilder {
         if (checkRes.forModel(model)) {
           GraphEdgeMatcherDescriptor info = checkRes.getInfo();
           knownMatchers.add(info);
-          if (isDefault(resource)) {
-            defMatchers.add(info);
+          String defModel = getDefault(resource);
+          if (null != defModel) {
+            defMatchers.put(defModel, info);
           }
         }
       }
     }
   }
 
-  private boolean isDefault(Object resource) {
+  private String getDefault(Object resource) {
     if (!(resource instanceof PropertyResource)) {
-      return false;
+      return null;
     }
     PropertyResource propRes = (PropertyResource) resource;
     String propVal = propRes.getProperty(PropertyResources.PROP_DEFAULT);
-    boolean modelContrib = model.getRelationContribs().contains(propVal);
-    if (modelContrib) {
-      return true;
+    if (model.getRelationContribs().contains(propVal)) {
+      return propVal;
     }
-    return model.getNodeContribs().contains(propVal);
+    if (model.getNodeContribs().contains(propVal)) {
+      return propVal;
+    }
+    return null;
   }
 }

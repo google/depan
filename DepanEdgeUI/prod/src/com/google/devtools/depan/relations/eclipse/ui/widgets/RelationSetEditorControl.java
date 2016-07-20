@@ -35,7 +35,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Editor control for {@link RelationSet}.  This {@link Control} is
@@ -140,7 +139,7 @@ public class RelationSetEditorControl extends Composite {
 
   public void setRelationSetSelectorInput(
       RelationSetDescriptor selectedRelSet,
-      List<RelationSetDescriptor> choices) {
+      Collection<RelationSetDescriptor> choices) {
 
     relationSetSelector.setInput(selectedRelSet, choices);
   }

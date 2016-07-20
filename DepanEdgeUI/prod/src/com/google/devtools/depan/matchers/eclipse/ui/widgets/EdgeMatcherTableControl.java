@@ -183,7 +183,7 @@ public class EdgeMatcherTableControl extends Composite {
   /**
    * Fill the list with {@link Relation}s.
    */
-  public void updateTableRows(List<Relation> rowRelations) {
+  public void updateTableRows(Collection<Relation> rowRelations) {
     forwardMatchers.clear();
     reverseMatchers.clear();
 

@@ -40,7 +40,6 @@ import com.google.devtools.depan.eclipse.visualization.ogl.RendererEvent;
 import com.google.devtools.depan.eclipse.visualization.ogl.RendererEvents;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.api.RelationSet;
-import com.google.devtools.depan.graph.registry.RelationRegistry;
 import com.google.devtools.depan.graph_doc.eclipse.ui.resources.GraphResources;
 import com.google.devtools.depan.graph_doc.model.GraphDocument;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
@@ -372,6 +371,10 @@ public class ViewEditor extends MultiPageEditorPart {
 
   public GraphModel getParentGraph() {
     return viewInfo.getParentGraph();
+  }
+
+  public Collection<Relation> getDisplayRelations() {
+    return viewResources.getDisplayRelations();
   }
 
   public Collection<RelationSetDescriptor> getRelationSetsChoices() {
@@ -939,11 +942,6 @@ public class ViewEditor extends MultiPageEditorPart {
   public void setEdgeProperty(
       GraphEdge edge, EdgeDisplayProperty newProperty) {
     viewInfo.setEdgeProperty(edge, newProperty);
-  }
-
-  public Collection<Relation> getDisplayRelations() {
-    // TODO: return viewInfo.getDisplayRelations();
-    return RelationRegistry.getRegistryRelations();
   }
 
   public EdgeDisplayProperty getRelationProperty(Relation relation) {

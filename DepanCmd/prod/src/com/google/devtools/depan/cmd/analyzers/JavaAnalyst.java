@@ -71,8 +71,8 @@ public class JavaAnalyst implements DependencyAnalyst {
     GraphModel resultGraph = graphBuilder.createGraphModel();
 
     DependencyModel.Builder modelBuilder = new DependencyModel.Builder();
-    modelBuilder.addRelationContrib(FileSystemRelationContributor.ID);
     modelBuilder.addRelationContrib(JavaRelationContributor.ID);
+    modelBuilder.addRelationContrib(FileSystemRelationContributor.ID);
 
     return new GraphDocument(modelBuilder.build(), resultGraph);
   }

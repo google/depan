@@ -17,9 +17,9 @@
 package com.google.devtools.depan.relations.eclipse.ui.widgets;
 
 import com.google.devtools.depan.edge_ui.EdgeUILogger;
-import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.platform.AlphabeticSorter;
 import com.google.devtools.depan.platform.ListenerManager;
+import com.google.devtools.depan.platform.ViewerObjectToString;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -33,6 +33,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -84,7 +85,14 @@ public class RelationSetSelectorControl extends Composite {
     setsViewer = new ComboViewer(this, SWT.READ_ONLY | SWT.FLAT);
     setsViewer.setContentProvider(new ArrayContentProvider());
     setsViewer.setLabelProvider(RelationSetLabelProvider.PROVIDER);
-    setsViewer.setSorter(new AlphabeticSorter());
+
+    setsViewer.setSorter(new AlphabeticSorter(new ViewerObjectToString() {
+
+        @Override
+        public String getString(Object object) {
+          return RelationSetLabelProvider.PROVIDER.getText(object);
+        }
+      }));
 
     setsViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 
@@ -110,11 +118,12 @@ public class RelationSetSelectorControl extends Composite {
    * 
    * @param selectedRelSet {GraphEdgeMatcherDescriptor RelationSet} to select
    *  in control
-   * @param choices selectable alternatives
+   * @param choices selectable alternatives.  Since the viewer controls the
+   *   presentation order, no ordering is expected.
    */
   public void setInput(
       RelationSetDescriptor relationSet,
-      List<RelationSetDescriptor> choices) {
+      Collection<RelationSetDescriptor> choices) {
     setsViewer.setInput(choices);
     setSelection(relationSet);
   }
@@ -165,7 +174,7 @@ public class RelationSetSelectorControl extends Composite {
       return null;
     }
     IStructuredSelection select = (IStructuredSelection) selection;
-    if (select.getFirstElement() instanceof GraphEdgeMatcherDescriptor) {
+    if (select.getFirstElement() instanceof RelationSetDescriptor) {
       return (RelationSetDescriptor) select.getFirstElement();
     }
     return null;

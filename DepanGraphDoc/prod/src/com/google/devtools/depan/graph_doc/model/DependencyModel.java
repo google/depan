@@ -22,6 +22,7 @@ import com.google.devtools.depan.graph.registry.RelationRegistry;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -40,16 +41,29 @@ public class DependencyModel {
     this.relationContribIds = relationContribIds;
   }
 
-  public List<Relation> getRelations() {
-    return RelationRegistry.getRegistryRelations(relationContribIds);
-  }
-
+  /**
+   * Order implies priority.
+   * The {@code get(0)} element has the highest priority.
+   */
   public List<String> getNodeContribs() {
     return ImmutableList.copyOf(nodeContribIds);
   }
 
+
+  /**
+   * Order implies priority.
+   * The {@code get(0)} element has the highest priority.
+   */
   public List<String> getRelationContribs() {
     return ImmutableList.copyOf(relationContribIds);
+  }
+
+
+  /**
+   * No implicit ordering over members of the relationship "universe".
+   */
+  public Collection<Relation> getRelations() {
+    return RelationRegistry.getRegistryRelations(relationContribIds);
   }
 
   public static class Builder {

@@ -16,53 +16,52 @@
 
 package com.google.devtools.depan.graph_doc.eclipse.ui.plugins;
 
+import com.google.devtools.depan.graph_doc.eclipse.ui.resources.AnalysisResources;
 import com.google.devtools.depan.platform.PlatformLogger;
 import com.google.devtools.depan.platform.plugin.ContributionEntry;
 import com.google.devtools.depan.platform.plugin.ContributionRegistry;
-
-import com.google.common.collect.Maps;
+import com.google.devtools.depan.platform.resources.ResourceContainer;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 
-import java.util.Map;
 
 /**
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public class FromGraphDocRegistry extends
-    ContributionRegistry<FromGraphDocContributor> {
+public class AnalysisResourceRegistry
+    extends ContributionRegistry<AnalysisResourceInstaller> {
 
   /**
    * Extension point name for persistence configuration
    */
   public final static String EXTENTION_POINT =
-      "com.google.devtools.depan.graph_doc.eclipse.ui.registry.from_graph_doc";
+      "com.google.devtools.depan.graph_doc.eclipse.ui.registry.analysis_resource";
 
   /**
    * Static instance. This class is a singleton.
    * It is created lazily on first access.
    */
-  private static FromGraphDocRegistry INSTANCE = null;
+  private static AnalysisResourceRegistry INSTANCE = null;
 
-  static class Entry extends ContributionEntry<FromGraphDocContributor>{
+  static class Entry extends ContributionEntry<AnalysisResourceInstaller>{
 
     public Entry(String bundleId, IConfigurationElement element) {
       super(bundleId, element);
     }
 
     @Override
-    protected FromGraphDocContributor createInstance() throws CoreException {
-      return (FromGraphDocContributor) buildInstance(ATTR_CLASS);
+    protected AnalysisResourceInstaller createInstance() throws CoreException {
+      return (AnalysisResourceInstaller) buildInstance(ATTR_CLASS);
     }
   }
 
-  private FromGraphDocRegistry() {
+  private AnalysisResourceRegistry() {
     // Prevent instantiation.
   }
 
   @Override
-  protected ContributionEntry<FromGraphDocContributor> buildEntry(
+  protected ContributionEntry<AnalysisResourceInstaller> buildEntry(
       String bundleId, IConfigurationElement element) {
     return new Entry(bundleId, element);
   }
@@ -70,20 +69,15 @@ public class FromGraphDocRegistry extends
   @Override
   protected void reportException(String entryId, Exception err) {
     PlatformLogger.logException(
-        "Relation registry load failure for " + entryId, err);
+        "Analysis resource registry load failure for " + entryId, err);
   }
 
-  /////////////////////////////////////
-  // Project Relations
-
-  public Map<String, FromGraphDocContributor> getContributionMap() {
-    Map<String, FromGraphDocContributor> result = Maps.newHashMap();
-    for (ContributionEntry<FromGraphDocContributor> contrib : getContributions()) {
-      FromGraphDocContributor fromGraphDoc = contrib.getInstance();
-      result.put(fromGraphDoc.getLabel(), fromGraphDoc);
+  private void installResources() {
+    ResourceContainer root = AnalysisResources.getRoot();
+    for (ContributionEntry<AnalysisResourceInstaller> contrib
+        : getContributions()) {
+      contrib.getInstance().installResource(root);
     }
-
-    return result ;
   }
 
   /////////////////////////////////////
@@ -93,15 +87,15 @@ public class FromGraphDocRegistry extends
    * Provide the {@code SourcePluginRegistry} singleton.
    * It is created lazily when needed.
    */
-  public static synchronized FromGraphDocRegistry getInstance() {
+  public static synchronized AnalysisResourceRegistry getInstance() {
     if (null == INSTANCE) {
-      INSTANCE = new FromGraphDocRegistry();
+      INSTANCE = new AnalysisResourceRegistry();
       INSTANCE.load(EXTENTION_POINT);
     }
     return INSTANCE;
   }
 
-  public static Map<String, FromGraphDocContributor> getRegistryContributionMap() {
-    return getInstance().getContributionMap();
+  public static void installRegistryResources() {
+    getInstance().installResources();
   }
 }

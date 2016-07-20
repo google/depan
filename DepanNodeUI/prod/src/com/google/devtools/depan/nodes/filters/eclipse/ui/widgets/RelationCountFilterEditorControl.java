@@ -43,6 +43,7 @@ import org.eclipse.swt.widgets.Spinner;
 import java.net.URI;
 import java.text.MessageFormat;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -126,7 +127,8 @@ public class RelationCountFilterEditorControl extends Composite {
 
     basicControl.setInput(filterInfo);
 
-    List<Relation> projectRelations = RelationRegistry.getRegistryRelations();
+    Collection<Relation> projectRelations = 
+        RelationRegistry.getRegistryRelations();
     filterRepo = new RelationSetDescrRepo(projectRelations);
     filterRepo.setRelationSet(filterInfo.getRelationSet());
 

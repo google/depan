@@ -3,7 +3,7 @@
 <schema targetNamespace="com.google.devtools.depan.graph_doc.ui" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="com.google.devtools.depan.graph_doc.ui" id="com.google.devtools.depan.graph_doc.eclipse.ui.registry.from_graph_doc" name="New From Graph"/>
+         <meta.schema plugin="com.google.devtools.depan.graph_doc.ui" id="com.google.devtools.depan.graph_doc.eclipse.ui.registry.analysis_resource" name="Analysis Resources Installer"/>
       </appinfo>
       <documentation>
          [Enter description of this extension point.]
@@ -18,7 +18,7 @@
       </annotation>
       <complexType>
          <sequence minOccurs="1" maxOccurs="unbounded">
-            <element ref="contribution" minOccurs="1" maxOccurs="unbounded"/>
+            <element ref="installer"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -47,23 +47,23 @@
       </complexType>
    </element>
 
-   <element name="contribution">
+   <element name="installer">
       <complexType>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
                   
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn=":com.google.devtools.depan.graph_doc.eclipse.ui.registry.FromGraphDocContributor"/>
+                  <meta.attribute kind="java" basedOn=":com.google.devtools.depan.graph_doc.eclipse.ui.plugins.AnalysisResourceInstaller"/>
                </appinfo>
-            </annotation>
-         </attribute>
-         <attribute name="id" type="string" use="required">
-            <annotation>
-               <documentation>
-                  
-               </documentation>
             </annotation>
          </attribute>
       </complexType>

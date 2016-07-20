@@ -27,4 +27,11 @@
             name="File System Node Colors">
       </page>
    </extension>
+   <extension
+         point="com.google.devtools.depan.graph_doc.eclipse.ui.registry.analysis_resource">
+      <installer
+            class="com.google.devtools.depan.filesystem.FileSystemAnalysisResourcePlugin"
+            id="com.google.devtools.depan.filesystem.FileSystemAnalysisResourcePlugin">
+      </installer>
+   </extension>
 </plugin>

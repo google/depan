@@ -31,6 +31,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -88,7 +89,7 @@ public class EdgeMatcherEditorControl extends Composite {
   /**
    * Fill the list with {@link Relation}s.
    */
-  public void updateTable(List<Relation> relations) {
+  public void updateTable(Collection<Relation> relations) {
     editor.updateTableRows(relations);
   }
 

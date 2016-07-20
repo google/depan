@@ -26,6 +26,7 @@ import com.google.common.collect.Lists;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -86,19 +87,19 @@ public class RelationRegistry extends
   /////////////////////////////////////
   // Project Relations
 
-  public List<Relation> getRelations() {
-    List<Relation> result = Lists.newArrayList();
-    for (ContributionEntry<RelationContributor> entry : getContributions()) {
-      result.addAll(entry.getInstance().getRelations());
-    }
-    return result;
+  public Collection<Relation> getRelations() {
+    return buildRelations(getContributions());
   }
 
+  public Collection<Relation> getRelations(Collection<String> contribIds) {
+    return buildRelations(getContributions(contribIds));
+  }
 
-  public List<Relation> getRelations(List<String> contribIds) {
+  private Collection<Relation> buildRelations(
+      Collection<ContributionEntry<RelationContributor>> contrib) {
+
     List<Relation> result = Lists.newArrayList();
-    for (ContributionEntry<RelationContributor> entry 
-        : getContributions(contribIds)) {
+    for (ContributionEntry<RelationContributor> entry : contrib) {
       result.addAll(entry.getInstance().getRelations());
     }
     return result;
@@ -119,11 +120,12 @@ public class RelationRegistry extends
     return INSTANCE;
   }
 
-  public static List<Relation> getRegistryRelations() {
+  public static Collection<Relation> getRegistryRelations() {
     return getInstance().getRelations();
   }
 
-  public static List<Relation> getRegistryRelations(List<String> contribIds) {
+  public static Collection<Relation> getRegistryRelations(
+      Collection<String> contribIds) {
     return getInstance().getRelations(contribIds);
   }
 }

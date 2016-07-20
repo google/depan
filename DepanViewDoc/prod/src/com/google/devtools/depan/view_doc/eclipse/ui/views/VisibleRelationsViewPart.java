@@ -50,7 +50,7 @@ import java.util.Collection;
  */
 public class VisibleRelationsViewPart extends AbstractViewDocViewPart {
 
-  public static final String PART_NAME = "Relation Visibility";
+  public static final String PART_NAME = "Visible Relations";
 
   /////////////////////////////////////
   // UX Elements
@@ -219,6 +219,8 @@ public class VisibleRelationsViewPart extends AbstractViewDocViewPart {
     ViewEditor editor = getEditor();
     // relationSetEditor.updateTable(editor.getBuiltinAnalysisPlugins());
     relationSetEditor.selectRelations(editor.getDisplayRelations());
+    relationSetEditor.setRelationSetSelectorInput(
+        editor.getDefaultRelationSet(), editor.getRelationSetsChoices());
 
     vizRepo = new PartRelationRepo(editor);
     relationSetEditor.setRelationSetRepository(vizRepo);

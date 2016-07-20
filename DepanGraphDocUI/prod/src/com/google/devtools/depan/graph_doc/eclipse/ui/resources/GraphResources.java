@@ -17,11 +17,13 @@
 package com.google.devtools.depan.graph_doc.eclipse.ui.resources;
 
 import com.google.devtools.depan.graph.api.Relation;
+import com.google.devtools.depan.graph.registry.RelationRegistry;
 import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -73,5 +75,10 @@ public class GraphResources {
 
   public List<GraphEdgeMatcherDescriptor> getEdgeMatcherChoices() {
     return matchers;
+  }
+
+  public Collection<Relation> getDisplayRelations() {
+    return RelationRegistry.getRegistryRelations(
+        depsModel.getRelationContribs());
   }
 }
