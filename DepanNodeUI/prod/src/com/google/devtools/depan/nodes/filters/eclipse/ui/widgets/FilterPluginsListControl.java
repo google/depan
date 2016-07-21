@@ -23,6 +23,8 @@ import com.google.devtools.depan.platform.eclipse.ui.widgets.MapChoiceControl;
 
 import org.eclipse.swt.widgets.Composite;
 
+import java.util.Map;
+
 /**
  * @author Lee Carver
  */
@@ -30,8 +32,23 @@ public class FilterPluginsListControl
     extends MapChoiceControl<ContextualFilterContributor<? extends ContextualFilter>> {
   
   public FilterPluginsListControl(Composite parent) {
-    super(parent, ContextualFilterRegistry.getRegistryContributionMap());
+    super(parent);
+
+    Map<String, ContextualFilterContributor<? extends ContextualFilter>>
+        filters = ContextualFilterRegistry.getRegistryContributionMap();
+    setInput(getBestFrom(filters), filters);
   }
+
+  private static
+  ContextualFilterContributor<? extends ContextualFilter> getBestFrom(
+      Map<String,
+      ContextualFilterContributor<? extends ContextualFilter>> contribs) {
+    if (contribs.isEmpty()) {
+      return null;
+    }
+    return contribs.values().iterator().next();
+  }
+
 
   @Override
   @SuppressWarnings("unchecked")

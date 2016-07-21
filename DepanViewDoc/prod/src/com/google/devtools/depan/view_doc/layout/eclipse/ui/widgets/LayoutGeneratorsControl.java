@@ -22,6 +22,8 @@ import com.google.devtools.depan.view_doc.layout.plugins.LayoutGeneratorRegistry
 
 import org.eclipse.swt.widgets.Composite;
 
+import java.util.Map;
+
 /**
  * Provide a ComboViewer dropdown control for registry contributions.
  * @author Lee Carver
@@ -30,7 +32,20 @@ public class LayoutGeneratorsControl
     extends MapChoiceControl<LayoutGeneratorContributor> {
 
   public LayoutGeneratorsControl(Composite parent) {
-    super(parent, LayoutGeneratorRegistry.getRegistryContributionMap());
+    super(parent);
+
+    Map<String, LayoutGeneratorContributor> layouts =
+        LayoutGeneratorRegistry.getRegistryContributionMap();
+
+    setInput(getBestLayout(layouts), layouts);
+  }
+
+  private static LayoutGeneratorContributor getBestLayout(
+      Map<String, LayoutGeneratorContributor> contribs) {
+    if (contribs.isEmpty()) {
+      return null;
+    }
+    return contribs.values().iterator().next();
   }
 
   @Override

@@ -25,6 +25,7 @@ import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
@@ -53,20 +54,37 @@ public abstract class MapChoiceControl<T> extends Composite {
    */
   protected abstract T coerceResult(Object obj);
 
-  public MapChoiceControl(
-      Composite parent, Map<String, T> contributions) {
+  public MapChoiceControl(Composite parent) {
     super(parent, SWT.NONE);
     setLayout(new FillLayout());
 
-    viewer = new ComboViewer(
-        this, SWT.FLAT | SWT.READ_ONLY | SWT.DROP_DOWN | SWT.SINGLE );
+    viewer = new ComboViewer(this, SWT.READ_ONLY | SWT.FLAT);
+//        this, SWT.FLAT | SWT.READ_ONLY | SWT.DROP_DOWN | SWT.SINGLE );
 //      ListViewer flags: SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
-    viewer.setLabelProvider(new ControlLabelProvider());
     viewer.setContentProvider(new ControlContentProvider());
-    viewer.setInput(contributions);
+    viewer.setLabelProvider(new ControlLabelProvider());
 
     listener = new ControlSelectionChangedListener();
     viewer.addSelectionChangedListener(listener);
+  }
+
+  public void setInput(T selection, Map<String, T> contributions) {
+    viewer.setInput(contributions);
+    StructuredSelection selector = buildSelection(selection, contributions);
+    viewer.setSelection(selector);
+  }
+
+  private StructuredSelection buildSelection(
+      T selection, Map<String, T> contributions) {
+    if (null == selection) {
+      return null;
+    }
+    for (Entry<String, T> item : contributions.entrySet()) {
+      if (selection == item.getValue()) {
+        return(new StructuredSelection(item));
+      }
+    }
+    return null;
   }
 
   @SuppressWarnings("unchecked")

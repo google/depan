@@ -22,14 +22,28 @@ import com.google.devtools.depan.platform.eclipse.ui.widgets.MapChoiceControl;
 
 import org.eclipse.swt.widgets.Composite;
 
+import java.util.Map;
+
 /**
  * @author Lee Carver
  */
 public class FromGraphDocListControl
     extends MapChoiceControl<FromGraphDocContributor> {
-  
+
   public FromGraphDocListControl(Composite parent) {
-    super(parent, FromGraphDocRegistry.getRegistryContributionMap());
+    super(parent);
+
+    Map<String, FromGraphDocContributor> froms =
+        FromGraphDocRegistry.getRegistryContributionMap();
+    setInput(getBestFrom(froms), froms);
+  }
+
+  private static FromGraphDocContributor getBestFrom(
+      Map<String, FromGraphDocContributor> contribs) {
+    if (contribs.isEmpty()) {
+      return null;
+    }
+    return contribs.values().iterator().next();
   }
 
   @Override
