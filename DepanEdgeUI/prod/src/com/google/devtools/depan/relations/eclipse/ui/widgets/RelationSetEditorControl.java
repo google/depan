@@ -25,6 +25,8 @@ import com.google.devtools.depan.relations.models.RelationSetRepository;
 
 import com.google.common.collect.Lists;
 
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -74,6 +76,8 @@ public class RelationSetEditorControl extends Composite {
    */
   private RelationSetSelectorControl relationSetSelector;
 
+  private Collection<Relation> relSetChange;
+
   /////////////////////////////////////
   // Public methods
 
@@ -89,6 +93,13 @@ public class RelationSetEditorControl extends Composite {
 
     viewer = new RelationSetTableControl(this);
     viewer.setLayoutData(Widgets.buildGrabFillData());
+    viewer.addSelectionChangedListener(new ISelectionChangedListener() {
+
+        @Override
+        public void selectionChanged(SelectionChangedEvent event) {
+          handleTableSelectionChange();
+        }
+      });
   }
 
   /**
@@ -112,9 +123,9 @@ public class RelationSetEditorControl extends Composite {
   /**
    * Updates control with {@link #setInput(Collection)} based on repo content.
    */
-  public void setRelationSetRepository(RelationSetRepository reSetlRepo) {
-    viewer.setVisibiltyRepository(reSetlRepo);
-    setInput(getRepositoryUniverse(reSetlRepo));
+  public void setRelationSetRepository(RelationSetRepository relSetRepo) {
+    viewer.setVisibiltyRepository(relSetRepo);
+    setInput(getRepositoryUniverse(relSetRepo));
   }
 
   private Collection<Relation> getRepositoryUniverse(
@@ -142,6 +153,7 @@ public class RelationSetEditorControl extends Composite {
       Collection<RelationSetDescriptor> choices) {
 
     relationSetSelector.setInput(selectedRelSet, choices);
+    handleRelSetPickerChange(selectedRelSet);
   }
 
   /////////////////////////////////////
@@ -178,9 +190,6 @@ public class RelationSetEditorControl extends Composite {
   private void selectedInvertRelations() {
     Collection<Relation> relations = viewer.getSelectedRelations();
     viewer.selectInverseRelations(relations);
-
-    // Invalidate relation set on manual relation selection
-    relationSetSelector.clearSelection();
   }
 
   /////////////////////////////////////
@@ -284,12 +293,22 @@ public class RelationSetEditorControl extends Composite {
   /////////////////////////////////////
   // RelSetPicker integration
 
+  private void handleTableSelectionChange() {
+    if (null != relSetChange) {
+      relSetChange = null;
+      return;
+    }
+    // Invalidate relation set on manual relation selection
+    relationSetSelector.clearSelection();
+  }
+
   /**
    * Change listener for RelationSetPickerControl.
    */
   private void handleRelSetPickerChange(RelationSetDescriptor relationSet) {
     if (null != relationSet) {
-      selectRelations(buildRelations(relationSet.getRelationSet()));
+      relSetChange = buildRelations(relationSet.getRelationSet());
+      selectRelations(relSetChange);
     }
   }
 

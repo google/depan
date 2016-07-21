@@ -217,13 +217,12 @@ public class VisibleRelationsViewPart extends AbstractViewDocViewPart {
   protected void acquireResources() {
 
     ViewEditor editor = getEditor();
-    // relationSetEditor.updateTable(editor.getBuiltinAnalysisPlugins());
-    relationSetEditor.selectRelations(editor.getDisplayRelations());
-    relationSetEditor.setRelationSetSelectorInput(
-        editor.getDefaultRelationSet(), editor.getRelationSetsChoices());
 
     vizRepo = new PartRelationRepo(editor);
     relationSetEditor.setRelationSetRepository(vizRepo);
+
+    relationSetEditor.setRelationSetSelectorInput(
+        editor.getDefaultRelationSet(), editor.getRelationSetsChoices());
   }
 
   @Override
