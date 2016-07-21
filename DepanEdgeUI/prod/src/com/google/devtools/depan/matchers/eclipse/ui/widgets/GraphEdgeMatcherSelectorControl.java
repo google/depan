@@ -20,6 +20,7 @@ import com.google.devtools.depan.edge_ui.EdgeUILogger;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.platform.AlphabeticSorter;
 import com.google.devtools.depan.platform.ListenerManager;
+import com.google.devtools.depan.platform.ViewerObjectToString;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -32,7 +33,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
 
 import java.util.List;
 
@@ -46,23 +46,8 @@ import java.util.List;
  */
 public class GraphEdgeMatcherSelectorControl extends Composite {
 
-  /** Text for standard picker label */
-  public static final String EDGE_MATCHER_LABEL = "Edges: ";
-
   /** The drop-down list itself. */
-  private ComboViewer setsViewer = null;
-
-  /////////////////////////////////////
-  // Helpers for users.
-
-  /**
-   * Provide a standard label for a {@code RelationSetPickerControl}.
-   */
-  public static Label createEdgeMatcherLabel(Composite parent) {
-    Label result = new Label(parent, SWT.NONE);
-    result.setText(EDGE_MATCHER_LABEL);
-    return result;
-  }
+  private ComboViewer setsViewer;
 
   /////////////////////////////////////
   // Listener interface for interested parties
@@ -73,7 +58,6 @@ public class GraphEdgeMatcherSelectorControl extends Composite {
   }
 
   /** Listener when the selection change. */
-  // private List<SelectorListener> selectionListeners = Lists.newArrayList();
   private ListenerManager<SelectorListener> selectionListeners =
       new ListenerManager<SelectorListener> ();
 
@@ -88,7 +72,7 @@ public class GraphEdgeMatcherSelectorControl extends Composite {
   }
 
   /////////////////////////////////////
-  // Edge Matcher Selector itself
+  // Edge matcher selector itself
 
   public GraphEdgeMatcherSelectorControl(Composite parent) {
     super(parent, SWT.NONE);
@@ -97,7 +81,14 @@ public class GraphEdgeMatcherSelectorControl extends Composite {
     setsViewer = new ComboViewer(this, SWT.READ_ONLY | SWT.FLAT);
     setsViewer.setContentProvider(new ArrayContentProvider());
     setsViewer.setLabelProvider(GraphEdgeMatcherLabelProvider.PROVIDER);
-    setsViewer.setSorter(new AlphabeticSorter());
+
+    setsViewer.setSorter(new AlphabeticSorter(new ViewerObjectToString() {
+
+      @Override
+      public String getString(Object object) {
+        return GraphEdgeMatcherLabelProvider.PROVIDER.getText(object);
+      }
+    }));
 
     setsViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 

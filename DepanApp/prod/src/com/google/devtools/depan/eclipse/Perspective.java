@@ -16,8 +16,6 @@
 
 package com.google.devtools.depan.eclipse;
 
-import com.google.devtools.depan.eclipse.natures.NewDepanProjectWizard;
-
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;

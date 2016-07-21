@@ -16,10 +16,6 @@
 
 package com.google.devtools.depan.cmd.dispatch;
 
-import com.google.devtools.depan.cmd.CmdLogger;
-
-import org.eclipse.equinox.app.IApplication;
-
 import java.util.List;
 
 /**

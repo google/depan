@@ -17,11 +17,8 @@
 package com.google.devtools.depan.view_doc.eclipse.ui.trees;
 
 import com.google.devtools.depan.eclipse.ui.collapse.trees.CollapseDataWrapper;
-import com.google.devtools.depan.eclipse.ui.collapse.trees.CollapseTreeRoot;
 import com.google.devtools.depan.eclipse.ui.nodes.trees.ViewerRoot;
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeViewerProvider;
-import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
-import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptors;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
 

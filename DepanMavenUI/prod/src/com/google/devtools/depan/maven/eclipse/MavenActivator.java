@@ -36,7 +36,7 @@ import org.osgi.framework.BundleContext;
 public class MavenActivator extends AbstractUIPlugin {
 
   /** Plug-in ID used to identify this plug-in. */
-  public static final String PLUGIN_ID = "com.google.devtools.depan.maven";
+  public static final String PLUGIN_ID = "com.google.devtools.depan.maven.ui";
 
   /**
    * Bundle that is responsible for storing the resources for this plug-in.

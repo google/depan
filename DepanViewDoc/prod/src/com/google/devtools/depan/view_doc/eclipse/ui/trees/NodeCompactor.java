@@ -16,7 +16,6 @@
 
 package com.google.devtools.depan.view_doc.eclipse.ui.trees;
 
-import com.google.devtools.depan.collapse.model.CollapseData;
 import com.google.devtools.depan.collapse.model.CollapseTreeModel;
 import com.google.devtools.depan.eclipse.ui.collapse.trees.CollapseTreeRoot;
 import com.google.devtools.depan.eclipse.ui.nodes.trees.GraphData;

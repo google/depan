@@ -39,7 +39,6 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.xml.sax.InputSource;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 
 /**

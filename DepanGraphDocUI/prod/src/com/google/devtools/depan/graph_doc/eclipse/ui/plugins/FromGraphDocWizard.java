@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.graph_doc.eclipse.ui.plugins;
 
+import com.google.devtools.depan.graph_doc.eclipse.ui.resources.GraphResources;
 import com.google.devtools.depan.graph_doc.model.GraphDocument;
 import com.google.devtools.depan.model.GraphNode;
 
@@ -31,14 +32,16 @@ public abstract class FromGraphDocWizard extends Wizard {
 
   private IFile graphFile;
   private GraphDocument graphDoc;
+  private GraphResources graphResources;
   private GraphNode topNode;
   private Collection<GraphNode> nodes;
 
   public void init(
-      IFile graphFile, GraphDocument graphDoc,
+      IFile graphFile, GraphDocument graphDoc, GraphResources graphResources,
       GraphNode topNode, Collection<GraphNode> nodes) {
     this.graphFile = graphFile;
     this.graphDoc = graphDoc;
+    this.graphResources = graphResources;
     this.topNode = topNode;
     this.nodes = nodes;
   }
@@ -49,6 +52,10 @@ public abstract class FromGraphDocWizard extends Wizard {
 
   public GraphDocument getGraphDoc() {
     return graphDoc;
+  }
+
+  protected GraphResources getGraphResources() {
+    return graphResources;
   }
 
   public GraphNode getTopNode() {

@@ -18,7 +18,6 @@ package com.google.devtools.depan.eclipse.visualization.plugins.impl;
 
 import com.google.devtools.depan.eclipse.visualization.ogl.GLPanel;
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeRenderingProperty;
-import com.google.devtools.depan.eclipse.visualization.ogl.RendererEvent;
 import com.google.devtools.depan.eclipse.visualization.ogl.RendererEvents;
 import com.google.devtools.depan.eclipse.visualization.plugins.core.NodeRenderingPlugin;
 

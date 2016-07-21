@@ -32,7 +32,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * A GUI tool to display an edge matcher, with a selector for forward

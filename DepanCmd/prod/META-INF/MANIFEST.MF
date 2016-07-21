@@ -4,7 +4,6 @@ Bundle-Name: DepAn CMD
 Bundle-SymbolicName: com.google.devtools.depan.cmd;singleton:=true
 Bundle-Version: 2.0.0.qualifier
 Bundle-Vendor: Pnambic Computing
-Bundle-Localization: plugin
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Require-Bundle: org.eclipse.core.runtime,

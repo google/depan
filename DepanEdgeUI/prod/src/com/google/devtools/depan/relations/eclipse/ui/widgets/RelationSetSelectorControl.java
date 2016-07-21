@@ -47,10 +47,7 @@ import java.util.List;
 public class RelationSetSelectorControl extends Composite {
 
   /** The drop-down list itself. */
-  private ComboViewer setsViewer = null;
-
-  /////////////////////////////////////
-  // Helpers for users.
+  private ComboViewer setsViewer;
 
   /////////////////////////////////////
   // Listener interface for interested parties
@@ -61,7 +58,6 @@ public class RelationSetSelectorControl extends Composite {
   }
 
   /** Listener when the selection change. */
-  // private List<SelectorListener> selectionListeners = Lists.newArrayList();
   private ListenerManager<SelectorListener> selectionListeners =
       new ListenerManager<SelectorListener> ();
 
@@ -76,7 +72,7 @@ public class RelationSetSelectorControl extends Composite {
   }
 
   /////////////////////////////////////
-  // Edge Matcher Selector itself
+  // Relation set selector itself
 
   public RelationSetSelectorControl(Composite parent) {
     super(parent, SWT.NONE);

@@ -1,6 +1,7 @@
 package com.google.devtools.depan.view_doc.eclipse.ui.wizards;
 
 import com.google.devtools.depan.graph_doc.eclipse.ui.plugins.FromGraphDocWizard;
+import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditorInput;
@@ -18,7 +19,7 @@ public class ViewFromGraphDocWizard extends FromGraphDocWizard {
 
   @Override
   public void addPages() {
-    page = new ViewFromGraphDocPage();
+    page = new ViewFromGraphDocPage(getGraphResources());
     addPage(page);
   }
 
@@ -40,7 +41,8 @@ public class ViewFromGraphDocWizard extends FromGraphDocWizard {
         new GraphModelReference(getGraphFile(), getGraphDoc());
 
     ViewPreferences userPrefs = new ViewPreferences();
-    // userPrefs.setLayoutFinder(layoutEdgeMatcher);
+    GraphEdgeMatcherDescriptor matcher = page.getLayoutMatcher();
+    userPrefs.setLayoutFinder(matcher);
 
     ViewDocument viewInfo = new ViewDocument(graphRef, getNodes(), userPrefs);
 

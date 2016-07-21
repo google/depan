@@ -381,7 +381,7 @@ public class GraphEditor extends MultiPageEditorPart {
       return;
     }
     FromGraphDocWizard wizard = choice.newWizard();
-    wizard.init(file, graph, topNode, nodes);
+    wizard.init(file, graph, graphResources, topNode, nodes);
 
     // Run the wizard.
     Shell shell = getSite().getWorkbenchWindow().getShell();

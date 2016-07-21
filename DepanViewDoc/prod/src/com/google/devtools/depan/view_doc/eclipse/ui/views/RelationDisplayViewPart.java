@@ -17,7 +17,6 @@
 package com.google.devtools.depan.view_doc.eclipse.ui.views;
 
 import com.google.devtools.depan.graph.api.Relation;
-import com.google.devtools.depan.graph.registry.RelationRegistry;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 import com.google.devtools.depan.view_doc.eclipse.ViewDocResources;
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;

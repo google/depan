@@ -92,8 +92,6 @@ public class JarFileLister {
    * the .class contents that are present.
    */
   private void parse() {
-    int count = zipFile.size();
-    int index = 0;
 
     Enumeration<? extends ZipEntry> entries = zipFile.entries();
     while (entries.hasMoreElements()) {

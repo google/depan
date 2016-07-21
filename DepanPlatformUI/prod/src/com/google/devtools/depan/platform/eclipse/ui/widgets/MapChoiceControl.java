@@ -16,6 +16,9 @@
 
 package com.google.devtools.depan.platform.eclipse.ui.widgets;
 
+import com.google.devtools.depan.platform.AlphabeticSorter;
+import com.google.devtools.depan.platform.ViewerObjectToString;
+
 import com.google.common.collect.Lists;
 
 import org.eclipse.jface.viewers.ComboViewer;
@@ -43,7 +46,10 @@ import java.util.Map.Entry;
  */
 public abstract class MapChoiceControl<T> extends Composite {
 
-  private ComboViewer viewer;
+  private static ControlLabelProvider CONTROL_LABEL_PROVIDER =
+      new ControlLabelProvider();
+
+  private final ComboViewer viewer;
 
   private ControlSelectionChangedListener listener;
 
@@ -60,7 +66,14 @@ public abstract class MapChoiceControl<T> extends Composite {
 
     viewer = new ComboViewer(this, SWT.READ_ONLY | SWT.FLAT);
     viewer.setContentProvider(new ControlContentProvider());
-    viewer.setLabelProvider(new ControlLabelProvider());
+    viewer.setLabelProvider(CONTROL_LABEL_PROVIDER);
+    viewer.setSorter(new AlphabeticSorter(new ViewerObjectToString() {
+
+        @Override
+        public String getString(Object object) {
+          return CONTROL_LABEL_PROVIDER.getText(object);
+        }
+      }));
 
     listener = new ControlSelectionChangedListener();
     viewer.addSelectionChangedListener(listener);
@@ -69,10 +82,17 @@ public abstract class MapChoiceControl<T> extends Composite {
   public void setInput(T selection, Map<String, T> contributions) {
     viewer.setInput(contributions);
     StructuredSelection selector = buildSelection(selection, contributions);
+    setSelection(selector);
+  }
+
+  /**
+   * Derived classes use this to implement type-specific selection.
+   */
+  protected void setSelection(StructuredSelection selector) {
     viewer.setSelection(selector);
   }
 
-  private StructuredSelection buildSelection(
+  protected StructuredSelection buildSelection(
       T selection, Map<String, T> contributions) {
     if (null == selection) {
       return null;
@@ -94,12 +114,12 @@ public abstract class MapChoiceControl<T> extends Composite {
     return null;
   }
 
-  private class ControlLabelProvider extends LabelProvider {
+  private static class ControlLabelProvider extends LabelProvider {
     @SuppressWarnings("unchecked")
     @Override
     public String getText(Object element) {
       if (element instanceof Map.Entry<?, ?>) {
-        Entry<String, T> item = (Map.Entry<String, T>) element;
+        Entry<String, ?> item = (Map.Entry<String, ?>) element;
         return item.getKey();
       }
 

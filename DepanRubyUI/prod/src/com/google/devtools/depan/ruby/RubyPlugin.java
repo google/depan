@@ -28,7 +28,6 @@ import com.google.devtools.depan.ruby.eclipse.RubyImageTransformer;
 import com.google.devtools.depan.ruby.eclipse.RubyNodeComparator;
 import com.google.devtools.depan.ruby.eclipse.RubyNodePainter;
 import com.google.devtools.depan.ruby.eclipse.RubyShapeTransformer;
-import com.google.devtools.depan.ruby.editors.RubyElementEditors;
 import com.google.devtools.depan.ruby.graph.ClassElement;
 import com.google.devtools.depan.ruby.graph.ClassMethodElement;
 import com.google.devtools.depan.ruby.graph.InstanceMethodElement;

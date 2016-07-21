@@ -1,5 +1,9 @@
 package com.google.devtools.depan.view_doc.eclipse.ui.wizards;
 
+import com.google.devtools.depan.graph_doc.eclipse.ui.resources.GraphResources;
+import com.google.devtools.depan.matchers.eclipse.ui.widgets.GraphEdgeMatcherSelectorControl;
+import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
+import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 import com.google.devtools.depan.view_doc.layout.LayoutGenerator;
 import com.google.devtools.depan.view_doc.layout.eclipse.ui.widgets.LayoutGeneratorsControl;
 import com.google.devtools.depan.view_doc.layout.plugins.LayoutGeneratorContributor;
@@ -10,7 +14,9 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Label;
+
+import java.util.List;
 
 public class ViewFromGraphDocPage extends WizardPage {
 
@@ -21,8 +27,14 @@ public class ViewFromGraphDocPage extends WizardPage {
 
   private LayoutGeneratorsControl layoutChoice;
 
-  protected ViewFromGraphDocPage() {
+  private GraphEdgeMatcherSelectorControl matcherChoice;
+
+  private GraphResources graphInfo;
+
+  protected ViewFromGraphDocPage(GraphResources graphInfo) {
     super(PAGE_NAME);
+    this.graphInfo = graphInfo;
+
     setTitle(PAGE_NAME);
     setDescription(PAGE_DESCRIPTION);
  }
@@ -43,6 +55,7 @@ public class ViewFromGraphDocPage extends WizardPage {
     setControl(result);
   }
 
+  @SuppressWarnings("unused")
   private Group setupOptions(Composite parent) {
     Group result = new Group(parent, SWT.NONE);
 
@@ -50,12 +63,19 @@ public class ViewFromGraphDocPage extends WizardPage {
     result.setLayout(layout);
     result.setText("Diagram options");
 
-    // TODO: Add edge selections ..
-
-    Text label = new Text(result, SWT.NULL);
-    label.setText("Layout:");
-
+    Label layoutLabel = Widgets.buildCompactLabel(result, "Layout: ");
     layoutChoice = new LayoutGeneratorsControl(result);
+    layoutChoice.setLayoutData(Widgets.buildHorzFillData());
+
+    Label relSetLabel = Widgets.buildCompactLabel(result, "Edges: ");
+    matcherChoice = new GraphEdgeMatcherSelectorControl(result);
+    matcherChoice.setLayoutData(Widgets.buildHorzFillData());
+
+    GraphEdgeMatcherDescriptor matcher = graphInfo.getDefaultEdgeMatcher();
+    List<GraphEdgeMatcherDescriptor> choices =
+        graphInfo.getEdgeMatcherChoices();
+    matcherChoice.setInput(matcher, choices);
+
     return result;
   }
 
@@ -77,10 +97,14 @@ public class ViewFromGraphDocPage extends WizardPage {
 
   protected void updateStatus(String message) {
     setErrorMessage(message);
-    setPageComplete(isPageComplete());
+    setPageComplete((null == message) && isPageComplete());
   }
 
   public LayoutGenerator getLayoutGenerator() {
     return layoutChoice.getChoice().getLayoutGenerator();
+  }
+
+  public GraphEdgeMatcherDescriptor getLayoutMatcher() {
+    return matcherChoice.getSelection();
   }
 }

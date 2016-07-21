@@ -38,6 +38,12 @@ public class FromGraphDocListControl
     setInput(getBestFrom(froms), froms);
   }
 
+  public void selectFrom(FromGraphDocContributor choice) {
+    Map<String, FromGraphDocContributor> froms =
+        FromGraphDocRegistry.getRegistryContributionMap();
+    setSelection(buildSelection(choice, froms));
+  }
+
   private static FromGraphDocContributor getBestFrom(
       Map<String, FromGraphDocContributor> contribs) {
     if (contribs.isEmpty()) {
