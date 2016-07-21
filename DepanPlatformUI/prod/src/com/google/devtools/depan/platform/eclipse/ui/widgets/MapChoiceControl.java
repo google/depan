@@ -59,8 +59,6 @@ public abstract class MapChoiceControl<T> extends Composite {
     setLayout(new FillLayout());
 
     viewer = new ComboViewer(this, SWT.READ_ONLY | SWT.FLAT);
-//        this, SWT.FLAT | SWT.READ_ONLY | SWT.DROP_DOWN | SWT.SINGLE );
-//      ListViewer flags: SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
     viewer.setContentProvider(new ControlContentProvider());
     viewer.setLabelProvider(new ControlLabelProvider());
 
