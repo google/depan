@@ -16,17 +16,64 @@
 
 package com.google.devtools.depan.graph.basic;
 
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+
+import java.util.Map;
+import java.util.Set;
+
 public class BasicGraphTestCase {
 
-  protected BasicNode<String> createSimpleNode(String name) {
+  protected static final String HEAD = "head";
+  protected static final String TAIL = "tail";
+
+  protected static BasicNode<String> createSimpleNode(String name) {
     return new SimpleNode<String>(name);
   }
 
-  protected BasicNode<String> addSimpleNode(
-      BasicGraph<String>graph, String name) {
-    BasicNode<String> result = createSimpleNode(name);
-    graph.addNode(result);
-    return result;
+  public static abstract class GraphFixture {
+
+    public BasicGraph<String> graph;
+
+    public void create() {
+      Map<String, BasicNode<? extends String>> nodes = createNodes();
+      Set<BasicEdge<? extends String>> edges = createEdges();
+
+      graph = new BasicGraph<String>(nodes, edges);
+    }
+
+    public BasicNode<? extends String> findNode(String id) {
+      return graph.findNode(id);
+    }
+
+    protected abstract Map<String, BasicNode<? extends String>> createNodes();
+
+    protected abstract Set<BasicEdge<? extends String>> createEdges();
   }
 
+  public static class SimpleGraphFixture extends GraphFixture{
+
+    public BasicNode<String> headNode;
+    public BasicNode<String> tailNode;
+    public BasicEdge<String> edge;
+
+    @Override
+    public Map<String, BasicNode<? extends String>> createNodes() {
+      headNode = createSimpleNode(HEAD);
+      tailNode = createSimpleNode(TAIL);
+      Map<String, BasicNode<? extends String>> nodes = Maps.newHashMap();
+      nodes.put(headNode.getId(), headNode);
+      nodes.put(tailNode.getId(), tailNode);
+      return nodes;
+    }
+
+    @Override
+    public Set<BasicEdge<? extends String>> createEdges() {
+      edge = new BasicEdge<String>(
+              MockRelation.SIMPLE_RELATION, headNode, tailNode);
+      Set<BasicEdge<? extends String>> edges = Sets.newHashSet();
+      edges.add(edge);
+      return edges;
+    }
+  }
 }

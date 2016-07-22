@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>TestCore</name>
-	<comment>Core graph definitions and structures for DepAn [Tests]</comment>
+	<name>TestBuilder</name>
+	<comment>Datatypes for programmic generation of DepAn dependency graphs [Tests]</comment>
 	<projects>
 	</projects>
 	<buildSpec>

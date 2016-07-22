@@ -18,10 +18,13 @@ package com.google.devtools.depan.graph.basic;
 
 import static org.junit.Assert.*;
 
-import org.junit.Test;
-
 import com.google.devtools.depan.graph.api.Relation;
 
+import org.junit.Test;
+
+/**
+ * @author <a href="leeca@pnambic.com">Lee Carver</a>
+ */
 public class BasicEdgeTest extends BasicGraphTestCase {
 
   @Test

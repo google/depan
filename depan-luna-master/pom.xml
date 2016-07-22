@@ -21,10 +21,13 @@
     <!-- Plugins -->
     <!-- Platform components -->
     <module>../DepanBuilder/prod</module>
+    <module>../DepanBuilder/test</module>
     <module>../DepanCore/prod</module>
+    <module>../DepanCore/test</module>
     <module>../DepanEdge/prod</module>
     <module>../DepanGraphDoc/prod</module>
     <module>../DepanNode/prod</module>
+    <module>../DepanNode/test</module>
     <module>../DepanPersistence/prod</module>
     <module>../DepanPlatform/prod</module>
 

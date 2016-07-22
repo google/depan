@@ -169,7 +169,7 @@ public class NodeCompactor {
     TreeModel.Flat model = new TreeModel.Flat(nodes);
     GraphData<GraphNode> data = new GraphData<GraphNode>(
         NodeTreeProviders.GRAPH_NODE_PROVIDER, model);
-    String label = MessageFormat.format("Solitares [{0} nodes]", nodes.size());
+    String label = MessageFormat.format("Solitaires [{0} nodes]", nodes.size());
     return new ActionRemainsRoot(data, label);
   }
 

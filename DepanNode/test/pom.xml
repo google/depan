@@ -1,0 +1,35 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.pnambic.depan</groupId>
+    <artifactId>depan-luna-parent</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <relativePath>../../depan-luna-parent</relativePath>
+  </parent>
+
+  <artifactId>com.google.devtools.depan.nodes-test</artifactId>
+  <version>2.0.0-SNAPSHOT</version>
+  <packaging>eclipse-test-plugin</packaging>
+
+  <name>DepAn Nodes [Tests]</name>
+  <description>Manipulate nodes, and their lists and trees [Tests]</description>
+
+  <build>
+    <sourceDirectory>src</sourceDirectory>
+  </build>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.11</version>
+    </dependency>
+
+    <!-- DepAn dependencies -->
+    <dependency>
+      <groupId>com.pnambic.depan</groupId>
+      <artifactId>com.google.devtools.depan.nodes</artifactId>
+      <version>2.0.0-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
+</project>

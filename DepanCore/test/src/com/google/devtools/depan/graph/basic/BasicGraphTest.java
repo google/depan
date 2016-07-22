@@ -27,91 +27,22 @@ public class BasicGraphTest extends BasicGraphTestCase {
 
   @Test
   public void testBasic() {
-    BasicGraph<String> graph = new BasicGraph<String>();
-    assertNotNull(graph);
+    SimpleGraphFixture fixture = new SimpleGraphFixture();
+    fixture.create();
 
-    BasicNode<? extends String> head = addSimpleNode(graph, "head");
-    assertNotNull(head);
-    assertSame(head, graph.findNode("head"));
+    assertNotNull(fixture.headNode);
+    assertNotNull(fixture.tailNode);
+    assertNotNull(fixture.edge);
+    assertNotNull(fixture.graph);
 
-    BasicNode<? extends String> tail = addSimpleNode(graph, "tail");
-    assertNotNull(tail);
-    assertNotSame(head, tail);
-    assertSame(tail, graph.findNode("tail"));
+    BasicNode<? extends String> headNode = fixture.findNode(HEAD);
+    BasicNode<? extends String> tailNode = fixture.findNode(TAIL);
+    assertSame(fixture.headNode, headNode);
+    assertSame(fixture.tailNode, tailNode);
+    assertNotSame(headNode, tailNode);
 
-    BasicEdge<? extends String> simpleEdge =
-        graph.addEdge(MockRelation.SIMPLE_RELATION, head, tail);
-    assertNotNull(simpleEdge);
-
-    assertSame(MockRelation.SIMPLE_RELATION, simpleEdge.getRelation());
-    assertSame(head, simpleEdge.getHead());
-    assertSame(tail, simpleEdge.getTail());
-  }
-
-  @Test
-  public void test2Relations() {
-    BasicGraph<String> graph = new BasicGraph<String>();
-    assertNotNull(graph);
-
-    BasicNode<? extends String> head = addSimpleNode(graph, "head");
-    assertNotNull(head);
-
-    BasicNode<? extends String> tail = addSimpleNode(graph, "tail");
-    assertNotNull(tail);
-
-    BasicEdge<? extends String> simpleEdge =
-        graph.addEdge(MockRelation.SIMPLE_RELATION, head, tail);
-    assertNotNull(simpleEdge);
-
-    BasicEdge<? extends String> memberEdge =
-        graph.addEdge(MockRelation.MEMBER_RELATION, head, tail);
-    assertNotNull(memberEdge);
-    assertNotSame(simpleEdge, memberEdge);
-
-    BasicEdge<? extends String> foundEdge =
-        graph.findEdge(MockRelation.MEMBER_RELATION, head, tail);
-    assertNotNull(foundEdge);
-    assertSame(memberEdge, foundEdge);
-  }
-
-  @Test
-  public void testDuplicateNodes() {
-    BasicGraph<String> graph = new BasicGraph<String>();
-    assertNotNull(graph);
-
-    BasicNode<? extends String> head = addSimpleNode(graph, "head");
-    assertNotNull(head);
-
-    try {
-      graph.addNode(head);
-      fail("should not be able to create two 'head' nodes");
-    } catch (IllegalArgumentException errArg) {
-      // expected
-    }
-  }
-
-  @Test
-  public void testDuplicateEdges() {
-    BasicGraph<String> graph = new BasicGraph<String>();
-    assertNotNull(graph);
-
-    BasicNode<String> head = addSimpleNode(graph, "head");
-    assertNotNull(head);
-
-    BasicNode<String> tail = addSimpleNode(graph, "tail");
-    assertNotNull(tail);
-
-    BasicEdge<? extends String> simpleEdge =
-        graph.addEdge(MockRelation.SIMPLE_RELATION, head, tail);
-    assertNotNull(simpleEdge);
-
-    try {
-      @SuppressWarnings("unused")
-      BasicEdge<? extends String> badEdge =
-          graph.addEdge(MockRelation.SIMPLE_RELATION, head, tail);
-      fail("should not be able to create two simple edges");
-    } catch (IllegalArgumentException errArg) {
-      // expected
-    }
+    assertSame(MockRelation.SIMPLE_RELATION, fixture.edge.getRelation());
+    assertSame(headNode, fixture.edge.getHead());
+    assertSame(tailNode, fixture.edge.getTail());
   }
 }

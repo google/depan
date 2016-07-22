@@ -7,6 +7,5 @@ Bundle-Vendor: Pnambic Computing
 Require-Bundle: com.google.guava
 Export-Package: com.google.devtools.depan.graph.api,
  com.google.devtools.depan.graph.basic,
- com.google.devtools.depan.model,
- com.google.devtools.depan.model.testing
+ com.google.devtools.depan.model
 Bundle-ClassPath: .
