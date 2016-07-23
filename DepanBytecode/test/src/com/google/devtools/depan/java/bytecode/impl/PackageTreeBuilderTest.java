@@ -32,23 +32,28 @@ import com.google.devtools.depan.java.graph.JavaRelation;
 import com.google.devtools.depan.java.graph.PackageElement;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.model.builder.DependenciesDispatcher;
-import com.google.devtools.depan.model.builder.DependenciesListener;
-import com.google.devtools.depan.model.builder.ElementFilter;
+import com.google.devtools.depan.model.builder.api.GraphBuilder;
+import com.google.devtools.depan.model.builder.api.GraphBuilders;
+import com.google.devtools.depan.model.builder.chain.DependenciesDispatcher;
+import com.google.devtools.depan.model.builder.chain.DependenciesListener;
+import com.google.devtools.depan.model.builder.chain.ElementFilter;
 
 /**
  * @author <a href="leeca@google.com">Lee Carver</a>
  */
 public class PackageTreeBuilderTest {
 
-  private GraphModel graph;
+  private GraphBuilder graphBuilder;
+
   private DependenciesListener builder;
+
+  private GraphModel graph;
 
   @Before
   public void setUp() throws Exception {
-    graph = new GraphModel();
+    graphBuilder = GraphBuilders.createGraphModelBuilder();
     builder = new DependenciesDispatcher(
-        ElementFilter.ALL_NODES, graph.getBuilder());
+        ElementFilter.ALL_NODES, graphBuilder);
   }
 
   @Test
@@ -61,6 +66,7 @@ public class PackageTreeBuilderTest {
         packageFile, treeFile);
     assertEquals("java:com.google.depan.view", packageNode.getId());
 
+    graph = graphBuilder.createGraphModel();
     assertDirectoryTree("/a/b/c/com", "google", "com");
     assertDirectoryTree("/a/b/c/com/google", "depan", "com.google");
     assertDirectoryTree("/a/b/c/com/google/depan", "view", "com.google.depan");
@@ -81,6 +87,7 @@ public class PackageTreeBuilderTest {
         packageFile, treeFile);
     assertEquals("java:com.google.depan.view", packageNode.getId());
 
+    graph = graphBuilder.createGraphModel();
     assertDirectoryBase("/blix/blax", "com.google.depan.view");
     assertDirectoryPath("/blix", "/blix/blax", "com.google.depan");
 
