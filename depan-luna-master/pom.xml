@@ -52,6 +52,7 @@
     <module>../DepanJava/prod</module>
     <module>../DepanJavaUI/prod</module>
     <module>../DepanBytecode/prod</module>
+    <module>../DepanBytecode/test</module>
     <module>../DepanBytecodeUI/prod</module>
 
     <module>../DepanJavaScript/prod</module>
