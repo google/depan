@@ -34,6 +34,7 @@
     <!-- App/UI components -->
     <module>../DepanApp/prod</module>
     <module>../DepanCollapser/prod</module>
+    <module>../DepanCollapser/test</module>
     <module>../DepanEdgeUI/prod</module>
     <module>../DepanGraphDocUI/prod</module>
     <module>../DepanLayouts/prod</module>
