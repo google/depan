@@ -27,7 +27,8 @@ import com.google.devtools.depan.model.ElementVisitor;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.model.interfaces.GraphBuilder;
+import com.google.devtools.depan.model.builder.api.GraphBuilder;
+import com.google.devtools.depan.model.builder.api.GraphBuilders;
 
 /**
  * @author <a href="leeca@google.com">Lee Carver</a>
@@ -36,11 +37,11 @@ public class TreeBuilderTest {
 
   @Test
   public void testInsertLeaf() {
-    GraphModel test = new GraphModel();
 
-    MockBuilder treeBuilder = new MockBuilder(test.getBuilder());
+    MockBuilder treeBuilder = new MockBuilder();
     MockPathInfo leafInfo = new MockPathInfo(new File("this/is/a test/path"));
     GraphNode leaf = treeBuilder.insertLeaf(leafInfo);
+    GraphModel test = treeBuilder.buildGraph();
 
     assertPaths("tst:this/is/a test/path", leaf.getId());
     assertEquals(4, test.getNodes().size());
@@ -49,11 +50,10 @@ public class TreeBuilderTest {
 
   @Test
   public void testInsertLeaf_withDuplicate() {
-    GraphModel test = new GraphModel();
-
-    MockBuilder treeBuilder = new MockBuilder(test.getBuilder());
+    MockBuilder treeBuilder = new MockBuilder();
     MockPathInfo leafInfo = new MockPathInfo(new File("this/is/a test/path"));
     GraphNode leaf = treeBuilder.insertLeaf(leafInfo);
+    GraphModel test = treeBuilder.buildGraph();
 
     assertPaths("tst:this/is/a test/path", leaf.getId());
     assertEquals(4, test.getNodes().size());
@@ -68,12 +68,8 @@ public class TreeBuilderTest {
 }
 
   private static class MockBuilder extends TreeBuilder {
-    private final GraphBuilder builder;
-
-    public MockBuilder(GraphBuilder builder) {
-      super();
-      this.builder = builder;
-    }
+    private final GraphBuilder builder =
+        GraphBuilders.createGraphModelBuilder();
 
     @Override
     protected void insertEdge(
@@ -87,7 +83,11 @@ public class TreeBuilderTest {
     @Override
     protected GraphNode lookupNode(PathInfo path) {
       GraphNode probe = path.createNode();
-      return (GraphNode) builder.getGraph().findNode(probe.getId());
+      return builder.findNode(probe.getId());
+    }
+
+    public GraphModel buildGraph() {
+      return builder.createGraphModel();
     }
   }
 

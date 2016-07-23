@@ -46,6 +46,7 @@
 
     <!-- Dependency modeling components-->
     <module>../DepanFileSystem/prod</module>
+    <module>../DepanFileSystem/test</module>
     <module>../DepanFileSystemUI/prod</module>
 
     <module>../DepanJava/prod</module>

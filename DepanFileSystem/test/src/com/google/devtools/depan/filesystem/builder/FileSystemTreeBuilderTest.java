@@ -10,8 +10,10 @@ import org.junit.Test;
 
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.model.builder.DependenciesListener;
-import com.google.devtools.depan.model.builder.SimpleDependencyListener;
+import com.google.devtools.depan.model.builder.api.GraphBuilder;
+import com.google.devtools.depan.model.builder.api.GraphBuilders;
+import com.google.devtools.depan.model.builder.chain.DependenciesListener;
+import com.google.devtools.depan.model.builder.chain.SimpleDependencyListener;
 
 /**
  * @author <a href="leeca@google.com">Lee Carver</a>
@@ -20,12 +22,13 @@ public class FileSystemTreeBuilderTest {
 
   @Test
   public void testInsertLeaf() {
-    GraphModel test = new GraphModel();
-    DependenciesListener builder = new SimpleDependencyListener(test.getBuilder());
-    FileSystemTreeBuilder treeBuilder = new FileSystemTreeBuilder(builder);
+    GraphBuilder builder = GraphBuilders.createGraphModelBuilder();
+    DependenciesListener listener = new SimpleDependencyListener(builder);
+    FileSystemTreeBuilder treeBuilder = new FileSystemTreeBuilder(listener);
     PathInfo leafInfo = new FilePathInfo(new File("this/is/a test/path"));
 
     GraphNode leaf = treeBuilder.insertLeaf(leafInfo);
+    GraphModel test = builder.createGraphModel();
 
     assertPaths("fs:this/is/a test/path", leaf.getId());
     assertEquals(4, test.getNodes().size());
@@ -34,12 +37,13 @@ public class FileSystemTreeBuilderTest {
 
   @Test
   public void testInsertLeaf_withDuplicate() {
-    GraphModel test = new GraphModel();
-    DependenciesListener builder = new SimpleDependencyListener(test.getBuilder());
-    FileSystemTreeBuilder treeBuilder = new FileSystemTreeBuilder(builder);
+    GraphBuilder builder = GraphBuilders.createGraphModelBuilder();
+    DependenciesListener listener = new SimpleDependencyListener(builder);
+    FileSystemTreeBuilder treeBuilder = new FileSystemTreeBuilder(listener);
     PathInfo leafInfo = new FilePathInfo(new File("this/is/a test/path"));
 
     GraphNode leaf = treeBuilder.insertLeaf(leafInfo);
+    GraphModel test = builder.createGraphModel();
 
     assertPaths("fs:this/is/a test/path", leaf.getId());
     assertEquals(4, test.getNodes().size());
