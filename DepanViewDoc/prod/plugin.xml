@@ -178,5 +178,23 @@
             project="true">
       </wizard>
    </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="com.google.devtools.depan.eclipse.preferences.ColorPreferencesPage"
+            id="com.google.devtools.depan.eclipse.preferences.colors"
+            name="Colors">
+      </page>
+      <page
+            class="com.google.devtools.depan.eclipse.preferences.LabelPreferencesPage"
+            id="com.google.devtools.depan.eclipse.preferences.labels"
+            name="Labels">
+      </page>
+      <page
+            class="com.google.devtools.depan.eclipse.preferences.NodePreferencesPage"
+            id="com.google.devtools.depan.eclipse.preferences.nodeoptions"
+            name="Node Rendering options">
+      </page>
+   </extension>
 
 </plugin>
