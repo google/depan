@@ -93,6 +93,7 @@ public class BuilderTest { // extends BasicGraphTestCase {
     assertNotSame(foundEdge, foundFind);
   }
 
+  @SuppressWarnings("unused")
   @Test
   public void testDuplicateNodes() {
     GraphModelBuilder builder = new GraphModelBuilder();

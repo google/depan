@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.collapse.model;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import com.google.devtools.depan.edges.matchers.GraphEdgeMatchers;
 import com.google.devtools.depan.graph.api.EdgeMatcher;
@@ -63,8 +63,12 @@ public class CollapserTest {
   @Test
   public void testBasic() {
     GraphNode[] testNodes = TestUtils.buildNodes(5);
+    assertNotNull(testNodes);
+    assertEquals(5, testNodes.length);
+
     GraphModel testGraph =
         TestUtils.buildComplete(testNodes, TestRelation.SAMPLE);
+    assertNotNull(testGraph);
   }
 
   /**
