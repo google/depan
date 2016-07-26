@@ -14,4 +14,5 @@ Require-Bundle: org.eclipse.core.resources,
  depan-xstream-library
 Bundle-ClassPath: .
 Export-Package: com.google.devtools.depan.graph_doc.model,
+ com.google.devtools.depan.graph_doc.operations,
  com.google.devtools.depan.graph_doc.persistence

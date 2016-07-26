@@ -20,6 +20,8 @@ import com.google.devtools.depan.cmd.CmdLogger;
 
 import org.eclipse.equinox.app.IApplication;
 
+import java.io.File;
+import java.net.URI;
 import java.util.List;
 
 /**
@@ -51,6 +53,13 @@ public abstract class AbstractCommandExec implements CommandExec {
 
   protected List<String> getParms() {
     return args.subList(1, args.size());
+  }
+
+  /**
+   * Obtain remaining arguments.
+   */
+  protected List<String> getParmsAfter(int index) {
+    return args.subList(2 + index, args.size());
   }
 
   /**
@@ -86,4 +95,10 @@ public abstract class AbstractCommandExec implements CommandExec {
     result = new Integer(1);
     CmdLogger.LOG.warning(msg);
   }
+
+  protected URI buildLocation(String outName) {
+    File result = new File(outName);
+    return result.toURI();
+  }
+
 }

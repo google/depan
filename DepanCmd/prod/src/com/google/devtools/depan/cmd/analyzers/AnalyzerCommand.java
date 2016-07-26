@@ -26,7 +26,6 @@ import com.google.devtools.depan.maven.builder.PomProcessing;
 import com.google.devtools.depan.maven.graphml.MavenGraphFactory;
 import com.google.devtools.depan.model.builder.chain.ElementFilter;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.text.MessageFormat;
@@ -146,10 +145,5 @@ public class AnalyzerCommand extends AbstractCommandExec {
     GraphModelXmlPersist persist = GraphModelXmlPersist.build(false);
     GraphDocument analysis = analyzer.runAnalysis();
     persist.save(location, analysis);
-  }
-
-  private URI buildLocation(String outName) {
-    File result = new File(outName);
-    return result.toURI();
   }
 }

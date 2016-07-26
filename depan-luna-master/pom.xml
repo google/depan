@@ -26,6 +26,7 @@
     <module>../DepanCore/test</module>
     <module>../DepanEdge/prod</module>
     <module>../DepanGraphDoc/prod</module>
+    <module>../DepanGraphDoc/test</module>
     <module>../DepanNode/prod</module>
     <module>../DepanNode/test</module>
     <module>../DepanPersistence/prod</module>
@@ -81,6 +82,7 @@
 
     <!-- CLI Release -->
     <module>../DepanCmd/prod</module>
+    <module>../DepanCmd/test</module>
     <module>../depan-cmd-feature</module>
     <module>../depan-cli-feature</module>
     <module>../depan-cli-release</module>

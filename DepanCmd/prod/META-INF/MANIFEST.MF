@@ -17,4 +17,6 @@ Require-Bundle: org.eclipse.core.runtime,
  com.google.guava,
  com.google.devtools.depan.persistence,
  com.google.devtools.depan.maven,
- com.google.devtools.depan.graphml
+ com.google.devtools.depan.graphml,
+ com.google.devtools.depan.platform
+Export-Package: com.google.devtools.depan.cmd.dispatch

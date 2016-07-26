@@ -16,35 +16,29 @@
 
 package com.google.devtools.depan.cmd.dispatch;
 
-import com.google.devtools.depan.cmd.analyzers.AnalyzerFactory;
-import com.google.devtools.depan.cmd.setops.UnionFactory;
+import static org.junit.Assert.assertTrue;
 
-import com.google.common.collect.Maps;
+import com.google.devtools.depan.cmd.analyzers.AnalyzerCommand;
+import com.google.devtools.depan.cmd.dispatch.CommandDef;
+import com.google.devtools.depan.cmd.dispatch.CommandExec;
+import com.google.devtools.depan.cmd.setops.UnionCommand;
 
-import java.util.Map;
+import org.junit.Test;
 
 /**
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public class CommandDef {
+public class TestCommandDef {
 
-  private static Map<String, CommandFactory> cmds = Maps.newHashMap();
-  static {
-    cmds.put("analyze", new AnalyzerFactory());
-    cmds.put("union", new UnionFactory());
+  @Test
+  public void testAnalyzeLookup() {
+    CommandExec cmd = CommandDef.lookup("analyze");
+    assertTrue(cmd instanceof AnalyzerCommand);
   }
 
-  /**
-   * @param string
-   * @return
-   */
-  public static CommandExec lookup(String string) {
-    CommandFactory result = cmds.get(string);
-    if (null != result) {
-      return result.buildCommand();
-    }
-
-    return new UnrecognizedCommand();
+  @Test
+  public void testUnionLookup() {
+    CommandExec cmd = CommandDef.lookup("union");
+    assertTrue(cmd instanceof UnionCommand);
   }
-
 }
