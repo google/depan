@@ -32,6 +32,7 @@
     <module>../DepanNode/test</module>
     <module>../DepanPersistence/prod</module>
     <module>../DepanPlatform/prod</module>
+    <module>../DepanTest/prod</module>
 
     <!-- App/UI components -->
     <module>../DepanApp/prod</module>
