@@ -20,6 +20,7 @@ import com.google.devtools.depan.graph.api.RelationSet;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.RelationSets;
+import com.google.devtools.depan.test.TestUtils;
 
 import org.junit.Test;
 
@@ -36,7 +37,7 @@ public class GraphsTest {
   @Test
   public void testBasic() {
     GraphNode[] nodeArray = TestUtils.buildNodes(5);
-    GraphModel test = TestUtils.buildComplete(nodeArray, TestRelation.SAMPLE);
+    GraphModel test = TestUtils.buildComplete(nodeArray, TestUtils.RELATION);
 
     assertEquals(5, test.getNodes().size());
     assertEquals(10, test.getEdges().size());
@@ -46,12 +47,12 @@ public class GraphsTest {
   @Test
   public void testGetForwardRelationCount() {
     GraphNode[] nodeArray = TestUtils.buildNodes(5);
-    GraphModel test = TestUtils.buildComplete(nodeArray, TestRelation.SAMPLE);
+    GraphModel test = TestUtils.buildComplete(nodeArray, TestUtils.RELATION);
 
     Collection<GraphNode> nodeSet = test.getNodesSet();
     assertEquals(nodeArray.length, nodeSet.size());
 
-    RelationSet forwardSet = RelationSets.createSingle(TestRelation.SAMPLE);
+    RelationSet forwardSet = RelationSets.createSingle(TestUtils.RELATION);
 
     Map<GraphNode, Integer> forwardMap =
         Graphs.getForwardRelationCount(test, nodeSet, forwardSet );
@@ -67,12 +68,12 @@ public class GraphsTest {
   @Test
   public void testGetReverseRelationCount() {
     GraphNode[] nodeArray = TestUtils.buildNodes(5);
-    GraphModel test = TestUtils.buildComplete(nodeArray, TestRelation.SAMPLE);
+    GraphModel test = TestUtils.buildComplete(nodeArray, TestUtils.RELATION);
 
     Collection<GraphNode> nodeSet = test.getNodesSet();
     assertEquals(nodeArray.length, nodeSet.size());
 
-    RelationSet reverseSet = RelationSets.createSingle(TestRelation.SAMPLE);
+    RelationSet reverseSet = RelationSets.createSingle(TestUtils.RELATION);
 
     Map<GraphNode, Integer> reverseMap =
         Graphs.getReverseRelationCount(test, nodeSet, reverseSet);

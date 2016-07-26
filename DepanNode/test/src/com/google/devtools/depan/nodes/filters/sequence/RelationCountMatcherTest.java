@@ -20,8 +20,6 @@ import com.google.devtools.depan.graph.api.RelationSet;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.RelationSets;
-import com.google.devtools.depan.nodes.TestRelation;
-import com.google.devtools.depan.nodes.TestUtils;
 import com.google.devtools.depan.nodes.filters.model.ContextualFilter;
 import com.google.devtools.depan.nodes.filters.model.DepanContext;
 import com.google.devtools.depan.nodes.filters.sequence.CountPredicates.IncludeAbove;
@@ -29,6 +27,7 @@ import com.google.devtools.depan.nodes.filters.sequence.CountPredicates.IncludeB
 import com.google.devtools.depan.nodes.filters.sequence.CountPredicates.IncludeEquals;
 import com.google.devtools.depan.nodes.filters.sequence.CountPredicates.IncludeInRange;
 import com.google.devtools.depan.nodes.filters.sequence.CountPredicates.IncludeOutside;
+import com.google.devtools.depan.test.TestUtils;
 
 import junit.framework.TestCase;
 
@@ -180,10 +179,10 @@ public class RelationCountMatcherTest extends TestCase {
 
     private TestData(int size, boolean forward, boolean reverse) {
       nodeArray = TestUtils.buildNodes(size);
-      testModel = TestUtils.buildComplete(nodeArray, TestRelation.SAMPLE);
+      testModel = TestUtils.buildComplete(nodeArray, TestUtils.RELATION);
       nodeSet = TestUtils.toSet(nodeArray);
 
-      countSet = RelationSets.createSingle(TestRelation.SAMPLE);
+      countSet = RelationSets.createSingle(TestUtils.RELATION);
       testContext = new DepanContext();
       testContext.setUniverse(testModel);
     }

@@ -6,4 +6,5 @@ Bundle-Version: 2.0.0.qualifier
 Bundle-Vendor: Pnambic Computing
 Fragment-Host: com.google.devtools.depan.collapser
 Require-Bundle: org.junit,
- com.google.devtools.depan.edges
+ com.google.devtools.depan.edges,
+ com.google.devtools.depan.test

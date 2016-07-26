@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.nodes;
+package com.google.devtools.depan.test;
 
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.basic.BasicEdge;
@@ -34,6 +34,19 @@ import java.util.Set;
  * @author <a href='mailto:leeca@google.com'>Lee Carver</a>
  */
 public class TestUtils {
+
+  public static Relation RELATION = new Relation() {
+
+    @Override
+    public String getForwardName() {
+      return "forward";
+    }
+
+    @Override
+    public String getReverseName() {
+      return "reverse";
+    }
+  };
 
   public static String getNodeId(int count) {
     return nameGen("node ", count);

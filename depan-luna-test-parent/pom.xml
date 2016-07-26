@@ -1,0 +1,43 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.pnambic.depan</groupId>
+    <artifactId>depan-luna-parent</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <relativePath>../depan-luna-parent</relativePath>
+  </parent>
+
+  <artifactId>depan-luna-test-parent</artifactId>
+  <packaging>pom</packaging>
+
+  <name>DepAn Luna Test Parent</name>
+  <description>Luna-based DepAn Test Definitions</description>
+
+  <properties>
+    <!-- Third-party libraries -->
+    <guava.version>18.0</guava.version>
+    <joda-time.version>2.9</joda-time.version>
+    <junit.version>4.12</junit.version>
+
+    <!-- DepAn Packaged libraries -->
+    <depan.asm.version>0.0.1-SNAPSHOT</depan.asm.version>
+    <depan.jogl.version>0.0.1-SNAPSHOT</depan.jogl.version>
+    <depan.jung.version>0.0.1-SNAPSHOT</depan.jung.version>
+    <depan.xstream.version>0.0.1-SNAPSHOT</depan.xstream.version>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <!-- OSGi compliant libraries -->
+
+     <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>${junit.version}</version>
+      </dependency>
+
+    </dependencies>
+  </dependencyManagement>
+
+</project>
+

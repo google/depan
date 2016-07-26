@@ -27,6 +27,7 @@ import com.google.devtools.depan.model.RelationSets;
 import com.google.devtools.depan.nodes.Graphs;
 import com.google.devtools.depan.nodes.trees.HierarchicalTreeModel;
 import com.google.devtools.depan.nodes.trees.TreeModel;
+import com.google.devtools.depan.test.TestUtils;
 
 import com.google.common.collect.Lists;
 
@@ -67,7 +68,7 @@ public class CollapserTest {
     assertEquals(5, testNodes.length);
 
     GraphModel testGraph =
-        TestUtils.buildComplete(testNodes, TestRelation.SAMPLE);
+        TestUtils.buildComplete(testNodes, TestUtils.RELATION);
     assertNotNull(testGraph);
   }
 
@@ -80,7 +81,7 @@ public class CollapserTest {
     Collapser collapser = new Collapser();
     GraphNode[] testNodes = TestUtils.buildNodes(5);
     GraphModel testGraph =
-        TestUtils.buildComplete(testNodes, TestRelation.SAMPLE);
+        TestUtils.buildComplete(testNodes, TestUtils.RELATION);
 
     assertGraphNodesEdges(testGraph, 5, 10);
 
@@ -105,7 +106,7 @@ public class CollapserTest {
     Collapser collapser = new Collapser();
     GraphNode[] testNodes = TestUtils.buildNodes(5);
     GraphModel testGraph =
-        TestUtils.buildComplete(testNodes, TestRelation.SAMPLE);
+        TestUtils.buildComplete(testNodes, TestUtils.RELATION);
 
     assertGraphNodesEdges(testGraph, 5, 10);
 
@@ -141,7 +142,7 @@ public class CollapserTest {
     Collapser collapser = new Collapser();
     GraphNode[] testNodes = TestUtils.buildNodes(5);
     GraphModel testGraph =
-        TestUtils.buildComplete(testNodes, TestRelation.SAMPLE);
+        TestUtils.buildComplete(testNodes, TestUtils.RELATION);
 
     assertGraphNodesEdges(testGraph, 5, 10);
 
@@ -170,10 +171,10 @@ public class CollapserTest {
     Collapser collapser = new Collapser();
     GraphNode[] testNodes = TestUtils.buildNodes(5);
     GraphModel testGraph =
-        TestUtils.buildComplete(testNodes, TestRelation.SAMPLE);
+        TestUtils.buildComplete(testNodes, TestUtils.RELATION);
 
     assertGraphNodesEdges(testGraph, 5, 10);
-    RelationSet relSet = RelationSets.createSingle(TestRelation.SAMPLE);
+    RelationSet relSet = RelationSets.createSingle(TestUtils.RELATION);
     EdgeMatcher<String> matcher =
         GraphEdgeMatchers.createForwardEdgeMatcher(relSet);
     TreeModel treeData = new HierarchicalTreeModel(

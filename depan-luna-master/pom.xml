@@ -17,6 +17,7 @@
   <modules>
     <module>../depan-parent</module>
     <module>../depan-luna-parent</module>
+    <module>../depan-luna-test-parent</module>
 
     <!-- Plugins -->
     <!-- Platform components -->

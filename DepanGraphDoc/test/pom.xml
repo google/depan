@@ -2,9 +2,9 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.pnambic.depan</groupId>
-    <artifactId>depan-luna-parent</artifactId>
+    <artifactId>depan-luna-test-parent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <relativePath>../../depan-luna-parent</relativePath>
+    <relativePath>../../depan-luna-test-parent</relativePath>
   </parent>
 
   <artifactId>com.google.devtools.depan.graph_doc-test</artifactId>
@@ -23,13 +23,18 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.11</version>
     </dependency>
 
     <!-- DepAn dependencies -->
     <dependency>
       <groupId>com.pnambic.depan</groupId>
-      <artifactId>com.google.devtools.depan.collapser</artifactId>
+      <artifactId>com.google.devtools.depan.graph_doc</artifactId>
+      <version>2.0.0-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.pnambic.depan</groupId>
+      <artifactId>com.google.devtools.depan.test</artifactId>
       <version>2.0.0-SNAPSHOT</version>
     </dependency>
   </dependencies>

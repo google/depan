@@ -20,6 +20,7 @@ import static org.junit.Assert.*;
 
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
+import com.google.devtools.depan.test.TestUtils;
 
 import org.junit.Test;
 
