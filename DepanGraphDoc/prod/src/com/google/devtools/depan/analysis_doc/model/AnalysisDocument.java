@@ -14,29 +14,29 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.platform.resources;
+package com.google.devtools.depan.analysis_doc.model;
 
 import com.google.devtools.depan.graph_doc.model.DependencyModel;
-
-import com.google.common.collect.Maps;
-
-import java.util.Map;
+import com.google.devtools.depan.resources.PropertyDocument;
 
 /**
- * Common resource type that supports generic info, {@link DependencyModel}
- * matching, and {@link PropertyResource}s for each entity.
- * 
+ * Document type for analysis objects that are tied to a set of relation and
+ * node contributions.
+ *
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public class ModelResource<T> implements PropertyResource {
+public class AnalysisDocument<T> extends PropertyDocument<T> {
+
+  public static final String INFO_KEY = "info";
 
   private final T info;
-  private final ModelMatcher matcher;
-  private final Map<String, String> properties = Maps.newHashMap();
 
-  public ModelResource(T info, ModelMatcher matcher) {
-    this.info = info;
+  private ModelMatcher matcher;
+
+  public AnalysisDocument(String name, ModelMatcher matcher, T info) {
+    super(name);
     this.matcher = matcher;
+    this.info = info;
   }
 
   public T getInfo() {
@@ -48,11 +48,22 @@ public class ModelResource<T> implements PropertyResource {
   }
 
   @Override
-  public String getProperty(String key) {
-    return properties.get(key);
+  public Object getObject(String key) {
+    if (INFO_KEY.equals(key)) {
+      return getInfo();
+    }
+    return super.getObject(key);
   }
 
-  public void setProperty(String key, String value) {
-    properties.put(key, value);
+  @Override
+  protected boolean isWritable(String key) {
+    if (INFO_KEY.equals(key)) {
+      return false;
+    }
+    return super.isWritable(key);
+  }
+
+  protected ModelMatcher getMatcher() {
+    return matcher;
   }
 }

@@ -42,7 +42,7 @@ public abstract class DefaultingFilterContribution<T extends ContextualFilter>
       return createWrapperFilter(filters.iterator().next());
     }
     String msg = MessageFormat.format(
-        "Group for {0} must be asingleton, has {1} elements",
+        "Group for {0} must be a singleton, has {1} elements",
         getLabel(), filters.size());
     throw new UnsupportedOperationException(msg);
   }

@@ -17,7 +17,8 @@ Require-Bundle: org.eclipse.core.runtime,
  com.google.guava,
  org.eclipse.ui,
  com.google.devtools.depan.platform,
- com.google.devtools.depan.nodes
+ com.google.devtools.depan.nodes,
+ com.google.devtools.depan.persistence
 Bundle-ClassPath: .
 Export-Package: com.google.devtools.depan.graph_doc.eclipse.ui.plugins,
  com.google.devtools.depan.graph_doc.eclipse.ui.resources,

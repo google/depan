@@ -17,7 +17,6 @@
 package com.google.devtools.depan.relations.eclipse.ui.wizards;
 
 import com.google.devtools.depan.graph.api.RelationSet;
-import com.google.devtools.depan.model.RelationSets;
 import com.google.devtools.depan.persistence.AbstractDocXmlPersist;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 import com.google.devtools.depan.relations.persistence.RelationSetDescriptorXmlPersist;
@@ -51,7 +50,7 @@ public class NewRelationSetWizard
   /**
    * {@link RelationSet} to be saved.
    */
-  private final RelationSetDescriptor relationSet;
+  private final RelationSetDescriptor relSetDescr;
 
   /**
    * Constructor for a new wizard, for the creation of a new named
@@ -60,17 +59,8 @@ public class NewRelationSetWizard
    * @param finder A {@link DirectedRelationFinder} describing the new set.
    */
   public NewRelationSetWizard(RelationSetDescriptor relationSet) {
-    this.relationSet = relationSet;
+    this.relSetDescr = relationSet;
   }
-
-  public NewRelationSetWizard(RelationSet relationSet) {
-    this(new RelationSetDescriptor("unnamed", relationSet));
-  }
-
-  public NewRelationSetWizard() {
-    this(RelationSets.EMPTY);
-  }
-
 
   /////////////////////////////////////
   // Wizard hook methods
@@ -93,7 +83,7 @@ public class NewRelationSetWizard
   protected RelationSetDescriptor buildDocument(IProgressMonitor monitor) {
     monitor.beginTask("Preparing edge matcher", 1);
     monitor.worked(1);
-    return relationSet;
+    return relSetDescr;
   }
 
   @Override

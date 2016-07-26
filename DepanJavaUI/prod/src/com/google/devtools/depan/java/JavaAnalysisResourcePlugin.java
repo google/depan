@@ -16,23 +16,17 @@
 
 package com.google.devtools.depan.java;
 
+import com.google.devtools.depan.analysis_doc.model.AnalysisProperties;
 import com.google.devtools.depan.edges.matchers.GraphEdgeMatchers;
 import com.google.devtools.depan.graph.api.RelationSet;
 import com.google.devtools.depan.graph_doc.eclipse.ui.plugins.AnalysisResourceInstaller;
-import com.google.devtools.depan.graph_doc.eclipse.ui.resources.AnalysisResources;
 import com.google.devtools.depan.java.graph.JavaRelation;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphEdgeMatcher;
 import com.google.devtools.depan.model.RelationSets;
-import com.google.devtools.depan.platform.resources.FeatureMatcher;
-import com.google.devtools.depan.platform.resources.ModelResource;
-import com.google.devtools.depan.platform.resources.PropertyResources;
-import com.google.devtools.depan.platform.resources.ResourceContainer;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
-
-import com.google.common.collect.ImmutableList;
-
-import java.util.Collections;
+import com.google.devtools.depan.resources.ResourceContainer;
+import com.google.devtools.depan.resources.analysis.AnalysisResources;
 
 /**
  * Captures many of the capabilities provided by the legacy
@@ -42,12 +36,6 @@ import java.util.Collections;
  */
 public class JavaAnalysisResourcePlugin implements
     AnalysisResourceInstaller {
-
-  private static final FeatureMatcher JAVA_MATCHER =
-      new FeatureMatcher(
-          Collections.<String>emptyList(), 
-          // TO-BE: ImmutableList.<String>of(FileSystemNodeContributor.ID),
-          ImmutableList.<String>of(JavaRelationContributor.ID));
 
   public static final RelationSet JAVA_RELSET =
       RelationSets.createArray(JavaRelation.values());
@@ -65,36 +53,35 @@ public class JavaAnalysisResourcePlugin implements
 
   private void installMatchers(ResourceContainer matchers) {
     for (RelationSetDescriptor descr : JavaRelationSets.builtins) {
-      RelationSet relSet = descr.getRelationSet();
+      RelationSet relSet = descr.getInfo();
       GraphEdgeMatcher matcher =
           GraphEdgeMatchers.createForwardEdgeMatcher(relSet);
-      GraphEdgeMatcherDescriptor install = 
-          new GraphEdgeMatcherDescriptor(descr.getName(), matcher);
-      ModelResource<GraphEdgeMatcherDescriptor> resource =
-          new ModelResource<GraphEdgeMatcherDescriptor>(install, JAVA_MATCHER);
+      GraphEdgeMatcherDescriptor resource = 
+          new GraphEdgeMatcherDescriptor(
+              descr.getName(), descr.getModel(), matcher);
       matchers.addResource(descr.getName(), resource);
     }
 
-    @SuppressWarnings("unchecked")
-    ModelResource<GraphEdgeMatcherDescriptor> defResource =
-        (ModelResource<GraphEdgeMatcherDescriptor>)
+    GraphEdgeMatcherDescriptor defResource = (GraphEdgeMatcherDescriptor)
         matchers.getResource(JavaRelationSets.CONTAINER.getName());
     defResource.setProperty(
-        PropertyResources.PROP_DEFAULT, JavaRelationContributor.ID);
+        AnalysisProperties.DEFAULT_PROP, JavaRelationContributor.ID);
   }
 
+  /**
+   * @param relSets
+   */
+  /**
+   * @param relSets
+   */
   private void installRelSets(ResourceContainer relSets) {
     for (RelationSetDescriptor descr : JavaRelationSets.builtins) {
-      ModelResource<RelationSetDescriptor> resource =
-          new ModelResource<RelationSetDescriptor>(descr, JAVA_MATCHER);
-      relSets.addResource(descr.getName(), resource);
+      relSets.addResource(descr.getName(), descr);
     }
 
-    @SuppressWarnings("unchecked")
-    ModelResource<RelationSetDescriptor> defResource =
-        (ModelResource<RelationSetDescriptor>)
+    RelationSetDescriptor defResource = (RelationSetDescriptor)
         relSets.getResource(JavaRelationSets.CONTAINER.getName());
     defResource.setProperty(
-        PropertyResources.PROP_DEFAULT, JavaRelationContributor.ID);
+        AnalysisProperties.DEFAULT_PROP, JavaRelationContributor.ID);
   }
 }

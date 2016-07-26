@@ -16,7 +16,9 @@
 
 package com.google.devtools.depan.nodes.filters.eclipse.ui.widgets;
 
+import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.registry.RelationRegistry;
+import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.matchers.eclipse.ui.widgets.EdgeMatcherEditorControl;
 import com.google.devtools.depan.matchers.eclipse.ui.widgets.EdgeMatcherSaveLoadControl;
 import com.google.devtools.depan.matchers.eclipse.ui.wizards.NewEdgeMatcherWizard;
@@ -31,6 +33,7 @@ import org.eclipse.swt.widgets.Composite;
 
 import java.net.URI;
 import java.text.MessageFormat;
+import java.util.Collection;
 
 /**
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
@@ -50,6 +53,8 @@ public class EdgeMatcherFilterEditorControl extends Composite {
 
   private EdgeMatcherEditorControl edgeMatcherEditor;
 
+  private DependencyModel model;
+
   /////////////////////////////////////
   // Public methods
 
@@ -65,11 +70,15 @@ public class EdgeMatcherFilterEditorControl extends Composite {
     matchEditor.setLayoutData(Widgets.buildGrabFillData());
   }
 
-  public void setInput(EdgeMatcherFilter editFilter) {
+  public void setInput(EdgeMatcherFilter editFilter, DependencyModel model) {
     this.editFilter = editFilter;
+    this.model = model;
+
     basicControl.setInput(editFilter);
 
-    edgeMatcherEditor.updateTable(RelationRegistry.getRegistryRelations());
+    Collection<Relation> projectRelations = 
+        RelationRegistry.getRegistryRelations(model.getRelationContribs());
+    edgeMatcherEditor.updateTable(projectRelations);
     edgeMatcherEditor.updateEdgeMatcher(editFilter.getEdgeMatcher());
   }
 
@@ -113,14 +122,14 @@ public class EdgeMatcherFilterEditorControl extends Composite {
       String label = MessageFormat.format(
           "{0} filter", basicControl.getFilterName());
       GraphEdgeMatcherDescriptor target =
-          new GraphEdgeMatcherDescriptor(label, matcher);
+          new GraphEdgeMatcherDescriptor(label, model, matcher);
       return new NewEdgeMatcherWizard(target);
     }
 
     @Override
     protected void loadURI(URI uri) {
       GraphEdgeMatcherDescriptor loadMatcher = loadEdgeMatcherDoc(uri);
-      edgeMatcherEditor.updateEdgeMatcher(loadMatcher.getEdgeMatcher());
+      edgeMatcherEditor.updateEdgeMatcher(loadMatcher.getInfo());
     }
   }
 }

@@ -3,6 +3,7 @@
  */
 package com.google.devtools.depan.relations.models;
 
+import com.google.devtools.depan.analysis_doc.model.ModelMatcher;
 import com.google.devtools.depan.model.RelationSets;
 
 /**
@@ -16,5 +17,5 @@ public class RelationSetDescriptors {
   }
 
   public static RelationSetDescriptor EMPTY = new RelationSetDescriptor(
-      "Empty", RelationSets.EMPTY);
+      "Empty", ModelMatcher.ALL_MODELS, RelationSets.EMPTY);
 }

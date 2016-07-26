@@ -17,6 +17,7 @@
 package com.google.devtools.depan.matchers.eclipse.ui.wizards;
 
 import com.google.devtools.depan.edges.matchers.GraphEdgeMatchers;
+import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.matchers.persistence.EdgeMatcherDocXmlPersist;
 import com.google.devtools.depan.persistence.AbstractDocXmlPersist;
@@ -61,7 +62,10 @@ public class NewEdgeMatcherWizard
    * @param finder A {@link DirectedRelationFinder} describing the new set.
    */
   public NewEdgeMatcherWizard() {
-    this(new GraphEdgeMatcherDescriptor("Empty", GraphEdgeMatchers.EMPTY));
+    this(new GraphEdgeMatcherDescriptor(
+        "Empty",
+        DependencyModel.createFromRegistry(),
+        GraphEdgeMatchers.EMPTY));
   }
 
   public NewEdgeMatcherWizard(GraphEdgeMatcherDescriptor matcherInfo) {

@@ -16,15 +16,15 @@
 
 package com.google.devtools.depan.graph_doc.eclipse.ui.resources;
 
+import com.google.devtools.depan.analysis_doc.model.AnalysisProperties;
 import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptors;
-import com.google.devtools.depan.platform.resources.ModelResource;
-import com.google.devtools.depan.platform.resources.PropertyResource;
-import com.google.devtools.depan.platform.resources.PropertyResources;
-import com.google.devtools.depan.platform.resources.ResourceContainer;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 import com.google.devtools.depan.relations.models.RelationSetDescriptors;
+import com.google.devtools.depan.resources.PropertyDocument;
+import com.google.devtools.depan.resources.ResourceContainer;
+import com.google.devtools.depan.resources.analysis.AnalysisResources;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Lists;
@@ -57,6 +57,12 @@ public class GraphResourceBuilder {
       ResourceContainer root, DependencyModel model) {
     this.root = root;
     this.model = model;
+  }
+
+  public static GraphResources forModel(DependencyModel model) {
+    ResourceContainer root = AnalysisResources.getRoot();
+    GraphResourceBuilder result = new GraphResourceBuilder(root, model);
+    return result.build();
   }
 
   public GraphResources build() {
@@ -132,39 +138,34 @@ public class GraphResourceBuilder {
     return null;
   }
 
-  @SuppressWarnings("unchecked")
   private void buildRelationSets(
       ResourceContainer tree, DependencyModel model) {
     for (Object resource : tree.getResources()) {
-      if (resource instanceof ModelResource<?>) {
-        ModelResource<RelationSetDescriptor> checkRes =
-            (ModelResource<RelationSetDescriptor>) resource;
+      if (resource instanceof RelationSetDescriptor) {
+        RelationSetDescriptor checkRes = (RelationSetDescriptor) resource;
         if (checkRes.forModel(model)) {
-          RelationSetDescriptor info = checkRes.getInfo();
-          knownRelSets.add(info);
-          String defModel = getDefault(resource);
+          knownRelSets.add(checkRes);
+          String defModel = getDefault(checkRes);
           if (null != defModel) {
-            defRelSets.put(defModel, info);
+            defRelSets.put(defModel, checkRes);
           }
         }
       }
     }
   }
 
-  @SuppressWarnings("unchecked")
-  public void buildMatcherSets(
+  private void buildMatcherSets(
       ResourceContainer tree, DependencyModel model) {
 
     for (Object resource : tree.getResources()) {
-      if (resource instanceof ModelResource<?>) {
-        ModelResource<GraphEdgeMatcherDescriptor> checkRes =
-            (ModelResource<GraphEdgeMatcherDescriptor>) resource;
+      if (resource instanceof GraphEdgeMatcherDescriptor) {
+        GraphEdgeMatcherDescriptor checkRes =
+            (GraphEdgeMatcherDescriptor) resource;
         if (checkRes.forModel(model)) {
-          GraphEdgeMatcherDescriptor info = checkRes.getInfo();
-          knownMatchers.add(info);
-          String defModel = getDefault(resource);
+          knownMatchers.add(checkRes);
+          String defModel = getDefault(checkRes);
           if (null != defModel) {
-            defMatchers.put(defModel, info);
+            defMatchers.put(defModel, checkRes);
           }
         }
       }
@@ -172,11 +173,11 @@ public class GraphResourceBuilder {
   }
 
   private String getDefault(Object resource) {
-    if (!(resource instanceof PropertyResource)) {
+    if (!(resource instanceof PropertyDocument)) {
       return null;
     }
-    PropertyResource propRes = (PropertyResource) resource;
-    String propVal = propRes.getProperty(PropertyResources.PROP_DEFAULT);
+    PropertyDocument<?> propRes = (PropertyDocument<?>) resource;
+    String propVal = propRes.getProperty(AnalysisProperties.DEFAULT_PROP);
     if (model.getRelationContribs().contains(propVal)) {
       return propVal;
     }

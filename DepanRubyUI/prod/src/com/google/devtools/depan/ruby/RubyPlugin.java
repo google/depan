@@ -86,13 +86,13 @@ public class RubyPlugin { // extends AbstractSourcePlugin {
     classes.add(SingletonMethodElement.class);
 
     RelationSetDescriptor.Builder dependentBuilder =
-        RelationSetDescriptor.createBuilder("Ruby Extends");
+        RelationSetDescriptor.createBuilder("Ruby Extends", null);
     dependentBuilder.addRelation(RubyRelation.EXTENDS_TYPE);
     EXTENDS_TYPE = dependentBuilder.build();
     builtinSets.add(EXTENDS_TYPE);
 
     RelationSetDescriptor.Builder moduleBuilder =
-        RelationSetDescriptor.createBuilder("Ruby Members");
+        RelationSetDescriptor.createBuilder("Ruby Members", null);
     moduleBuilder.addRelation(RubyRelation.CLASS_MEMBER);
     moduleBuilder.addRelation(RubyRelation.INSTANCE_MEMBER);
     moduleBuilder.addRelation(RubyRelation.SINGLETON_MEMBER);
@@ -100,7 +100,7 @@ public class RubyPlugin { // extends AbstractSourcePlugin {
     builtinSets.add(MEMBER_ELEMENTS);
 
     RelationSetDescriptor.Builder containerBuilder =
-        RelationSetDescriptor.createBuilder("All Ruby");
+        RelationSetDescriptor.createBuilder("All Ruby", null);
     relations = Lists.newArrayList(); 
     for (Relation r : RubyRelation.values()) {
       relations.add(r);

@@ -86,7 +86,7 @@ public class JungBuilder {
           DirectedGraph<GraphNode, GraphEdge> result,
           Set<GraphNode> includedNodes) {
 
-    EdgeMatcher<String> matcher = edgeMatcher.getEdgeMatcher();
+    EdgeMatcher<String> matcher = edgeMatcher.getInfo();
     for (GraphEdge edge : graphModel.getEdges()) {
       // Filter on nodes first
       if (!includedNodes.contains(edge.getHead()))

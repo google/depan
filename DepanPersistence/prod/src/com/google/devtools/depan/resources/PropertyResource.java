@@ -14,13 +14,18 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.platform.resources;
+package com.google.devtools.depan.resources;
 
 /**
  * Define access to properties associated with a resource.
+ * 
+ * Most properties are modeled as {@link String}s, but some are better
+ * considered as generic {@link Object}s.
  * 
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
 public interface PropertyResource {
   String getProperty(String key);
+
+  Object getObject(String key);
 }

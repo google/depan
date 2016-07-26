@@ -253,7 +253,8 @@ public class NodeFilterViewPart extends AbstractViewDocViewPart {
 
     ViewEditor editor = getEditor();
 
-    filterControl.setInput(editor.getActiveNodeFilter());
+    filterControl.setInput(
+        editor.getActiveNodeFilter(), editor.getDependencyModel());
 
     refreshSources();
 

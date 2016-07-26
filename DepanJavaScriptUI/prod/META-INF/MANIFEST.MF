@@ -21,4 +21,5 @@ Require-Bundle: org.eclipse.core.runtime,
  com.google.devtools.depan.filesystem.ui,
  com.google.devtools.depan.java.ui,
  com.google.guava,
- com.google.devtools.depan.persistence
+ com.google.devtools.depan.persistence,
+ com.google.devtools.depan.graph_doc

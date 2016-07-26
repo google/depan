@@ -22,7 +22,6 @@ import com.google.devtools.depan.graph_doc.model.GraphDocument;
 import com.google.devtools.depan.graph_doc.operations.MergeGraphDoc;
 import com.google.devtools.depan.graph_doc.persistence.GraphModelXmlPersist;
 
-import java.io.IOException;
 import java.net.URI;
 
 /**

@@ -16,7 +16,8 @@ Require-Bundle: org.eclipse.core.runtime,
  com.google.devtools.depan.platform.ui,
  depan-xstream-library,
  com.google.guava,
- com.google.devtools.depan.edges.ui
+ com.google.devtools.depan.edges.ui,
+ com.google.devtools.depan.graph_doc
 Bundle-ClassPath: .
 Export-Package: com.google.devtools.depan.matchers.eclipse.ui.widgets,
  com.google.devtools.depan.matchers.eclipse.ui.wizards,

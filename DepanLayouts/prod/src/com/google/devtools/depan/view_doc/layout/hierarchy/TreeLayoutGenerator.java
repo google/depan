@@ -107,7 +107,7 @@ public abstract class TreeLayoutGenerator implements LayoutGenerator {
       return new NewTreeLayout(
               jungGraph,
               context.getGraphModel(),
-              context.getEdgeMatcher().getEdgeMatcher(),
+              context.getEdgeMatcher().getInfo(),
               context.getViewport());
     }
   };
@@ -124,7 +124,7 @@ public abstract class TreeLayoutGenerator implements LayoutGenerator {
       return new NewRadialLayout(
               jungGraph,
               context.getGraphModel(),
-              context.getEdgeMatcher().getEdgeMatcher(),
+              context.getEdgeMatcher().getInfo(),
               context.getViewport());
     }
   };

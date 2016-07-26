@@ -10,5 +10,10 @@ Require-Bundle: org.eclipse.core.runtime,
  com.google.devtools.depan.core,
  com.google.devtools.depan.platform,
  com.google.devtools.depan.persistence,
- depan-xstream-library
-Export-Package: com.google.devtools.depan.javascript.graph
+ depan-xstream-library,
+ com.google.devtools.depan.graph_doc,
+ com.google.guava,
+ com.google.devtools.depan.filesystem,
+ com.google.devtools.depan.java
+Export-Package: com.google.devtools.depan.javascript,
+ com.google.devtools.depan.javascript.graph

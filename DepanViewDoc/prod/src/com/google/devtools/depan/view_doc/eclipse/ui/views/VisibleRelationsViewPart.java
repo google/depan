@@ -19,6 +19,7 @@ package com.google.devtools.depan.view_doc.eclipse.ui.views;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.api.RelationSet;
 import com.google.devtools.depan.graph.registry.RelationRegistry;
+import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 import com.google.devtools.depan.relations.eclipse.ui.widgets.RelationSetEditorControl;
 import com.google.devtools.depan.relations.eclipse.ui.wizards.NewRelationSetWizard;
@@ -181,8 +182,11 @@ public class VisibleRelationsViewPart extends AbstractViewDocViewPart {
    */
   private void saveSelection() {
 
-    NewRelationSetWizard wizard =
-        new NewRelationSetWizard(getEditor().getVisibleRelationSet());
+    RelationSet vizRelSet = getEditor().getVisibleRelationSet();
+    DependencyModel model = getEditor().getDependencyModel();
+    RelationSetDescriptor relSetDescr = new RelationSetDescriptor(
+        "- unnamed -", model, vizRelSet);
+    NewRelationSetWizard wizard = new NewRelationSetWizard(relSetDescr);
 
     Shell shell = getSite().getWorkbenchWindow().getShell();
     WizardDialog dialog = new WizardDialog(shell, wizard);
@@ -202,7 +206,7 @@ public class VisibleRelationsViewPart extends AbstractViewDocViewPart {
     RelationSetDescriptorXmlPersist loader =
         RelationSetDescriptorXmlPersist.build(true);
     RelationSetDescriptor visDescr = loader.load(visURI);
-    RelationSet visRels = visDescr.getRelationSet();
+    RelationSet visRels = visDescr.getInfo();
 
     ViewEditor ed = getEditor();
     for (Relation relation : RelationRegistry.getRegistryRelations()) {

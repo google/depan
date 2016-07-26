@@ -41,6 +41,7 @@ import com.google.devtools.depan.eclipse.visualization.ogl.RendererEvents;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.api.RelationSet;
 import com.google.devtools.depan.graph_doc.eclipse.ui.resources.GraphResources;
+import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.graph_doc.model.GraphDocument;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptors;
@@ -371,6 +372,10 @@ public class ViewEditor extends MultiPageEditorPart {
 
   public GraphModel getParentGraph() {
     return viewInfo.getParentGraph();
+  }
+
+  public DependencyModel getDependencyModel() {
+    return viewInfo.getDependencyModel();
   }
 
   public Collection<Relation> getDisplayRelations() {
@@ -1390,7 +1395,7 @@ public class ViewEditor extends MultiPageEditorPart {
 
   public GraphData<NodeDisplayProperty> getHierarchy(
       GraphEdgeMatcherDescriptor edgeMatcher) {
-    return hierarchies.getHierarchy(edgeMatcher.getEdgeMatcher());
+    return hierarchies.getHierarchy(edgeMatcher.getInfo());
   }
 
   /**

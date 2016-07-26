@@ -16,23 +16,17 @@
 
 package com.google.devtools.depan.filesystem;
 
+import com.google.devtools.depan.analysis_doc.model.AnalysisProperties;
 import com.google.devtools.depan.edges.matchers.GraphEdgeMatchers;
 import com.google.devtools.depan.filesystem.graph.FileSystemRelation;
 import com.google.devtools.depan.graph.api.RelationSet;
 import com.google.devtools.depan.graph_doc.eclipse.ui.plugins.AnalysisResourceInstaller;
-import com.google.devtools.depan.graph_doc.eclipse.ui.resources.AnalysisResources;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphEdgeMatcher;
 import com.google.devtools.depan.model.RelationSets;
-import com.google.devtools.depan.platform.resources.FeatureMatcher;
-import com.google.devtools.depan.platform.resources.ModelResource;
-import com.google.devtools.depan.platform.resources.PropertyResources;
-import com.google.devtools.depan.platform.resources.ResourceContainer;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
-
-import com.google.common.collect.ImmutableList;
-
-import java.util.Collections;
+import com.google.devtools.depan.resources.ResourceContainer;
+import com.google.devtools.depan.resources.analysis.AnalysisResources;
 
 /**
  * Captures many of the capabilities provided by the legacy
@@ -44,12 +38,6 @@ public class FileSystemAnalysisResourcePlugin implements
     AnalysisResourceInstaller {
 
   private static final String FS_CONTAINER_LABEL = "Filesystem Containers";
-
-  private static final FeatureMatcher FS_MATCHER =
-      new FeatureMatcher(
-          Collections.<String>emptyList(), 
-          // TO-BE: ImmutableList.<String>of(FileSystemNodeContributor.ID),
-          ImmutableList.<String>of(FileSystemRelationContributor.ID));
 
   public static final RelationSet FS_RELSET =
       RelationSets.createArray(FileSystemRelation.values());
@@ -68,22 +56,20 @@ public class FileSystemAnalysisResourcePlugin implements
   private void installMatchers(ResourceContainer matchers) {
     GraphEdgeMatcher matcher =
         GraphEdgeMatchers.createForwardEdgeMatcher(FS_RELSET);
-    GraphEdgeMatcherDescriptor descr =
-        new GraphEdgeMatcherDescriptor(FS_CONTAINER_LABEL, matcher);
-    ModelResource<GraphEdgeMatcherDescriptor> resource =
-        new ModelResource<GraphEdgeMatcherDescriptor>(descr, FS_MATCHER);
+    GraphEdgeMatcherDescriptor resource =
+        new GraphEdgeMatcherDescriptor(
+            FS_CONTAINER_LABEL, FileSystemPluginActivator.FILE_SYSTEM_MODEL, matcher);
     resource.setProperty(
-        PropertyResources.PROP_DEFAULT, FileSystemRelationContributor.ID);
-    matchers.addResource(descr.getName(), resource);
+        AnalysisProperties.DEFAULT_PROP, FileSystemRelationContributor.ID);
+    matchers.addResource(resource.getName(), resource);
   }
 
   private void installRelSets(ResourceContainer relSets) {
-    RelationSetDescriptor descr =
-        new RelationSetDescriptor(FS_CONTAINER_LABEL, FS_RELSET);
-    ModelResource<RelationSetDescriptor> resource =
-        new ModelResource<RelationSetDescriptor>(descr, FS_MATCHER);
+    RelationSetDescriptor resource =
+        new RelationSetDescriptor(
+            FS_CONTAINER_LABEL, FileSystemPluginActivator.FILE_SYSTEM_MODEL, FS_RELSET);
     resource.setProperty(
-        PropertyResources.PROP_DEFAULT, FileSystemRelationContributor.ID);
-    relSets.addResource(descr.getName(), resource);
+        AnalysisProperties.DEFAULT_PROP, FileSystemRelationContributor.ID);
+    relSets.addResource(resource.getName(), resource);
   }
 }

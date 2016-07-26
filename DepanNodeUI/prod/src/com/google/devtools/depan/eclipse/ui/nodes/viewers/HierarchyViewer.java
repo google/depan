@@ -179,7 +179,7 @@ public class HierarchyViewer<T> extends Composite {
       return new GraphData<T>(null, TreeModel.EMPTY);
     }
     GraphData<T> baseData =
-        hierarchies.getHierarchy(selectedEdgeMatcher.getEdgeMatcher());
+        hierarchies.getHierarchy(selectedEdgeMatcher.getInfo());
 
     // Synthesize a inverse tree if requested.
     // These are not cached.  The inverted hierarchies are often small,

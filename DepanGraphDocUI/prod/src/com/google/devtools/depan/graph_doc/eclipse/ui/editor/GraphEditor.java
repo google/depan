@@ -25,7 +25,7 @@ import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeTreeProviders;
 import com.google.devtools.depan.graph_doc.GraphDocLogger;
 import com.google.devtools.depan.graph_doc.eclipse.ui.plugins.FromGraphDocContributor;
 import com.google.devtools.depan.graph_doc.eclipse.ui.plugins.FromGraphDocWizard;
-import com.google.devtools.depan.graph_doc.eclipse.ui.resources.AnalysisResources;
+import com.google.devtools.depan.graph_doc.eclipse.ui.resources.GraphResourceBuilder;
 import com.google.devtools.depan.graph_doc.eclipse.ui.resources.GraphResources;
 import com.google.devtools.depan.graph_doc.eclipse.ui.widgets.FromGraphDocListControl;
 import com.google.devtools.depan.graph_doc.model.DependencyModel;
@@ -114,7 +114,7 @@ public class GraphEditor extends MultiPageEditorPart {
     handleHierarchyChanged();
 
     DependencyModel model = graph.getDependencyModel();
-    graphResources = AnalysisResources.buildAnalysisResources(model);
+    graphResources = GraphResourceBuilder.forModel(model);
 
     // set the title to the filename, excepted the file extension
     String title = file.getName();

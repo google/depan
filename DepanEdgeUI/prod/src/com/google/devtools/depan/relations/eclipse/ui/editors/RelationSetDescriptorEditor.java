@@ -112,10 +112,10 @@ public class RelationSetDescriptorEditor extends EditorPart {
   private void updateDocument() {
 
     RelationSet relSet = relRepo.getRelationSet();
-    RelationSetDescriptor result =
-        new RelationSetDescriptor(relSetName.getText(), relSet);
+    RelationSetDescriptor result = new RelationSetDescriptor(
+        relSetName.getText(), relSetInfo.getModel(), relSet);
     relSetInfo = result;
-    relRepo.setRelationSet(relSetInfo.getRelationSet());
+    relRepo.setRelationSet(relSetInfo.getInfo());
   }
 
   /**
@@ -184,7 +184,7 @@ public class RelationSetDescriptorEditor extends EditorPart {
       // .. maybe in the future, it should use only project relations?
       // see RelationRegistry.getRegistryRelations()
       relRepo = new RelationSetDescrRepo(null);
-      relRepo.setRelationSet(relSetInfo.getRelationSet());
+      relRepo.setRelationSet(relSetInfo.getInfo());
 
       setPartName(buildPartName());
       setDirtyState(false);

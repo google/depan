@@ -89,7 +89,7 @@ public class FileSystemPlugin { // { extends AbstractSourcePlugin {
     classes.add(FileElement.class);
 
     RelationSetDescriptor.Builder containerBuilder =
-        RelationSetDescriptor.createBuilder("Filesystem Containers");
+        RelationSetDescriptor.createBuilder("Filesystem Containers", null);
     relations = Lists.newArrayList(); 
     for (Relation r : FileSystemRelation.values()) {
       relations.add(r);

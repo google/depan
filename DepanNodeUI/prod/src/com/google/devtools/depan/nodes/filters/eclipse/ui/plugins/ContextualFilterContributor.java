@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.nodes.filters.eclipse.ui.plugins;
 
+import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.nodes.filters.eclipse.ui.widgets.FilterEditorDialog;
 import com.google.devtools.depan.nodes.filters.model.ContextualFilter;
 
@@ -57,5 +58,6 @@ public interface ContextualFilterContributor <T extends ContextualFilter> {
 
   boolean handlesFilterInstance(ContextualFilter filter);
 
-  FilterEditorDialog<T> buildEditorDialog(Shell shell, ContextualFilter filter);
+  FilterEditorDialog<T> buildEditorDialog(
+      Shell shell, ContextualFilter filter, DependencyModel model);
 }

@@ -16,8 +16,15 @@
 
 package com.google.devtools.depan.maven;
 
+import com.google.devtools.depan.filesystem.FileSystemRelationContributor;
+import com.google.devtools.depan.graph_doc.model.DependencyModel;
+
+import com.google.common.collect.ImmutableList;
+
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+
+import java.util.Collections;
 
 /**
  * The activator class controls the plug-in life cycle.
@@ -28,6 +35,13 @@ public class MavenPluginActivator implements BundleActivator {
 
   /** Plug-in ID used to identify this plug-in. */
   public static final String PLUGIN_ID = "com.google.devtools.depan.maven";
+
+  public static final DependencyModel MAVEN_MODEL =
+      new DependencyModel(
+          Collections.<String>emptyList(), 
+          ImmutableList.<String>of(
+              MavenRelationContributor.ID,
+              FileSystemRelationContributor.ID));
 
   public MavenPluginActivator() {
   }

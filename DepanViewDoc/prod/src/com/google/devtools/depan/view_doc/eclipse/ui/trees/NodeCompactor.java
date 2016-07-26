@@ -154,7 +154,7 @@ public class NodeCompactor {
     GraphModel treeGraph = GraphBuilders.buildFromNodes(master, remains);
     GraphData<GraphNode> data = GraphData.createGraphData(
         NodeTreeProviders.GRAPH_NODE_PROVIDER,
-        treeGraph, matcher.getEdgeMatcher());
+        treeGraph, matcher.getInfo());
 
     // Update remains with info from hierarchy tree
     TreeModel tree = data.getTreeModel();

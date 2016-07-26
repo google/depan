@@ -11,5 +11,6 @@ Require-Bundle: com.google.guava,
  com.google.devtools.depan.nodes,
  com.google.devtools.depan.view_doc,
  com.google.devtools.depan.edges,
- com.google.devtools.depan.edges.ui
+ com.google.devtools.depan.edges.ui,
+ com.google.devtools.depan.graph_doc
 Bundle-ClassPath: .

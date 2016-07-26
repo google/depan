@@ -277,7 +277,7 @@ public class EdgeMatcherEditor extends EditorPart {
     matcherName.setText(matcherInfo.getName());
 
     edgeMatcherEditor.updateTable(RelationRegistry.getRegistryRelations());
-    edgeMatcherEditor.updateEdgeMatcher(matcherInfo.getEdgeMatcher());
+    edgeMatcherEditor.updateEdgeMatcher(matcherInfo.getInfo());
   }
 
 
@@ -287,8 +287,8 @@ public class EdgeMatcherEditor extends EditorPart {
 
   private GraphEdgeMatcherDescriptor buildEdgeMatcherDocument() {
     GraphEdgeMatcher edgeMatcher = edgeMatcherEditor.buildEdgeMatcher();
-    GraphEdgeMatcherDescriptor result =
-        new GraphEdgeMatcherDescriptor(matcherName.getText(), edgeMatcher);
+    GraphEdgeMatcherDescriptor result = new GraphEdgeMatcherDescriptor(
+            matcherName.getText(), matcherInfo.getModel(), edgeMatcher);
     return result;
   }
   private void handleDocumentChange() {

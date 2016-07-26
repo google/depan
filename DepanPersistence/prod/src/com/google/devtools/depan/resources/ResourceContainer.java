@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.platform.resources;
+package com.google.devtools.depan.resources;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;

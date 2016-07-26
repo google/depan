@@ -16,7 +16,10 @@
 
 package com.google.devtools.depan.matchers.models;
 
+import com.google.devtools.depan.analysis_doc.model.ModelAnalysisDocument;
+import com.google.devtools.depan.analysis_doc.model.ModelMatcher;
 import com.google.devtools.depan.graph.api.EdgeMatcher;
+import com.google.devtools.depan.graph_doc.model.DependencyModel;
 
 /**
  * Document type for named {@link EdgeMatcher}s.
@@ -25,33 +28,21 @@ import com.google.devtools.depan.graph.api.EdgeMatcher;
  *
  * @author ycoppel@google.com (Yohann Coppel)
  */
-public class GraphEdgeMatcherDescriptor {
-    // implements EdgeMatcher<String> {
+public class GraphEdgeMatcherDescriptor
+    extends ModelAnalysisDocument<EdgeMatcher<String>>{
 
   /**
    * Preferred file extension for documents.
    */
   public static final String EXTENSION = "gemxml";
 
-  private final String name;
-  private final EdgeMatcher<String> matcher;
-
-  /**
-   * Construct a {@link GraphEdgeMatcherDescriptor} with the given name.
-   *
-   * @param name name for this {@link RelationshipSet}
-   * @param matcher edge matcher for the supplied name
-   */
-  public GraphEdgeMatcherDescriptor(String name, EdgeMatcher<String> matcher) {
-    this.name = name;
-    this.matcher = matcher;
+  public GraphEdgeMatcherDescriptor(
+      String name, DependencyModel model, EdgeMatcher<String> info) {
+    super(name, model, info);
   }
 
-  public String getName() {
-    return name;
-  }
-
-  public EdgeMatcher<String> getEdgeMatcher() {
-    return matcher;
+  public GraphEdgeMatcherDescriptor(
+      String name, ModelMatcher matcher, EdgeMatcher<String> info) {
+    super(name, matcher, info);
   }
 }

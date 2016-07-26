@@ -54,8 +54,7 @@ public class JavaRelationSets {
 
   static {
     // class member relationships only
-    Builder classBuilder = RelationSetDescriptor.createBuilder(
-        "Class Members");
+    Builder classBuilder = createRelSetBuilder("Class Members");
     classBuilder.addRelation(JavaRelation.INNER_TYPE);
     classBuilder.addRelation(JavaRelation.MEMBER_FIELD);
     classBuilder.addRelation(JavaRelation.MEMBER_METHOD);
@@ -67,16 +66,14 @@ public class JavaRelationSets {
     CLASS_MEMBER = classBuilder.build();
 
     // package + class member relationships
-    Builder pkgBuilder = RelationSetDescriptor.createBuilder(
-        "Package Members");
+    Builder pkgBuilder = createRelSetBuilder("Package Members");
     pkgBuilder.addRelation(JavaRelation.CLASS);
     pkgBuilder.addRelation(JavaRelation.PACKAGE);
     pkgBuilder.addBuilderSet(classBuilder);
     PKG_MEMBER = pkgBuilder.build();
 
     // container relationships
-    Builder containerBuilder = RelationSetDescriptor.createBuilder(
-        "Java Containers");
+    Builder containerBuilder = createRelSetBuilder("Java Containers");
     containerBuilder.addRelation(FileSystemRelation.CONTAINS_DIR);
     containerBuilder.addRelation(FileSystemRelation.CONTAINS_FILE);
     containerBuilder.addRelation(JavaRelation.CLASSFILE);
@@ -85,24 +82,21 @@ public class JavaRelationSets {
     CONTAINER = containerBuilder.build();
 
     // static class member relationships
-    Builder staticBuilder = RelationSetDescriptor.createBuilder(
-        "Static Members");
+    Builder staticBuilder = createRelSetBuilder("Static Members");
     staticBuilder.addRelation(JavaRelation.STATIC_FIELD);
     staticBuilder.addRelation(JavaRelation.STATIC_METHOD);
     staticBuilder.addRelation(JavaRelation.STATIC_TYPE);
     STATIC_MEMBER = staticBuilder.build();
 
     // instance class member relationships
-    Builder instanceBuilder = RelationSetDescriptor.createBuilder(
-        "Instance Members");
+    Builder instanceBuilder = createRelSetBuilder("Instance Members");
     instanceBuilder.addRelation(JavaRelation.MEMBER_FIELD);
     instanceBuilder.addRelation(JavaRelation.MEMBER_METHOD);
     instanceBuilder.addRelation(JavaRelation.MEMBER_TYPE);
     INSTANCE_MEMBER = instanceBuilder.build();
 
     // object extension relationships
-    Builder extBuilder = RelationSetDescriptor.createBuilder(
-        "Extensions");
+    Builder extBuilder = createRelSetBuilder("Extensions");
     extBuilder.addRelation(JavaRelation.WRITE);
     extBuilder.addRelation(JavaRelation.EXTENDS);
     extBuilder.addRelation(JavaRelation.IMPLEMENTS);
@@ -113,15 +107,14 @@ public class JavaRelationSets {
     EXTENSION = extBuilder.build();
 
     // object use relationships
-    Builder useBuilder = RelationSetDescriptor.createBuilder(
-        "Uses");
+    Builder useBuilder = createRelSetBuilder("Uses");
     useBuilder.addRelation(JavaRelation.CALL);
     useBuilder.addRelation(JavaRelation.READ);
     useBuilder.addRelation(JavaRelation.TYPE);
     USES = useBuilder.build();
 
     // check all relationships
-    Builder allBuilder = RelationSetDescriptor.createBuilder("All Java");
+    Builder allBuilder = createRelSetBuilder("All Java");
     for (JavaRelation relation : JavaRelation.values()) {
       allBuilder.addRelation(relation);
     }
@@ -137,5 +130,10 @@ public class JavaRelationSets {
     builtins.add(USES);
     builtins.add(CONTAINER);
     builtins.add(ALL);
+  }
+
+  private static Builder createRelSetBuilder(String name) {
+    return RelationSetDescriptor.createBuilder(
+        name, JavaPluginActivator.JAVA_MODEL);
   }
 }

@@ -16,8 +16,11 @@
 
 package com.google.devtools.depan.relations.models;
 
+import com.google.devtools.depan.analysis_doc.model.ModelAnalysisDocument;
+import com.google.devtools.depan.analysis_doc.model.ModelMatcher;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.api.RelationSet;
+import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.model.RelationSets;
 
 import com.google.common.collect.Sets;
@@ -36,13 +39,15 @@ import java.util.Set;
  *
  * @author ycoppel@google.com (Yohann Coppel)
  */
-public class RelationSetDescriptor {
+public class RelationSetDescriptor
+    extends ModelAnalysisDocument<RelationSet>{
 
   public static final String EXTENSION = "relxml";
 
-  private final String name;
-
-  private final RelationSet relationSet;
+  public RelationSetDescriptor(
+      String name, ModelMatcher matcher, RelationSet info) {
+    super(name, matcher, info);
+  }
 
   /**
    * Construct a {@link RelationSetDescriptor} with the given name.
@@ -50,25 +55,16 @@ public class RelationSetDescriptor {
    * @param name name for this {@link RelationSetDescriptor}
    * @param relationSet set of relations to name
    */
-  public RelationSetDescriptor(String name, RelationSet relationSet) {
-    this.name = name;
-    this.relationSet = relationSet;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-
-  public RelationSet getRelationSet() {
-    return relationSet;
+  public RelationSetDescriptor(
+      String name, DependencyModel model, RelationSet relationSet) {
+    super(name, model, relationSet);
   }
 
   /**
    * Provide a builder to incrementally assemble a RelationSet value object.
    */
-  public static Builder createBuilder(String name) {
-    return new Builder(name);
+  public static Builder createBuilder(String name, DependencyModel model) {
+    return new Builder(name, model);
   }
 
   /**
@@ -77,6 +73,8 @@ public class RelationSetDescriptor {
   public static class Builder {
     private final String name;
 
+    private final DependencyModel model;
+
     private final Set<Relation> relations = Sets.newHashSet();
 
     /**
@@ -84,8 +82,9 @@ public class RelationSetDescriptor {
      *
      * @param name name for this {@link RelationshipSet}
      */
-    public Builder(String name) {
+    public Builder(String name, DependencyModel model) {
       this.name = name;
+      this.model =model;
     }
 
     public void addRelation(Relation relation) {
@@ -104,7 +103,7 @@ public class RelationSetDescriptor {
       // Make a defensive copy.
       Set<Relation> clone = Sets.newHashSet(relations);
       RelationSet builtSet = RelationSets.createSimple(clone);
-      return new RelationSetDescriptor(name, builtSet);
+      return new RelationSetDescriptor(name, model, builtSet);
     }
   }
 }

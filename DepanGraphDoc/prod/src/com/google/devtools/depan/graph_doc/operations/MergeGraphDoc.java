@@ -25,17 +25,7 @@ package com.google.devtools.depan.graph_doc.operations;
 
 import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.graph_doc.model.GraphDocument;
-import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
-import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.model.builder.api.GraphBuilder;
-import com.google.devtools.depan.model.builder.api.GraphBuilders;
-
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-
-import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Lee Carver <leeca@pnambic.com>

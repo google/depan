@@ -14,18 +14,34 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.platform.resources;
+package com.google.devtools.depan.resources.analysis;
+
+import com.google.devtools.depan.resources.ResourceContainer;
 
 /**
- * Define common properties for resources in DepAn.
- * 
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public class PropertyResources {
+public class AnalysisResources {
 
-  public static final String PROP_DEFAULT = "default";
+  public static final String ROOT = "resources";
 
-  private PropertyResources() {
+  // Some pre-defined resource containers
+  public static final String MATCHERS = "matchers";
+  public static final String RELATION_SETS = "relation_sets";
+
+  private static final ResourceContainer ROOT_CONTAINER = 
+      ResourceContainer.buildRootContainer(ROOT);
+
+  static {
+    ROOT_CONTAINER.addChild(MATCHERS);
+    ROOT_CONTAINER.addChild(RELATION_SETS);
+  }
+
+  private AnalysisResources() {
     // Prevent instantiation.
+  }
+
+  public static ResourceContainer getRoot() {
+    return ROOT_CONTAINER;
   }
 }

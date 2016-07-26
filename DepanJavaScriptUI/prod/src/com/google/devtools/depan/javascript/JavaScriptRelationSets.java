@@ -58,7 +58,9 @@ public class JavaScriptRelationSets {
   static {
     // container relationships
     RelationSetDescriptor.Builder lexBuilder =
-        RelationSetDescriptor.createBuilder("JavaScript Lexical Containment");
+        RelationSetDescriptor.createBuilder(
+            "JavaScript Lexical Containment",
+            JavaScriptPluginActivator.JAVASCRIPT_MODEL);
     lexBuilder.addRelation(FileSystemRelation.CONTAINS_DIR);
     lexBuilder.addRelation(FileSystemRelation.CONTAINS_FILE);
     lexBuilder.addRelation(FileSystemRelation.SYMBOLIC_LINK);
@@ -68,7 +70,9 @@ public class JavaScriptRelationSets {
     LEXICAL_CONTAINMENT = lexBuilder.build();
 
     RelationSetDescriptor.Builder bindBuilder =
-        RelationSetDescriptor.createBuilder("JavaScript Binding Containment");
+        RelationSetDescriptor.createBuilder(
+            "JavaScript Binding Containment",
+            JavaScriptPluginActivator.JAVASCRIPT_MODEL);
     bindBuilder.addRelation(JavaScriptRelation.BINDS_ELEMENT);
     BINDING_CONTAINMENT = bindBuilder.build();
 

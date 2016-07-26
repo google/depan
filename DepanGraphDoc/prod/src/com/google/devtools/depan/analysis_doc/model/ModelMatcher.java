@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.platform.resources;
+package com.google.devtools.depan.analysis_doc.model;
 
 import com.google.devtools.depan.graph_doc.model.DependencyModel;
 
@@ -24,9 +24,17 @@ import com.google.devtools.depan.graph_doc.model.DependencyModel;
 public interface ModelMatcher {
 
   /**
-   * @param model
-   * @return
+   * Indicate whether this object is appropriate for the supplied
+   * {@link DependencyModel}.
    */
   boolean forModel(DependencyModel model);
+
+  public static ModelMatcher ALL_MODELS = new ModelMatcher() {
+
+    @Override
+    public boolean forModel(DependencyModel model) {
+      return true;
+    }
+  };
 
 }

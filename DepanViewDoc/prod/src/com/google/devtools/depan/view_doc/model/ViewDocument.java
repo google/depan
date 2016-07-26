@@ -20,7 +20,7 @@ import com.google.devtools.depan.collapse.model.Collapser;
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeTreeProvider;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.api.RelationSet;
-import com.google.devtools.depan.graph_doc.eclipse.ui.resources.AnalysisResources;
+import com.google.devtools.depan.graph_doc.eclipse.ui.resources.GraphResourceBuilder;
 import com.google.devtools.depan.graph_doc.eclipse.ui.resources.GraphResources;
 import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
@@ -105,13 +105,16 @@ public class ViewDocument {
     return parentGraph.getLocation();
   }
 
+  public DependencyModel getDependencyModel() {
+    return parentGraph.getGraph().getDependencyModel();
+  }
+  
   /**
    * The result should be retained by the controlling editor, since the
    * value is not retained or saved.
    */
   public GraphResources buildGraphResources() {
-    DependencyModel model = parentGraph.getGraph().getDependencyModel();
-    return AnalysisResources.buildAnalysisResources(model);
+    return GraphResourceBuilder.forModel(getDependencyModel());
   }
 
   public Collection<GraphNode> getViewNodes() {

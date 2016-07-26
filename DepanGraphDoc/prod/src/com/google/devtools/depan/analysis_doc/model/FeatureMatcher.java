@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.platform.resources;
+package com.google.devtools.depan.analysis_doc.model;
 
 import com.google.devtools.depan.graph_doc.model.DependencyModel;
 
-import java.util.Collection;
+import java.util.List;
 
 /**
  * Match a {@link DependencyModel} if any of the features are known
@@ -28,45 +28,35 @@ import java.util.Collection;
  */
 public class FeatureMatcher implements ModelMatcher {
 
-  private final Collection<String> nodeFeatures;
-  private final Collection<String> relationFeatures;
+  private final DependencyModel model;
 
-  public FeatureMatcher(
-      Collection<String> nodeFeatures,
-      Collection<String> relationFeatures) {
-    this.nodeFeatures = nodeFeatures;
-    this.relationFeatures = relationFeatures;
+  public FeatureMatcher(DependencyModel model) {
+    this.model = model;
   }
 
   @Override
-  public boolean forModel(DependencyModel model) {
-    if (checkNodes(model)) {
+  public boolean forModel(DependencyModel check) {
+    if (isListed(
+        check.getNodeContribs(), model.getNodeContribs())) {
       return true;
     }
-    if (checkRelations(model)) {
+    if (isListed(
+        check.getRelationContribs(), model.getRelationContribs())) {
       return true;
     }
-
     return false;
   }
 
-  public boolean checkRelations(DependencyModel model) {
-    for (String contrib : model.getRelationContribs()) {
-      if (relationFeatures.contains(contrib)) {
+  private boolean isListed(List<String> inCheck, List<String> inModel) {
+    for (String contrib : inCheck) {
+      if (inModel.contains(contrib)) {
         return true;
       }
     }
     return false;
   }
 
-
-  public boolean checkNodes(DependencyModel model) {
-    for (String contrib : model.getNodeContribs()) {
-      if (nodeFeatures.contains(contrib)) {
-        return true;
-      }
-    }
-    return false;
+  public DependencyModel getModel() {
+    return model;
   }
-
 }

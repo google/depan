@@ -13,7 +13,9 @@ Require-Bundle: org.eclipse.core.runtime,
  com.google.devtools.depan.platform,
  com.google.guava,
  depan-xstream-library,
- com.google.devtools.depan.graphml
+ com.google.devtools.depan.graphml,
+ com.google.devtools.depan.graph_doc,
+ com.google.devtools.depan.filesystem
 Export-Package: com.google.devtools.depan.maven,
  com.google.devtools.depan.maven.builder,
  com.google.devtools.depan.maven.graph,

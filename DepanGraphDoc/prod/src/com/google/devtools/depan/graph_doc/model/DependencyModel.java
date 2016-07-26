@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -81,5 +82,11 @@ public class DependencyModel {
     public DependencyModel build() {
       return new DependencyModel(nodeContribIds, relationContribIds);
     }
+  }
+
+  public static DependencyModel createFromRegistry() {
+    return new DependencyModel(
+        Collections.<String>emptyList(),
+        RelationRegistry.getRegistryContribIds());
   }
 }

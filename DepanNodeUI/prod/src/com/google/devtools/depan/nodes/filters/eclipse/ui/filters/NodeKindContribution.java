@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.nodes.filters.eclipse.ui.filters;
 
+import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.model.Element;
 import com.google.devtools.depan.nodes.filters.eclipse.ui.widgets.FilterEditorDialog;
 import com.google.devtools.depan.nodes.filters.eclipse.ui.widgets.NodeKindFilterEditorControl;
@@ -61,8 +62,8 @@ public class NodeKindContribution
   }
 
   @Override
-  public FilterEditorDialog<NodeKindFilter>
-      buildEditorDialog(Shell shell, ContextualFilter filter) {
+  public FilterEditorDialog<NodeKindFilter> buildEditorDialog(
+      Shell shell, ContextualFilter filter, DependencyModel model) {
     if (!handlesFilterInstance(filter)) {
       String msg = MessageFormat.format(
           "Filter {0} is assignable as a {1} type.",

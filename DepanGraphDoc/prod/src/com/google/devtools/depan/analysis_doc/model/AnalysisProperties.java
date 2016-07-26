@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.graph_doc.eclipse.ui.plugins;
-
-import com.google.devtools.depan.resources.ResourceContainer;
+package com.google.devtools.depan.analysis_doc.model;
 
 /**
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public interface AnalysisResourceInstaller {
-  
-  void installResource(ResourceContainer installRoot);
+public class AnalysisProperties {
+
+  public static final String DEFAULT_PROP = "default";
+
+  private AnalysisProperties() {
+    // Prevent instantiation.
+  }
 }

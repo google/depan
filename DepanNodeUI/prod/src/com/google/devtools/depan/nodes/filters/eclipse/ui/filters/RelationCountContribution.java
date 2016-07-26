@@ -17,6 +17,7 @@
 package com.google.devtools.depan.nodes.filters.eclipse.ui.filters;
 
 import com.google.devtools.depan.graph.api.RelationSet;
+import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.model.RelationSets;
 import com.google.devtools.depan.nodes.filters.eclipse.ui.widgets.FilterEditorDialog;
 import com.google.devtools.depan.nodes.filters.eclipse.ui.widgets.RelationCountFilterEditorControl;
@@ -64,30 +65,34 @@ public class RelationCountContribution
   }
 
   @Override
-  public FilterEditorDialog<RelationCountFilter>
-      buildEditorDialog(Shell shell, ContextualFilter filter) {
+  public FilterEditorDialog<RelationCountFilter> buildEditorDialog(
+      Shell shell, ContextualFilter filter, DependencyModel model) {
     if (!handlesFilterInstance(filter)) {
       String msg = MessageFormat.format(
           "Filter {0} is assignable as a {1} type.",
           filter.getName(), RelationCountFilter.class.getName());
       throw new IllegalArgumentException(msg);
     }
-    return new ContributionEditorDialog(shell, (RelationCountFilter) filter);
+    return new ContributionEditorDialog(
+        shell, (RelationCountFilter) filter, model);
   }
 
   private static class ContributionEditorDialog
       extends FilterEditorDialog<RelationCountFilter> {
 
+    private final DependencyModel model;
+
     protected ContributionEditorDialog(
-        Shell parentShell, RelationCountFilter filter) {
+        Shell parentShell, RelationCountFilter filter, DependencyModel model) {
       super(parentShell, filter);
+      this.model = model;
     }
 
     @Override
     protected Control createDialogArea(Composite parent) {
       RelationCountFilterEditorControl result =
           new RelationCountFilterEditorControl(parent);
-      result.setInput(getFilter());
+      result.setInput(getFilter(), model);
       return result;
     }
   }

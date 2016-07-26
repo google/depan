@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.nodes.filters.eclipse.ui.widgets;
 
+import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.nodes.filters.eclipse.ui.plugins.ContextualFilterContributor;
 import com.google.devtools.depan.nodes.filters.eclipse.ui.plugins.ContextualFilterContributors;
 import com.google.devtools.depan.nodes.filters.eclipse.ui.plugins.ContextualFilterRegistry;
@@ -52,6 +53,8 @@ public class FilterTableEditorControl extends Composite {
 
   private FilterPluginsListControl filterChoice;
 
+  private DependencyModel model;
+
   /////////////////////////////////////
   // Public methods
 
@@ -70,8 +73,9 @@ public class FilterTableEditorControl extends Composite {
     commands.setLayoutData(Widgets.buildHorzFillData());
   }
 
-  public void setInput(SteppingFilter editFilter) {
+  public void setInput(SteppingFilter editFilter, DependencyModel model) {
     this.editFilter = editFilter;
+    this.model = model;
 
     updateControls();
   }
@@ -306,7 +310,8 @@ public class FilterTableEditorControl extends Composite {
       return null;
     }
 
-    FilterEditorDialog<?> dialog = contrib.buildEditorDialog(getShell(), filter);
+    FilterEditorDialog<?> dialog =
+        contrib.buildEditorDialog(getShell(), filter, model);
     if (Dialog.OK == dialog.open()) {
       return dialog.getFilter();
     }

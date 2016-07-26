@@ -117,6 +117,14 @@ public class RelationRegistry extends
     return buildRelations(getContributions(contribIds));
   }
 
+  public List<String> getContribIds() {
+    List<String> result = Lists.newArrayList();
+    for (ContributionEntry<RelationContributor> contrib : getContributions()) {
+      result.add(contrib.getId());
+    }
+    return result;
+  }
+
   private Collection<Relation> buildRelations(
       Collection<ContributionEntry<RelationContributor>> contrib) {
 
@@ -165,5 +173,9 @@ public class RelationRegistry extends
   public static String getRegistryRelationSource(
       Relation relation) {
     return getInstance().getRelationSource(relation);
+  }
+
+  public static List<String> getRegistryContribIds() {
+    return getInstance().getContribIds();
   }
 }

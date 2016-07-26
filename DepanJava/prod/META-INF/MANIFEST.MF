@@ -9,7 +9,10 @@ Require-Bundle: org.eclipse.core.resources,
  com.google.devtools.depan.core,
  com.google.devtools.depan.platform,
  com.google.devtools.depan.persistence,
- depan-xstream-library
+ depan-xstream-library,
+ com.google.devtools.depan.graph_doc,
+ com.google.guava,
+ com.google.devtools.depan.filesystem
 Bundle-ClassPath: .
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: com.google.devtools.depan.java.JavaPluginActivator

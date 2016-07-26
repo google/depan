@@ -15,13 +15,24 @@
  */
 
 package com.google.devtools.depan.filesystem;
+import com.google.devtools.depan.graph_doc.model.DependencyModel;
+
+import com.google.common.collect.ImmutableList;
+
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+
+import java.util.Collections;
 
 public class FileSystemPluginActivator implements BundleActivator {
 
   /** Plug-in ID used to identify this plug-in. */
   public static final String PLUGIN_ID = "com.google.devtools.depan.filesystem";
+
+  public static final DependencyModel FILE_SYSTEM_MODEL =
+      new DependencyModel(
+          Collections.<String>emptyList(), 
+          ImmutableList.<String>of(FileSystemRelationContributor.ID));
 
   public FileSystemPluginActivator() {
   }

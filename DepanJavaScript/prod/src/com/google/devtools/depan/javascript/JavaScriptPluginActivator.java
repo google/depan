@@ -15,13 +15,30 @@
  */
 
 package com.google.devtools.depan.javascript;
+import com.google.devtools.depan.filesystem.FileSystemRelationContributor;
+import com.google.devtools.depan.graph_doc.model.DependencyModel;
+import com.google.devtools.depan.java.JavaRelationContributor;
+
+import com.google.common.collect.ImmutableList;
+
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+
+import java.util.Collections;
 
 public class JavaScriptPluginActivator implements BundleActivator {
 
   /** Plug-in ID used to identify this plug-in. */
   public static final String PLUGIN_ID = "com.google.devtools.depan.filesystem";
+
+  public static final DependencyModel JAVASCRIPT_MODEL =
+      new DependencyModel(
+          Collections.<String>emptyList(), 
+          ImmutableList.<String>of(
+              JavaScriptRelationContributor.ID,
+              JavaRelationContributor.ID,
+              FileSystemRelationContributor.ID));
+
 
   public JavaScriptPluginActivator() {
   }

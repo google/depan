@@ -17,6 +17,7 @@
 package com.google.devtools.depan.nodes.filters.eclipse.ui.filters;
 
 import com.google.devtools.depan.edges.matchers.GraphEdgeMatchers;
+import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.nodes.filters.eclipse.ui.widgets.EdgeMatcherFilterEditorControl;
 import com.google.devtools.depan.nodes.filters.eclipse.ui.widgets.FilterEditorDialog;
 import com.google.devtools.depan.nodes.filters.model.ContextualFilter;
@@ -58,30 +59,34 @@ public class EdgeMatcherContribution
   }
 
   @Override
-  public FilterEditorDialog<EdgeMatcherFilter>
-      buildEditorDialog(Shell shell, ContextualFilter filter) {
+  public FilterEditorDialog<EdgeMatcherFilter> buildEditorDialog(
+      Shell shell, ContextualFilter filter, DependencyModel model) {
     if (!handlesFilterInstance(filter)) {
       String msg = MessageFormat.format(
           "Filter {0} is assignable as a {1} type.",
           filter.getName(), EdgeMatcherFilter.class.getName());
       throw new IllegalArgumentException(msg);
     }
-    return new ContributionEditorDialog(shell, (EdgeMatcherFilter) filter);
+    return new ContributionEditorDialog(
+        shell, (EdgeMatcherFilter) filter, model);
   }
 
   private static class ContributionEditorDialog
       extends FilterEditorDialog<EdgeMatcherFilter> {
 
+    private final DependencyModel model;
+
     protected ContributionEditorDialog(
-        Shell parentShell, EdgeMatcherFilter filter) {
+        Shell parentShell, EdgeMatcherFilter filter, DependencyModel model) {
       super(parentShell, filter);
+      this.model = model;
     }
 
     @Override
     protected Control createDialogArea(Composite parent) {
       EdgeMatcherFilterEditorControl result =
           new EdgeMatcherFilterEditorControl(parent);
-      result.setInput(getFilter());
+      result.setInput(getFilter(), model);
       return result;
     }
   }

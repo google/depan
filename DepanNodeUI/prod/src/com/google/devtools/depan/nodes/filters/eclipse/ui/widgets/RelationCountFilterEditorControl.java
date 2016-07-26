@@ -19,6 +19,7 @@ package com.google.devtools.depan.nodes.filters.eclipse.ui.widgets;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.api.RelationSet;
 import com.google.devtools.depan.graph.registry.RelationRegistry;
+import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.nodes.filters.sequence.CountPredicate;
 import com.google.devtools.depan.nodes.filters.sequence.RelationCountFilter;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
@@ -28,6 +29,10 @@ import com.google.devtools.depan.relations.eclipse.ui.wizards.NewRelationSetWiza
 import com.google.devtools.depan.relations.models.RelationSetDescrRepo;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 import com.google.devtools.depan.relations.models.RelationSetDescriptors;
+import com.google.devtools.depan.resources.ResourceContainer;
+import com.google.devtools.depan.resources.analysis.AnalysisResources;
+
+import com.google.common.collect.Lists;
 
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.SWT;
@@ -42,7 +47,6 @@ import org.eclipse.swt.widgets.Spinner;
 
 import java.net.URI;
 import java.text.MessageFormat;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -72,6 +76,8 @@ public class RelationCountFilterEditorControl extends Composite {
 
   private RelationSetDescrRepo filterRepo;
 
+  private DependencyModel model;
+
   /**
    * Connect the save/load control to this type's data structures.
    */
@@ -87,14 +93,15 @@ public class RelationCountFilterEditorControl extends Composite {
       RelationSet relSet = filterRepo.getRelationSet();
       String label = MessageFormat.format(
           "{0} filter", basicControl.getFilterName());
-      RelationSetDescriptor target = new RelationSetDescriptor(label, relSet);
+      RelationSetDescriptor target = new RelationSetDescriptor(
+          label, model, relSet);
       return new NewRelationSetWizard(target);
     }
 
     @Override
     protected void loadURI(URI uri) {
       RelationSetDescriptor loadDoc = loadRelationSetDescr(uri);
-      filterRepo.setRelationSet(loadDoc.getRelationSet());
+      filterRepo.setRelationSet(loadDoc.getInfo());
     }
   }
 
@@ -122,13 +129,14 @@ public class RelationCountFilterEditorControl extends Composite {
     rangeArea.setLayoutData(Widgets.buildHorzFillData());
   }
 
-  public void setInput(RelationCountFilter filterInfo) {
+  public void setInput(RelationCountFilter filterInfo, DependencyModel model) {
     this.filterInfo = filterInfo;
+    this.model = model;
 
     basicControl.setInput(filterInfo);
 
     Collection<Relation> projectRelations = 
-        RelationRegistry.getRegistryRelations();
+        RelationRegistry.getRegistryRelations(model.getRelationContribs());
     filterRepo = new RelationSetDescrRepo(projectRelations);
     filterRepo.setRelationSet(filterInfo.getRelationSet());
 
@@ -168,8 +176,20 @@ public class RelationCountFilterEditorControl extends Composite {
   }
 
   public List<RelationSetDescriptor> getRelationSetsChoices() {
-    // TODO: Pull from project/view_doc choices?
-    return Arrays.asList(RelationSetDescriptors.EMPTY);
+    ResourceContainer tree =
+        AnalysisResources.getRoot().getChild(AnalysisResources.RELATION_SETS);
+
+    List<RelationSetDescriptor> result = Lists.newArrayList();
+    for (Object resource : tree.getResources()) {
+        if (resource instanceof RelationSetDescriptor) {
+          RelationSetDescriptor checkRes = (RelationSetDescriptor) resource;
+          if (checkRes.forModel(model)) {
+            result.add(checkRes);
+          }
+        }
+      }
+
+    return result;
   }
 
   @Override

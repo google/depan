@@ -16,11 +16,14 @@
 
 package com.google.devtools.depan.graph_doc.eclipse.ui.plugins;
 
-import com.google.devtools.depan.graph_doc.eclipse.ui.resources.AnalysisResources;
+import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptors;
 import com.google.devtools.depan.platform.PlatformLogger;
 import com.google.devtools.depan.platform.plugin.ContributionEntry;
 import com.google.devtools.depan.platform.plugin.ContributionRegistry;
-import com.google.devtools.depan.platform.resources.ResourceContainer;
+import com.google.devtools.depan.relations.models.RelationSetDescriptors;
+import com.google.devtools.depan.resources.PropertyDocument;
+import com.google.devtools.depan.resources.ResourceContainer;
+import com.google.devtools.depan.resources.analysis.AnalysisResources;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -73,11 +76,29 @@ public class AnalysisResourceRegistry
   }
 
   private void installResources() {
+    // Start with build-in resources 
     ResourceContainer root = AnalysisResources.getRoot();
+    installBuiltInResources(root);
+
+    // Add in contributed resources
     for (ContributionEntry<AnalysisResourceInstaller> contrib
         : getContributions()) {
       contrib.getInstance().installResource(root);
     }
+  }
+
+  private static void installBuiltInResources(ResourceContainer root) {
+    ResourceContainer matchers = root.getChild(AnalysisResources.MATCHERS);
+    addResource(matchers, GraphEdgeMatcherDescriptors.FORWARD);
+    addResource(matchers, GraphEdgeMatcherDescriptors.EMPTY);
+
+    ResourceContainer relSets = root.getChild(AnalysisResources.RELATION_SETS);
+    addResource(relSets, RelationSetDescriptors.EMPTY);
+  }
+
+  private static void addResource(
+      ResourceContainer container, PropertyDocument<?> resource) {
+    container.addResource(resource.getName(), resource);
   }
 
   /////////////////////////////////////

@@ -32,6 +32,7 @@ import com.google.devtools.depan.model.Element;
 import com.google.devtools.depan.model.ElementTransformer;
 import com.google.devtools.depan.persistence.XStreamConfig;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
+import com.google.devtools.depan.relations.models.RelationSetDescriptor.Builder;
 import com.google.devtools.depan.remap_doc.plugins.ElementEditor;
 import com.google.devtools.depan.view_doc.eclipse.ui.plugins.ElementClassTransformer;
 
@@ -95,7 +96,7 @@ public class MavenPlugin { // extends AbstractSourcePlugin {
     classes.add(PropertyElement.class);
 
     RelationSetDescriptor.Builder dependentBuilder =
-        RelationSetDescriptor.createBuilder("Dependent Modules");
+        createRelSetBuilder("Dependent Modules");
     dependentBuilder.addRelation(MavenRelation.COMPILE_SCOPE);
     dependentBuilder.addRelation(MavenRelation.IMPORT_SCOPE);
     dependentBuilder.addRelation(MavenRelation.PROVIDED_SCOPE);
@@ -106,25 +107,25 @@ public class MavenPlugin { // extends AbstractSourcePlugin {
     builtinSets.add(DEPENDENT_MODULES);
 
     RelationSetDescriptor.Builder moduleBuilder =
-        RelationSetDescriptor.createBuilder("Maven Modules");
+        createRelSetBuilder("Maven Modules");
     moduleBuilder.addRelation(MavenRelation.MODULE_DEPEND);
     MODULE_MEMBER = moduleBuilder.build();
     builtinSets.add(MODULE_MEMBER);
 
     RelationSetDescriptor.Builder parentBuilder =
-        RelationSetDescriptor.createBuilder("Parent Modules");
+        createRelSetBuilder("Parent Modules");
     parentBuilder.addRelation(MavenRelation.PARENT_DEPEND);
     PARENT_MEMBER = parentBuilder.build();
     builtinSets.add(PARENT_MEMBER);
 
     RelationSetDescriptor.Builder propertyBuilder =
-        RelationSetDescriptor.createBuilder("Property Elements");
+        createRelSetBuilder("Property Elements");
     propertyBuilder.addRelation(MavenRelation.PROPERTY_DEPEND);
     PROPERTY_MEMBER = propertyBuilder.build();
     builtinSets.add(PROPERTY_MEMBER);
 
     RelationSetDescriptor.Builder containerBuilder =
-        RelationSetDescriptor.createBuilder("All Maven");
+        createRelSetBuilder("All Maven");
     relations = Lists.newArrayList(); 
     for (Relation r : MavenRelation.values()) {
       relations.add(r);
@@ -133,6 +134,11 @@ public class MavenPlugin { // extends AbstractSourcePlugin {
 
     MVN_CONTAINER = containerBuilder.build();
     builtinSets.add(MVN_CONTAINER);
+  }
+
+  private static Builder createRelSetBuilder(String name) {
+    return RelationSetDescriptor.createBuilder(
+        name, MavenPluginActivator.MAVEN_MODEL);
   }
 
   /**
