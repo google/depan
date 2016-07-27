@@ -136,10 +136,15 @@ public class NodeCompactor {
   }
 
   private PlatformObject buildCollapseRoot() {
+
+    CollapseTreeModel treeModel = getCollapseTreeModel();
+    int rootCnt = treeModel.computeRoots().size();
+    int nodeCnt = treeModel.computeNodes().size();
+
     String label = MessageFormat.format(
-        "{0} Collapse nodes", editor.getPartName());
+        "Collapse nodes [{0} roots, {1} nodes]", rootCnt, nodeCnt);
     return CollapseTreeRoot.build(
-        getCollapseTreeModel(), NodeTreeProviders.GRAPH_NODE_PROVIDER, label);
+        treeModel, NodeTreeProviders.GRAPH_NODE_PROVIDER, label);
   }
 
   /**
