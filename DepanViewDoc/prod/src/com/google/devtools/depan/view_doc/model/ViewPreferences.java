@@ -599,19 +599,6 @@ public class ViewPreferences {
   /////////////////////////////////////
   // Manipulate the compacted node view state
 
-  /**
-   * Based on the collapsing preferences, compute the set of nodes and
-   * edges that are exposed in a graph.
-   * 
-   * @param graph source of nodes to collapse
-   * @return graph containing only uncollapsed nodes
-   */
-  public GraphModel getExposedGraph(GraphModel graph) {
-    return graph;
-    // TODO
-    // return collapser.buildExposedGraph(graph);
-  }
-
   public List<GraphEdgeMatcherDescriptor> getTreeDescriptors() {
     return ImmutableList.copyOf(treeDescriptors);
   }

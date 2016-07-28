@@ -271,10 +271,6 @@ public class ViewDocument {
     return userPrefs.getCollapser();
   }
 
-  /**
-   * @param viewGraph
-   * @param treeModel
-   */
   public void collapseTree(GraphModel viewGraph, TreeModel treeModel) {
     userPrefs.collapseTree(viewGraph, treeModel);
   }
@@ -284,7 +280,7 @@ public class ViewDocument {
     userPrefs.collapseNodeList(master, children);
   }
 
-    public void uncollapseMasterNode(GraphNode master) {
+  public void uncollapseMasterNode(GraphNode master) {
     userPrefs.uncollapseMasterNode(master);
   }
 

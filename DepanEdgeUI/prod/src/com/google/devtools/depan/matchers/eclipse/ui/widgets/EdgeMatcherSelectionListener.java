@@ -14,25 +14,14 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.resources.analysis;
+package com.google.devtools.depan.matchers.eclipse.ui.widgets;
 
-import com.google.devtools.depan.resources.ResourceContainer;
+import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 
 /**
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public class AnalysisResources {
+public interface EdgeMatcherSelectionListener {
 
-  public static final String ROOT = "resources";
-
-  private static final ResourceContainer ROOT_CONTAINER = 
-      ResourceContainer.buildRootContainer(ROOT);
-
-  private AnalysisResources() {
-    // Prevent instantiation.
-  }
-
-  public static ResourceContainer getRoot() {
-    return ROOT_CONTAINER;
-  }
+  void selected(GraphEdgeMatcherDescriptor selection);
 }

@@ -49,8 +49,11 @@ import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.RelationSets;
+import com.google.devtools.depan.model.builder.api.GraphBuilders;
+import com.google.devtools.depan.nodes.Graphs;
 import com.google.devtools.depan.nodes.filters.model.ContextualFilter;
 import com.google.devtools.depan.nodes.filters.sequence.SteppingFilter;
+import com.google.devtools.depan.nodes.trees.HierarchicalTreeModel;
 import com.google.devtools.depan.nodes.trees.TreeModel;
 import com.google.devtools.depan.platform.ListenerManager;
 import com.google.devtools.depan.platform.WorkspaceTools;
@@ -308,6 +311,17 @@ public class ViewEditor extends MultiPageEditorPart {
   }
 
   public void collapseTreeHierarchy(TreeModel treeModel) {
+    viewInfo.collapseTree(getViewGraph(), treeModel);
+  }
+
+  public void collapseNodesByHierarchy(
+      Collection<GraphNode> nodes, GraphEdgeMatcherDescriptor matcher) {
+    GraphModel treeGraph = GraphBuilders.buildFromNodes(
+        getViewGraph(), nodes);
+    TreeModel treeModel = new HierarchicalTreeModel(
+        Graphs.computeSpanningHierarchy(treeGraph, matcher.getInfo()));
+
+    // OPEN: or, is 1st arg treeGraph??
     viewInfo.collapseTree(getViewGraph(), treeModel);
   }
 
@@ -1644,20 +1658,6 @@ public class ViewEditor extends MultiPageEditorPart {
     public void optionChanged(String optionId, String value) {
       handleOptionChange(optionId, value);
     }
-
-
-/* TODO
-    @Override
-    public void collapseChanged(
-        Collection<CollapseData> created,
-        Collection<CollapseData> removed,
-        Object author) {
-      updateSelectedNodes(removed, author);
-      updateExposedGraph();
-      renderer.updateCollapseChanges(created, removed);
-      markDirty();
-    }
-*/
 
     @Override
     public void collapseChanged(Collection<CollapseData> created,

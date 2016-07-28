@@ -17,10 +17,12 @@
 package com.google.devtools.depan.graph_doc.eclipse.ui.plugins;
 
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptors;
+import com.google.devtools.depan.matchers.models.MatcherResources;
 import com.google.devtools.depan.platform.PlatformLogger;
 import com.google.devtools.depan.platform.plugin.ContributionEntry;
 import com.google.devtools.depan.platform.plugin.ContributionRegistry;
 import com.google.devtools.depan.relations.models.RelationSetDescriptors;
+import com.google.devtools.depan.relations.models.RelationSetResources;
 import com.google.devtools.depan.resources.PropertyDocument;
 import com.google.devtools.depan.resources.ResourceContainer;
 import com.google.devtools.depan.resources.analysis.AnalysisResources;
@@ -88,11 +90,11 @@ public class AnalysisResourceRegistry
   }
 
   private static void installBuiltInResources(ResourceContainer root) {
-    ResourceContainer matchers = root.getChild(AnalysisResources.MATCHERS);
+    ResourceContainer matchers = MatcherResources.getContainer();
     addResource(matchers, GraphEdgeMatcherDescriptors.FORWARD);
     addResource(matchers, GraphEdgeMatcherDescriptors.EMPTY);
 
-    ResourceContainer relSets = root.getChild(AnalysisResources.RELATION_SETS);
+    ResourceContainer relSets = RelationSetResources.getContainer();
     addResource(relSets, RelationSetDescriptors.EMPTY);
   }
 

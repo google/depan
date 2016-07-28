@@ -29,10 +29,7 @@ import com.google.devtools.depan.relations.eclipse.ui.wizards.NewRelationSetWiza
 import com.google.devtools.depan.relations.models.RelationSetDescrRepo;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 import com.google.devtools.depan.relations.models.RelationSetDescriptors;
-import com.google.devtools.depan.resources.ResourceContainer;
-import com.google.devtools.depan.resources.analysis.AnalysisResources;
-
-import com.google.common.collect.Lists;
+import com.google.devtools.depan.relations.models.RelationSetResources;
 
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.SWT;
@@ -171,25 +168,9 @@ public class RelationCountFilterEditorControl extends Composite {
     relationSetEditor.setRelationSetRepository(filterRepo);
 
     RelationSetDescriptor relationSet = RelationSetDescriptors.EMPTY;
-    List<RelationSetDescriptor> choices = getRelationSetsChoices();
+    List<RelationSetDescriptor> choices =
+        RelationSetResources.getRelationSets(model);
     relationSetEditor.setRelationSetSelectorInput(relationSet, choices);
-  }
-
-  public List<RelationSetDescriptor> getRelationSetsChoices() {
-    ResourceContainer tree =
-        AnalysisResources.getRoot().getChild(AnalysisResources.RELATION_SETS);
-
-    List<RelationSetDescriptor> result = Lists.newArrayList();
-    for (Object resource : tree.getResources()) {
-        if (resource instanceof RelationSetDescriptor) {
-          RelationSetDescriptor checkRes = (RelationSetDescriptor) resource;
-          if (checkRes.forModel(model)) {
-            result.add(checkRes);
-          }
-        }
-      }
-
-    return result;
   }
 
   @Override

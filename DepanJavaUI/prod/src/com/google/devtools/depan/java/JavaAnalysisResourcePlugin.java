@@ -22,11 +22,12 @@ import com.google.devtools.depan.graph.api.RelationSet;
 import com.google.devtools.depan.graph_doc.eclipse.ui.plugins.AnalysisResourceInstaller;
 import com.google.devtools.depan.java.graph.JavaRelation;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
+import com.google.devtools.depan.matchers.models.MatcherResources;
 import com.google.devtools.depan.model.GraphEdgeMatcher;
 import com.google.devtools.depan.model.RelationSets;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
+import com.google.devtools.depan.relations.models.RelationSetResources;
 import com.google.devtools.depan.resources.ResourceContainer;
-import com.google.devtools.depan.resources.analysis.AnalysisResources;
 
 /**
  * Captures many of the capabilities provided by the legacy
@@ -42,13 +43,8 @@ public class JavaAnalysisResourcePlugin implements
 
   @Override
   public void installResource(ResourceContainer installRoot) {
-    ResourceContainer matchers =
-        installRoot.getChild(AnalysisResources.MATCHERS);
-    ResourceContainer relSets =
-        installRoot.getChild(AnalysisResources.RELATION_SETS);
-
-    installMatchers(matchers);
-    installRelSets(relSets);
+    installMatchers(MatcherResources.getContainer());
+    installRelSets(RelationSetResources.getContainer());
   }
 
   private void installMatchers(ResourceContainer matchers) {
@@ -68,12 +64,6 @@ public class JavaAnalysisResourcePlugin implements
         AnalysisProperties.DEFAULT_PROP, JavaRelationContributor.ID);
   }
 
-  /**
-   * @param relSets
-   */
-  /**
-   * @param relSets
-   */
   private void installRelSets(ResourceContainer relSets) {
     for (RelationSetDescriptor descr : JavaRelationSets.builtins) {
       relSets.addResource(descr.getName(), descr);

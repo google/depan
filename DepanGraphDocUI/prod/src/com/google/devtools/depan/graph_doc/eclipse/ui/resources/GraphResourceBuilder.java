@@ -20,11 +20,11 @@ import com.google.devtools.depan.analysis_doc.model.AnalysisProperties;
 import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptors;
+import com.google.devtools.depan.matchers.models.MatcherResources;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 import com.google.devtools.depan.relations.models.RelationSetDescriptors;
+import com.google.devtools.depan.relations.models.RelationSetResources;
 import com.google.devtools.depan.resources.PropertyDocument;
-import com.google.devtools.depan.resources.ResourceContainer;
-import com.google.devtools.depan.resources.analysis.AnalysisResources;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Lists;
@@ -33,11 +33,12 @@ import java.util.List;
 import java.util.Set;
 
 /**
+ * Provide a {@link GraphResource} Builder that uses the "well-known"
+ * {@link MatcherResources} and {@link RelationSetResources} suppliers.
+ * 
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
 public class GraphResourceBuilder {
-
-  private final ResourceContainer root;
 
   private final DependencyModel model;
 
@@ -53,31 +54,25 @@ public class GraphResourceBuilder {
   private LinkedHashMultimap<String, RelationSetDescriptor> defRelSets =
       LinkedHashMultimap.create();
 
-  public GraphResourceBuilder(
-      ResourceContainer root, DependencyModel model) {
-    this.root = root;
+  public GraphResourceBuilder(DependencyModel model) {
     this.model = model;
   }
 
   public static GraphResources forModel(DependencyModel model) {
-    ResourceContainer root = AnalysisResources.getRoot();
-    GraphResourceBuilder result = new GraphResourceBuilder(root, model);
+    GraphResourceBuilder result = new GraphResourceBuilder(model);
     return result.build();
   }
 
   public GraphResources build() {
-    ResourceContainer relSetCntr =
-        root.getChild(AnalysisResources.RELATION_SETS);
-    buildRelationSets(relSetCntr, model);
+
+    buildMatcherSets(MatcherResources.getMatchers(model));
+    buildRelationSets(RelationSetResources.getRelationSets(model));
+
+    GraphEdgeMatcherDescriptor defMatcher = calcDefMatcher();
     RelationSetDescriptor defRelSet = calcDefRelSet();
 
-    ResourceContainer matcherCntr =
-        root.getChild(AnalysisResources.MATCHERS);
-    buildMatcherSets(matcherCntr, model);
-    GraphEdgeMatcherDescriptor defMatcher = calcDefMatcher();
-
     return new GraphResources(
-        model, knownRelSets, knownMatchers, defRelSet, defMatcher);
+        model, knownRelSets, knownMatchers, defRelSet , defMatcher);
   }
 
   private GraphEdgeMatcherDescriptor calcDefMatcher() {
@@ -138,36 +133,26 @@ public class GraphResourceBuilder {
     return null;
   }
 
-  private void buildRelationSets(
-      ResourceContainer tree, DependencyModel model) {
-    for (Object resource : tree.getResources()) {
-      if (resource instanceof RelationSetDescriptor) {
-        RelationSetDescriptor checkRes = (RelationSetDescriptor) resource;
-        if (checkRes.forModel(model)) {
-          knownRelSets.add(checkRes);
-          String defModel = getDefault(checkRes);
-          if (null != defModel) {
-            defRelSets.put(defModel, checkRes);
-          }
-        }
+  private void buildRelationSets(List<RelationSetDescriptor> relSets) {
+
+    knownRelSets.addAll(relSets);
+
+    for (RelationSetDescriptor matcher : relSets) {
+      String defModel = getDefault(matcher);
+      if (null != defModel) {
+        defRelSets.put(defModel, matcher);
       }
     }
   }
 
-  private void buildMatcherSets(
-      ResourceContainer tree, DependencyModel model) {
+  private void buildMatcherSets(List<GraphEdgeMatcherDescriptor> matchers) {
 
-    for (Object resource : tree.getResources()) {
-      if (resource instanceof GraphEdgeMatcherDescriptor) {
-        GraphEdgeMatcherDescriptor checkRes =
-            (GraphEdgeMatcherDescriptor) resource;
-        if (checkRes.forModel(model)) {
-          knownMatchers.add(checkRes);
-          String defModel = getDefault(checkRes);
-          if (null != defModel) {
-            defMatchers.put(defModel, checkRes);
-          }
-        }
+    knownMatchers.addAll(matchers);
+
+    for (GraphEdgeMatcherDescriptor matcher : matchers) {
+      String defModel = getDefault(matcher);
+      if (null != defModel) {
+        defMatchers.put(defModel, matcher);
       }
     }
   }
