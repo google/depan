@@ -28,7 +28,6 @@ import com.google.devtools.depan.nodes.filters.sequence.EdgeMatcherFilter;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 
 import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
 import java.net.URI;
@@ -38,33 +37,27 @@ import java.util.Collection;
 /**
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public class EdgeMatcherFilterEditorControl extends Composite {
+public class EdgeMatcherFilterEditorControl
+    extends FilterEditorControl<EdgeMatcherFilter> {
 
   /**
-   * {@link EdgeMatcherFilter} document that is being edited.
+   * {@link EdgeMatcherFilter} definition that is being edited.
    */
   @SuppressWarnings("unused") // It's likely to be used in the future.
   private EdgeMatcherFilter editFilter;
 
+  private DependencyModel model;
+
   /////////////////////////////////////
   // UX Elements
 
-  private final BasicFilterEditorControl basicControl;
-
-  private EdgeMatcherEditorControl edgeMatcherEditor;
-
-  private DependencyModel model;
+  EdgeMatcherEditorControl edgeMatcherEditor;
 
   /////////////////////////////////////
   // Public methods
 
   public EdgeMatcherFilterEditorControl(Composite parent) {
-    super(parent, SWT.NONE);
-    setLayout(Widgets.buildContainerLayout(1));
-
-    // Handle common stuff, like name and summary
-    basicControl = new BasicFilterEditorControl(this);
-    basicControl.setLayoutData(Widgets.buildHorzFillData());
+    super(parent);
 
     Composite matchEditor = setupEdgeMatcherEditor(this);
     matchEditor.setLayoutData(Widgets.buildGrabFillData());
@@ -82,7 +75,8 @@ public class EdgeMatcherFilterEditorControl extends Composite {
     edgeMatcherEditor.updateEdgeMatcher(editFilter.getEdgeMatcher());
   }
 
-  public EdgeMatcherFilter buildEdgeMatcherFilter() {
+  @Override
+  public EdgeMatcherFilter buildFilter() {
     GraphEdgeMatcher matcher = edgeMatcherEditor.buildEdgeMatcher();
     EdgeMatcherFilter result = new EdgeMatcherFilter(matcher);
     result.setName(basicControl.getFilterName());

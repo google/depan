@@ -14,48 +14,23 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.nodes.filters.eclipse.ui.widgets;
+package com.google.devtools.depan.nodes.filters.eclipse.ui.filters;
 
+import com.google.devtools.depan.analysis_doc.model.ModelAnalysisDocument;
+import com.google.devtools.depan.analysis_doc.model.ModelMatcher;
 import com.google.devtools.depan.nodes.filters.model.ContextualFilter;
 
-import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.swt.widgets.Shell;
-
 /**
+ * Define the persistent data for saving {@link ContextualFilter}s.
+ * 
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public abstract class FilterEditorDialog<T extends ContextualFilter>
-    extends Dialog {
+public class ContextualFilterDocument
+    extends ModelAnalysisDocument<ContextualFilter>{
 
-  private final T filter;
-  private T result;
-
-  /**
-   * @param parentShell
-   */
-  protected FilterEditorDialog(Shell parentShell, T filter) {
-    super(parentShell);
-    this.filter = filter;
+  public ContextualFilterDocument(
+      ModelMatcher matcher, ContextualFilter info) {
+    super(info.getName(), matcher, info);
   }
 
-  @Override
-  protected boolean isResizable() {
-    return true;
-  };
-
-  @Override
-  protected void okPressed() {
-    result = buildFilter();
-    super.okPressed();
-  }
-
-  public T getResult() {
-    return result;
-  }
-
-  protected T getFilter() {
-    return filter;
-  }
-
-  protected abstract T buildFilter();
 }

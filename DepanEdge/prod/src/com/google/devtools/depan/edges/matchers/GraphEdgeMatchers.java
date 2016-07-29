@@ -31,25 +31,11 @@ public class GraphEdgeMatchers {
 
   public static GraphEdgeMatcher createForwardEdgeMatcher(
       final RelationSet relationSet) {
-    return new GraphEdgeMatcher() {
-  
-        @Override
-        public boolean relationForward(Relation relation) {
-          return relationSet.contains(relation);
-        }};
+    return new ForwardEdgeMatcher(relationSet);
   }
 
   public static GraphEdgeMatcher createBinaryEdgeMatcher(
       final RelationSet forward, final RelationSet reverse) {
-    return new GraphEdgeMatcher() {
-        @Override
-        public boolean relationForward(Relation relation) {
-          return forward.contains(relation);
-        }
-
-        @Override
-      public boolean relationReverse(Relation relation) {
-        return reverse.contains(relation);
-      }};
+    return new BinaryEdgeMatcher(forward, reverse);
   }
 }

@@ -61,20 +61,22 @@ public class EdgeMatcherContribution
   @Override
   public FilterEditorDialog<EdgeMatcherFilter> buildEditorDialog(
       Shell shell, ContextualFilter filter, DependencyModel model) {
-    if (!handlesFilterInstance(filter)) {
-      String msg = MessageFormat.format(
-          "Filter {0} is assignable as a {1} type.",
-          filter.getName(), EdgeMatcherFilter.class.getName());
-      throw new IllegalArgumentException(msg);
+    if (handlesFilterInstance(filter)) {
+      return new ContributionEditorDialog(
+          shell, (EdgeMatcherFilter) filter, model);
     }
-    return new ContributionEditorDialog(
-        shell, (EdgeMatcherFilter) filter, model);
+    String msg = MessageFormat.format(
+        "Filter {0} is not assignable as a {1} type.",
+        filter.getName(), EdgeMatcherFilter.class.getName());
+    throw new IllegalArgumentException(msg);
   }
 
   private static class ContributionEditorDialog
       extends FilterEditorDialog<EdgeMatcherFilter> {
 
     private final DependencyModel model;
+
+    private EdgeMatcherFilterEditorControl editor;
 
     protected ContributionEditorDialog(
         Shell parentShell, EdgeMatcherFilter filter, DependencyModel model) {
@@ -84,10 +86,14 @@ public class EdgeMatcherContribution
 
     @Override
     protected Control createDialogArea(Composite parent) {
-      EdgeMatcherFilterEditorControl result =
-          new EdgeMatcherFilterEditorControl(parent);
-      result.setInput(getFilter(), model);
-      return result;
+      editor = new EdgeMatcherFilterEditorControl(parent);
+      editor.setInput(getFilter(), model);
+      return editor;
+    }
+
+    @Override
+    protected EdgeMatcherFilter buildFilter() {
+      return editor.buildFilter();
     }
   }
 }

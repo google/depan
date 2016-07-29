@@ -26,6 +26,7 @@
     <module>../DepanCore/prod</module>
     <module>../DepanCore/test</module>
     <module>../DepanEdge/prod</module>
+    <module>../DepanEdge/test</module>
     <module>../DepanGraphDoc/prod</module>
     <module>../DepanGraphDoc/test</module>
     <module>../DepanNode/prod</module>

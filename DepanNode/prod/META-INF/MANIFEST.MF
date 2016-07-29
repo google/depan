@@ -6,7 +6,9 @@ Bundle-Version: 2.0.0.qualifier
 Bundle-Vendor: Pnambic Computing
 Require-Bundle: com.google.devtools.depan.core,
  com.google.guava,
- com.google.devtools.depan.platform
+ com.google.devtools.depan.platform,
+ com.google.devtools.depan.graph_doc,
+ com.google.devtools.depan.edges
 Bundle-ClassPath: .
 Export-Package: com.google.devtools.depan.nodes,
  com.google.devtools.depan.nodes.filters.model,

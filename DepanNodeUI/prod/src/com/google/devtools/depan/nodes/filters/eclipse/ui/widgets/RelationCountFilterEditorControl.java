@@ -53,12 +53,18 @@ import java.util.List;
  *
  * @author <a href="leeca@google.com">Lee Carver</a>
  */
-public class RelationCountFilterEditorControl extends Composite {
+public class RelationCountFilterEditorControl
+    extends FilterEditorControl<RelationCountFilter> {
 
   public static final RelationCount.Settings EMPTY_SETTINGS =
       new RelationCount.Settings();
 
+  /**
+   * {@link RelationCountFilter} definition that is being edited.
+   */
   private RelationCountFilter filterInfo;
+
+  private DependencyModel model;
 
   /////////////////////////////////////
   // UX Elements
@@ -72,8 +78,6 @@ public class RelationCountFilterEditorControl extends Composite {
   private RangeTool reverseRange;
 
   private RelationSetDescrRepo filterRepo;
-
-  private DependencyModel model;
 
   /**
    * Connect the save/load control to this type's data structures.
@@ -112,12 +116,7 @@ public class RelationCountFilterEditorControl extends Composite {
    * @param settings initial set of choices
    */
   public RelationCountFilterEditorControl(Composite parent) {
-    super(parent, SWT.NONE);
-    setLayout(Widgets.buildContainerLayout(1));
-
-    // Handle common stuff, like name and summary
-    basicControl = new BasicFilterEditorControl(this);
-    basicControl.setLayoutData(Widgets.buildHorzFillData());
+    super(parent);
 
     Composite setEditor = setupRelationSetEditor(this);
     setEditor.setLayoutData(Widgets.buildGrabFillData());
@@ -171,6 +170,12 @@ public class RelationCountFilterEditorControl extends Composite {
     List<RelationSetDescriptor> choices =
         RelationSetResources.getRelationSets(model);
     relationSetEditor.setRelationSetSelectorInput(relationSet, choices);
+  }
+
+  @Override
+  public RelationCountFilter buildFilter() {
+    // TODO: Make a new one, or ensure this one is actually edited.
+    return filterInfo;
   }
 
   @Override

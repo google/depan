@@ -104,7 +104,16 @@ public class EdgeMatcherEditorControl extends Composite {
   // UX Setup
 
   private Composite setupAllRelsButtons(Composite parent) {
-    Composite result = Widgets.buildGridContainer(parent, 2);
+    Composite result = Widgets.buildGridContainer(parent, 3);
+
+    Button clearAll =
+        Widgets.buildGridPushButton(result, "Clear all lines");
+    clearAll.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        editor.clearRelations();
+      }
+    });
 
     Button reverseAll =
         Widgets.buildGridPushButton(result, "Reverse all lines");

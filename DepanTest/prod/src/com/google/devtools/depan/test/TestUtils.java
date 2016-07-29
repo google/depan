@@ -17,12 +17,14 @@
 package com.google.devtools.depan.test;
 
 import com.google.devtools.depan.graph.api.Relation;
+import com.google.devtools.depan.graph.api.RelationSet;
 import com.google.devtools.depan.graph.basic.BasicEdge;
 import com.google.devtools.depan.graph.basic.BasicNode;
 import com.google.devtools.depan.model.ElementVisitor;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
+import com.google.devtools.depan.model.RelationSets;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -47,6 +49,10 @@ public class TestUtils {
       return "reverse";
     }
   };
+
+  public static RelationSet buildRelationSet() {
+    return RelationSets.createSingle(RELATION);
+  }
 
   public static String getNodeId(int count) {
     return nameGen("node ", count);

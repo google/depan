@@ -1,0 +1,56 @@
+/*
+ * Copyright 2016 The Depan Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.google.devtools.depan.edges.matchers;
+
+import static org.junit.Assert.*;
+
+import com.google.devtools.depan.graph.api.RelationSet;
+import com.google.devtools.depan.model.GraphEdgeMatcher;
+import com.google.devtools.depan.model.RelationSets;
+import com.google.devtools.depan.test.TestUtils;
+
+import org.junit.Test;
+
+/**
+ * @author <a href="leeca@pnambic.com">Lee Carver</a>
+ */
+public class TestGraphEdgeMatchers {
+
+  @Test
+  public void testCreateForwardEdgeMatcher() {
+    RelationSet relSet = TestUtils.buildRelationSet();
+    GraphEdgeMatcher matcher =
+        GraphEdgeMatchers.createForwardEdgeMatcher(relSet);
+    assertTrue(matcher.relationForward(TestUtils.RELATION)); 
+    assertFalse(matcher.relationReverse(TestUtils.RELATION)); 
+  }
+
+  @Test
+  public void testCreateBinaryEdgeMatcher() {
+    RelationSet testSet = TestUtils.buildRelationSet();
+
+    GraphEdgeMatcher forward = GraphEdgeMatchers.createBinaryEdgeMatcher(
+        testSet, RelationSets.EMPTY);
+    assertTrue(forward.relationForward(TestUtils.RELATION)); 
+    assertFalse(forward.relationReverse(TestUtils.RELATION)); 
+
+    GraphEdgeMatcher reverse = GraphEdgeMatchers.createBinaryEdgeMatcher(
+        RelationSets.EMPTY, testSet);
+    assertFalse(reverse.relationForward(TestUtils.RELATION)); 
+    assertTrue(reverse.relationReverse(TestUtils.RELATION)); 
+  }
+}

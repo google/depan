@@ -91,9 +91,9 @@ public class RelationSetTableControl extends Composite {
   public static final int INDEX_VISIBLE = 2;
 
   private static final EditColTableDef[] TABLE_DEF = new EditColTableDef[] {
-    new EditColTableDef(COL_NAME, false, COL_NAME, 320),
-    new EditColTableDef(COL_SOURCE, false, COL_SOURCE, 160),
-    new EditColTableDef(COL_VISIBLE, true, COL_VISIBLE, 110),
+    new EditColTableDef(COL_NAME, false, COL_NAME, 350),
+    new EditColTableDef(COL_SOURCE, false, COL_SOURCE, 180),
+    new EditColTableDef(COL_VISIBLE, true, COL_VISIBLE, 180),
   };
 
   /////////////////////////////////////
@@ -155,11 +155,9 @@ public class RelationSetTableControl extends Composite {
     relSetViewer.setLabelProvider(new ControlLabelProvider());
     relSetViewer.setColumnProperties(EditColTableDef.getProperties(TABLE_DEF));
     relSetViewer.setCellModifier(new ControlCellModifier());
+    relSetViewer.setContentProvider(ArrayContentProvider.getInstance());
 
     configSorters(relSetTable);
-
-    // Configure content last: use updateTable() to render relations
-    relSetViewer.setContentProvider(ArrayContentProvider.getInstance());
   }
 
   /**

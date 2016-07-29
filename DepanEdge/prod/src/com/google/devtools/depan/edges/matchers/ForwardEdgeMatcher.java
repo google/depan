@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 The Depan Project Authors
+ * Copyright 2016 The Depan Project Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,30 +14,28 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.graph.basic;
+package com.google.devtools.depan.edges.matchers;
 
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.api.RelationSet;
+import com.google.devtools.depan.model.GraphEdgeMatcher;
 
 /**
- * @author <a href="mailto:leeca@pnambic.com">Lee Carver</a>
+ * Edge matchers based on recognizing a {@link RelationSet} edge in
+ * the forward direction.
+ * 
+ * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public class BinaryEdgeMatcher<T> extends AbstractEdgeMatcher<T> {
-  private final RelationSet forward;
-  private final RelationSet reverse;
+public class ForwardEdgeMatcher extends GraphEdgeMatcher {
 
-  public BinaryEdgeMatcher(RelationSet forward, RelationSet reverse) {
-    this.forward = forward;
-    this.reverse = reverse;
+  private final RelationSet relationSet;
+
+  ForwardEdgeMatcher(RelationSet relationSet) {
+    this.relationSet = relationSet;
   }
 
   @Override
   public boolean relationForward(Relation relation) {
-    return forward.contains(relation);
-  }
-
-  @Override
-  public boolean relationReverse(Relation relation) {
-    return reverse.contains(relation);
+    return relationSet.contains(relation);
   }
 }

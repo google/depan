@@ -25,7 +25,6 @@ import com.google.devtools.depan.nodes.filters.sequence.SteppingFilter;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
@@ -40,31 +39,28 @@ import java.util.List;
  * 
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public class FilterTableEditorControl extends Composite {
+public class FilterTableEditorControl
+    extends FilterEditorControl<SteppingFilter> {
+
+  /**
+   * {@link SteppingFilter} that is being edited.
+   */
+  private SteppingFilter editFilter;
+
+  private DependencyModel model;
 
   /////////////////////////////////////
   // UX Elements
 
-  private BasicFilterEditorControl basicControl;
-
   private FilterTableControl filterControl;
 
-  private SteppingFilter editFilter;
-
   private FilterPluginsListControl filterChoice;
-
-  private DependencyModel model;
 
   /////////////////////////////////////
   // Public methods
 
   public FilterTableEditorControl(Composite parent) {
-    super(parent, SWT.NONE);
-    setLayout(Widgets.buildContainerLayout(1));
-
-    // Handle common stuff, like name and summary
-    basicControl = new BasicFilterEditorControl(this);
-    basicControl.setLayoutData(Widgets.buildHorzFillData());
+    super(parent);
 
     filterControl = new FilterTableControl(this);
     filterControl.setLayoutData(Widgets.buildGrabFillData());
@@ -78,6 +74,13 @@ public class FilterTableEditorControl extends Composite {
     this.model = model;
 
     updateControls();
+  }
+
+
+  @Override
+  public SteppingFilter buildFilter() {
+    // TODO: Make a new one, or ensure this one is actually edited.
+    return editFilter;
   }
 
   /////////////////////////////////////
@@ -313,7 +316,7 @@ public class FilterTableEditorControl extends Composite {
     FilterEditorDialog<?> dialog =
         contrib.buildEditorDialog(getShell(), filter, model);
     if (Dialog.OK == dialog.open()) {
-      return dialog.getFilter();
+      return dialog.getResult();
     }
     return null;
   }

@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: TestEdge
+Bundle-SymbolicName: com.google.devtools.depan.edges-test
+Bundle-Version: 2.0.0.qualifier
+Fragment-Host: com.google.devtools.depan.edges
+Bundle-Vendor: Pnambic Computing
+Require-Bundle: org.junit,
+ com.google.devtools.depan.test

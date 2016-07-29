@@ -48,7 +48,7 @@ public class BasicFilterEditorControl extends Composite {
   private BasicFilter editFilter;
 
   @SuppressWarnings("unused")
-  public BasicFilterEditorControl(Composite parent) {
+  public BasicFilterEditorControl(FilterEditorControl<?> parent) {
     super(parent, SWT.NONE);
     setLayout(Widgets.buildContainerLayout(5));
 
@@ -91,9 +91,14 @@ public class BasicFilterEditorControl extends Composite {
       return;
     }
 
-    String summary = editFilter.buildSummary();
+    // Use edited filter information to build summary.
+    String summary = buildFilter().buildSummary();
     editFilter.setSummary(summary);
     updateSummaryText();
+  }
+
+  private BasicFilter buildFilter() {
+    return ((FilterEditorControl<?>) getParent()).buildFilter();
   }
 
   private void updateNameText() {
@@ -102,7 +107,6 @@ public class BasicFilterEditorControl extends Composite {
   }
 
   private void updateSummaryText() {
-    // TODO: visible indicator for empty summary
     summaryText.setText(fmtFilterSummary());
   }
 
@@ -134,7 +138,7 @@ public class BasicFilterEditorControl extends Composite {
       return false;
     }
 
-    // Intent to be no filter unless it detected (and valid).
+    // Intent to be no filter unless it is detected and valid.
     return true;
   }
 }

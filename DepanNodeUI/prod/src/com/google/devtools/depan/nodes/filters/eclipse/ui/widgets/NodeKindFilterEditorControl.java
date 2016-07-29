@@ -22,7 +22,6 @@ import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 
 import com.google.common.collect.ImmutableList;
 
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
 import java.util.Collection;
@@ -32,10 +31,17 @@ import java.util.Collection;
  * 
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public class NodeKindFilterEditorControl extends Composite {
+public class NodeKindFilterEditorControl
+    extends FilterEditorControl<NodeKindFilter> {
+
+  /////////////////////////////////////
+  // UX Elements
 
   /** Control for selecting Element Kinds. */
   private NodeKindTableControl nodeTable;
+
+  /////////////////////////////////////
+  // Public methods
 
   /**
    * Construct the UI for element kind selection.
@@ -44,8 +50,7 @@ public class NodeKindFilterEditorControl extends Composite {
    * @param style standard window style
    */
   public NodeKindFilterEditorControl(Composite parent) {
-    super(parent, SWT.NONE);
-    setLayout(Widgets.buildContainerLayout(1));
+    super(parent);
 
     // Top: element kind selection
     nodeTable = new NodeKindTableControl(this);
@@ -66,6 +71,15 @@ public class NodeKindFilterEditorControl extends Composite {
     Collection<ElementKindDescriptor> selection =
         nodeTable.findDescriptors(input.getNodeKinds());
     nodeTable.setSelection(selection);
+  }
+
+  @Override
+  public NodeKindFilter buildFilter() {
+    NodeKindFilter result = new NodeKindFilter(
+        nodeTable.getSelectedElementKindSet());
+    result.setName(basicControl.getFilterName());
+    result.setSummary(basicControl.getFilterSummary());
+    return result;
   }
 
   @Override

@@ -61,10 +61,14 @@ public class EdgeMatcherTableControl extends Composite {
   public static final String COL_FORWARD = "Forward";
   public static final String COL_BACKWARD = "Backward";
 
+  public static final int INDEX_RELATION = 0;
+  public static final int INDEX_FORWARD = 1;
+  public static final int INDEX_BACKWARD = 2;
+
   public static final EditColTableDef[] TABLE_DEF = new EditColTableDef[] {
-    new EditColTableDef(COL_RELATION, false, COL_RELATION, 150),
-    new EditColTableDef(COL_FORWARD, true, COL_FORWARD, 140),
-    new EditColTableDef(COL_BACKWARD, true, COL_BACKWARD, 80)
+    new EditColTableDef(COL_RELATION, false, COL_RELATION, 320),
+    new EditColTableDef(COL_FORWARD, true, COL_FORWARD, 180),
+    new EditColTableDef(COL_BACKWARD, true, COL_BACKWARD, 180)
   };
 
   private static final String[] BOTH_MATCHERS =
@@ -140,9 +144,9 @@ public class EdgeMatcherTableControl extends Composite {
     EditColTableDef.setupTable(TABLE_DEF, relationTable);
 
     CellEditor[] cellEditors = new CellEditor[TABLE_DEF.length];
-    cellEditors[0] = null;
-    cellEditors[1] = new CheckboxCellEditor(relationTable);
-    cellEditors[2] = new CheckboxCellEditor(relationTable);
+    cellEditors[INDEX_RELATION] = null;
+    cellEditors[INDEX_FORWARD] = new CheckboxCellEditor(relationTable);
+    cellEditors[INDEX_BACKWARD] = new CheckboxCellEditor(relationTable);
 
     // cell content
     viewer.setCellEditors(cellEditors);
@@ -152,18 +156,15 @@ public class EdgeMatcherTableControl extends Composite {
     viewer.setContentProvider(ArrayContentProvider.getInstance());
 
     viewer.setSorter(new AlphabeticSorter(new ViewerObjectToString() {
+
       @Override
       public String getString(Object object) {
-          if (!(object instanceof Relation)) {
-            return object.toString();
+          if (object instanceof Relation) {
+            return ((Relation) object).toString();
           }
-          Relation relation = (Relation) object;
-          return relation.toString();
+          return object.toString();
         }
       }));
-
-    // content = new TableContentProvider<Relation>();
-    // content.initViewer(viewer);
   }
 
   /////////////////////////////////////
@@ -227,6 +228,10 @@ public class EdgeMatcherTableControl extends Composite {
     viewer.setSelection(null);
   }
 
+  public void clearRelations() {
+    clearRelations(getInput());
+  }
+
   public void reverseRelations() {
     reverseRelations(getInput());
   }
@@ -281,6 +286,14 @@ public class EdgeMatcherTableControl extends Composite {
 
   /////////////////////////////////////
   // Change values for collected relations
+
+  public void clearRelations(Collection<Relation> relations) {
+    for (Relation relation : relations) {
+      setForward(relation, false);
+      setReverse(relation, false);
+      viewer.update(relation, BOTH_MATCHERS);
+    }
+  }
 
   public void reverseRelations(Collection<Relation> relations) {
     for (Relation relation : relations) {
@@ -395,17 +408,16 @@ public class EdgeMatcherTableControl extends Composite {
 
     @Override
     public String getColumnText(Object element, int columnIndex) {
-      if (!(element instanceof Relation)) {
-        return "";
-      }
-      Relation relation = ((Relation) element);
-      switch (columnIndex) {
-      case 0:
-        return relation.toString().toLowerCase();
-      case 1:
-        return relation.getForwardName();
-      case 2:
-        return relation.getReverseName();
+      if (element instanceof Relation) {
+        Relation relation = ((Relation) element);
+        switch (columnIndex) {
+        case INDEX_RELATION:
+          return relation.toString();
+        case INDEX_FORWARD:
+          return relation.getForwardName();
+        case INDEX_BACKWARD:
+          return relation.getReverseName();
+        }
       }
       return "";
     }

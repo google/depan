@@ -82,6 +82,8 @@ public class RelationCountContribution
 
     private final DependencyModel model;
 
+    private RelationCountFilterEditorControl editor;
+
     protected ContributionEditorDialog(
         Shell parentShell, RelationCountFilter filter, DependencyModel model) {
       super(parentShell, filter);
@@ -90,10 +92,14 @@ public class RelationCountContribution
 
     @Override
     protected Control createDialogArea(Composite parent) {
-      RelationCountFilterEditorControl result =
-          new RelationCountFilterEditorControl(parent);
-      result.setInput(getFilter(), model);
-      return result;
+      editor = new RelationCountFilterEditorControl(parent);
+      editor.setInput(getFilter(), model);
+      return editor;
+    }
+
+    @Override
+    protected RelationCountFilter buildFilter() {
+      return editor.buildFilter();
     }
   }
 }

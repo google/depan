@@ -16,46 +16,28 @@
 
 package com.google.devtools.depan.nodes.filters.eclipse.ui.widgets;
 
-import com.google.devtools.depan.nodes.filters.model.ContextualFilter;
+import com.google.devtools.depan.nodes.filters.sequence.BasicFilter;
+import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 
-import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Composite;
 
 /**
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public abstract class FilterEditorDialog<T extends ContextualFilter>
-    extends Dialog {
+public abstract class FilterEditorControl<T extends BasicFilter>
+  extends Composite {
 
-  private final T filter;
-  private T result;
+  protected final BasicFilterEditorControl basicControl;
 
-  /**
-   * @param parentShell
-   */
-  protected FilterEditorDialog(Shell parentShell, T filter) {
-    super(parentShell);
-    this.filter = filter;
+  public FilterEditorControl(Composite parent) {
+    super(parent, SWT.NONE);
+    setLayout(Widgets.buildContainerLayout(1));
+
+    // Handle common stuff, like name and summary
+    basicControl = new BasicFilterEditorControl(this);
+    basicControl.setLayoutData(Widgets.buildHorzFillData());
   }
 
-  @Override
-  protected boolean isResizable() {
-    return true;
-  };
-
-  @Override
-  protected void okPressed() {
-    result = buildFilter();
-    super.okPressed();
-  }
-
-  public T getResult() {
-    return result;
-  }
-
-  protected T getFilter() {
-    return filter;
-  }
-
-  protected abstract T buildFilter();
+  public abstract T buildFilter();
 }

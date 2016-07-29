@@ -76,6 +76,8 @@ public class NodeKindContribution
   private static class ContributionEditorDialog
       extends FilterEditorDialog<NodeKindFilter> {
 
+    private NodeKindFilterEditorControl editor;
+
     protected ContributionEditorDialog(
         Shell parentShell, NodeKindFilter filter) {
       super(parentShell, filter);
@@ -83,10 +85,15 @@ public class NodeKindContribution
 
     @Override
     protected Control createDialogArea(Composite parent) {
-      NodeKindFilterEditorControl result =
+      NodeKindFilterEditorControl editor =
           new NodeKindFilterEditorControl(parent);
-      result.setInput(getFilter());
-      return result;
+      editor.setInput(getFilter());
+      return editor;
+    }
+
+    @Override
+    protected NodeKindFilter buildFilter() {
+      return editor.buildFilter();
     }
   }
 }
