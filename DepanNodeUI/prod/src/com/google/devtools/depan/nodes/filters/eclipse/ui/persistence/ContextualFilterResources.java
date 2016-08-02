@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.nodes.filters.eclipse.ui.filters;
+package com.google.devtools.depan.nodes.filters.eclipse.ui.persistence;
 
 import com.google.devtools.depan.graph_doc.model.DependencyModel;
-import com.google.devtools.depan.nodes.filters.model.ContextualFilter;
+import com.google.devtools.depan.nodes.filters.eclipse.ui.filters.ContextualFilterDocument;
 import com.google.devtools.depan.resources.ResourceContainer;
 import com.google.devtools.depan.resources.analysis.AnalysisResources;
 
@@ -26,11 +26,9 @@ import com.google.common.collect.Lists;
 import java.util.List;
 
 /**
- * Provide a standard location for {@link ContextualFilter}s.
- * 
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public class FilterResources {
+public class ContextualFilterResources {
 
   public static final String FILTERS = "filters";
 
@@ -38,7 +36,7 @@ public class FilterResources {
     AnalysisResources.getRoot().addChild(FILTERS);
   }
 
-  private FilterResources() {
+  private ContextualFilterResources() {
     // Prevent instantiation.
   }
 
@@ -46,14 +44,14 @@ public class FilterResources {
     return AnalysisResources.getRoot().getChild(FILTERS);
   }
 
-  public static List<ContextualFilterDocument> getFilters(
+  public static List<ContextualFilterDocument> getMatchers(
       DependencyModel model) {
 
     List<ContextualFilterDocument> result = Lists.newArrayList();
 
     // Filter for GEMs with the supplied model.
     for (Object resource : getContainer().getResources()) {
-        if (resource instanceof ContextualFilter) {
+        if (resource instanceof ContextualFilterDocument) {
           ContextualFilterDocument checkFilter =
               (ContextualFilterDocument) resource;
 

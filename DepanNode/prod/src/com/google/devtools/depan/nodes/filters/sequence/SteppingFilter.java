@@ -19,7 +19,6 @@ package com.google.devtools.depan.nodes.filters.sequence;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.nodes.filters.model.ContextKey;
 import com.google.devtools.depan.nodes.filters.model.ContextualFilter;
-import com.google.devtools.depan.nodes.filters.model.FilterContext;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -29,6 +28,9 @@ import java.util.Collection;
 import java.util.List;
 
 /**
+ * Filter nodes by executing the individual {@link ContextualFilter}s
+ * in a list in order.
+ * 
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
 public class SteppingFilter extends BasicFilter {
@@ -37,11 +39,6 @@ public class SteppingFilter extends BasicFilter {
    * Sequence of filters to execute.
    */
   private List<ContextualFilter> steps = Lists.newArrayList();
-
-  /**
-   * Context to apply for each filter.
-   */
-  private FilterContext context;
 
   public SteppingFilter() {
     this("Filter sequence");
@@ -67,15 +64,10 @@ public class SteppingFilter extends BasicFilter {
   // ContextualFilter methods
 
   @Override
-  public void receiveContext(FilterContext context) {
-    this.context = context;
-  }
-
-  @Override
   public Collection<GraphNode> computeNodes(Collection<GraphNode> nodes) {
     Collection<GraphNode> result = nodes;
     for (ContextualFilter filter : steps) {
-      filter.receiveContext(context);
+      filter.receiveContext(getFilterContext());
       result = filter.computeNodes(result);
     }
     return result;
@@ -88,7 +80,6 @@ public class SteppingFilter extends BasicFilter {
   public Collection<ContextKey> getContextKeys() {
     Collection<ContextKey> result = Sets.newHashSet();
     for (ContextualFilter filter : steps) {
-      filter.receiveContext(context);
       result.addAll(filter.getContextKeys());
     }
     return result;

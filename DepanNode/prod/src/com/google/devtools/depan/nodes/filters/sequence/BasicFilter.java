@@ -43,9 +43,9 @@ public abstract class BasicFilter implements ContextualFilter {
   private String summary;
 
   /**
-   * Context most recently received.
+   * Context most recently received.  Never saved as part of filter.
    */
-  private FilterContext context;
+  private transient FilterContext context;
 
   public BasicFilter() {
     this("- unnamed -", null);
@@ -74,14 +74,6 @@ public abstract class BasicFilter implements ContextualFilter {
     return buildSummary();
   }
 
-  protected FilterContext getFilterContext() {
-    return context;
-  }
-
-  protected GraphModel getContextUniverse() {
-    return (GraphModel) context.get(ContextKey.Base.UNIVERSE);
-  }
-
   public void setName(String name) {
     this.name = name;
   }
@@ -99,10 +91,32 @@ public abstract class BasicFilter implements ContextualFilter {
    * Describe this {@link ContextualFilter} based on it's parameters.
    * Derived types are encouraged to override this method.
    * 
-   * This is public so UX elements can manipulate the result before assigning
-   * and explicit summary.
+   * This is public so UX elements can manipulate the result
+   * before assigning an explicit summary.
    */
   public String buildSummary() {
     return "- empty summary -";
+  }
+
+  /////////////////////////////////////
+  // Context tools for derived types
+
+  protected FilterContext getFilterContext() {
+    return context;
+  }
+
+  /**
+   * Deliver the value for the supplied {@link ContextKey}.
+   * The result may be {@code null}.
+   */
+  protected Object getContextValue(ContextKey key) {
+    return context.get(key);
+  }
+
+  /**
+   * Super-common case.
+   */
+  protected GraphModel getContextUniverse() {
+    return (GraphModel) getContextValue(ContextKey.Base.UNIVERSE);
   }
 }

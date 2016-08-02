@@ -19,6 +19,9 @@ package com.google.devtools.depan.resources;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
+
 import java.util.Collection;
 import java.util.Map;
 
@@ -103,5 +106,20 @@ public class ResourceContainer {
 
   public Collection<Object> getResources() {
     return ImmutableList.copyOf(resources.values());
+  }
+
+  /**
+   * Convert the {@link ResourceContainer} into an Eclipse Project relative
+   * folder path.
+   */
+  public IPath getPath() {
+    IPath result = Path.fromOSString(label);
+    while (null != parent) {
+      IPath front = Path.fromOSString(parent.getLabel());
+      parent = parent.getParent();
+      result = front.append(result);
+    }
+
+    return result;
   }
 }

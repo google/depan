@@ -32,6 +32,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ToolBar;
@@ -71,12 +72,27 @@ public class GraphNodeViewer extends Composite {
   }
 
   private Composite setupOptions(Composite parent) {
-    Composite result = Widgets.buildGridContainer(parent, 1);
+    Composite result = new Composite(parent, SWT.NONE);
+    GridLayout layout = Widgets.buildContainerLayout(1);
+
+    Composite leftCmds = createCommands(result);
+    if (null != leftCmds) {
+      leftCmds.setLayoutData(Widgets.buildHorzFillData());
+      layout.numColumns = 2;
+    }
+    result.setLayout(layout);
 
     ToolBar rightOptions = createToolBar(result);
     rightOptions.setLayoutData(Widgets.buildTrailFillData());
 
     return result;
+  }
+
+  /**
+   * Hook method for derived types to add left-side commands.
+   */
+  protected Composite createCommands(Composite result) {
+    return null;
   }
 
   public void setNvProvider(NodeViewerProvider nvProvider) {

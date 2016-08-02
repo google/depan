@@ -27,6 +27,7 @@ import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
@@ -89,19 +90,18 @@ public class FilterTableEditorControl
   private Composite setupCommandButtons(Composite parent) {
     Composite result = Widgets.buildGridContainer(parent, 2);
 
-    Composite actions = setupActionButtons(result);
-    actions.setLayoutData(Widgets.buildHorzFillData());
+    Composite edits = setupEditButtons(result);
+    edits.setLayoutData(Widgets.buildHorzFillData());
 
-    Composite xfers =  setupSaveButtons(result);
-    xfers.setLayoutData(Widgets.buildTrailFillData());
-
+    Composite order = setupOrderButtons(result);
+    order.setLayoutData(Widgets.buildTrailFillData());
     return result;
   }
 
-  private Composite setupActionButtons(Composite parent) {
-    Composite result = Widgets.buildGridContainer(parent, 7);
+  private Composite setupEditButtons(Composite parent) {
+    Composite result = Widgets.buildGridContainer(parent, 5);
 
-    Button editButton = Widgets.buildGridPushButton(result, "Edit...");
+    Button editButton = Widgets.buildCompactPushButton(result, "Edit...");
     editButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -114,9 +114,9 @@ public class FilterTableEditorControl
     // Alternative: list in filterChoice varies by filter's form and number
     // of items selected.
     filterChoice = new FilterPluginsListControl(result);
-    filterChoice.setLayoutData(Widgets.buildHorzFillData());
+    filterChoice.setLayoutData(new GridData());
 
-    Button addButton = Widgets.buildGridPushButton(result, "Add");
+    Button addButton = Widgets.buildCompactPushButton(result, "Add");
     addButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -124,7 +124,7 @@ public class FilterTableEditorControl
       }
     });
 
-    Button wrapButton = Widgets.buildGridPushButton(result, "Wrap");
+    Button wrapButton = Widgets.buildCompactPushButton(result, "Wrap");
     wrapButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -132,7 +132,7 @@ public class FilterTableEditorControl
       }
     });
 
-    Button removeButton = Widgets.buildGridPushButton(result, "Remove");
+    Button removeButton = Widgets.buildCompactPushButton(result, "Remove");
     removeButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -140,7 +140,13 @@ public class FilterTableEditorControl
       }
     });
 
-    Button upButton = Widgets.buildGridPushButton(result, "Up");
+    return result;
+  }
+
+  private Composite setupOrderButtons(Composite parent) {
+    Composite result = Widgets.buildGridContainer(parent, 2);
+
+    Button upButton = Widgets.buildTrailPushButton(result, "Up");
     upButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -148,7 +154,7 @@ public class FilterTableEditorControl
       }
     });
 
-    Button downButton = Widgets.buildGridPushButton(result, "Down");
+    Button downButton = Widgets.buildTrailPushButton(result, "Down");
     downButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -157,41 +163,6 @@ public class FilterTableEditorControl
     });
 
     return result;
-  }
-
-  private Composite setupSaveButtons(Composite parent) {
-    Composite result = Widgets.buildGridContainer(parent, 2);
-
-    Button saveButton = Widgets.buildGridPushButton(result, "Save...");
-    saveButton.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        saveFilterTable();
-      }
-    });
-
-    Button loadButton = Widgets.buildGridPushButton(result, "Load...");
-    loadButton.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        loadFilterTable();
-      }
-    });
-
-    return result;
-  }
-
-  /////////////////////////////////////
-  // Persistence integration
-
-  private void saveFilterTable() {
-    // TODO Auto-generated method stub
-    
-  }
-
-  private void loadFilterTable() {
-    // TODO Auto-generated method stub
-    
   }
 
   /////////////////////////////////////
@@ -315,6 +286,9 @@ public class FilterTableEditorControl
 
     FilterEditorDialog<?> dialog =
         contrib.buildEditorDialog(getShell(), filter, model);
+    if (null == dialog) {
+      return null;
+    }
     if (Dialog.OK == dialog.open()) {
       return dialog.getResult();
     }

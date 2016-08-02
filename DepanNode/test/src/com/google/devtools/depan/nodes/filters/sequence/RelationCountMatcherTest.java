@@ -20,8 +20,10 @@ import com.google.devtools.depan.graph.api.RelationSet;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.RelationSets;
+import com.google.devtools.depan.nodes.filters.context.MapContext;
+import com.google.devtools.depan.nodes.filters.model.ContextKey;
+import com.google.devtools.depan.nodes.filters.model.ContextKey.Base;
 import com.google.devtools.depan.nodes.filters.model.ContextualFilter;
-import com.google.devtools.depan.nodes.filters.model.DepanContext;
 import com.google.devtools.depan.nodes.filters.sequence.CountPredicates.IncludeAbove;
 import com.google.devtools.depan.nodes.filters.sequence.CountPredicates.IncludeBelow;
 import com.google.devtools.depan.nodes.filters.sequence.CountPredicates.IncludeEquals;
@@ -29,9 +31,12 @@ import com.google.devtools.depan.nodes.filters.sequence.CountPredicates.IncludeI
 import com.google.devtools.depan.nodes.filters.sequence.CountPredicates.IncludeOutside;
 import com.google.devtools.depan.test.TestUtils;
 
+import com.google.common.collect.Maps;
+
 import junit.framework.TestCase;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 
 public class RelationCountMatcherTest extends TestCase {
@@ -175,7 +180,7 @@ public class RelationCountMatcherTest extends TestCase {
     public GraphNode[] nodeArray;
     public Set<GraphNode>nodeSet;
     private RelationSet countSet;
-    private DepanContext testContext;
+    private MapContext testContext;
 
     private TestData(int size, boolean forward, boolean reverse) {
       nodeArray = TestUtils.buildNodes(size);
@@ -183,8 +188,10 @@ public class RelationCountMatcherTest extends TestCase {
       nodeSet = TestUtils.toSet(nodeArray);
 
       countSet = RelationSets.createSingle(TestUtils.RELATION);
-      testContext = new DepanContext();
-      testContext.setUniverse(testModel);
+
+      Map<ContextKey, Object> mappings = Maps.newHashMap();
+      mappings.put(Base.UNIVERSE, testModel);
+      testContext = new MapContext(mappings);
     }
 
     public Collection<GraphNode> computeNodes(ContextualFilter filter) {

@@ -14,24 +14,26 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.nodes.filters.eclipse.ui.filters;
+package com.google.devtools.depan.nodes.filters.context;
 
-import com.google.devtools.depan.analysis_doc.model.ModelAnalysisDocument;
-import com.google.devtools.depan.analysis_doc.model.ModelMatcher;
-import com.google.devtools.depan.nodes.filters.model.ContextualFilter;
+import com.google.devtools.depan.nodes.filters.model.ContextKey;
+import com.google.devtools.depan.nodes.filters.model.FilterContext;
+
+import java.util.Map;
 
 /**
- * Define the persistent data for saving {@link ContextualFilter}s.
- * 
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public class ContextualFilterDocument
-    extends ModelAnalysisDocument<ContextualFilter>{
+public class MapContext implements FilterContext {
 
-  public static final String EXTENSION = "cfxml";
+  private final Map<ContextKey, Object> contextData;
 
-  public ContextualFilterDocument(
-      ModelMatcher matcher, ContextualFilter info) {
-    super(info.getName(), matcher, info);
+  public MapContext(Map<ContextKey, Object> contextData) {
+    this.contextData = contextData;
+  }
+
+  @Override
+  public Object get(ContextKey key) {
+    return contextData.get(key);
   }
 }

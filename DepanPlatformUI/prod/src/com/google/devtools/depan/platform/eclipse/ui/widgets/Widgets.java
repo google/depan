@@ -89,6 +89,9 @@ public class Widgets {
     return result;
   }
 
+  /**
+   * Use directly for image buttons without text.
+   */
   public static Button buildGridPushButton(Composite parent) {
     Button result = new Button(parent, SWT.PUSH);
     result.setLayoutData(buildHorzFillData());
@@ -97,6 +100,13 @@ public class Widgets {
 
   public static Button buildGridPushButton(Composite parent, String label) {
     Button result = buildGridPushButton(parent);
+    result.setText(label);
+    return result;
+  }
+
+  public static Button buildCompactPushButton(Composite parent, String label) {
+    Button result = new Button(parent, SWT.PUSH);
+    result.setLayoutData(new GridData());
     result.setText(label);
     return result;
   }

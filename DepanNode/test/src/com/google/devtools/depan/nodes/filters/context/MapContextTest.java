@@ -14,26 +14,31 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.nodes.filters.model;
+package com.google.devtools.depan.nodes.filters.context;
 
-import com.google.devtools.depan.model.GraphModel;
+import static org.junit.Assert.*;
+
+import com.google.devtools.depan.nodes.filters.model.ContextKey;
+import com.google.devtools.depan.nodes.filters.model.ContextKey.Base;
+import com.google.devtools.depan.nodes.filters.model.FilterContext;
 
 import com.google.common.collect.Maps;
+
+import org.junit.Test;
 
 import java.util.Map;
 
 /**
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public class DepanContext implements FilterContext {
-  private final Map<ContextKey, Object> contextData = Maps.newHashMap();
+public class MapContextTest {
 
-  @Override
-  public Object get(ContextKey key) {
-    return contextData.get(key);
-  }
-
-  public void setUniverse(GraphModel model) {
-    contextData.put(ContextKey.Base.UNIVERSE, model);
+  @Test
+  public void testBasic() {
+    Map<ContextKey, Object> testData = Maps.newHashMap();
+    String testValue = "Any object";
+    testData.put(Base.UNIVERSE, testValue);
+    FilterContext testContext = new MapContext(testData);
+    assertEquals(testValue, testContext.get(Base.UNIVERSE));
   }
 }

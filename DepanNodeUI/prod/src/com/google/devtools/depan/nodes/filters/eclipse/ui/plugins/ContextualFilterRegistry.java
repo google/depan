@@ -92,7 +92,8 @@ public class ContextualFilterRegistry extends
 
   private ContextualFilterContributor<? extends ContextualFilter> findContributor(ContextualFilter filter) {
     for (ContributionEntry<ContextualFilterContributor<? extends ContextualFilter>> contrib : getContributions()) {
-      ContextualFilterContributor<? extends ContextualFilter> result = contrib.getInstance();
+      ContextualFilterContributor<? extends ContextualFilter> result =
+          contrib.getInstance();
       if (result.handlesFilterInstance(filter)) {
         return result;
       }

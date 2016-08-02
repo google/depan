@@ -441,7 +441,7 @@ public class ViewEditor extends MultiPageEditorPart {
    */
   public SteppingFilter getActiveNodeFilter( ) {
     if (null == nodeFilter) {
-      String name = MessageFormat.format("{0} node filters", getPartName());
+      String name = MessageFormat.format("{0} node filters", baseName);
       nodeFilter = new SteppingFilter(name);
     }
     return nodeFilter;
@@ -649,10 +649,8 @@ public class ViewEditor extends MultiPageEditorPart {
   }
 
   private String buildFileInputBaseName(IFile file) {
-    String name = file.getName();
-    IPath result = Path.fromOSString(name);
-    result.removeFileExtension();
-    return result.toOSString();
+    IPath result = Path.fromOSString(file.getName());
+    return result.removeFileExtension().toOSString();
   }
 
   /**
@@ -835,7 +833,7 @@ public class ViewEditor extends MultiPageEditorPart {
     setInputWithNotify(effInput);
   }
 
-  private IFile getSaveAsFile() {
+  public IFile getSaveAsFile() {
     IFile infoFile = getInputFile();
     if (null != infoFile) {
       return infoFile;
