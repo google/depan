@@ -14,25 +14,25 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.resources.analysis;
+package com.google.devtools.depan.platform;
 
-import com.google.devtools.depan.resources.ResourceContainer;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 
 /**
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public class AnalysisResources {
+public class PlatformTools {
 
-  public static final String ROOT = "Resources";
-
-  private static final ResourceContainer ROOT_CONTAINER = 
-      ResourceContainer.buildRootContainer(ROOT);
-
-  private AnalysisResources() {
+  private PlatformTools() {
     // Prevent instantiation.
   }
 
-  public static ResourceContainer getRoot() {
-    return ROOT_CONTAINER;
+  public static void throwCoreException(
+      String message, String pluginId) throws CoreException {
+    IStatus status = new Status(
+        IStatus.ERROR, pluginId, IStatus.OK, message, null);
+    throw new CoreException(status);
   }
 }

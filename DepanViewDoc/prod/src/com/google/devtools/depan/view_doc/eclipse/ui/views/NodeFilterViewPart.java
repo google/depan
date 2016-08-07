@@ -38,6 +38,8 @@ import com.google.devtools.depan.nodes.filters.sequence.SteppingFilter;
 import com.google.devtools.depan.platform.WorkspaceTools;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Sasher;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
+import com.google.devtools.depan.resource_doc.eclipse.ui.persistence.LoadResourceDialog;
+import com.google.devtools.depan.resource_doc.eclipse.ui.persistence.SaveResourceDialog;
 import com.google.devtools.depan.resources.ResourceContainer;
 import com.google.devtools.depan.view_doc.eclipse.ViewDocLogger;
 import com.google.devtools.depan.view_doc.eclipse.ViewDocResources;
@@ -49,8 +51,10 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.wizard.WizardDialog;
@@ -64,7 +68,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.dialogs.SaveAsDialog;
 
 import java.text.MessageFormat;
 import java.util.Collection;
@@ -74,7 +77,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 /**
- * Tool to set display properties for individual nodes.
+ * Define node filters for the current {@link ViewEditor}.
  *
  * @author ycoppel@google.com (Yohann Coppel)
  */
@@ -160,7 +163,8 @@ public class NodeFilterViewPart extends AbstractViewDocViewPart {
   private Composite setupSaveButtons(Composite parent) {
     Composite result = Widgets.buildGridContainer(parent, 2);
 
-    Button saveButton = Widgets.buildGridPushButton(result, "Save As...");
+    Button saveButton = Widgets.buildGridPushButton(
+        result, "Save as NodeFilter...");
     saveButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -168,7 +172,8 @@ public class NodeFilterViewPart extends AbstractViewDocViewPart {
       }
     });
 
-    Button loadButton = Widgets.buildGridPushButton(result, "Load From...");
+    Button loadButton = Widgets.buildGridPushButton(
+        result, "Load from NodeFilter...");
     loadButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -377,35 +382,105 @@ public class NodeFilterViewPart extends AbstractViewDocViewPart {
   // Persistence integration
 
   private void saveFilterTable() {
-    ContextualFilter filter = filterControl.buildFilter();
-    IFile saveAs = getSaveAsFile(filter.getName());
-
-    SaveAsDialog saveDlg = new SaveAsDialog(getEditor().getSite().getShell());
-    saveDlg.setOriginalFile(saveAs);
-    saveDlg.setOriginalName(saveAs.getName());
-    if (saveDlg.open() != SaveAsDialog.OK) {
+    // Run SaveResource dialog using current editor content.
+    ContextualFilter saveFilter = filterControl.buildFilter();
+    IFile saveFile = getSaveAsFile(saveFilter);
+    if (null == saveFile) {
       return;
     }
 
+    // Construct persistent document.
     DependencyModel model = getEditor().getDependencyModel();
     FeatureMatcher matcher = new FeatureMatcher(model);
     ContextualFilterDocument result =
-        new ContextualFilterDocument(matcher, filter);
-
-    // get the file relatively to the workspace.
-    IFile saveFile = WorkspaceTools.calcViewFile(
-        saveDlg.getResult(), ContextualFilterDocument.EXTENSION);
+        new ContextualFilterDocument(matcher, saveFilter);
 
     ContextualFilterXmlPersist persist =
         ContextualFilterXmlPersist.build(false);
-
     WorkspaceTools.saveDocument(saveFile, result, persist, null);
   }
 
+  private void loadFilterTable() {
+    IFile loadFile = getLoadFromFile();
+    if (null == loadFile) {
+      return;
+    }
+
+    ContextualFilterXmlPersist persist =
+        ContextualFilterXmlPersist.build(true);
+    ContextualFilterDocument result = persist.load(loadFile.getRawLocationURI());
+    DependencyModel model = result.getModel();
+    ContextualFilter filter = result.getInfo();
+    if (filter instanceof SteppingFilter) {
+      filterControl.setInput((SteppingFilter) filter, model);
+    } else {
+      String name = MessageFormat.format("Wrapped {0}", filter.getName());
+      String summary = MessageFormat.format("From {0}", filter.getSummary());
+      SteppingFilter synth = new SteppingFilter(name, summary);
+      filterControl.setInput(synth, model);
+    }
+  }
+
   /**
-   * @return
+   * Get container and file name from user, with good handling for defaults.
    */
-  private IFile getSaveAsFile(String filterName) {
+  private IFile getSaveAsFile(ContextualFilter filter) {
+    IFile saveAs = guessSaveAsFile(filter.getName());
+
+    SaveResourceDialog saveDlg =
+        new SaveResourceDialog(getEditor().getSite().getShell());
+    saveDlg.setInput(saveAs);
+    if (saveDlg.open() != SaveResourceDialog.OK) {
+      return null;
+    }
+
+    // get the file relatively to the workspace.
+    try {
+      return WorkspaceTools.calcFileWithExt(
+          saveDlg.getResult(), ContextualFilterDocument.EXTENSION);
+    } catch (CoreException errCore) {
+      String msg = MessageFormat.format(
+          "Error saving resource to {0}", saveAs);
+      ViewDocLogger.logException(msg, errCore);
+    }
+    return null;
+  }
+
+  /**
+   * Get container and file name from user, with good handling for defaults.
+   */
+  private IFile getLoadFromFile() {
+    IContainer rsrcRoot = guessResourceRoot();
+
+    LoadResourceDialog loadDlg =
+        new LoadResourceDialog(getEditor().getSite().getShell());
+    loadDlg.setInput(rsrcRoot, ContextualFilterDocument.EXTENSION);
+    if (loadDlg.open() != SaveResourceDialog.OK) {
+      return null;
+    }
+
+    // get the file relatively to the workspace.
+    try {
+      return WorkspaceTools.calcFileWithExt(
+          loadDlg.getResult(), ContextualFilterDocument.EXTENSION);
+    } catch (CoreException errCore) {
+      String msg = MessageFormat.format(
+          "Error loading resource from {0}", rsrcRoot);
+      ViewDocLogger.logException(msg, errCore);
+    }
+    return null;
+  }
+
+  /**
+   * Infer the expected file for the named filter.
+   * 
+   * The resulting file is obey the following storage convention:
+   *   [ViewDoc-Project][Resource-Type-Path][Resource-Name]
+   * 
+   * The user will be able to edit this result before a storage action is
+   * performed.
+   */
+  private IFile guessSaveAsFile(String filterName) {
     IPath namePath = Path.fromOSString(filterName);
     namePath.addFileExtension(ContextualFilterDocument.EXTENSION);
 
@@ -418,14 +493,23 @@ public class NodeFilterViewPart extends AbstractViewDocViewPart {
     return proj.getFile(destPath);
   }
 
-  private void loadFilterTable() {
-    ContextualFilterXmlPersist loader =
-        ContextualFilterXmlPersist.build(true);
-    // ContextualFilter blix = loader.load(uri);
-    // TODO Auto-generated method stub
-    
-  }
+  /**
+   * Infer the expected container for filter resources.
+   * 
+   * The resulting file follow the namining conventions for porject resources.
+   *   [ViewDoc-Project][Resource-Type-Path][Resource-Name]
+   * 
+   * The user will be able to edit this result before a storage action is
+   * performed.
+   */
+  private IContainer guessResourceRoot() {
+    ResourceContainer filters = ContextualFilterResources.getContainer();
+    IPath treePath = filters.getPath();
 
+    IFile editPath = getEditor().getSaveAsFile();
+    IProject proj = editPath.getProject();
+    return proj.getFolder(treePath);
+  }
 
   /////////////////////////////////////
   // ViewDoc/Editor integration

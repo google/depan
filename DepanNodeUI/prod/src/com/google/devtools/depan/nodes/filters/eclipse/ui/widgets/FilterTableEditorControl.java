@@ -70,6 +70,11 @@ public class FilterTableEditorControl
     commands.setLayoutData(Widgets.buildHorzFillData());
   }
 
+  /**
+   * The supplied {@link #editFilter} is modified in place.
+   * However, use the {@link #buildFilter()} method to ensure
+   * all updates have been applied.
+   */
   public void setInput(SteppingFilter editFilter, DependencyModel model) {
     this.editFilter = editFilter;
     this.model = model;
@@ -77,10 +82,16 @@ public class FilterTableEditorControl
     updateControls();
   }
 
-
+  /**
+   * Provide the current state of the {@link #editFilter}, with all
+   * pending user interface changes applied. 
+   */
   @Override
   public SteppingFilter buildFilter() {
-    // TODO: Make a new one, or ensure this one is actually edited.
+    // The updateSteps() method incrementally handles step changes
+    // to the editFilter.  No need to update via setSteps() again.
+    editFilter.setName(basicControl.getFilterName());
+    editFilter.setSummary(basicControl.getFilterSummary());
     return editFilter;
   }
 
@@ -311,7 +322,8 @@ public class FilterTableEditorControl
   private void updateSteps(List<ContextualFilter> steps) {
     editFilter.setSteps(steps);
 
-    updateControls();
+    // No need to update name or summary.
+    filterControl.setInput(editFilter.getSteps());
   }
 
   /**

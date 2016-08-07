@@ -49,6 +49,22 @@ public final class WorkspaceTools {
    */
   private WorkspaceTools() { }
 
+  /**
+   * Ensure that we have a file extension on the file name.
+   * 
+   * @param savePath Initial save path from user
+   * @return valid IFile with an extension.
+   */
+  public static IFile calcFileWithExt(IFile saveFile, String ext) {
+    IPath savePath = saveFile.getFullPath();
+    String saveExt = savePath.getFileExtension();
+    if (null == saveExt) {
+      savePath = savePath.addFileExtension(ext);
+    } else if (!saveExt.equals(ext)) {
+      savePath = savePath.addFileExtension(ext);
+    }
+    return ResourcesPlugin.getWorkspace().getRoot().getFile(savePath);
+  }
 
   /**
    * Ensure that we have a file extension on the file name.
@@ -65,7 +81,6 @@ public final class WorkspaceTools {
     }
     return ResourcesPlugin.getWorkspace().getRoot().getFile(savePath);
   }
-
 
   /**
    * Open a dialog box asking the user to select an existing project under the

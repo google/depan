@@ -14,25 +14,34 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.resources.analysis;
+package com.google.devtools.depan.resource_doc.eclipse.ui.persistence;
 
-import com.google.devtools.depan.resources.ResourceContainer;
+import org.eclipse.swt.widgets.Shell;
 
 /**
+ * Based on Eclipse's {@code SaveAsDialog}.
+ *
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public class AnalysisResources {
+public class LoadResourceDialog extends AbstractResourceDialog {
 
-  public static final String ROOT = "Resources";
+  private static final String LOAD_RESOURCE_TITLE = "Load resource";
 
-  private static final ResourceContainer ROOT_CONTAINER = 
-      ResourceContainer.buildRootContainer(ROOT);
+  private static final String LOAD_RESOURCE_MSG =
+      "Load resource from another location.";
 
-  private AnalysisResources() {
-    // Prevent instantiation.
+  public LoadResourceDialog(Shell parentShell) {
+    super(parentShell);
   }
 
-  public static ResourceContainer getRoot() {
-    return ROOT_CONTAINER;
+  @Override
+  protected void decorateShell(Shell shell) {
+    shell.setText(LOAD_RESOURCE_TITLE);
+  }
+
+  @Override
+  protected void decorateDialog() {
+    setTitle(LOAD_RESOURCE_TITLE);
+    setMessage(LOAD_RESOURCE_MSG);
   }
 }

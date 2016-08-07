@@ -100,6 +100,10 @@ public class ResourceContainer {
     return children.get(label);
   }
 
+  public Collection<ResourceContainer> getChildren() {
+    return ImmutableList.copyOf(children.values());
+  }
+
   public Object getResource(String label) {
     return resources.get(label);
   }
@@ -108,15 +112,23 @@ public class ResourceContainer {
     return ImmutableList.copyOf(resources.values());
   }
 
+  public IPath getPath() {
+    return getPath(this);
+  }
+
   /**
    * Convert the {@link ResourceContainer} into an Eclipse Project relative
    * folder path.
+   * 
+   * As a static method, it's much harder to inadvertently alter the state
+   * of the instance.
    */
-  public IPath getPath() {
-    IPath result = Path.fromOSString(label);
-    while (null != parent) {
-      IPath front = Path.fromOSString(parent.getLabel());
-      parent = parent.getParent();
+  public static IPath getPath(ResourceContainer container) {
+    IPath result = Path.fromOSString(container.getLabel());
+    ResourceContainer pathRsrc = container.getParent();
+    while (null != pathRsrc) {
+      IPath front = Path.fromOSString(pathRsrc.getLabel());
+      pathRsrc = pathRsrc.getParent();
       result = front.append(result);
     }
 

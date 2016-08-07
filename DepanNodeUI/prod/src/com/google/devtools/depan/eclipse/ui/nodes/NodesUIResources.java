@@ -16,9 +16,11 @@
 
 package com.google.devtools.depan.eclipse.ui.nodes;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.osgi.framework.Bundle;
 
 /**
  * @author ycoppel@google.com (Yohann Coppel)
@@ -26,6 +28,8 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 public final class NodesUIResources {
 
   public static final String PLUGIN_ID = "com.google.devtools.depan.nodes.ui";
+
+  public static final Bundle BUNDLE = Platform.getBundle(PLUGIN_ID);
 
   public static final Image IMAGE_EXPANDALL =
       NodesUIResources.getImageFromPath("icons/expandall.png");

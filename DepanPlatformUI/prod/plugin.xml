@@ -8,5 +8,15 @@
             name="DepAn">
       </category>
    </extension>
+   <extension
+         point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="com.google.devtools.depan.resources.ResourceContainer"
+            class="com.google.devtools.depan.resource_doc.eclipse.ui.widgets.ResourceContainerAdapterFactory">
+         <adapter
+               type="org.eclipse.ui.model.IWorkbenchAdapter">
+         </adapter>
+      </factory>
+   </extension>
 
 </plugin>

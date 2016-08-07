@@ -21,7 +21,6 @@ import com.google.devtools.depan.nodes.filters.eclipse.ui.filters.ContextualFilt
 import com.google.devtools.depan.persistence.AbstractDocXmlPersist;
 import com.google.devtools.depan.persistence.ObjectXmlPersist;
 import com.google.devtools.depan.persistence.XStreamFactory;
-import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 
 import java.net.URI;
 

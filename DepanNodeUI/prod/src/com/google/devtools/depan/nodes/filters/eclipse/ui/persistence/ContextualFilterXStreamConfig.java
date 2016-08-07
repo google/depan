@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.nodes.filters.eclipse.ui.persistence;
 
+import com.google.devtools.depan.eclipse.ui.nodes.NodesUIResources;
 import com.google.devtools.depan.nodes.filters.eclipse.ui.filters.ContextualFilterDocument;
 import com.google.devtools.depan.persistence.XStreamConfig;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
@@ -46,6 +47,6 @@ public class ContextualFilterXStreamConfig implements XStreamConfig {
 
   @Override
   public Collection<? extends Bundle> getDocumentBundles() {
-    return Collections.emptyList();
+    return Collections.singletonList(NodesUIResources.BUNDLE);
   }
 }
