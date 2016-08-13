@@ -32,7 +32,7 @@ import java.net.URI;
 public class RelationSetDescriptorXmlPersist
     extends AbstractDocXmlPersist<RelationSetDescriptor> {
 
-  private final static RelationSetDescriptorXStreamConfig docConfig =
+  private final static RelationSetDescriptorXStreamConfig DOC_CONFIG =
       new RelationSetDescriptorXStreamConfig();
 
   public RelationSetDescriptorXmlPersist(ObjectXmlPersist xmlPersist) {
@@ -40,7 +40,7 @@ public class RelationSetDescriptorXmlPersist
   }
 
   public static RelationSetDescriptorXmlPersist build(boolean readable) {
-    ObjectXmlPersist persist = XStreamFactory.build(readable, docConfig);
+    ObjectXmlPersist persist = XStreamFactory.build(readable, DOC_CONFIG);
     return new RelationSetDescriptorXmlPersist(persist);
   }
 

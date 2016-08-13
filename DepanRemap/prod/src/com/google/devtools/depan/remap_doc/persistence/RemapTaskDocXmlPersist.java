@@ -1,5 +1,5 @@
 /*
- * Copyright 2009 The Depan Project Authors
+ * Copyright 2016 The Depan Project Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,53 +14,51 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.view_doc.persistence;
+package com.google.devtools.depan.remap_doc.persistence;
 
 import com.google.devtools.depan.persistence.AbstractDocXmlPersist;
 import com.google.devtools.depan.persistence.ObjectXmlPersist;
 import com.google.devtools.depan.persistence.XStreamFactory;
-import com.google.devtools.depan.view_doc.model.RelationDisplayDocument;
+import com.google.devtools.depan.remap_doc.model.MigrationTask;
 
 import java.net.URI;
 
 /**
  * Provide easy to use load and save methods for
- * {@link RelationDisplayDocument}s.
+ * {@link NodeKindDocument}s.
  * 
  * @author <a href="mailto:leeca@google.com">Lee Carver</a>
  */
-public class RelationDisplayDocumentXmlPersist
-    extends AbstractDocXmlPersist<RelationDisplayDocument> {
+public class RemapTaskDocXmlPersist
+    extends AbstractDocXmlPersist<MigrationTask> {
 
-  private final static RelationDisplayDocumentXStreamConfig DOC_CONFIG =
-      new RelationDisplayDocumentXStreamConfig();
+  private final static RemapTaskDocXStreamConfig DOC_CONFIG =
+      new RemapTaskDocXStreamConfig();
 
-  public RelationDisplayDocumentXmlPersist(ObjectXmlPersist xmlPersist) {
+  public RemapTaskDocXmlPersist(ObjectXmlPersist xmlPersist) {
     super(xmlPersist);
   }
 
-  public static RelationDisplayDocumentXmlPersist build(boolean readable) {
+  public static RemapTaskDocXmlPersist build(boolean readable) {
     ObjectXmlPersist persist = XStreamFactory.build(readable, DOC_CONFIG);
-    return new RelationDisplayDocumentXmlPersist(persist);
+    return new RemapTaskDocXmlPersist(persist);
   }
 
   /////////////////////////////////////
   // Hook method implementations for AbstractDocXmlPersist
 
   @Override
-  protected RelationDisplayDocument coerceLoad(Object load) {
-      return (RelationDisplayDocument) load;
+  protected MigrationTask coerceLoad(Object load) {
+      return (MigrationTask) load;
   }
 
   @Override
   protected String logLoadException(URI uri, Exception err) {
-    return logException(
-        "Unable to load edge display properties from {0}", uri, err);
+    return logException("Unable to load MigrationTask from {0}", uri, err);
   }
 
   @Override
   public String logSaveException(URI uri, Exception err) {
-    return logException(
-        "Unable to load edge display properties to {0}", uri, err);
+    return logException("Unable to save MigrationTask to {0}", uri, err);
   }
 }

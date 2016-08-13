@@ -32,7 +32,7 @@ import java.net.URI;
 public class ContextualFilterXmlPersist
     extends AbstractDocXmlPersist<ContextualFilterDocument> {
 
-  private final static ContextualFilterXStreamConfig docConfig =
+  private final static ContextualFilterXStreamConfig DOC_CONFIG =
       new ContextualFilterXStreamConfig();
 
   public ContextualFilterXmlPersist(ObjectXmlPersist xmlPersist) {
@@ -40,7 +40,7 @@ public class ContextualFilterXmlPersist
   }
 
   public static ContextualFilterXmlPersist build(boolean readable) {
-    ObjectXmlPersist persist = XStreamFactory.build(readable, docConfig);
+    ObjectXmlPersist persist = XStreamFactory.build(readable, DOC_CONFIG);
     return new ContextualFilterXmlPersist(persist);
   }
 

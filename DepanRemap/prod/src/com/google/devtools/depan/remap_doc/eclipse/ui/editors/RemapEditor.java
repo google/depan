@@ -16,13 +16,13 @@
 
 package com.google.devtools.depan.remap_doc.eclipse.ui.editors;
 
-
-import com.google.devtools.depan.persistence.ObjectXmlPersist;
-import com.google.devtools.depan.persistence.XStreamFactory;
+import com.google.devtools.depan.platform.WorkspaceTools;
 import com.google.devtools.depan.remap_doc.model.MigrationGroup;
 import com.google.devtools.depan.remap_doc.model.MigrationRule;
 import com.google.devtools.depan.remap_doc.model.MigrationTask;
+import com.google.devtools.depan.remap_doc.persistence.RemapTaskDocXmlPersist;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
@@ -36,7 +36,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.MultiPageEditorPart;
 
 import java.io.IOException;
-import java.net.URI;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -44,7 +44,6 @@ import java.util.Collection;
  * Editor for Remap (.dpanr) files.
  *
  * @author ycoppel@google.com (Yohann Coppel)
- *
  */
 public class RemapEditor extends MultiPageEditorPart
     implements MigrationTaskListener {
@@ -68,7 +67,8 @@ public class RemapEditor extends MultiPageEditorPart
   private Collection<MigrationTaskListener> taskListeners =
       new ArrayList<MigrationTaskListener>();
 
-  private URI uri;
+  private IFile taskFile;
+  // private URI uri;
 
   /* (non-Javadoc)
    * @see org.eclipse.ui.part.MultiPageEditorPart#createPages()
@@ -151,35 +151,29 @@ public class RemapEditor extends MultiPageEditorPart
 
     if (input instanceof IFileEditorInput) {
       try {
-        uri = ((IFileEditorInput) input).getFile().getLocationURI();
-        // TODO(leeca):  Is this configured with the correct XStream flavor?
-        ObjectXmlPersist persist = XStreamFactory.build(true, null);
+        taskFile = ((IFileEditorInput) input).getFile();
+        RemapTaskDocXmlPersist persist = RemapTaskDocXmlPersist.build(true);
 
         migrationTask = loadMigrationTask(persist);
         this.setPartName(migrationTask.getName());
       } catch (IOException errIo) {
-        throw new PartInitException("Unable to load migration task from " + uri, errIo);
+        String msg = MessageFormat.format(
+            "Unable to load migration task from {0}", taskFile.getFullPath());
+        throw new PartInitException(msg, errIo);
       }
     }
   }
 
-  private MigrationTask loadMigrationTask(ObjectXmlPersist persist)
+  private MigrationTask loadMigrationTask(RemapTaskDocXmlPersist persist)
       throws IOException {
-    return (MigrationTask) persist.load(uri);
+    return (MigrationTask) persist.load(taskFile.getLocationURI());
   }
 
   @Override
   public void doSave(IProgressMonitor monitor) {
-    try {
-      // TODO(leeca):  Is this configured with the correct XStream flavor?
-      ObjectXmlPersist persist = XStreamFactory.build(false, null);
-      persist.save(uri, migrationTask);
-      setDirtyState(false);
-    } catch (IOException errIo) {
-      monitor.setCanceled(true);
-      throw new RuntimeException(
-          "Unable to save migration task to " + uri, errIo);
-    }
+    RemapTaskDocXmlPersist persist = RemapTaskDocXmlPersist.build(false);
+    WorkspaceTools.saveDocument(taskFile, migrationTask, persist, null);
+    setDirtyState(false);
   }
 
   @Override
@@ -240,6 +234,5 @@ public class RemapEditor extends MultiPageEditorPart
     for (MigrationTaskListener listener : taskListeners) {
       listener.ruleUpdated(source, group, rule);
     }
-
   }
 }

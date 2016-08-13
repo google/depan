@@ -90,7 +90,7 @@ public abstract class GenericSaveLoadControl<T extends PropertyDocument<?>>
       return;
     }
     AbstractDocXmlPersist<T> persist = config.getDocXmlPersist(false);
-    persist.save(saveFile.getLocationURI(), rsrc);
+    WorkspaceTools.saveDocument(saveFile, rsrc, persist, null);
   }
 
   /**

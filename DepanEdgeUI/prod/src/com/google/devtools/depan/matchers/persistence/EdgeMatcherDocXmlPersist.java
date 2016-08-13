@@ -32,7 +32,7 @@ import java.net.URI;
 public class EdgeMatcherDocXmlPersist
     extends AbstractDocXmlPersist<GraphEdgeMatcherDescriptor> {
 
-  private final static EdgeMatcherDocXStreamConfig docConfig =
+  private final static EdgeMatcherDocXStreamConfig DOC_CONFIG =
       new EdgeMatcherDocXStreamConfig();
 
   public EdgeMatcherDocXmlPersist(ObjectXmlPersist xmlPersist) {
@@ -40,7 +40,7 @@ public class EdgeMatcherDocXmlPersist
   }
 
   public static EdgeMatcherDocXmlPersist build(boolean readable) {
-    ObjectXmlPersist persist = XStreamFactory.build(readable, docConfig);
+    ObjectXmlPersist persist = XStreamFactory.build(readable, DOC_CONFIG);
     return new EdgeMatcherDocXmlPersist(persist);
   }
 

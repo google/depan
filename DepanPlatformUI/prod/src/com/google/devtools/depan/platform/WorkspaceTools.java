@@ -234,7 +234,10 @@ public final class WorkspaceTools {
 
   /**
    * Can't be part of {@link AbstractDocXmlPersist}, due to UI elements
-   * {@code monitor} and {@code file.touch()}.
+   * {@code monitor} and {@code file.refreshLocal()}.
+   * 
+   * Cancels the {@code monitor} if there is an exception,
+   * but reports no worked steps on the supplied  {@code monitor}.
    */
   public static <T> void saveDocument(
       IFile file, T docInfo,
