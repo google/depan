@@ -26,13 +26,15 @@ import com.google.devtools.depan.nodes.filters.sequence.RelationCountFilter;
 
 import com.google.common.collect.ImmutableList;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
-import java.text.MessageFormat;
-
 /**
+ * Provides labels, {@link Form}s, factories, and dialog editors
+ * for {@link NodeKindFilter}s.
+ * 
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
 public class NodeKindContribution
@@ -63,14 +65,13 @@ public class NodeKindContribution
 
   @Override
   public FilterEditorDialog<NodeKindFilter> buildEditorDialog(
-      Shell shell, ContextualFilter filter, DependencyModel model) {
-    if (!handlesFilterInstance(filter)) {
-      String msg = MessageFormat.format(
-          "Filter {0} is assignable as a {1} type.",
-          filter.getName(), RelationCountFilter.class.getName());
-      throw new IllegalArgumentException(msg);
+      Shell shell, ContextualFilter filter,
+      DependencyModel model, IProject project) {
+    if (handlesFilterInstance(filter)) {
+      return new ContributionEditorDialog(
+          shell, (NodeKindFilter) filter, model, project);
     }
-    return new ContributionEditorDialog(shell, (NodeKindFilter) filter);
+    throw buildNotAssignable(filter, RelationCountFilter.class);
   }
 
   private static class ContributionEditorDialog
@@ -79,15 +80,15 @@ public class NodeKindContribution
     private NodeKindFilterEditorControl editor;
 
     protected ContributionEditorDialog(
-        Shell parentShell, NodeKindFilter filter) {
-      super(parentShell, filter);
+        Shell parentShell, NodeKindFilter filter,
+        DependencyModel model, IProject project) {
+      super(parentShell, filter, model, project);
     }
 
     @Override
     protected Control createDialogArea(Composite parent) {
-      NodeKindFilterEditorControl editor =
-          new NodeKindFilterEditorControl(parent);
-      editor.setInput(getFilter());
+      editor = new NodeKindFilterEditorControl(parent);
+      editor.setInput(getFilter(), getModel(), getProject());
       return editor;
     }
 

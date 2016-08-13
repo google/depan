@@ -16,47 +16,61 @@
 
 package com.google.devtools.depan.relations.eclipse.ui.widgets;
 
-import com.google.devtools.depan.graph.api.RelationSet;
+import com.google.devtools.depan.persistence.AbstractDocXmlPersist;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.GenericSaveLoadControl;
+import com.google.devtools.depan.platform.eclipse.ui.widgets.SaveLoadConfig;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
+import com.google.devtools.depan.relations.models.RelationSetResources;
 import com.google.devtools.depan.relations.persistence.RelationSetDescriptorXmlPersist;
+import com.google.devtools.depan.resources.ResourceContainer;
 
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.FileDialog;
-
-import java.net.URI;
 
 /**
- * Control for saving and loading {@link RelationSet}s.
+ * Control for saving and loading {@code RelationSet} documents
+ * (a.k.a {@link RelationSetDescriptor}s).  The class defines the type-specific
+ * strings and factories for the supplied generic type
+ * {@link RelationSetDescriptor}.
  * 
- * This provides the right set of document extensions.
- * Concrete types still need to add {@link #getSaveWizard()} and
- * {@link #loadURI(URI)} implementations.
- *
  * @author ycoppel@google.com (Yohann Coppel)
  */
 public abstract class RelationSetSaveLoadControl
-    extends GenericSaveLoadControl {
-
-  public RelationSetSaveLoadControl(
-      Composite parent, String saveLabel, String loadLabel) {
-    super(parent, saveLabel, loadLabel);
-  }
+    extends GenericSaveLoadControl<RelationSetDescriptor> {
 
   public RelationSetSaveLoadControl(Composite parent) {
-    super(parent, "Save as RelationSet...", "Load from RelationSet...");
+    super(parent, CONFIG);
   }
 
-  @Override
-  protected void prepareLoadDialog(FileDialog dialog) {
-    dialog.setFilterExtensions(new String[] {RelationSetDescriptor.EXTENSION});
-  }
+  private static SaveLoadConfig<RelationSetDescriptor> CONFIG =
+      new ControlSaveLoadConfig();
 
-  /**
-   * Utility method for derived types to use when implementing
-   * {@link #loadURI(URI)}.
-   */
-  protected RelationSetDescriptor loadRelationSetDescr(URI uri) {
-    return RelationSetDescriptorXmlPersist.build(true).load(uri);
+  private static class ControlSaveLoadConfig
+      extends SaveLoadConfig<RelationSetDescriptor> {
+
+    @Override
+    public ResourceContainer getContainer() {
+      return RelationSetResources.getContainer();
+    }
+
+    @Override
+    public AbstractDocXmlPersist<RelationSetDescriptor> getDocXmlPersist(
+        boolean readable) {
+      return RelationSetDescriptorXmlPersist.build(readable);
+    }
+
+    @Override
+    public String getSaveLabel() {
+      return "Save as RelationSet...";
+    }
+
+    @Override
+    public String getLoadLabel() {
+      return "Load from RelationSet...";
+    }
+
+    @Override
+    public String getExension() {
+      return RelationSetDescriptor.EXTENSION;
+    }
   }
 }

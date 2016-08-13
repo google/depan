@@ -9,10 +9,10 @@ import java.net.URI;
 import java.text.MessageFormat;
 
 /**
+ * Provide easy to use load and save methods for {@link ViewDocument}s.
  * Do all the type coercions cleanly.
  * 
  * @author Lee Carver
- *
  */
 public class ViewDocXmlPersist extends AbstractDocXmlPersist<ViewDocument> {
 

@@ -18,21 +18,33 @@ package com.google.devtools.depan.nodes.filters.eclipse.ui.filters;
 
 import com.google.devtools.depan.analysis_doc.model.ModelAnalysisDocument;
 import com.google.devtools.depan.analysis_doc.model.ModelMatcher;
-import com.google.devtools.depan.nodes.filters.model.ContextualFilter;
+import com.google.devtools.depan.graph_doc.model.DependencyModel;
+import com.google.devtools.depan.model.Element;
+
+import java.util.Collection;
 
 /**
- * Define the persistent data for saving {@link ContextualFilter}
- * as resources.
+ * Document type for named resources with collections of {@link Element} types.
+ * 
+ * @since 2016 Based on legacy {@code RelationshipSet}.
  * 
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public class ContextualFilterDocument
-    extends ModelAnalysisDocument<ContextualFilter>{
+public class NodeKindDocument
+    extends ModelAnalysisDocument<Collection<Class<? extends Element>>>{
 
-  public static final String EXTENSION = "cfxml";
+  /**
+   * Preferred file extension for documents.
+   */
+  public static final String EXTENSION = "nkxml";
 
-  public ContextualFilterDocument(
-      ModelMatcher matcher, ContextualFilter info) {
-    super(info.getName(), matcher, info);
+  public NodeKindDocument(
+      String name, DependencyModel model, Collection<Class<? extends Element>> info) {
+    super(name, model, info);
+  }
+
+  public NodeKindDocument(
+      String name, ModelMatcher matcher, Collection<Class<? extends Element>> info) {
+    super(name, matcher, info);
   }
 }

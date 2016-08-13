@@ -23,13 +23,15 @@ import com.google.devtools.depan.nodes.filters.eclipse.ui.widgets.FilterEditorDi
 import com.google.devtools.depan.nodes.filters.model.ContextualFilter;
 import com.google.devtools.depan.nodes.filters.sequence.EdgeMatcherFilter;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
-import java.text.MessageFormat;
-
 /**
+ * Provides labels, {@link Form}s, factories, and dialog editors
+ * for {@link EdgeMatcherFilter}s.
+ * 
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
 public class EdgeMatcherContribution
@@ -60,34 +62,30 @@ public class EdgeMatcherContribution
 
   @Override
   public FilterEditorDialog<EdgeMatcherFilter> buildEditorDialog(
-      Shell shell, ContextualFilter filter, DependencyModel model) {
+      Shell shell, ContextualFilter filter,
+      DependencyModel model, IProject project) {
     if (handlesFilterInstance(filter)) {
       return new ContributionEditorDialog(
-          shell, (EdgeMatcherFilter) filter, model);
+          shell, (EdgeMatcherFilter) filter, model, project);
     }
-    String msg = MessageFormat.format(
-        "Filter {0} is not assignable as a {1} type.",
-        filter.getName(), EdgeMatcherFilter.class.getName());
-    throw new IllegalArgumentException(msg);
+    throw buildNotAssignable(filter, EdgeMatcherFilter.class);
   }
 
   private static class ContributionEditorDialog
       extends FilterEditorDialog<EdgeMatcherFilter> {
 
-    private final DependencyModel model;
-
     private EdgeMatcherFilterEditorControl editor;
 
     protected ContributionEditorDialog(
-        Shell parentShell, EdgeMatcherFilter filter, DependencyModel model) {
-      super(parentShell, filter);
-      this.model = model;
+        Shell parentShell, EdgeMatcherFilter filter,
+        DependencyModel model, IProject project) {
+      super(parentShell, filter, model, project);
     }
 
     @Override
     protected Control createDialogArea(Composite parent) {
       editor = new EdgeMatcherFilterEditorControl(parent);
-      editor.setInput(getFilter(), model);
+      editor.setInput(getFilter(), getModel(), getProject());
       return editor;
     }
 

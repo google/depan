@@ -16,104 +16,185 @@
 
 package com.google.devtools.depan.platform.eclipse.ui.widgets;
 
-import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.jface.wizard.WizardDialog;
+import com.google.devtools.depan.persistence.AbstractDocXmlPersist;
+import com.google.devtools.depan.platform.PlatformLogger;
+import com.google.devtools.depan.platform.WorkspaceTools;
+import com.google.devtools.depan.resource_doc.eclipse.ui.persistence.LoadResourceDialog;
+import com.google.devtools.depan.resource_doc.eclipse.ui.persistence.SaveResourceDialog;
+import com.google.devtools.depan.resources.PropertyDocument;
+
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Shell;
 
-import java.io.File;
-import java.net.URI;
+import java.text.MessageFormat;
 
 /**
  * Control for saving and loading many types of documents.
+ * 
+ * Provides a space-filling pair of buttons, one for save and one for load.
+ * The {@link SaveLoadConfig} instance provides type-specific UX elements
+ * and serialization capabilities.
  *
  * @author ycoppel@google.com (Yohann Coppel)
+ * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public abstract class GenericSaveLoadControl extends Composite {
+public abstract class GenericSaveLoadControl<T extends PropertyDocument<?>>
+    extends Composite {
 
-  public GenericSaveLoadControl(
-      Composite parent, String saveLabel, String loadLabel) {
+  private SaveLoadConfig<T> config;
+
+  public GenericSaveLoadControl(Composite parent, SaveLoadConfig<T> config) {
     super(parent, SWT.NONE);
     setLayout(Widgets.buildContainerLayout(2));
 
-    Button saveButton = new Button(this, SWT.PUSH);
-    saveButton.setText(saveLabel);
-    saveButton.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false));
+    this.config = config; 
+
+    Button saveButton = Widgets.buildGridPushButton(
+        this, config.getSaveLabel());
 
     saveButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
-        saveSelection();
+        handleSave();
       }
     });
 
-    Button loadButton = new Button(this, SWT.PUSH);
-    loadButton.setText(loadLabel);
-    loadButton.setLayoutData(
-        new GridData(SWT.FILL, SWT.FILL, true, false));
+    Button loadButton = Widgets.buildGridPushButton(
+        this, config.getLoadLabel());
 
     loadButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
-        loadSelection();
+        handleLoad();
       }
     });
   }
 
   /**
-   * Open a dialog to save the current selection under a new name.
+   * Open a dialog to save a resource.
    */
-  private void saveSelection() {
+  private void handleSave() {
 
-    Wizard wizard = getSaveWizard();
-
-    Shell shell = getShell();
-    WizardDialog dialog = new WizardDialog(shell, wizard);
-    dialog.open();
+    T rsrc = buildSaveResource();
+    IFile saveFile = getSaveAsFile(rsrc.getName());
+    if (null == saveFile) {
+      return;
+    }
+    AbstractDocXmlPersist<T> persist = config.getDocXmlPersist(false);
+    persist.save(saveFile.getLocationURI(), rsrc);
   }
 
-  private void loadSelection() {
-    Shell shell = getShell();
-    FileDialog dialog = new FileDialog(shell, SWT.OPEN);
-    prepareLoadDialog(dialog);
-    String visFilename = dialog.open();
-    if (null == visFilename) {
+  /**
+   * Open a dialog to load a resource.
+   */
+  private void handleLoad() {
+    IFile loadFile = getLoadFromFile();
+    if (null == loadFile) {
       return;
     }
 
-    loadURI(new File(visFilename).toURI());
+    AbstractDocXmlPersist<T> persist = config.getDocXmlPersist(false);
+    T doc = persist.load(loadFile.getRawLocationURI());
+    installLoadResource(doc);
   }
 
   /////////////////////////////////////
-  // Hook methods
+  // SaveAs support
+
+  private IFile getSaveAsFile(String rsrcName) {
+    IFile saveAs = guessSaveAsFile(rsrcName);
+    SaveResourceDialog saveDlg = new SaveResourceDialog(getShell());
+    saveDlg.setInput(saveAs);
+    if (saveDlg.open() != SaveResourceDialog.OK) {
+      return null;
+    }
+
+    // get the file relatively to the workspace.
+    try {
+      return WorkspaceTools.calcFileWithExt(
+          saveDlg.getResult(), config.getExension());
+    } catch (CoreException errCore) {
+      String msg = MessageFormat.format(
+          "Error saving resource to {0}", saveAs);
+      PlatformLogger.logException(msg, errCore);
+    }
+    return null;
+  }
+
+  protected IFile guessSaveAsFile(String rsrcName) {
+    IPath namePath = Path.fromOSString(rsrcName);
+    namePath.addFileExtension(config.getExension());
+
+    IPath treePath = config.getContainer().getPath();
+    IPath destPath = treePath.append(namePath);
+
+    IProject proj = getProject();
+    return proj.getFile(destPath);
+  }
+
+  /////////////////////////////////////
+  // LoadFrom support
 
   /**
-   * Prepare the supplied {@link FileDialog} for the 
-   * @param dialog
+   * Get container and file name from user, with good handling for defaults.
    */
-  protected abstract void prepareLoadDialog(FileDialog dialog);
+  private IFile getLoadFromFile() {
+    IContainer rsrcRoot = guessResourceRoot();
+
+    LoadResourceDialog loadDlg = new LoadResourceDialog(getShell());
+    loadDlg.setInput(rsrcRoot, config.getExension());
+    if (loadDlg.open() != SaveResourceDialog.OK) {
+      return null;
+    }
+
+    // get the file relatively to the workspace.
+    try {
+      return WorkspaceTools.calcFileWithExt(
+          loadDlg.getResult(), config.getExension());
+    } catch (CoreException errCore) {
+      String msg = MessageFormat.format(
+          "Error loading resource from {0}", rsrcRoot);
+      PlatformLogger.logException(msg, errCore);
+    }
+    return null;
+  }
 
   /**
-   * Provide a {@link Wizard} suitable for saving the document.
+   * Infer the expected container for filter resources.
    * 
-   * Typically, the document to save is obtained at via some reference
-   * in the concrete derived types, and embedded in the 
-   * returned {@link Wizard}.
+   * The resulting file follow the naming conventions for project resources.
+   *   [ViewDoc-Project][Resource-Type-Path][Resource-Name]
+   * 
+   * The user will be able to edit this result before a storage action is
+   * performed.
    */
-  protected abstract Wizard getSaveWizard();
+  private IContainer guessResourceRoot() {
+    IPath treePath = config.getContainer().getPath();
+    return getProject().getFolder(treePath);
+  }
+
+  /////////////////////////////////////
+  // Hook methods for button actions
+
+  protected abstract IProject getProject();
 
   /**
-   * Load the document identified by the supplied {@link URI}.
-   * 
-   * Typically, the document is saved via some reference in the concrete
-   * derived type.
+   * Provide a document to save,
+   * based on the current state of the editor's controls.
    */
-  protected abstract void loadURI(URI uri);
+  protected abstract T buildSaveResource();
+
+  /**
+   * Configure the editor's controls, based on the supplied document.
+   */
+  protected abstract void installLoadResource(T doc);
 }

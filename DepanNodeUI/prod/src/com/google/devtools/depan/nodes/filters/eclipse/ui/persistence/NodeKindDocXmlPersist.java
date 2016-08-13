@@ -1,5 +1,5 @@
 /*
- * Copyright 2009 The Depan Project Authors
+ * Copyright 2016 The Depan Project Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.matchers.persistence;
+package com.google.devtools.depan.nodes.filters.eclipse.ui.persistence;
 
-import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
+import com.google.devtools.depan.nodes.filters.eclipse.ui.filters.NodeKindDocument;
 import com.google.devtools.depan.persistence.AbstractDocXmlPersist;
 import com.google.devtools.depan.persistence.ObjectXmlPersist;
 import com.google.devtools.depan.persistence.XStreamFactory;
@@ -25,40 +25,40 @@ import java.net.URI;
 
 /**
  * Provide easy to use load and save methods for
- * {@link GraphEdgeMatcherDescriptor}s.
+ * {@link NodeKindDocument}s.
  * 
  * @author <a href="mailto:leeca@google.com">Lee Carver</a>
  */
-public class EdgeMatcherDocXmlPersist
-    extends AbstractDocXmlPersist<GraphEdgeMatcherDescriptor> {
+public class NodeKindDocXmlPersist
+    extends AbstractDocXmlPersist<NodeKindDocument> {
 
-  private final static EdgeMatcherDocXStreamConfig docConfig =
-      new EdgeMatcherDocXStreamConfig();
+  private final static NodeKindDocXStreamConfig docConfig =
+      new NodeKindDocXStreamConfig();
 
-  public EdgeMatcherDocXmlPersist(ObjectXmlPersist xmlPersist) {
+  public NodeKindDocXmlPersist(ObjectXmlPersist xmlPersist) {
     super(xmlPersist);
   }
 
-  public static EdgeMatcherDocXmlPersist build(boolean readable) {
+  public static NodeKindDocXmlPersist build(boolean readable) {
     ObjectXmlPersist persist = XStreamFactory.build(readable, docConfig);
-    return new EdgeMatcherDocXmlPersist(persist);
+    return new NodeKindDocXmlPersist(persist);
   }
 
   /////////////////////////////////////
   // Hook method implementations for AbstractDocXmlPersist
 
   @Override
-  protected GraphEdgeMatcherDescriptor coerceLoad(Object load) {
-      return (GraphEdgeMatcherDescriptor) load;
+  protected NodeKindDocument coerceLoad(Object load) {
+      return (NodeKindDocument) load;
   }
 
   @Override
   protected String logLoadException(URI uri, Exception err) {
-    return logException("Unable to load EdgeMatcher from {0}", uri, err);
+    return logException("Unable to load NodeKind from {0}", uri, err);
   }
 
   @Override
   public String logSaveException(URI uri, Exception err) {
-    return logException("Unable to save EdgeMatcher to {0}", uri, err);
+    return logException("Unable to save NodeKind to {0}", uri, err);
   }
 }

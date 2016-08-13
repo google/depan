@@ -18,35 +18,30 @@ package com.google.devtools.depan.nodes.filters.eclipse.ui.widgets;
 
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.registry.RelationRegistry;
-import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.matchers.eclipse.ui.widgets.EdgeMatcherEditorControl;
 import com.google.devtools.depan.matchers.eclipse.ui.widgets.EdgeMatcherSaveLoadControl;
-import com.google.devtools.depan.matchers.eclipse.ui.wizards.NewEdgeMatcherWizard;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphEdgeMatcher;
 import com.google.devtools.depan.nodes.filters.sequence.EdgeMatcherFilter;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 
-import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.swt.widgets.Composite;
 
-import java.net.URI;
 import java.text.MessageFormat;
 import java.util.Collection;
 
 /**
+ * Enhances {@link EdgeMatcherFilter} editing with a
+ * {@link EdgeMatcherEditorControl}.
+ * 
+ * Includes save-load support for the embedded {@link GraphEdgeMatcher}
+ * (e.g. {@link GraphEdgeMatcherDescriptor}).
+ * 
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
 public class EdgeMatcherFilterEditorControl
     extends FilterEditorControl<EdgeMatcherFilter> {
-
-  /**
-   * {@link EdgeMatcherFilter} definition that is being edited.
-   */
-  @SuppressWarnings("unused") // It's likely to be used in the future.
-  private EdgeMatcherFilter editFilter;
-
-  private DependencyModel model;
 
   /////////////////////////////////////
   // UX Elements
@@ -58,30 +53,31 @@ public class EdgeMatcherFilterEditorControl
 
   public EdgeMatcherFilterEditorControl(Composite parent) {
     super(parent);
-
-    Composite matchEditor = setupEdgeMatcherEditor(this);
-    matchEditor.setLayoutData(Widgets.buildGrabFillData());
-  }
-
-  public void setInput(EdgeMatcherFilter editFilter, DependencyModel model) {
-    this.editFilter = editFilter;
-    this.model = model;
-
-    basicControl.setInput(editFilter);
-
-    Collection<Relation> projectRelations = 
-        RelationRegistry.getRegistryRelations(model.getRelationContribs());
-    edgeMatcherEditor.updateTable(projectRelations);
-    edgeMatcherEditor.updateEdgeMatcher(editFilter.getEdgeMatcher());
   }
 
   @Override
   public EdgeMatcherFilter buildFilter() {
     GraphEdgeMatcher matcher = edgeMatcherEditor.buildEdgeMatcher();
     EdgeMatcherFilter result = new EdgeMatcherFilter(matcher);
-    result.setName(basicControl.getFilterName());
-    result.setSummary(basicControl.getFilterSummary());
+    updateBasicFields(result);
     return result;
+  }
+
+  /////////////////////////////////////
+  // Control management
+
+  @Override
+  protected void setupControls(Composite parent) {
+    Composite matchEditor = setupEdgeMatcherEditor(this);
+    matchEditor.setLayoutData(Widgets.buildGrabFillData());
+  }
+
+  @Override
+  protected void updateControls() {
+    Collection<Relation> projectRelations =
+        RelationRegistry.getRegistryRelations(getModel().getRelationContribs());
+    edgeMatcherEditor.updateTable(projectRelations);
+    edgeMatcherEditor.updateEdgeMatcher(getFilter().getEdgeMatcher());
   }
 
   /////////////////////////////////////
@@ -111,19 +107,21 @@ public class EdgeMatcherFilterEditorControl
     }
 
     @Override
-    protected Wizard getSaveWizard() {
-      GraphEdgeMatcher matcher = edgeMatcherEditor.buildEdgeMatcher();
-      String label = MessageFormat.format(
-          "{0} filter", basicControl.getFilterName());
-      GraphEdgeMatcherDescriptor target =
-          new GraphEdgeMatcherDescriptor(label, model, matcher);
-      return new NewEdgeMatcherWizard(target);
+    protected IProject getProject() {
+      return EdgeMatcherFilterEditorControl.this.getProject();
     }
 
     @Override
-    protected void loadURI(URI uri) {
-      GraphEdgeMatcherDescriptor loadMatcher = loadEdgeMatcherDoc(uri);
-      edgeMatcherEditor.updateEdgeMatcher(loadMatcher.getInfo());
+    protected GraphEdgeMatcherDescriptor buildSaveResource() {
+      EdgeMatcherFilter filter = buildFilter();
+      String label = MessageFormat.format( "{0} filter", filter.getName());
+      return new GraphEdgeMatcherDescriptor(
+          label, getModel(), filter.getEdgeMatcher());
+    }
+
+    @Override
+    protected void installLoadResource(GraphEdgeMatcherDescriptor doc) {
+      edgeMatcherEditor.updateEdgeMatcher(doc.getInfo());
     }
   }
 }

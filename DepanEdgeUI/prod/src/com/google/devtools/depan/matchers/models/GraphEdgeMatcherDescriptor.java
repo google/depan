@@ -22,7 +22,7 @@ import com.google.devtools.depan.graph.api.EdgeMatcher;
 import com.google.devtools.depan.graph_doc.model.DependencyModel;
 
 /**
- * Document type for named {@link EdgeMatcher}s.
+ * Document type for named {@link EdgeMatcher} resources.
  * 
  * @since 2015 Based on legacy {@code RelationshipSet}.
  *

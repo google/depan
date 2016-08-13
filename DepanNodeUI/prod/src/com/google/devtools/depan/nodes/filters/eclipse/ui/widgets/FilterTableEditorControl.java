@@ -16,7 +16,6 @@
 
 package com.google.devtools.depan.nodes.filters.eclipse.ui.widgets;
 
-import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.nodes.filters.eclipse.ui.plugins.ContextualFilterContributor;
 import com.google.devtools.depan.nodes.filters.eclipse.ui.plugins.ContextualFilterContributors;
 import com.google.devtools.depan.nodes.filters.eclipse.ui.plugins.ContextualFilterRegistry;
@@ -34,21 +33,18 @@ import org.eclipse.swt.widgets.Composite;
 import java.util.List;
 
 /**
- * Show a table of {@link ContextualFilter}, suitable for editing.
+ * Enhances {@link SteppingFilter} editing with a
+ * {@link FilterTableControl}.
  * 
- * This class could be named equivalently as {@code SteppingFilterEditorControl}.
+ * Show a table of {@link ContextualFilter}s, suitable for editing.
+ * 
+ * This class could be named equivalently as
+ * {@code SteppingFilterEditorControl}.
  * 
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
 public class FilterTableEditorControl
     extends FilterEditorControl<SteppingFilter> {
-
-  /**
-   * {@link SteppingFilter} that is being edited.
-   */
-  private SteppingFilter editFilter;
-
-  private DependencyModel model;
 
   /////////////////////////////////////
   // UX Elements
@@ -62,37 +58,23 @@ public class FilterTableEditorControl
 
   public FilterTableEditorControl(Composite parent) {
     super(parent);
+  }
 
+  /////////////////////////////////////
+  // Control management
+
+  @Override
+  protected void updateControls() {
+    filterControl.setInput(getFilter().getSteps());
+  }
+
+  @Override
+  protected void setupControls(Composite parent) {
     filterControl = new FilterTableControl(this);
     filterControl.setLayoutData(Widgets.buildGrabFillData());
 
     Composite commands = setupCommandButtons(this);
     commands.setLayoutData(Widgets.buildHorzFillData());
-  }
-
-  /**
-   * The supplied {@link #editFilter} is modified in place.
-   * However, use the {@link #buildFilter()} method to ensure
-   * all updates have been applied.
-   */
-  public void setInput(SteppingFilter editFilter, DependencyModel model) {
-    this.editFilter = editFilter;
-    this.model = model;
-
-    updateControls();
-  }
-
-  /**
-   * Provide the current state of the {@link #editFilter}, with all
-   * pending user interface changes applied. 
-   */
-  @Override
-  public SteppingFilter buildFilter() {
-    // The updateSteps() method incrementally handles step changes
-    // to the editFilter.  No need to update via setSteps() again.
-    editFilter.setName(basicControl.getFilterName());
-    editFilter.setSummary(basicControl.getFilterSummary());
-    return editFilter;
   }
 
   /////////////////////////////////////
@@ -180,7 +162,7 @@ public class FilterTableEditorControl
   // Editor actions
 
   private void addNewFilter() {
-    if (null == editFilter) {
+    if (null == getFilter()) {
       return;
     }
     ContextualFilterContributor<? extends ContextualFilter> contrib =
@@ -195,7 +177,7 @@ public class FilterTableEditorControl
   }
 
   private void wrapFilter() {
-    if (null == editFilter) {
+    if (null == getFilter()) {
       return;
     }
     ContextualFilterContributor<? extends ContextualFilter> contrib =
@@ -213,10 +195,11 @@ public class FilterTableEditorControl
   }
 
   private void editFilter() {
-    if (null == editFilter) {
+    SteppingFilter steps = getFilter();
+    if (null == steps) {
       return;
     }
-    List<ContextualFilter> result = editFilter.getSteps();
+    List<ContextualFilter> result = steps.getSteps();
     List<ContextualFilter> target = filterControl.getSelectedFilters();
     if (target.isEmpty()) {
       return;
@@ -232,20 +215,22 @@ public class FilterTableEditorControl
   }
 
   private void removeFilter() {
-    if (null == editFilter) {
+    SteppingFilter steps = getFilter();
+    if (null == steps) {
       return;
     }
-    List<ContextualFilter> result = editFilter.getSteps();
+    List<ContextualFilter> result = steps.getSteps();
     List<ContextualFilter> target = filterControl.getSelectedFilters();
     result.removeAll(target);
     updateSteps(result);
   }
 
   private void moveFilterUp() {
-    if (null == editFilter) {
+    SteppingFilter steps = getFilter();
+    if (null == steps) {
       return;
     }
-    List<ContextualFilter> result = editFilter.getSteps();
+    List<ContextualFilter> result = steps.getSteps();
     List<ContextualFilter> target = filterControl.getSelectedFilters();
     if (target.isEmpty()) {
       return;
@@ -262,10 +247,11 @@ public class FilterTableEditorControl
   }
 
   private void moveFilterDown() {
-    if (null == editFilter) {
+    SteppingFilter steps = getFilter();
+    if (null == steps) {
       return;
     }
-    List<ContextualFilter> result = editFilter.getSteps();
+    List<ContextualFilter> result = steps.getSteps();
     List<ContextualFilter> target = filterControl.getSelectedFilters();
     if (target.isEmpty()) {
       return;
@@ -296,7 +282,7 @@ public class FilterTableEditorControl
     }
 
     FilterEditorDialog<?> dialog =
-        contrib.buildEditorDialog(getShell(), filter, model);
+        contrib.buildEditorDialog(getShell(), filter, getModel(), getProject());
     if (null == dialog) {
       return null;
     }
@@ -311,7 +297,7 @@ public class FilterTableEditorControl
    * @return 
    */
   private List<ContextualFilter> appendStep(ContextualFilter step) {
-    List<ContextualFilter> result = editFilter.getSteps();
+    List<ContextualFilter> result = getFilter().getSteps();
     result.add(step);
     return result;
   }
@@ -320,17 +306,10 @@ public class FilterTableEditorControl
    * Only the "steps"-subset of our setInput() method.
    */
   private void updateSteps(List<ContextualFilter> steps) {
-    editFilter.setSteps(steps);
+    SteppingFilter filter = getFilter();
+    filter.setSteps(steps);
 
     // No need to update name or summary.
-    filterControl.setInput(editFilter.getSteps());
-  }
-
-  /**
-   * Update the controls to the current status of the edit filter.
-   */
-  private void updateControls() {
-    basicControl.setInput(editFilter);
-    filterControl.setInput(editFilter.getSteps());
+    filterControl.setInput(filter.getSteps());
   }
 }

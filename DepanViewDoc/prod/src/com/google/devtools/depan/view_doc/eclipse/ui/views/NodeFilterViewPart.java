@@ -411,13 +411,14 @@ public class NodeFilterViewPart extends AbstractViewDocViewPart {
     ContextualFilterDocument result = persist.load(loadFile.getRawLocationURI());
     DependencyModel model = result.getModel();
     ContextualFilter filter = result.getInfo();
+    IProject project = getEditor().getResourceProject();
     if (filter instanceof SteppingFilter) {
-      filterControl.setInput((SteppingFilter) filter, model);
+      filterControl.setInput((SteppingFilter) filter, model, project);
     } else {
       String name = MessageFormat.format("Wrapped {0}", filter.getName());
       String summary = MessageFormat.format("From {0}", filter.getSummary());
       SteppingFilter synth = new SteppingFilter(name, summary);
-      filterControl.setInput(synth, model);
+      filterControl.setInput(synth, model, project);
     }
   }
 
@@ -518,9 +519,10 @@ public class NodeFilterViewPart extends AbstractViewDocViewPart {
   protected void acquireResources() {
 
     ViewEditor editor = getEditor();
-
     filterControl.setInput(
-        editor.getActiveNodeFilter(), editor.getDependencyModel());
+        editor.getActiveNodeFilter(),
+        editor.getDependencyModel(),
+        editor.getResourceProject());
 
     refreshSources();
 

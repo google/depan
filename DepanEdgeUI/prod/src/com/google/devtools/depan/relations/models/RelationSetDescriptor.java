@@ -28,9 +28,7 @@ import com.google.common.collect.Sets;
 import java.util.Set;
 
 /**
- * Adds a name to a {@link RelationSet}.
- * 
- * This is a persistable document type.
+ * Document type for named {@link RelationSet} resources.
  * 
  * @since Jun-2016 Contains a RelationSet, but isn't one.  This encourages
  *  clean handling as a document type.

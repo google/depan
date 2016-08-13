@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.matchers.eclipse.ui.widgets;
+package com.google.devtools.depan.nodes.filters.eclipse.ui.widgets;
 
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.matchers.models.MatcherResources;
-import com.google.devtools.depan.matchers.persistence.EdgeMatcherDocXmlPersist;
+import com.google.devtools.depan.nodes.filters.eclipse.ui.filters.NodeKindDocument;
+import com.google.devtools.depan.nodes.filters.eclipse.ui.persistence.NodeKindDocXmlPersist;
 import com.google.devtools.depan.persistence.AbstractDocXmlPersist;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.GenericSaveLoadControl;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.SaveLoadConfig;
@@ -26,27 +27,30 @@ import com.google.devtools.depan.resources.ResourceContainer;
 
 import org.eclipse.swt.widgets.Composite;
 
+import java.net.URI;
+
 /**
  * Control for saving and loading {@link GraphEdgeMatcherDescriptor}s
- * (a.k.a. {@code EdgeMatcherDocument}).  The class defines the type-specific
- * strings and factories for the supplied generic type
- * {@link GraphEdgeMatcherDescriptor}.
+ * (a.k.a. {@code EdgeMatcherDocument}).
+ * 
+ * This provides the right set of document extensions.
+ * Concrete types still need to add {@link #getSaveWizard()} and
+ * {@link #loadURI(URI)} implementations.
  *
  * @author ycoppel@google.com (Yohann Coppel)
  */
-public abstract class EdgeMatcherSaveLoadControl
-    extends GenericSaveLoadControl<GraphEdgeMatcherDescriptor> {
+public abstract class NodeKindSaveLoadControl
+    extends GenericSaveLoadControl<NodeKindDocument> {
 
-  public EdgeMatcherSaveLoadControl(Composite parent) {
+  public NodeKindSaveLoadControl(Composite parent) {
     super(parent, CONFIG);
   }
 
-  // Only need one.
-  private static SaveLoadConfig<GraphEdgeMatcherDescriptor> CONFIG =
+  private static SaveLoadConfig<NodeKindDocument> CONFIG =
       new ControlSaveLoadConfig();
 
   private static class ControlSaveLoadConfig
-      extends SaveLoadConfig<GraphEdgeMatcherDescriptor> {
+      extends SaveLoadConfig<NodeKindDocument> {
 
     @Override
     public ResourceContainer getContainer() {
@@ -54,19 +58,19 @@ public abstract class EdgeMatcherSaveLoadControl
     }
 
     @Override
-    public AbstractDocXmlPersist<GraphEdgeMatcherDescriptor> getDocXmlPersist(
+    public AbstractDocXmlPersist<NodeKindDocument> getDocXmlPersist(
         boolean readable) {
-      return EdgeMatcherDocXmlPersist.build(readable);
+      return NodeKindDocXmlPersist.build(readable);
     }
 
     @Override
     public String getSaveLabel() {
-      return "Save as EdgeMatcher...";
+      return "Save as NodeKinds...";
     }
 
     @Override
     public String getLoadLabel() {
-      return "Load from EdgeMatcher...";
+      return "Load from NodeKinds...";
     }
 
     @Override

@@ -84,6 +84,7 @@ import edu.uci.ics.jung.graph.DirectedGraph;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -371,6 +372,15 @@ public class ViewEditor extends MultiPageEditorPart {
 
   /////////////////////////////////////
   // Basic Getters and Setters
+
+  /**
+   * Provide the project to use for saving resource associated with this
+   * instance.  Under normal circumstances, it's the same project that contains
+   * the underlying view document.
+   */
+  public IProject getResourceProject() {
+    return getInputFile().getProject();
+  }
 
   public GraphModel getViewGraph() {
     return viewGraph;

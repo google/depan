@@ -16,8 +16,10 @@
 
 package com.google.devtools.depan.nodes.filters.eclipse.ui.widgets;
 
+import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.nodes.filters.model.ContextualFilter;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.widgets.Shell;
 
@@ -28,20 +30,28 @@ public abstract class FilterEditorDialog<T extends ContextualFilter>
     extends Dialog {
 
   private final T filter;
+
+  private final DependencyModel model;
+
+  private final IProject project;
+
   private T result;
 
   /**
    * @param parentShell
    */
-  protected FilterEditorDialog(Shell parentShell, T filter) {
+  protected FilterEditorDialog(
+      Shell parentShell, T filter, DependencyModel model, IProject project) {
     super(parentShell);
     this.filter = filter;
+    this.model = model;
+    this.project = project;
   }
 
   @Override
   protected boolean isResizable() {
     return true;
-  };
+  }
 
   @Override
   protected void okPressed() {
@@ -55,6 +65,14 @@ public abstract class FilterEditorDialog<T extends ContextualFilter>
 
   protected T getFilter() {
     return filter;
+  }
+
+  protected DependencyModel getModel() {
+    return model;
+  }
+
+  protected IProject getProject() {
+    return project;
   }
 
   protected abstract T buildFilter();

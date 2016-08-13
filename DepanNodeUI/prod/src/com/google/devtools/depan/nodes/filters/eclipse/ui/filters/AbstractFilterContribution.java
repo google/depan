@@ -31,30 +31,22 @@ public abstract class AbstractFilterContribution<T extends ContextualFilter>
 
   @Override
   public T createElementFilter() {
-    String msg = MessageFormat.format(
-        "No element factory defined for {0}", getLabel());
-    throw new UnsupportedOperationException(msg);
+    throw buildUnsupported("element");
   }
 
   @Override
   public T createWrapperFilter(ContextualFilter filter) {
-    String msg = MessageFormat.format(
-        "No wrapper factory defined {0}", getLabel());
-    throw new UnsupportedOperationException(msg);
+    throw buildUnsupported("wrapper");
   }
 
   @Override
   public T createGroupFilter(Collection<ContextualFilter> filters) {
-    String msg = MessageFormat.format(
-        "No group factory defined for {0}", getLabel());
-    throw new UnsupportedOperationException(msg);
+    throw buildUnsupported("group");
   }
 
   @Override
   public T createStepsFilter(List<ContextualFilter> filters) {
-    String msg = MessageFormat.format(
-        "No group factory defined for {0}", getLabel());
-    throw new UnsupportedOperationException(msg);
+    throw buildUnsupported("steps");
   }
 
   /////////////////////////////////////
@@ -62,5 +54,19 @@ public abstract class AbstractFilterContribution<T extends ContextualFilter>
 
   protected boolean isAssignableAs(ContextualFilter filter, Class<?> type) {
     return filter.getClass().isAssignableFrom(type);
+  }
+
+  protected IllegalArgumentException buildUnsupported(String kind) {
+    String msg = MessageFormat.format(
+        "No {0} factory defined for {1}", kind, getLabel());
+    throw new UnsupportedOperationException(msg);
+  }
+
+  protected IllegalArgumentException buildNotAssignable(
+      ContextualFilter filter, Class<?> type) {
+    String msg = MessageFormat.format(
+        "Filter {0} is not assignable as a {1} type.",
+        filter.getName(), type.getName());
+    return new IllegalArgumentException(msg);
   }
 }

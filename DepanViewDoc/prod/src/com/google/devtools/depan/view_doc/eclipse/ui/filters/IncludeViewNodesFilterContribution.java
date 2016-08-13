@@ -18,12 +18,18 @@ package com.google.devtools.depan.view_doc.eclipse.ui.filters;
 
 import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.nodes.filters.eclipse.ui.filters.DefaultingFilterContribution;
+import com.google.devtools.depan.nodes.filters.eclipse.ui.plugins.ContextualFilterContributor.Form;
 import com.google.devtools.depan.nodes.filters.eclipse.ui.widgets.FilterEditorDialog;
+import com.google.devtools.depan.nodes.filters.eclipse.ui.widgets.SimpleFilterEditorDialog;
 import com.google.devtools.depan.nodes.filters.model.ContextualFilter;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.swt.widgets.Shell;
 
 /**
+ * Provides labels, {@link Form}s, factories, and dialog editors
+ * for in-view {@link ViewNodesFilter}s.
+ * 
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
 public class IncludeViewNodesFilterContribution
@@ -55,8 +61,12 @@ public class IncludeViewNodesFilterContribution
 
   @Override
   public FilterEditorDialog<ViewNodesFilter> buildEditorDialog(
-      Shell shell, ContextualFilter filter, DependencyModel model) {
-    // Nothing to edit
-    return null;
+      Shell shell, ContextualFilter filter,
+      DependencyModel model, IProject project) {
+    if (handlesFilterInstance(filter)) {
+      return new SimpleFilterEditorDialog<ViewNodesFilter>(
+          shell, (ViewNodesFilter) filter, model, project);
+    }
+    throw buildNotAssignable(filter, ViewNodesFilter.class);
   }
 }

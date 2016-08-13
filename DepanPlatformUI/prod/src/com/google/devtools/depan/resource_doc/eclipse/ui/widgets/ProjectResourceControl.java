@@ -46,7 +46,6 @@ import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.part.DrillDownComposite;
 
-import java.io.File;
 import java.text.MessageFormat;
 
 /**
@@ -111,7 +110,6 @@ public class ProjectResourceControl extends Composite {
 
     validateInputs();
   }
-
 
   public String getContainerName() {
     return containerText.getText();
@@ -273,7 +271,7 @@ public class ProjectResourceControl extends Composite {
   }
 
   private static class ControlContentProvider extends WorkbenchContentProvider {
-    
+
     private final IProject proj;
 
     public ControlContentProvider(IProject proj) {

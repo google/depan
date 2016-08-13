@@ -26,13 +26,15 @@ import com.google.devtools.depan.nodes.filters.sequence.CountPredicate;
 import com.google.devtools.depan.nodes.filters.sequence.CountPredicates;
 import com.google.devtools.depan.nodes.filters.sequence.RelationCountFilter;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
-import java.text.MessageFormat;
-
 /**
+ * Provides labels, {@link Form}s, factories, and dialog editors
+ * for {@link RelationCountFilter}s.
+ * 
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
 public class RelationCountContribution
@@ -66,34 +68,30 @@ public class RelationCountContribution
 
   @Override
   public FilterEditorDialog<RelationCountFilter> buildEditorDialog(
-      Shell shell, ContextualFilter filter, DependencyModel model) {
+      Shell shell, ContextualFilter filter,
+      DependencyModel model, IProject project) {
     if (!handlesFilterInstance(filter)) {
-      String msg = MessageFormat.format(
-          "Filter {0} is assignable as a {1} type.",
-          filter.getName(), RelationCountFilter.class.getName());
-      throw new IllegalArgumentException(msg);
+      return new ContributionEditorDialog(
+          shell, (RelationCountFilter) filter, model, project);
     }
-    return new ContributionEditorDialog(
-        shell, (RelationCountFilter) filter, model);
+    throw buildNotAssignable(filter, RelationCountFilter.class);
   }
 
   private static class ContributionEditorDialog
       extends FilterEditorDialog<RelationCountFilter> {
 
-    private final DependencyModel model;
-
     private RelationCountFilterEditorControl editor;
 
     protected ContributionEditorDialog(
-        Shell parentShell, RelationCountFilter filter, DependencyModel model) {
-      super(parentShell, filter);
-      this.model = model;
+        Shell parentShell, RelationCountFilter filter,
+        DependencyModel model, IProject project) {
+      super(parentShell, filter, model, project);
     }
 
     @Override
     protected Control createDialogArea(Composite parent) {
       editor = new RelationCountFilterEditorControl(parent);
-      editor.setInput(getFilter(), model);
+      editor.setInput(getFilter(), getModel(), getProject());
       return editor;
     }
 

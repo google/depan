@@ -19,19 +19,17 @@ package com.google.devtools.depan.nodes.filters.eclipse.ui.widgets;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.api.RelationSet;
 import com.google.devtools.depan.graph.registry.RelationRegistry;
-import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.nodes.filters.sequence.CountPredicate;
 import com.google.devtools.depan.nodes.filters.sequence.RelationCountFilter;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 import com.google.devtools.depan.relations.eclipse.ui.widgets.RelationSetEditorControl;
 import com.google.devtools.depan.relations.eclipse.ui.widgets.RelationSetSaveLoadControl;
-import com.google.devtools.depan.relations.eclipse.ui.wizards.NewRelationSetWizard;
 import com.google.devtools.depan.relations.models.RelationSetDescrRepo;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 import com.google.devtools.depan.relations.models.RelationSetDescriptors;
 import com.google.devtools.depan.relations.models.RelationSetResources;
 
-import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -42,15 +40,21 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 
-import java.net.URI;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.List;
 
 /**
+ * Enhances {@link RelationCountFilter} editing with
+ * a {@link RelationSetEditorControl}
+ * and forward and reverse {@link RangeTool}s.
+ * 
  * Allow the user to select nodes based on a count of the forward (departing)
  * or reverse (arriving) edges.
- *
+ * 
+ * Includes save-load support for the embedded collection
+ * of {@link RelationSet}s (e.g. {@link RelationSetDescriptor}).
+ * 
  * @author <a href="leeca@google.com">Lee Carver</a>
  */
 public class RelationCountFilterEditorControl
@@ -59,17 +63,8 @@ public class RelationCountFilterEditorControl
   public static final RelationCount.Settings EMPTY_SETTINGS =
       new RelationCount.Settings();
 
-  /**
-   * {@link RelationCountFilter} definition that is being edited.
-   */
-  private RelationCountFilter filterInfo;
-
-  private DependencyModel model;
-
   /////////////////////////////////////
   // UX Elements
-
-  private BasicFilterEditorControl basicControl;
 
   private RelationSetEditorControl relationSetEditor;
 
@@ -78,33 +73,6 @@ public class RelationCountFilterEditorControl
   private RangeTool reverseRange;
 
   private RelationSetDescrRepo filterRepo;
-
-  /**
-   * Connect the save/load control to this type's data structures.
-   */
-  private class ControlSaveLoadControl extends
-      RelationSetSaveLoadControl {
-
-    private ControlSaveLoadControl(Composite parent) {
-      super(parent);
-    }
-
-    @Override
-    protected Wizard getSaveWizard() {
-      RelationSet relSet = filterRepo.getRelationSet();
-      String label = MessageFormat.format(
-          "{0} filter", basicControl.getFilterName());
-      RelationSetDescriptor target = new RelationSetDescriptor(
-          label, model, relSet);
-      return new NewRelationSetWizard(target);
-    }
-
-    @Override
-    protected void loadURI(URI uri) {
-      RelationSetDescriptor loadDoc = loadRelationSetDescr(uri);
-      filterRepo.setRelationSet(loadDoc.getInfo());
-    }
-  }
 
   /////////////////////////////////////
   // Public methods
@@ -117,29 +85,6 @@ public class RelationCountFilterEditorControl
    */
   public RelationCountFilterEditorControl(Composite parent) {
     super(parent);
-
-    Composite setEditor = setupRelationSetEditor(this);
-    setEditor.setLayoutData(Widgets.buildGrabFillData());
-
-    Composite rangeArea = setupRanges(this, EMPTY_SETTINGS);
-    rangeArea.setLayoutData(Widgets.buildHorzFillData());
-  }
-
-  public void setInput(RelationCountFilter filterInfo, DependencyModel model) {
-    this.filterInfo = filterInfo;
-    this.model = model;
-
-    basicControl.setInput(filterInfo);
-
-    Collection<Relation> projectRelations = 
-        RelationRegistry.getRegistryRelations(model.getRelationContribs());
-    filterRepo = new RelationSetDescrRepo(projectRelations);
-    filterRepo.setRelationSet(filterInfo.getRelationSet());
-
-    relationSetEditor.setRelationSetRepository(filterRepo);
-    relationSetEditor.selectRelations(projectRelations);
-
-    // TODO: Configure ranges, too.
   }
 
   /**
@@ -156,28 +101,6 @@ public class RelationCountFilterEditorControl
     reverseRange.setLimits(settings.reverse);
   }
 
-  /**
-   * Update all the UI values to the settings for the current 
-   * {@code ViewEditor}.
-   * 
-   * @param editor source of settings for UI configuration
-   */
-  public void updateControls() {
-
-    relationSetEditor.setRelationSetRepository(filterRepo);
-
-    RelationSetDescriptor relationSet = RelationSetDescriptors.EMPTY;
-    List<RelationSetDescriptor> choices =
-        RelationSetResources.getRelationSets(model);
-    relationSetEditor.setRelationSetSelectorInput(relationSet, choices);
-  }
-
-  @Override
-  public RelationCountFilter buildFilter() {
-    // TODO: Make a new one, or ensure this one is actually edited.
-    return filterInfo;
-  }
-
   @Override
   public void dispose() {
     reverseRange.dispose();
@@ -186,36 +109,66 @@ public class RelationCountFilterEditorControl
   }
 
   /////////////////////////////////////
+  // Control management
+
+  @Override
+  protected void updateControls() {
+
+    List<String> contribs = getModel().getRelationContribs();
+    Collection<Relation> projectRelations =
+        RelationRegistry.getRegistryRelations(contribs);
+    filterRepo = new RelationSetDescrRepo(projectRelations);
+    filterRepo.setRelationSet(getFilter().getRelationSet());
+
+    if (null != filterRepo.getUpdateSet()) {
+      RelationSet relationSet = filterRepo.getRelationSet();
+      getFilter().setRelationSet(relationSet);
+    }
+
+    relationSetEditor.setRelationSetRepository(filterRepo);
+
+    relationSetEditor.selectRelations(projectRelations);
+
+    RelationSetDescriptor relationSet = RelationSetDescriptors.EMPTY;
+    List<RelationSetDescriptor> choices =
+        RelationSetResources.getRelationSets(getModel());
+    relationSetEditor.setRelationSetSelectorInput(relationSet, choices);
+
+    // TODO: Configure ranges, too.
+  }
+
+  @Override
+  protected void setupControls(Composite parent) {
+    Composite setEditor = setupRelationSetEditor(parent);
+    setEditor.setLayoutData(Widgets.buildGrabFillData());
+
+    Composite rangeArea = setupRanges(parent, EMPTY_SETTINGS);
+    rangeArea.setLayoutData(Widgets.buildHorzFillData());
+  }
+
+  /////////////////////////////////////
   // UX Setup
 
   private Composite setupRelationSetEditor(Composite parent) {
     Composite result = Widgets.buildGridGroup(parent, "Relation Set", 1);
 
-    relationSetEditor = new RelationSetEditorControl(result);
-    relationSetEditor.setLayoutData(Widgets.buildGrabFillData());
-
     Composite saves = new ControlSaveLoadControl(result);
     saves.setLayoutData(Widgets.buildHorzFillData());
 
-    return result;
-  }
+    relationSetEditor = new RelationSetEditorControl(result);
+    relationSetEditor.setLayoutData(Widgets.buildGrabFillData());
 
-  public RelationCountFilter getFilter() {
-    if (null != filterRepo.getUpdateSet()) {
-      RelationSet relationSet = filterRepo.getRelationSet();
-      filterInfo.setRelationSet(relationSet);
-    }
-    return filterInfo;
+    return result;
   }
 
   private Composite setupRanges(
       Composite parent, RelationCount.Settings settings) {
     Composite result = new Composite(parent, SWT.NONE);
     result.setLayout(new GridLayout(2, true));
-    forwardRange = 
-        new RangeTool(result, SWT.NONE, "Forward:", settings.forward);
-    reverseRange =
-        new RangeTool(result, SWT.NONE, "Reverse:", settings.reverse);
+    forwardRange = new RangeTool(
+        result, SWT.NONE, "Forward:", settings.forward);
+    reverseRange = new RangeTool(
+        result, SWT.NONE, "Reverse:", settings.reverse);
 
     return result;
   }
@@ -396,6 +349,38 @@ public class RelationCountFilterEditorControl
     @Override
     public void widgetDefaultSelected(SelectionEvent e) {
       widgetSelected(e);
+    }
+  }
+
+  /////////////////////////////////////
+  // Integration classes
+
+  /**
+   * Connect the save/load control to this type's data structures.
+   */
+  private class ControlSaveLoadControl extends
+      RelationSetSaveLoadControl {
+
+    private ControlSaveLoadControl(Composite parent) {
+      super(parent);
+    }
+
+    @Override
+    protected IProject getProject() {
+      return RelationCountFilterEditorControl.this.getProject();
+    }
+
+    @Override
+    protected RelationSetDescriptor buildSaveResource() {
+      RelationCountFilter filter = buildFilter();
+      String label = MessageFormat.format("{0} filter", filter.getName());
+      return new RelationSetDescriptor(
+          label, getModel(), filter.getRelationSet());
+    }
+
+    @Override
+    protected void installLoadResource(RelationSetDescriptor doc) {
+      filterRepo.setRelationSet(doc.getInfo());
     }
   }
 }

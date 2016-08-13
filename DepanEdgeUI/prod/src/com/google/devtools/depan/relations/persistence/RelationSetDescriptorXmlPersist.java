@@ -16,7 +16,6 @@
 
 package com.google.devtools.depan.relations.persistence;
 
-import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.persistence.AbstractDocXmlPersist;
 import com.google.devtools.depan.persistence.ObjectXmlPersist;
 import com.google.devtools.depan.persistence.XStreamFactory;
@@ -25,7 +24,8 @@ import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 import java.net.URI;
 
 /**
- * Provide easy to use load and save methods for {@link GraphEdgeMatcherDescriptor}s.
+ * Provide easy to use load and save methods for
+ * {@link RelationSetDescriptor}s.
  * 
  * @author <a href="mailto:leeca@google.com">Lee Carver</a>
  */

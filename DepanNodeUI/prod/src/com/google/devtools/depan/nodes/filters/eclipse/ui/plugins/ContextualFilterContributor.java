@@ -20,19 +20,23 @@ import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.nodes.filters.eclipse.ui.widgets.FilterEditorDialog;
 import com.google.devtools.depan.nodes.filters.model.ContextualFilter;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.swt.widgets.Shell;
 
 import java.util.Collection;
 import java.util.List;
 
 /**
+ * Provides labels, {@link Form}s, factories, and dialog editors
+ * for {@link ContextualFilter}s.
+ * 
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
 public interface ContextualFilterContributor <T extends ContextualFilter> {
 
   /**
    * Generalized model for composable {@link ContextualFilter}s.
-   * This could be infered from the derivation of the concrete class
+   * This could be inferred from the derivation of the concrete class
    * {@link #getContributionClass()}, this effectively captures the common
    * UX question of whether there is delegate, group, sequence,
    * or no internal {@link ContextualFilter}.
@@ -59,5 +63,6 @@ public interface ContextualFilterContributor <T extends ContextualFilter> {
   boolean handlesFilterInstance(ContextualFilter filter);
 
   FilterEditorDialog<T> buildEditorDialog(
-      Shell shell, ContextualFilter filter, DependencyModel model);
+      Shell shell, ContextualFilter filter,
+      DependencyModel model, IProject project);
 }

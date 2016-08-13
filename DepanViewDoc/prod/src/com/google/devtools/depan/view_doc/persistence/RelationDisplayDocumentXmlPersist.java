@@ -24,7 +24,8 @@ import com.google.devtools.depan.view_doc.model.RelationDisplayDocument;
 import java.net.URI;
 
 /**
- * Provide easy to use load and save methods for {@link RelationDisplayDocument}s.
+ * Provide easy to use load and save methods for
+ * {@link RelationDisplayDocument}s.
  * 
  * @author <a href="mailto:leeca@google.com">Lee Carver</a>
  */
