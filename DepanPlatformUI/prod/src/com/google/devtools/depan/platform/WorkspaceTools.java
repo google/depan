@@ -16,8 +16,6 @@
 
 package com.google.devtools.depan.platform;
 
-import com.google.devtools.depan.persistence.AbstractDocXmlPersist;
-
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -26,14 +24,12 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.ContainerSelectionDialog;
-
-import java.net.URI;
 
 /**
  * A utility class that provides static methods for manipulating Eclipse
@@ -44,10 +40,9 @@ import java.net.URI;
  */
 public final class WorkspaceTools {
 
-  /**
-   * Prevent instantiation of this namespace class.
-   */
-  private WorkspaceTools() { }
+  private WorkspaceTools() {
+    // Prevent instantiation.
+  }
 
   /**
    * Ensure that we have a file extension on the file name.
@@ -164,94 +159,9 @@ public final class WorkspaceTools {
   }
 
   /**
-   * Guess a filename for a new file.  For example, if an initial filename
-   * of {@code Tree.dgi} already exist, the first guess will be
-   * {@code Tree (1).dgi}.
-   * 
-   * This is best-effort heuristic, and is not guaranteed to actually be an
-   * unused filename.  If the application wishes to ensure that no existing
-   * file is overwritten, additional checks are required in the application.
-   * 
-   * The implemented heuristic follows these lines:
-   * <ol>
-   * <li>if the initial proposal is unused, provide that filename.</li>
-   * <li>for a limited number of trials, insert a sequence number before the
-   *     filename's extension. If this modified filename is unused, provide it
-   *     as the result.</li>
-   * </ol>
-   * In all other cases, return the initial proposal.
-   * 
-   * Since the filename guessing heuristic is non-atomic with the actual file
-   * creation, the filename may exist by the time the application tries to
-   * create the file.  Additionally, if the heuristic gives up, the returned
-   * filename may exist anyway.
-   * 
-   * The numbered trials names begin with {@code start}, and end before the
-   * {@code limit} is reached.  Thus, a start of 1 and limit of 10 will 
-   * try the values 1 through 9.  If the limit is less then the start value,
-   * no variants are checked.
-   * 
-   * @param container intended parent of new file
-   * @param newFilename initial proposal for new filename
-   * @param start lowest number to use for filename variants
-   * @param limit stopping number for file variants
-   * @return the recommended filename to use
+   * Launch the runner with an event loop tied to the current display.
    */
-  public static String guessNewFilename(
-      IContainer container, String newFilename, int start, int limit) {
-    // Quick exit if container is no help
-    if (null == container) {
-      return newFilename;
-    }
-
-    // No point in testing if no variants are allowed
-    if (limit < start) {
-      return newFilename;
-    }
-
-    // Quick exit if proposed name does not exist
-    IPath newPath = Path.fromOSString(newFilename);
-    if (!container.exists(newPath)) {
-      return newFilename;
-    }
-
-    // Try to find an unused numbered variant
-    int trial = 1;
-    String ext = newPath.getFileExtension();
-    String base = newPath.removeFileExtension().toOSString();
-    do {
-      newPath = Path.fromOSString(base + " (" + trial + ")")
-          .addFileExtension(ext);
-      if (!container.exists(newPath)) {
-        return newPath.toOSString();
-      }
-      ++trial;
-    } while (trial < limit);
-
-    // Fall back to the bare filename
-    return newFilename;
-  }
-
-  /**
-   * Can't be part of {@link AbstractDocXmlPersist}, due to UI elements
-   * {@code monitor} and {@code file.refreshLocal()}.
-   * 
-   * Cancels the {@code monitor} if there is an exception,
-   * but reports no worked steps on the supplied  {@code monitor}.
-   */
-  public static <T> void saveDocument(
-      IFile file, T docInfo,
-      AbstractDocXmlPersist<T> persist,
-      IProgressMonitor monitor) {
-    URI location = file.getLocationURI();
-    try {
-      persist.save(location, docInfo);
-      file.refreshLocal(IResource.DEPTH_ZERO, monitor);
-    } catch (Exception err) {
-      if (null != monitor) {
-        monitor.setCanceled(true);
-      }
-      persist.logSaveException(location, err);
-    }
+  public static void asyncExec(Runnable runner) {
+    PlatformUI.getWorkbench().getDisplay().asyncExec(runner);
   }
 }

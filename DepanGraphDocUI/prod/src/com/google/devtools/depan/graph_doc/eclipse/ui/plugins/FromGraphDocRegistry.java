@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.graph_doc.eclipse.ui.plugins;
 
+import com.google.devtools.depan.graph_doc.GraphDocLogger;
 import com.google.devtools.depan.platform.PlatformLogger;
 import com.google.devtools.depan.platform.plugin.ContributionEntry;
 import com.google.devtools.depan.platform.plugin.ContributionRegistry;
@@ -25,6 +26,7 @@ import com.google.common.collect.Maps;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 
+import java.text.MessageFormat;
 import java.util.Map;
 
 /**
@@ -80,7 +82,14 @@ public class FromGraphDocRegistry extends
     Map<String, FromGraphDocContributor> result = Maps.newHashMap();
     for (ContributionEntry<FromGraphDocContributor> contrib : getContributions()) {
       FromGraphDocContributor fromGraphDoc = contrib.getInstance();
-      result.put(fromGraphDoc.getLabel(), fromGraphDoc);
+      String label = fromGraphDoc.getLabel();
+      if (!result.containsKey(label)) {
+        result.put(label, fromGraphDoc);
+      } else {
+        String msg = MessageFormat.format(
+            "Duplicate FromGraphDoc contribution for label {0}", label);
+        GraphDocLogger.LOG.warning(msg);
+      }
     }
 
     return result ;

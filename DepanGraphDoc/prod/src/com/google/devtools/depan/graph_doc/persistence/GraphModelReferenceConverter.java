@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.view_doc.persistence;
+package com.google.devtools.depan.graph_doc.persistence;
 
 import com.google.devtools.depan.graph_doc.model.GraphDocument;
-import com.google.devtools.depan.graph_doc.persistence.EdgeConverter;
-import com.google.devtools.depan.platform.ResourceCache;
-import com.google.devtools.depan.view_doc.model.GraphModelReference;
+import com.google.devtools.depan.graph_doc.model.GraphModelReference;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.Converter;

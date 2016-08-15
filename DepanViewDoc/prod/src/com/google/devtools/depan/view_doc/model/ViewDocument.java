@@ -23,6 +23,7 @@ import com.google.devtools.depan.graph.api.RelationSet;
 import com.google.devtools.depan.graph_doc.eclipse.ui.resources.GraphResourceBuilder;
 import com.google.devtools.depan.graph_doc.eclipse.ui.resources.GraphResources;
 import com.google.devtools.depan.graph_doc.model.DependencyModel;
+import com.google.devtools.depan.graph_doc.model.GraphModelReference;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;

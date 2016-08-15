@@ -35,6 +35,7 @@ import com.google.devtools.depan.nodes.filters.model.ContextKey.Base;
 import com.google.devtools.depan.nodes.filters.model.ContextualFilter;
 import com.google.devtools.depan.nodes.filters.model.FilterContext;
 import com.google.devtools.depan.nodes.filters.sequence.SteppingFilter;
+import com.google.devtools.depan.persistence.StorageTools;
 import com.google.devtools.depan.platform.WorkspaceTools;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Sasher;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
@@ -397,7 +398,7 @@ public class NodeFilterViewPart extends AbstractViewDocViewPart {
 
     ContextualFilterXmlPersist persist =
         ContextualFilterXmlPersist.build(false);
-    WorkspaceTools.saveDocument(saveFile, result, persist, null);
+    StorageTools.saveDocument(saveFile, result, persist, null);
   }
 
   private void loadFilterTable() {

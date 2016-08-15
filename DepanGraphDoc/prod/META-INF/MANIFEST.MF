@@ -16,4 +16,6 @@ Bundle-ClassPath: .
 Export-Package: com.google.devtools.depan.analysis_doc.model,
  com.google.devtools.depan.graph_doc.model,
  com.google.devtools.depan.graph_doc.operations,
- com.google.devtools.depan.graph_doc.persistence
+ com.google.devtools.depan.graph_doc.persistence,
+ com.google.devtools.depan.nodelist_doc.model,
+ com.google.devtools.depan.nodelist_doc.persistence

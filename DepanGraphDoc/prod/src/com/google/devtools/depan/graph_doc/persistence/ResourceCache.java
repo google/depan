@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.platform;
+package com.google.devtools.depan.graph_doc.persistence;
 
 import com.google.devtools.depan.graph_doc.model.GraphDocument;
-import com.google.devtools.depan.graph_doc.persistence.GraphModelXmlPersist;
+import com.google.devtools.depan.persistence.StorageTools;
 
 import com.google.common.collect.Maps;
 
@@ -75,7 +75,7 @@ public class ResourceCache implements IResourceChangeListener {
 
   public static void saveGraphDocument(IFile file, GraphDocument graph) {
     GraphModelXmlPersist persist = GraphModelXmlPersist.build(false);
-    WorkspaceTools.saveDocument(file, graph, persist, null);
+    StorageTools.saveDocument(file, graph, persist, null);
   }
 
   /**

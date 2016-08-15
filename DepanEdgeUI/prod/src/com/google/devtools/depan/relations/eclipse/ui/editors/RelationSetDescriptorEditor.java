@@ -19,6 +19,7 @@ package com.google.devtools.depan.relations.eclipse.ui.editors;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.api.RelationSet;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
+import com.google.devtools.depan.persistence.StorageTools;
 import com.google.devtools.depan.platform.WorkspaceTools;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 import com.google.devtools.depan.relations.eclipse.ui.widgets.RelationSetEditorControl;
@@ -128,7 +129,7 @@ public class RelationSetDescriptorEditor extends EditorPart {
   private void persistDocument(IProgressMonitor monitor) {
     RelationSetDescriptorXmlPersist persist =
         RelationSetDescriptorXmlPersist.build(false);
-    WorkspaceTools.saveDocument(file, relSetInfo, persist, monitor);
+    StorageTools.saveDocument(file, relSetInfo, persist, monitor);
 
     setDirtyState(false);
   }

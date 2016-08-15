@@ -13,6 +13,21 @@
             id="com.google.devtools.depan.graph_doc.eclipse.ui.editor.GraphEditor"
             name="Graph Tree">
       </editor>
+      <editor
+            class="com.google.devtools.depan.nodelist_doc.eclipse.ui.editor.NodeListEditor"
+            default="false"
+            extensions="dni"
+            icon="icons/graph_file-16x16.png"
+            id="com.google.devtools.depan.nodelist_doc.eclipse.ui.editor.NodeListEditor"
+            name="NodeList Editor">
+      </editor>
+   </extension>
+   <extension
+         point="com.google.devtools.depan.graph_doc.eclipse.ui.registry.from_graph_doc">
+      <contribution
+            class="com.google.devtools.depan.nodelist_doc.eclipse.ui.wizards.NodeListFromGraphDocContributor"
+            id="com.google.devtools.depan.nodelist_doc.eclipse.ui.wizards.NodeListFromGraphDocContributor">
+      </contribution>
    </extension>
 
 </plugin>

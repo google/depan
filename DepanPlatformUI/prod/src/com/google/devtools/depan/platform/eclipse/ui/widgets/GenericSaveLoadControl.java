@@ -17,6 +17,7 @@
 package com.google.devtools.depan.platform.eclipse.ui.widgets;
 
 import com.google.devtools.depan.persistence.AbstractDocXmlPersist;
+import com.google.devtools.depan.persistence.StorageTools;
 import com.google.devtools.depan.platform.PlatformLogger;
 import com.google.devtools.depan.platform.WorkspaceTools;
 import com.google.devtools.depan.resource_doc.eclipse.ui.persistence.LoadResourceDialog;
@@ -90,7 +91,7 @@ public abstract class GenericSaveLoadControl<T extends PropertyDocument<?>>
       return;
     }
     AbstractDocXmlPersist<T> persist = config.getDocXmlPersist(false);
-    WorkspaceTools.saveDocument(saveFile, rsrc, persist, null);
+    StorageTools.saveDocument(saveFile, rsrc, persist, null);
   }
 
   /**

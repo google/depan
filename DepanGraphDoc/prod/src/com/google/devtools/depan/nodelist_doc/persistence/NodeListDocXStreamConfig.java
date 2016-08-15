@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.view_doc.persistence;
+package com.google.devtools.depan.nodelist_doc.persistence;
 
+import com.google.devtools.depan.graph_doc.GraphDocResources;
 import com.google.devtools.depan.graph_doc.persistence.GraphModelReferenceConverter;
+import com.google.devtools.depan.nodelist_doc.model.NodeListDocument;
 import com.google.devtools.depan.persistence.XStreamConfig;
-import com.google.devtools.depan.view_doc.eclipse.ViewDocResources;
-import com.google.devtools.depan.view_doc.model.ViewDocument;
-import com.google.devtools.depan.view_doc.model.ViewPreferences;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -30,32 +29,23 @@ import java.util.Collection;
 import java.util.Collections;
 
 /**
- * Prepare an {@link XStream} for serializing an {@link ViewDocument}.
+ * Prepare an {@link XStream} for serializing an {@link NodeListDocument}.
  * 
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public class ViewDocXStreamConfig implements XStreamConfig {
+public class NodeListDocXStreamConfig implements XStreamConfig {
 
-  private static final String VIEW_PREFS = "view-prefs";
+  public static final String NODE_LIST_INFO_TAG = "node-list-info";
 
   @Override
   public void config(XStream xstream) {
     xstream.setMode(XStream.NO_REFERENCES);
-
-    xstream.alias(VIEW_PREFS, ViewPreferences.class);
-
-    ViewDocumentConverter converter = ViewDocumentConverter.configXStream(xstream);
-    EdgeReferenceConverter.configXStream(xstream, converter);
-    NodeReferenceConverter.configXStream(xstream, converter);
-
-    CameraPosConverter.configXStream(xstream);
-    CameraDirConverter.configXStream(xstream);
+    xstream.alias(NODE_LIST_INFO_TAG, NodeListDocument.class);
     GraphModelReferenceConverter.configXStream(xstream);
-    Point2DConverter.configXStream(xstream);
   }
 
   @Override
   public Collection<? extends Bundle> getDocumentBundles() {
-    return Collections.singletonList(ViewDocResources.BUNDLE);
+    return Collections.singletonList(GraphDocResources.BUNDLE);
   }
 }

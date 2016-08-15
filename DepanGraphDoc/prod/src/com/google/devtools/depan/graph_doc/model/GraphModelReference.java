@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.view_doc.model;
-
-import com.google.devtools.depan.graph_doc.model.GraphDocument;
+package com.google.devtools.depan.graph_doc.model;
 
 import org.eclipse.core.resources.IResource;
 

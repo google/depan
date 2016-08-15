@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.remap_doc.eclipse.ui.editors;
 
-import com.google.devtools.depan.platform.WorkspaceTools;
+import com.google.devtools.depan.persistence.StorageTools;
 import com.google.devtools.depan.remap_doc.model.MigrationGroup;
 import com.google.devtools.depan.remap_doc.model.MigrationRule;
 import com.google.devtools.depan.remap_doc.model.MigrationTask;
@@ -172,7 +172,7 @@ public class RemapEditor extends MultiPageEditorPart
   @Override
   public void doSave(IProgressMonitor monitor) {
     RemapTaskDocXmlPersist persist = RemapTaskDocXmlPersist.build(false);
-    WorkspaceTools.saveDocument(taskFile, migrationTask, persist, null);
+    StorageTools.saveDocument(taskFile, migrationTask, persist, null);
     setDirtyState(false);
   }
 

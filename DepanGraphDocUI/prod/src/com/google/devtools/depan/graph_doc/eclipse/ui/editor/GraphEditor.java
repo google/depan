@@ -30,9 +30,9 @@ import com.google.devtools.depan.graph_doc.eclipse.ui.resources.GraphResources;
 import com.google.devtools.depan.graph_doc.eclipse.ui.widgets.FromGraphDocListControl;
 import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.graph_doc.model.GraphDocument;
+import com.google.devtools.depan.graph_doc.persistence.ResourceCache;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.platform.ResourceCache;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 
 import org.eclipse.core.resources.IFile;
@@ -180,7 +180,7 @@ public class GraphEditor extends MultiPageEditorPart {
     });
 
     Button create = new Button(top, SWT.PUSH);
-    create.setText("Create view");
+    create.setText("Create");
     create.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {

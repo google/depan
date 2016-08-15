@@ -17,6 +17,7 @@
 package com.google.devtools.depan.graph_doc.eclipse.ui.wizards;
 
 import com.google.devtools.depan.graph_doc.model.GraphDocument;
+import com.google.devtools.depan.persistence.StorageTools;
 import com.google.devtools.depan.platform.WorkspaceTools;
 
 import org.eclipse.core.resources.IContainer;
@@ -78,7 +79,7 @@ public abstract class AbstractAnalysisPage extends WizardPage {
     container.setLayout(layout);
 
     IContainer outputContainer = WorkspaceTools.guessContainer(selection);
-    String outputFilename = WorkspaceTools.guessNewFilename(
+    String outputFilename = StorageTools.guessNewFilename(
         outputContainer, defaultFilename, 1, 10);
     outputPart = new AnalysisOutputPart(this, outputContainer, outputFilename);
     Composite outputGroup = outputPart.createControl(container);

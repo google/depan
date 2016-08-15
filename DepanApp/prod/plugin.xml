@@ -118,6 +118,10 @@
                name="preferenceCustomization"
                value="plugin_customization.ini">
          </property>
+         <property
+               name="appName"
+               value="DepAn [Win64]">
+         </property>
       </product>
    </extension>
 

@@ -55,6 +55,7 @@ import com.google.devtools.depan.nodes.filters.model.ContextualFilter;
 import com.google.devtools.depan.nodes.filters.sequence.SteppingFilter;
 import com.google.devtools.depan.nodes.trees.HierarchicalTreeModel;
 import com.google.devtools.depan.nodes.trees.TreeModel;
+import com.google.devtools.depan.persistence.StorageTools;
 import com.google.devtools.depan.platform.ListenerManager;
 import com.google.devtools.depan.platform.WorkspaceTools;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
@@ -95,7 +96,6 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
@@ -645,7 +645,8 @@ public class ViewEditor extends MultiPageEditorPart {
       setPartName(input.getName());
 
       try {
-        viewInfo = loadViewDocument(viewFile);
+        ViewDocXmlPersist loader = ViewDocXmlPersist.build(true, "load");
+        viewInfo = loader.load(viewFile.getLocationURI());
         setDirtyState(false);
       } catch (RuntimeException e) {
         viewInfo = null;
@@ -798,14 +799,6 @@ public class ViewEditor extends MultiPageEditorPart {
     return true;
   }
 
-  /**
-   * Load a view document from a file.
-   */
-  private static ViewDocument loadViewDocument(IFile file) {
-    ViewDocXmlPersist loader = ViewDocXmlPersist.build(true, "load");
-    return loader.load(file.getLocationURI());
-  }
-
   @Override
   public void doSave(IProgressMonitor monitor) {
     // If there are any file problems, do this as a Save As ..
@@ -851,7 +844,7 @@ public class ViewEditor extends MultiPageEditorPart {
 
     IContainer parent = viewInfo.getGraphModelLocation().getParent();
     String filebase = baseName + '.' + ViewDocument.EXTENSION;
-    String filename = WorkspaceTools.guessNewFilename(
+    String filename = StorageTools.guessNewFilename(
         parent, filebase, 1, 10);
 
     IPath filePath = Path.fromOSString(filename);
@@ -893,7 +886,7 @@ public class ViewEditor extends MultiPageEditorPart {
    */
   private void saveFile(IFile file, IProgressMonitor monitor, String opLabel) {
     ViewDocXmlPersist persist = ViewDocXmlPersist.build(false, opLabel);
-    WorkspaceTools.saveDocument(file, viewInfo, persist, monitor);
+    StorageTools.saveDocument(file, viewInfo, persist, monitor);
 
     setDirtyState(false);
   }
@@ -1421,19 +1414,11 @@ public class ViewEditor extends MultiPageEditorPart {
   }
 
   /**
-   * Provide the application's Display (i.e. the event loop)
-   * @return application's Display
-   */
-  private static Display getWorkbenchDisplay() {
-    return PlatformUI.getWorkbench().getDisplay();
-  }
-
-  /**
    * Post an update on the status line.
    * @param statusText text to display on status line
    */
   private void updateStatusLine(final String statusText) {
-    getWorkbenchDisplay().asyncExec(new Runnable() {
+    WorkspaceTools.asyncExec(new Runnable() {
 
       @Override
       public void run() {
@@ -1771,7 +1756,7 @@ public class ViewEditor extends MultiPageEditorPart {
    * separately from the other workbench windows.
    */
   public static void startViewEditor(ViewEditorInput viewInput) {
-    getWorkbenchDisplay().asyncExec(new ViewEditorRunnable(viewInput));
+    WorkspaceTools.asyncExec(new ViewEditorRunnable(viewInput));
   }
 
   private static class ViewEditorRunnable implements Runnable {
@@ -1787,8 +1772,8 @@ public class ViewEditor extends MultiPageEditorPart {
           .getActiveWorkbenchWindow().getActivePage();
       try {
         page.openEditor(input, ViewEditor.ID);
-      } catch (PartInitException e) {
-        e.printStackTrace();
+      } catch (PartInitException errInit) {
+        ViewDocLogger.logException("Unable to start NodeListEditor", errInit);
       }
     }
   }

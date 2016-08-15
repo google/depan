@@ -1,63 +1,67 @@
-package com.google.devtools.depan.view_doc.eclipse.ui.wizards;
+/*
+ * Copyright 2016 The Depan Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.google.devtools.depan.nodelist_doc.eclipse.ui.wizards;
 
 import com.google.devtools.depan.graph_doc.eclipse.ui.plugins.FromGraphDocWizard;
 import com.google.devtools.depan.graph_doc.model.GraphModelReference;
-import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
-import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditorInput;
-import com.google.devtools.depan.view_doc.layout.LayoutGenerator;
-import com.google.devtools.depan.view_doc.layout.grid.GridLayoutGenerator;
-import com.google.devtools.depan.view_doc.model.ViewDocument;
-import com.google.devtools.depan.view_doc.model.ViewPreferences;
+import com.google.devtools.depan.nodelist_doc.eclipse.ui.editor.NodeListEditor;
+import com.google.devtools.depan.nodelist_doc.eclipse.ui.editor.NodeListEditorInput;
+import com.google.devtools.depan.nodelist_doc.model.NodeListDocument;
+
+import org.eclipse.core.resources.IFile;
 
 import java.text.MessageFormat;
 
-public class ViewFromGraphDocWizard extends FromGraphDocWizard {
+/**
+ * @author <a href="mailto:leeca@google.com">Lee Carver</a>
+ */
+public class NodeListFromGraphDocWizard extends FromGraphDocWizard {
 
-  private ViewFromGraphDocPage page;
+  private NodeListFromGraphDocPage page;
 
   @Override
   public void addPages() {
-    page = new ViewFromGraphDocPage(getGraphResources());
+    page = new NodeListFromGraphDocPage(getGraphResources());
     addPage(page);
   }
 
   @Override
   public boolean performFinish() {
-    ViewEditorInput viewInput = buildViewInput();
-    ViewEditor.startViewEditor(viewInput);
+    NodeListEditorInput input = buildNodeListInput();
+    NodeListEditor.startNodeListEditor(input);
     return true;
   }
 
   /**
    * Unpack wizard page controls into a {@link ViewEditorInput}.
    */
-  private ViewEditorInput buildViewInput() {
+  private NodeListEditorInput buildNodeListInput() {
     String basename = calcName();
 
     // Create ViewDocument elements
     GraphModelReference graphRef =
         new GraphModelReference(getGraphFile(), getGraphDoc());
 
-    ViewPreferences userPrefs = new ViewPreferences();
-    GraphEdgeMatcherDescriptor matcher = page.getLayoutMatcher();
-    userPrefs.setLayoutFinder(matcher);
+    NodeListDocument viewInfo = new NodeListDocument(graphRef, getNodes());
 
-    ViewDocument viewInfo = new ViewDocument(graphRef, getNodes(), userPrefs);
-
-    ViewEditorInput result = new ViewEditorInput(viewInfo, basename);
-    result.setInitialLayout(calcInitialLayout());
+    NodeListEditorInput result = new NodeListEditorInput(viewInfo, basename);
 
     return result;
-  }
-
-  private LayoutGenerator calcInitialLayout() {
-    LayoutGenerator layout = page.getLayoutGenerator();
-    if (null != layout) {
-      return layout;
-    }
-    return new GridLayoutGenerator();
   }
 
   private String calcName() {
@@ -67,7 +71,7 @@ public class ViewFromGraphDocWizard extends FromGraphDocWizard {
     }
     GraphNode node = getTopNode();
     if (null == node) {
-      return "Empty Graph";
+      return "Empty NodeList";
     }
 
     String detail = calcDetailName(node);
@@ -101,8 +105,9 @@ public class ViewFromGraphDocWizard extends FromGraphDocWizard {
   }
 
   private String getSourceBase() {
-    String name = getGraphFile().getName();
-    String ext = getGraphFile().getFileExtension();
+    IFile graph = getGraphFile();
+    String name = graph.getName();
+    String ext = graph.getFileExtension();
     // If null, no period is present
     if (null == ext) {
       return name;

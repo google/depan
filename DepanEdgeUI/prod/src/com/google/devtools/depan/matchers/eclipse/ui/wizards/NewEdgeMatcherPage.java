@@ -17,7 +17,7 @@
 package com.google.devtools.depan.matchers.eclipse.ui.wizards;
 
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
-import com.google.devtools.depan.platform.WorkspaceTools;
+import com.google.devtools.depan.persistence.StorageTools;
 import com.google.devtools.depan.resource_doc.eclipse.ui.wizards.AbstractResouceWizardPage;
 import com.google.devtools.depan.resource_doc.eclipse.ui.wizards.ResourceOptionWizard;
 import com.google.devtools.depan.resource_doc.eclipse.ui.wizards.ResourceOutputPart;
@@ -72,7 +72,7 @@ public class NewEdgeMatcherPage extends AbstractResouceWizardPage {
   protected ResourceOutputPart createOutputPart(
       AbstractResouceWizardPage containingPage) {
     IContainer outputContainer = guessContainer();
-    String outputFilename = WorkspaceTools.guessNewFilename(
+    String outputFilename = StorageTools.guessNewFilename(
         outputContainer, DEFAULT_FILENAME, 1, 10);
 
     return new ResourceOutputPart(
