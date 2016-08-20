@@ -30,7 +30,7 @@ import java.util.List;
 /**
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public class TestMergeDependencyModel {
+public class MergeDependencyModelTest {
 
   private static final List<String> ALPHA =
       ImmutableList.<String>of("Alpha");

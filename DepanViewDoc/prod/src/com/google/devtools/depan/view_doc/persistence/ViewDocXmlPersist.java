@@ -5,6 +5,8 @@ import com.google.devtools.depan.persistence.ObjectXmlPersist;
 import com.google.devtools.depan.persistence.XStreamFactory;
 import com.google.devtools.depan.view_doc.model.ViewDocument;
 
+import org.eclipse.core.resources.IFile;
+
 import java.net.URI;
 import java.text.MessageFormat;
 
@@ -26,8 +28,14 @@ public class ViewDocXmlPersist extends AbstractDocXmlPersist<ViewDocument> {
     this.opLabel = opLabel;
   }
 
-  public static ViewDocXmlPersist build(boolean readable, String opLabel) {
-    ObjectXmlPersist persist = XStreamFactory.build(readable, VIEW_DOC_CONFIG);
+  public static ViewDocXmlPersist buildForSave(String opLabel) {
+    ObjectXmlPersist persist = XStreamFactory.build(false, VIEW_DOC_CONFIG);
+    return new ViewDocXmlPersist(persist, opLabel);
+  }
+
+  public static ViewDocXmlPersist buildForLoad(
+      IFile wkspFile, String opLabel) {
+    ObjectXmlPersist persist = XStreamFactory.build(true, VIEW_DOC_CONFIG);
     return new ViewDocXmlPersist(persist, opLabel);
   }
 

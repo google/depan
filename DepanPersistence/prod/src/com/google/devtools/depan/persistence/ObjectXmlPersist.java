@@ -69,7 +69,7 @@ public class ObjectXmlPersist {
    * Load an object from the provided URI.
    * 
    * @param uri location of persistent object
-   * @return object fro location
+   * @return object from location
    * @throws IOException
    */
   public Object load(URI uri) throws IOException {

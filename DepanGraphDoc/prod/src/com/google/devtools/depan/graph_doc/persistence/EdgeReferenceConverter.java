@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.view_doc.persistence;
+package com.google.devtools.depan.graph_doc.persistence;
 
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.basic.BasicEdge;
@@ -48,19 +48,19 @@ public class EdgeReferenceConverter implements Converter {
   private final Mapper mapper;
 
   /** Source of information about known edges and nodes. */
-  private final ViewDocumentConverter viewConverter;
+  private final ReferencedGraphDocumentConverter refConverter;
 
   public EdgeReferenceConverter(
-      Mapper mapper, ViewDocumentConverter viewConverter) {
+      Mapper mapper, ReferencedGraphDocumentConverter refConverter) {
     this.mapper = mapper;
-    this.viewConverter = viewConverter;
+    this.refConverter = refConverter;
   }
 
   public static void configXStream(
-      XStream xstream, ViewDocumentConverter converter) {
+      XStream xstream, ReferencedGraphDocumentConverter refConverter) {
     xstream.aliasType(EDGE_REF_TAG, GraphEdge.class);
     xstream.registerConverter(
-        new EdgeReferenceConverter(xstream.getMapper(), converter));
+        new EdgeReferenceConverter(xstream.getMapper(), refConverter));
   }
 
   @Override
@@ -107,7 +107,7 @@ public class EdgeReferenceConverter implements Converter {
   public Object unmarshal(HierarchicalStreamReader reader,
       UnmarshallingContext context) {
     try {
-      GraphModel graph = viewConverter.getGraphModel(context);
+      GraphModel graph = refConverter.getGraphModel(context);
 
       reader.moveDown();
       Relation relation = unmarshallRelation(reader, context);

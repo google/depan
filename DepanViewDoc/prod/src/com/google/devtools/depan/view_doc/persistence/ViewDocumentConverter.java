@@ -19,6 +19,8 @@ package com.google.devtools.depan.view_doc.persistence;
 import com.google.devtools.depan.graph_doc.model.GraphDocument;
 import com.google.devtools.depan.graph_doc.model.GraphModelReference;
 import com.google.devtools.depan.graph_doc.persistence.EdgeConverter;
+import com.google.devtools.depan.graph_doc.persistence.EdgeReferenceConverter;
+import com.google.devtools.depan.graph_doc.persistence.ReferencedGraphDocumentConverter;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.persistence.PersistenceLogger;
@@ -26,9 +28,7 @@ import com.google.devtools.depan.view_doc.model.ViewDocument;
 import com.google.devtools.depan.view_doc.model.ViewDocument.Components;
 import com.google.devtools.depan.view_doc.model.ViewPreferences;
 
-import com.google.common.collect.Sets;
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
@@ -37,14 +37,14 @@ import com.thoughtworks.xstream.mapper.Mapper;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Set;
 
 /**
  * Custom {@code XStream} converter for {@code ViewDocument}s.
  * 
  * @author <a href="mailto:leeca@google.com">Lee Carver</a>
  */
-public class ViewDocumentConverter implements Converter {
+public class ViewDocumentConverter
+    extends ReferencedGraphDocumentConverter {
 
   private static final String VIEW_INFO_TAG = "view-info";
 
@@ -53,42 +53,19 @@ public class ViewDocumentConverter implements Converter {
   /** Legacy tag for the view-nodes section. */
   private static final Object SET_LEGACY = "set";
 
-  private final Mapper mapper;
-
   public ViewDocumentConverter(Mapper mapper) {
-    this.mapper = mapper;
+    super(mapper);
+  }
+
+  public Class<?> getType() {
+    return ViewDocument.class;
   }
 
   public static ViewDocumentConverter configXStream(XStream xstream) {
-    ViewDocumentConverter result = new ViewDocumentConverter(xstream.getMapper());
-    xstream.aliasType(VIEW_INFO_TAG, ViewDocument.class);
-    xstream.registerConverter(result);
+    ViewDocumentConverter result =
+        new ViewDocumentConverter(xstream.getMapper());
+    result.registerWithTag(xstream, VIEW_INFO_TAG);
     return result;
-  }
-
-  /** Provide access to the referenced {@code GraphDocument}. */
-  public GraphDocument getGraphDocument(UnmarshallingContext context) {
-    return (GraphDocument) context.get(GraphDocument.class);
-  }
-
-  /**
-   * Provide access to the {@code GraphModel} of the referenced
-   * {@code GraphDocument}.
-   */
-  public GraphModel getGraphModel(UnmarshallingContext context) {
-    return getGraphDocument(context).getGraph();
-  }
-
-  /** Save a reference to the referenced {@code GraphDocument}. */
-  public void putGraphDocument(
-      UnmarshallingContext context, GraphDocument graphDoc) {
-    context.put(GraphDocument.class, graphDoc);
-  }
-
-  @Override
-  @SuppressWarnings("rawtypes")  // Parent type uses raw type Class
-  public boolean canConvert(Class type) {
-    return ViewDocument.class.equals(type);
   }
 
   /**
@@ -100,32 +77,14 @@ public class ViewDocumentConverter implements Converter {
     ViewDocument viewInfo = (ViewDocument) source;
     Components components = viewInfo.getComponents();
 
-    // Save all node references.
+    // Save the graph reference.
     marshalObject(components.getParentGraph(), writer, context);
 
     // Save all node references.
-    marshallNodes(components.getViewNodes(), VIEW_NODES, writer, context);
+    marshalNodes(components.getViewNodes(), VIEW_NODES, writer, context);
 
     // Save the preferences.
     marshalObject(components.getUserPrefs(), writer, context);
-  }
-
-  private void marshalObject(Object item,
-      HierarchicalStreamWriter writer, MarshallingContext context) {
-    String nodeLabel = mapper.serializedClass(item.getClass());
-    writer.startNode(nodeLabel);
-    context.convertAnother(item);
-    writer.endNode();
-  }
-
-  private void marshallNodes(Collection<GraphNode> nodes, String nodeLabel,
-      HierarchicalStreamWriter writer, MarshallingContext context) {
-    // Save all nodes.
-    writer.startNode(nodeLabel);
-    for (GraphNode node : nodes) {
-      marshalObject(node, writer, context);
-    }
-    writer.endNode();
   }
 
   /**
@@ -147,11 +106,10 @@ public class ViewDocumentConverter implements Converter {
 
     try {
       GraphModelReference viewInfo =
-          (GraphModelReference) unmarshalObject(reader, context);
-      putGraphDocument(context, viewInfo.getGraph());
+          unmarshalGraphModelReference(reader, context);
       context.put(GraphModel.class, viewInfo.getGraph());
 
-      Collection<GraphNode> viewNodes = loadGraphNodes(reader, context);
+      Collection<GraphNode> viewNodes = unmarshalNodes(reader, context);
 
       // TODO: Converter for ViewPreferences
       ViewPreferences viewPrefs = (ViewPreferences) unmarshalObject(reader, context);
@@ -164,34 +122,22 @@ public class ViewDocumentConverter implements Converter {
     }
   }
 
-  /**
-   * Isolate unchecked conversion.
-   */
-  private Collection<GraphNode> loadGraphNodes(
+  private Collection<GraphNode> unmarshalNodes(
       HierarchicalStreamReader reader, UnmarshallingContext context) {
 
     reader.moveDown();
-    if (!isViewNodes(reader)) {
-      reader.moveUp();
-      PersistenceLogger.LOG.info(
-          "Can't load nodes from section " + reader.getNodeName());
+    try {
+      if (!isViewNodes(reader)) {
+        PersistenceLogger.LOG.info(
+            "Can't load nodes from section " + reader.getNodeName());
 
-      return Collections.emptySet();
-    }
+        return Collections.emptySet();
+      }
 
-    Set<GraphNode> result = Sets.newHashSet();
-
-    while (reader.hasMoreChildren()) {
-      reader.moveDown();
-      String nodeName = reader.getNodeName();
-      Class<?> childClass = mapper.realClass(nodeName);
-      GraphNode node = (GraphNode) context.convertAnother(null, childClass);
-      result.add(node);
+      return unmarshalGraphNodes(reader, context);
+    } finally {
       reader.moveUp();
     }
-    reader.moveUp();
-
-    return result;
   }
 
   private boolean isViewNodes(HierarchicalStreamReader reader) {
@@ -203,17 +149,5 @@ public class ViewDocumentConverter implements Converter {
       return true;
     }
     return false;
-  }
-
-  private Object unmarshalObject(
-      HierarchicalStreamReader reader, UnmarshallingContext context) {
-    reader.moveDown();
-    String childName = reader.getNodeName();
-    Class<?> childClass = mapper.realClass(childName);
-
-    Object result = context.convertAnother(null, childClass);
-
-    reader.moveUp();
-    return result;
   }
 }

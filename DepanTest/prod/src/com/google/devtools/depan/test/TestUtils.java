@@ -20,6 +20,8 @@ import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.api.RelationSet;
 import com.google.devtools.depan.graph.basic.BasicEdge;
 import com.google.devtools.depan.graph.basic.BasicNode;
+import com.google.devtools.depan.graph_doc.model.DependencyModel;
+import com.google.devtools.depan.graph_doc.model.GraphDocument;
 import com.google.devtools.depan.model.ElementVisitor;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
@@ -29,6 +31,8 @@ import com.google.devtools.depan.model.RelationSets;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -102,7 +106,7 @@ public class TestUtils {
     return buildGraphModel(nodes, edges);
   }
 
-  private static GraphModel buildGraphModel(
+  public static GraphModel buildGraphModel(
       GraphNode nodes[], Set<BasicEdge<? extends String>> edges) {
     Map<String, BasicNode<? extends String>> graphNodes =
         Maps.newHashMapWithExpectedSize(nodes.length);
@@ -120,6 +124,18 @@ public class TestUtils {
     }
 
     return result;
+  }
+
+  public static GraphDocument buildTestDoc(int order) {
+    GraphNode[] nodes = TestUtils.buildNodes(order);
+    Set<BasicEdge<? extends String>> edges = Collections.emptySet();
+    List<String> nodeContribIds = Collections.emptyList();
+    List<String> relationContribId = Collections.emptyList();
+
+    GraphModel graph = TestUtils.buildGraphModel(nodes, edges);
+    DependencyModel model =
+        new DependencyModel(nodeContribIds, relationContribId);
+    return new GraphDocument(model , graph);
   }
 
   private static String nameGen(String prefix, int nodeCnt) {

@@ -17,6 +17,8 @@
 package com.google.devtools.depan.cmd.dispatch;
 
 import com.google.devtools.depan.cmd.CmdLogger;
+import com.google.devtools.depan.graph_doc.model.GraphDocument;
+import com.google.devtools.depan.graph_doc.persistence.GraphModelXmlPersist;
 
 import org.eclipse.equinox.app.IApplication;
 
@@ -88,9 +90,6 @@ public abstract class AbstractCommandExec implements CommandExec {
     return def;
   }
 
-  /**
-   * @param msg
-   */
   protected void failWithMessage(String msg) {
     result = new Integer(1);
     CmdLogger.LOG.warning(msg);
@@ -101,4 +100,44 @@ public abstract class AbstractCommandExec implements CommandExec {
     return result.toURI();
   }
 
+  /**
+   * Provide the {@link GraphDocument} associated
+   * with the supplied {@link URI}.
+   * 
+   * If the URI fails to load as a {@link GraphDocument}, writes a message
+   * to the log and returns {@code null}.
+   */
+  protected GraphDocument buildGraphDoc(URI graphUri) {
+    try {
+      CmdLogger.LOG.info("Loading GraphDoc from " + graphUri);
+      GraphModelXmlPersist loader = GraphModelXmlPersist.build(true);
+      return loader.load(graphUri);
+    } catch (RuntimeException err) {
+      CmdLogger.logException("Unable to load GraphDoc from " + graphUri, err);
+    }
+    return null;
+  }
+
+  /**
+   * Provide the {@link GraphDocument} associated
+   * with the supplied {@link #location}.
+   * 
+   * If the location fails to load as a {@link GraphDocument},
+   * writes a message to the log and returns {@code null}.
+   */
+  protected GraphDocument buildGraphDoc(String location) {
+    URI graphUri = buildLocation(location);
+    return buildGraphDoc(graphUri);
+  }
+
+  /**
+   * Provide the {@link GraphDocument} associated
+   * with the supplied parameter {@link #index}.
+   * 
+   * If the index fails to load as a {@link GraphDocument},
+   * writes a message to the log and returns {@code null}.
+   */
+  protected GraphDocument buildGraphDoc(int index) {
+    return buildGraphDoc(getParm(index));
+  }
 }

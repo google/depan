@@ -27,7 +27,7 @@ import org.junit.Test;
 /**
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public class TestMergeGraphModel {
+public class MergeGraphModelTest {
 
   @Test
   public void testBasic() {

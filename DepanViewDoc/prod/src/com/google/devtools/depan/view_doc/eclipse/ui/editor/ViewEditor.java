@@ -645,7 +645,8 @@ public class ViewEditor extends MultiPageEditorPart {
       setPartName(input.getName());
 
       try {
-        ViewDocXmlPersist loader = ViewDocXmlPersist.build(true, "load");
+        ViewDocXmlPersist loader =
+            ViewDocXmlPersist.buildForLoad(viewFile, "load");
         viewInfo = loader.load(viewFile.getLocationURI());
         setDirtyState(false);
       } catch (RuntimeException e) {
@@ -885,7 +886,7 @@ public class ViewEditor extends MultiPageEditorPart {
    * @throws IOException if the save is unsuccessful
    */
   private void saveFile(IFile file, IProgressMonitor monitor, String opLabel) {
-    ViewDocXmlPersist persist = ViewDocXmlPersist.build(false, opLabel);
+    ViewDocXmlPersist persist = ViewDocXmlPersist.buildForSave(opLabel);
     StorageTools.saveDocument(file, viewInfo, persist, monitor);
 
     setDirtyState(false);

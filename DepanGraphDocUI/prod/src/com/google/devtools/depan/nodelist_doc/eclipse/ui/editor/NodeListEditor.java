@@ -200,7 +200,7 @@ public class NodeListEditor extends EditorPart {
       IFileEditorInput fileInput = (IFileEditorInput) input;
       file = fileInput.getFile();
 
-      NodeListDocXmlPersist persist = NodeListDocXmlPersist.build(true);
+      NodeListDocXmlPersist persist = NodeListDocXmlPersist.buildForLoad(file);
       nodeListInfo = persist.load(file.getRawLocationURI());
 
       baseName = buildFileInputBaseName(file);
@@ -273,7 +273,7 @@ public class NodeListEditor extends EditorPart {
    * location.
    */
   private void persistDocument(IProgressMonitor monitor) {
-    NodeListDocXmlPersist persist = NodeListDocXmlPersist.build(false);
+    NodeListDocXmlPersist persist = NodeListDocXmlPersist.buildForSave();
     StorageTools.saveDocument(file, nodeListInfo, persist, monitor);
 
     setDirtyState(false);

@@ -28,7 +28,7 @@ import com.thoughtworks.xstream.converters.Converter;
 public abstract class AbstractTypeConverter implements Converter {
 
   /**
-   * Hook method to provide type the registration and converter processeses.
+   * Hook method to provide type the registration and converter processes.
    */
   public abstract Class<?> getType();
 

@@ -18,6 +18,7 @@ package com.google.devtools.depan.graph_doc.persistence;
 
 import com.google.devtools.depan.graph_doc.model.GraphDocument;
 import com.google.devtools.depan.graph_doc.model.GraphModelReference;
+import com.google.devtools.depan.model.GraphModel;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.Converter;
@@ -29,6 +30,10 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
+
+import java.io.File;
 
 /**
  * Custom {@code XStream} converter for {@code GraphModelReference}s.
@@ -39,6 +44,10 @@ import org.eclipse.core.resources.ResourcesPlugin;
  */
 public class GraphModelReferenceConverter implements Converter {
 
+  private enum GraphModelSource {
+    PROJECT, RELATIVE
+  }
+
   public static final String GRAPH_REF_TAG = "graph-ref";
 
   public GraphModelReferenceConverter() {
@@ -47,6 +56,30 @@ public class GraphModelReferenceConverter implements Converter {
   public static void configXStream(XStream xstream) {
     xstream.aliasType(GRAPH_REF_TAG, GraphModelReference.class);
     xstream.registerConverter(new GraphModelReferenceConverter());
+  }
+
+  /**
+   * Store the project-based path for the XML source in the supplied
+   * {@link UnmarshallingContext}.
+   */
+  public static void setProjectSource(UnmarshallingContext context, IFile source) {
+    context.put(GraphModelSource.PROJECT, source);
+  }
+
+  private IFile getProjectSource(UnmarshallingContext context) {
+    return (IFile) context.get(GraphModelSource.PROJECT);
+  }
+
+  /**
+   * Store the file-system path for the XML source in the supplied
+   * {@link UnmarshallingContext}.
+   */
+  public static void setRelativeSource(UnmarshallingContext context, File source) {
+    context.put(GraphModelSource.RELATIVE, source);
+  }
+
+  private File getRelativeSource(UnmarshallingContext context) {
+    return (File) context.get(GraphModelSource.RELATIVE);
   }
 
   @Override
@@ -62,14 +95,14 @@ public class GraphModelReferenceConverter implements Converter {
   public void marshal(Object source, HierarchicalStreamWriter writer,
       MarshallingContext context) {
     GraphModelReference graphRef = (GraphModelReference) source;
-    context.convertAnother(graphRef.getLocation().getFullPath().toString());
+    context.convertAnother(graphRef.getGraphPath());
   }
 
   /**
    * {@inheritDoc}
    * <p>
-   * This implementation reads in the workspace-relative name of the dependency
-   * graph file, and then tries to load that file as the graph model.
+   * Obtain the {@link GraphModelReference}, including loading the saved
+   * {@link GraphModel} from a project-based or file-system relative location.
    * 
    * @see EdgeConverter#unmarshal(HierarchicalStreamReader, UnmarshallingContext)
    */
@@ -77,21 +110,46 @@ public class GraphModelReferenceConverter implements Converter {
   public Object unmarshal(
       HierarchicalStreamReader reader, UnmarshallingContext context) {
 
-    IFile graphFile = unmarshallGraphLocation(context);
-
-    GraphDocument graph = ResourceCache.fetchGraphDocument(graphFile);
-    return new GraphModelReference(graphFile, graph);
-  }
-
-  /**
-   * @param graphPath
-   * @return
-   */
-  private IFile unmarshallGraphLocation(UnmarshallingContext context) {
     String graphPath = (String) context.convertAnother(null, String.class);
     if (null == graphPath) {
       throw new RuntimeException("Missing location for dependencies");
     }
+    if (graphPath.startsWith("/")) {
+      return unmarshalProjectGraphFile(graphPath, context);
+    }
+    return unmarshalRelativeGraphFile(graphPath, context);
+  }
+
+  private GraphModelReference unmarshalRelativeGraphFile(
+      String graphPath, UnmarshallingContext context) {
+
+    // Try project-based first - synthesize a project-based path relative
+    // to the source file.
+    IFile projectSrc = getProjectSource(context);
+    if (null != projectSrc) {
+      IPath namePath = Path.fromPortableString(graphPath);
+      IFile graphFile = projectSrc.getParent().getFile(namePath);
+      String graphProjectPath = graphFile.getFullPath().toPortableString();
+      return unmarshalProjectGraphFile(graphProjectPath, context);
+    }
+
+    // Try relative to file-system path for source file.
+    File relativeSrc = getRelativeSource(context);
+    if (null != relativeSrc) {
+      GraphModelXmlPersist persist = GraphModelXmlPersist.build(true);
+
+      File relativeFile = relativeSrc.getParentFile();
+      File graphFile = new File(relativeFile, graphPath);
+      GraphDocument graphDoc = persist.load(graphFile.toURI());
+      return new GraphModelReference(graphPath, graphDoc);
+    }
+
+    throw new RuntimeException(
+        "Can't locate resource " + graphPath + " for dependency information");
+  }
+
+  private GraphModelReference unmarshalProjectGraphFile(
+      String graphPath, UnmarshallingContext context) {
 
     IResource graphRsrc = ResourcesPlugin.getWorkspace().getRoot()
         .findMember(graphPath);
@@ -103,6 +161,7 @@ public class GraphModelReferenceConverter implements Converter {
       throw new RuntimeException("Resource " + graphPath + " is not a file");
     }
 
-    return (IFile) graphRsrc;
+    GraphDocument graph = ResourceCache.fetchGraphDocument((IFile) graphRsrc);
+    return new GraphModelReference(graphRsrc, graph);
   }
 }

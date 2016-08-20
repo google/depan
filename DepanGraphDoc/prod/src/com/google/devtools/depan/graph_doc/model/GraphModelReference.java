@@ -17,6 +17,7 @@
 package com.google.devtools.depan.graph_doc.model;
 
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 
 /**
  * Define a pairing between a graphModel and a file.  A custom converter that
@@ -26,20 +27,27 @@ import org.eclipse.core.resources.IResource;
  * @author <a href="mailto:leeca@google.com">Lee Carver</a>
  */
 public class GraphModelReference {
-  private final IResource location;
+  private final String path;
   private final GraphDocument graph;
 
-  public GraphModelReference(IResource location, GraphDocument graph) {
-    super();
-    this.location = location;
+  public GraphModelReference(String path, GraphDocument graph) {
+    this.path = path;
     this.graph = graph;
+  }
+
+  public GraphModelReference(IResource location, GraphDocument graph) {
+    this(location.getFullPath().toPortableString(), graph);
+  }
+
+  public String getGraphPath() {
+    return path;
   }
 
   /**
    * @return the location
    */
   public IResource getLocation() {
-    return location;
+    return ResourcesPlugin.getWorkspace().getRoot().findMember(path);
   }
 
   /**

@@ -17,6 +17,7 @@
 package com.google.devtools.depan.cmd.dispatch;
 
 import com.google.devtools.depan.cmd.analyzers.AnalyzerFactory;
+import com.google.devtools.depan.cmd.setops.SubtractFactory;
 import com.google.devtools.depan.cmd.setops.UnionFactory;
 
 import com.google.common.collect.Maps;
@@ -31,6 +32,7 @@ public class CommandDef {
   private static Map<String, CommandFactory> cmds = Maps.newHashMap();
   static {
     cmds.put("analyze", new AnalyzerFactory());
+    cmds.put("subtract", new SubtractFactory());
     cmds.put("union", new UnionFactory());
   }
 

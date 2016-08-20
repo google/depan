@@ -74,8 +74,10 @@ public class GraphModel extends BasicGraph<String> {
    * @return the collection of Nodes in this graph.
    */
   public Map<String, GraphNode> getNodesMap() {
-    Map<String, GraphNode> result = Maps.newHashMap();
-    for (GraphNode node : getNodes()) {
+    Collection<GraphNode> nodes = getNodes();
+    Map<String, GraphNode> result =
+        Maps.newHashMapWithExpectedSize(nodes.size());
+    for (GraphNode node : nodes) {
       result.put(node.getId().toString(), node);
     }
     return result;

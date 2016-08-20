@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.view_doc.persistence;
+package com.google.devtools.depan.graph_doc.persistence;
 
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
@@ -37,19 +37,19 @@ public class NodeReferenceConverter implements Converter {
 
   public static final String NODE_REF_TAG = "node-ref";
 
-  private final ViewDocumentConverter viewConverter;
+  private final ReferencedGraphDocumentConverter refConverter;
 
   /**
    * @param viewConverter
    */
-  public NodeReferenceConverter(ViewDocumentConverter viewConverter) {
-    this.viewConverter = viewConverter;
+  public NodeReferenceConverter(ReferencedGraphDocumentConverter refConverter) {
+    this.refConverter = refConverter;
   }
 
   public static void configXStream(
-      XStream xstream, ViewDocumentConverter converter) {
+      XStream xstream, ReferencedGraphDocumentConverter refConverter) {
     xstream.aliasType(NODE_REF_TAG, GraphNode.class);
-    xstream.registerConverter(new NodeReferenceConverter(converter));
+    xstream.registerConverter(new NodeReferenceConverter(refConverter));
   }
 
   @Override
@@ -71,9 +71,9 @@ public class NodeReferenceConverter implements Converter {
    * can be retrieved from the {@code UnmarshallingContext}.
    */
   @Override
-  public Object unmarshal(HierarchicalStreamReader reader,
-      UnmarshallingContext context) {
-    GraphModel graph = viewConverter.getGraphModel(context);
+  public Object unmarshal(
+      HierarchicalStreamReader reader, UnmarshallingContext context) {
+    GraphModel graph = refConverter.getGraphModel(context);
     String nodeId = reader.getValue();
     GraphNode result = (GraphNode) graph.findNode(nodeId);
     if (null == result) {
