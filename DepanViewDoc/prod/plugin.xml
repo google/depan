@@ -126,12 +126,29 @@
             id="com.google.devtools.depan.eclipse.actions.view.StrokeHighlight"
             name="Stroke highlight">
       </command>
+      <command
+            defaultHandler="com.google.devtools.depan.view_doc.eclipse.ui.handlers.TakeScreenshotHandler"
+            description="Take screenshot of current View Editor window"
+            id="com.google.devtools.depan.eclipse.actions.view.TakeScreenshot"
+            name="Take screenshot...">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
       <menuContribution
             allPopups="false"
             locationURI="menu:org.eclipse.ui.main.menu">
+         <menu
+               label="Edit">
+            <command
+                  commandId="com.google.devtools.depan.eclipse.actions.view.TakeScreenshot"
+                  icon="icons/screenshot_16x16.png"
+                  label="Take screenshot..."
+                  mnemonic="T"
+                  style="push"
+                  tooltip="Take a screenshot of the view, and save it to a file">
+            </command>
+         </menu>
          <menu
                label="View">
             <command

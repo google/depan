@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.eclipse;
 
+import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.ICoolBarManager;
 import org.eclipse.jface.action.IMenuManager;
@@ -97,9 +98,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     helpMenu.add(aboutAction);
 
     menuBar.add(depanMenu);
-    // allow contributions here with id "additions" (MB_ADDITIONS)
-    menuBar.add(new Separator(EDIT_SEPARATOR_TEXT));
-    menuBar.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+    menuBar.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
     menuBar.add(windowMenu);
     menuBar.add(helpMenu);
   }
@@ -113,6 +112,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
     coolBar.add(toolbar);
     // allow contributions here with id "additions" (MB_ADDITIONS)
-    // coolBar.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+    coolBar.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
   }
 }

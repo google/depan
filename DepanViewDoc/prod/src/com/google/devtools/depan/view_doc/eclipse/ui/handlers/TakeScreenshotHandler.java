@@ -18,26 +18,18 @@ package com.google.devtools.depan.view_doc.eclipse.ui.handlers;
 
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
 
-import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 
 /**
- * Toggles boolean options for ViewEditor option commands.
- * The command id must match the id for the view option.
- * 
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public class ViewEditorOptionHandler extends AbstractViewEditorHandler {
+public class TakeScreenshotHandler extends AbstractViewEditorHandler {
 
   @Override
   public Object execute(ExecutionEvent event) throws ExecutionException {
     ViewEditor viewer = getViewEditor(event);
-
-    Command command = event.getCommand();
-    String optionId = command.getId();
-    boolean value = viewer.isOptionChecked(optionId);
-    viewer.setBooleanOption(optionId, !value);
+    viewer.takeScreenshot();
     return null;
   }
 }
