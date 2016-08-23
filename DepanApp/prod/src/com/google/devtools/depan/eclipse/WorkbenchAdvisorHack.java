@@ -26,7 +26,6 @@ import org.eclipse.ui.application.WorkbenchAdvisor;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.internal.ide.IDEInternalWorkbenchImages;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
-import org.eclipse.ui.internal.ide.model.WorkbenchAdapterBuilder;
 import org.osgi.framework.Bundle;
 
 import java.net.URL;
@@ -230,6 +229,6 @@ public abstract class WorkbenchAdvisorHack extends WorkbenchAdvisor {
 
   @Override
   public void preStartup() {
-    WorkbenchAdapterBuilder.registerAdapters();
+    IDE.registerAdapters();
   }
 }

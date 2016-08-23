@@ -4,14 +4,17 @@ Bundle-Name: DepAn
 Bundle-SymbolicName: com.google.devtools.depan;singleton:=true
 Bundle-Version: 2.0.0.qualifier
 Bundle-Vendor: Pnambic Computing
-Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.equinox.app,
+Require-Bundle: org.eclipse.equinox.app,
+ org.eclipse.core.resources,
+ org.eclipse.core.runtime,
  org.eclipse.swt,
  org.eclipse.jface,
- org.eclipse.core.resources,
  org.eclipse.ui,
  org.eclipse.ui.ide,
  com.google.devtools.depan.core,
+ com.google.devtools.depan.persistence,
+ com.google.devtools.depan.edges.ui,
+ com.google.devtools.depan.nodes.ui,
  com.google.guava
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .

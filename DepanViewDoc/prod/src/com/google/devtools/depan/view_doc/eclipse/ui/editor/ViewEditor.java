@@ -379,7 +379,12 @@ public class ViewEditor extends MultiPageEditorPart {
    * the underlying view document.
    */
   public IProject getResourceProject() {
-    return getInputFile().getProject();
+    IFile input = getInputFile();
+    if (null != input) {
+      return input.getProject();
+    }
+
+    return viewInfo.getGraphModelLocation().getProject();
   }
 
   public GraphModel getViewGraph() {

@@ -58,6 +58,18 @@
          </property>
       </product>
    </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <wizard
+            category="com.google.devtools.depan"
+            class="com.google.devtools.depan.eclipse.natures.NewDepanProjectWizard"
+            finalPerspective="com.google.devtools.depan.eclipse.perspective"
+            icon="icons/branding/depan-icon-16x16.gif"
+            id="com.google.devtools.depan.eclipse.natures.NewDepanProjectWizard"
+            name="DepAn Project"
+            project="true">
+      </wizard>
+   </extension>
 
    <extension
          point="org.eclipse.ui.perspectives">
@@ -69,60 +81,14 @@
       </perspective>
    </extension>
    <extension
-         id="cli"
-         point="org.eclipse.core.runtime.products">
-      <product
-            application="com.google.devtools.depan.cmd.application"
-            name="DepAn [CLI]">
-         <property
-               name="aboutText"
-               value="DepAn - A direct manipulation tool for the visualization, analysis, and refactoring of dependencies in large applications.">
-         </property>
-         <property
-               name="appName"
-               value="DepAn [CLI]">
-         </property>
-      </product>
-   </extension>
-   <extension
-         id="app"
-         point="org.eclipse.core.runtime.products">
-      <product
-            application="com.google.devtools.depan.application"
-            name="DepAn [Win64]">
-         <property
-               name="windowImages"
-               value="/DepanAppMin/icons/branding/depan-icon-16x16.gif,/DepanAppMin/icons/branding/depan-icon-32x32.gif,/DepanAppMin/icons/branding/depan-icon-48x48.gif,/DepanAppMin/icons/branding/depan-icon-64x64.gif">
-         </property>
-         <property
-               name="aboutText"
-               value="DepAn - A direct manipulation tool for the visualization, analysis, and refactoring of dependencies in large applications.">
-         </property>
-         <property
-               name="aboutImage"
-               value="icons/branding/depan-icon-250x250.gif">
-         </property>
-         <property
-               name="startupForegroundColor"
-               value="000000">
-         </property>
-         <property
-               name="startupProgressRect"
-               value="5,275,445,15">
-         </property>
-         <property
-               name="startupMessageRect"
-               value="7,252,445,20">
-         </property>
-         <property
-               name="preferenceCustomization"
-               value="plugin_customization.ini">
-         </property>
-         <property
-               name="appName"
-               value="DepAn [Win64]">
-         </property>
-      </product>
+         id="DepAnNature"
+         name="DapAn"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="com.google.devtools.depan.eclipse.natures.DepAnNature">
+         </run>
+      </runtime>
    </extension>
 
 </plugin>
