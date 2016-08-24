@@ -16,6 +16,8 @@
 
 package com.google.devtools.depan.eclipse.ui.nodes;
 
+import com.google.devtools.depan.platform.PlatformResources;
+
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
@@ -31,20 +33,21 @@ public final class NodesUIResources {
 
   public static final Bundle BUNDLE = Platform.getBundle(PLUGIN_ID);
 
+  public static final ImageDescriptor IMAGE_DESC_EXPANDALL =
+      getImageDescriptor("icons/expandall.png");
+
   public static final Image IMAGE_EXPANDALL =
-      NodesUIResources.getImageFromPath("icons/expandall.png");
+      getImage(IMAGE_DESC_EXPANDALL);
 
   private NodesUIResources() {
     // Prevent instantiation.
   }
 
-  public static ImageDescriptor getImageDescriptor(String path) {
-    return AbstractUIPlugin.imageDescriptorFromPlugin(
-          PLUGIN_ID, path);
-    }
+  private static ImageDescriptor getImageDescriptor(String path) {
+    return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
+  }
 
-  public static Image getImageFromPath(String path) {
-    return AbstractUIPlugin.imageDescriptorFromPlugin(
-        PLUGIN_ID, path).createImage();
+  private static Image getImage(ImageDescriptor descriptor) {
+    return PlatformResources.getImage(descriptor);
   }
 }

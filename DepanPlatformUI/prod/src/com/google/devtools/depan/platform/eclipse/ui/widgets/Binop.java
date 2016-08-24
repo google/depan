@@ -19,6 +19,8 @@ package com.google.devtools.depan.platform.eclipse.ui.widgets;
 import com.google.devtools.depan.platform.BinaryOperators;
 import com.google.devtools.depan.platform.PlatformResources;
 
+import com.google.common.collect.Maps;
+
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.PlatformObject;
@@ -39,6 +41,8 @@ import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.part.WorkbenchPart;
+
+import java.util.Map;
 
 
 /**
@@ -84,6 +88,17 @@ public class Binop<T extends BinaryOperators<T>>
     public String toString() {
       return repr;
     }
+  }
+
+  private static Map<Operators, ImageDescriptor> OP_DESC = buildOpDesc();
+
+  static Map<Operators, ImageDescriptor> buildOpDesc() {
+    Map<Operators, ImageDescriptor> result = Maps.newHashMap();
+    result.put(Operators.AND, PlatformResources.IMAGE_DESC_AND);
+    result.put(Operators.OR, PlatformResources.IMAGE_DESC_OR);
+    result.put(Operators.XOR, PlatformResources.IMAGE_DESC_XOR);
+    result.put(Operators.NOT, PlatformResources.IMAGE_DESC_NOT);
+    return result;
   }
 
   public Binop(Composite parent, int style, WorkbenchPart part,
@@ -485,25 +500,10 @@ public class Binop<T extends BinaryOperators<T>>
     @SuppressWarnings("rawtypes")
     public ImageDescriptor getImageDescriptor(Object object) {
       if (object instanceof BinTree) {
-        String icon = getIcon(((BinTree) object).op);
-        return PlatformResources.getImageDescriptor(icon);
+        return OP_DESC.get(((BinTree) object).op);
       }
 
-      return null;
-    }
-
-    private String getIcon(Operators o) {
-      String base = "icons/";
-      if (o == Binop.Operators.AND) {
-        return base + "and16.png";
-      } else if (o == Binop.Operators.OR) {
-        return base + "or16.png";
-      } else if (o == Binop.Operators.XOR) {
-        return base + "xor16.png";
-      } else if (o == Binop.Operators.NOT) {
-        return base + "not16.png";
-      }
-      return "icons/sample.gif";
+      return PlatformResources.IMAGE_DESC_DEFAULT;
     }
 
     @Override

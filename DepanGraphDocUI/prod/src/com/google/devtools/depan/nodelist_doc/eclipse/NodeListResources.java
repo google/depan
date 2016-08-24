@@ -16,6 +16,8 @@
 
 package com.google.devtools.depan.nodelist_doc.eclipse;
 
+import com.google.devtools.depan.platform.PlatformResources;
+
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
@@ -50,6 +52,6 @@ public class NodeListResources {
   }
 
   private static Image getImage(ImageDescriptor descriptor) {
-    return descriptor.createImage();
+    return PlatformResources.getImage(descriptor);
   }
 }

@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.view_doc.eclipse;
 
+import com.google.devtools.depan.platform.PlatformResources;
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditorInput;
 
 import org.eclipse.core.runtime.Platform;
@@ -38,20 +39,11 @@ public class ViewDocResources {
   public static final ImageDescriptor IMAGE_DESC_VIEWDOC =
       getImageDescriptor("icons/view-editor.gif");
 
-  public static final Image IMAGE_VIEWDOC =
-      getImage(IMAGE_DESC_VIEWDOC);
-
   private static final ImageDescriptor IMAGE_DESC_RELATIONPICKER =
       getImageDescriptor("icons/relpicker.png");
 
-  public static final Image IMAGE_RELATIONPICKER =
-      getImage(IMAGE_DESC_RELATIONPICKER);
-
   private static final ImageDescriptor IMAGE_DESC_NODEEDITOR =
       getImageDescriptor("icons/nodeeditor.png");
-
-  public static final Image IMAGE_NODEEDITOR =
-      getImage(IMAGE_DESC_NODEEDITOR);
 
   private static final ImageDescriptor IMAGE_DESC_SELECTIONEDITOR =
       getImageDescriptor("icons/selectioneditor.png");
@@ -59,11 +51,20 @@ public class ViewDocResources {
   public static final Image IMAGE_SELECTIONEDITOR =
       getImage(IMAGE_DESC_SELECTIONEDITOR);
 
+  public static final Image IMAGE_VIEWDOC =
+      getImage(IMAGE_DESC_VIEWDOC);
+
+  public static final Image IMAGE_RELATIONPICKER =
+      getImage(IMAGE_DESC_RELATIONPICKER);
+
+  public static final Image IMAGE_NODEEDITOR =
+      getImage(IMAGE_DESC_NODEEDITOR);
+
   private static ImageDescriptor getImageDescriptor(String path) {
     return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
   }
 
   private static Image getImage(ImageDescriptor descriptor) {
-    return descriptor.createImage();
+    return PlatformResources.getImage(descriptor);
   }
 }

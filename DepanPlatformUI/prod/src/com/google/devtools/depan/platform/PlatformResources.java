@@ -19,9 +19,8 @@ package com.google.devtools.depan.platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.osgi.framework.Bundle;
 
-import java.net.URL;
+import java.text.MessageFormat;
 
 /**
  * @author ycoppel@google.com (Yohann Coppel)
@@ -34,32 +33,42 @@ public final class PlatformResources {
   public static final String PLUGIN_ID = "com.google.devtools.depan.platform.ui";
 
   // icons
+
+  public static final ImageDescriptor IMAGE_DESC_AND =
+      getImageDescriptor("icons/and.png");
+  public static final ImageDescriptor IMAGE_DESC_OR =
+      getImageDescriptor("icons/or.png");
+  public static final ImageDescriptor IMAGE_DESC_XOR =
+      getImageDescriptor("icons/xor.png");
+  public static final ImageDescriptor IMAGE_DESC_NOT =
+      getImageDescriptor("icons/not.png");
+  public static final ImageDescriptor IMAGE_DESC_DEFAULT =
+      getImageDescriptor("icons/sample.gif");
+
   public static final Image IMAGE_HANDTOOL =
-      PlatformResources.getImageFromPath("icons/hand.png");
+      getImage(getImageDescriptor("icons/hand.png"));
   public static final Image IMAGE_PICKTOOL =
-      PlatformResources.getImageFromPath("icons/arrow.png");
+      getImage(getImageDescriptor("icons/arrow.png"));
   public static final Image IMAGE_COLLAPSE =
-      PlatformResources.getImageFromPath("icons/collapse.png");
+      getImage(getImageDescriptor("icons/collapse.png"));
   public static final Image IMAGE_EXPANDALL =
-      PlatformResources.getImageFromPath("icons/expandall.png");
+      getImage(getImageDescriptor("icons/expandall.png"));
   public static final Image IMAGE_AND =
-      PlatformResources.getImageFromPath("icons/and.png");
+      getImage(IMAGE_DESC_AND);
   public static final Image IMAGE_OR =
-      PlatformResources.getImageFromPath("icons/or.png");
+      getImage(IMAGE_DESC_OR);
   public static final Image IMAGE_XOR =
-      PlatformResources.getImageFromPath("icons/xor.png");
+      getImage(IMAGE_DESC_XOR);
   public static final Image IMAGE_NOT =
-      PlatformResources.getImageFromPath("icons/not.png");
+      getImage(IMAGE_DESC_NOT);
 
   public static final Image IMAGE_ON =
-      PlatformResources.getImageFromPath("icons/brkpi_obj.gif");
+      getImage(getImageDescriptor("icons/brkpi_obj.gif"));
   public static final Image IMAGE_OFF =
-      PlatformResources.getImageFromPath("icons/brkpd_obj.gif");
+      getImage(getImageDescriptor("icons/brkpd_obj.gif"));
 
   public static final Image IMAGE_DEFAULT =
-      PlatformResources.getImageFromPath("icons/sample.gif");
-  public static final ImageDescriptor IMAGE_DESC_DEFAULT =
-      ImageDescriptor.createFromImage(IMAGE_DEFAULT);
+      getImage(IMAGE_DESC_DEFAULT);
 
   // private constructor to prevent instantiation
   private PlatformResources() { }
@@ -68,23 +77,20 @@ public final class PlatformResources {
     return on ? IMAGE_ON : IMAGE_OFF;
   }
 
-  public static ImageDescriptor getImageDescriptor(
-      Bundle bundle, String path) {
-    try {
-      URL imageURL = bundle.getResource(path);
-      return ImageDescriptor.createFromURL(imageURL);
-    } catch (Exception e) {
-      return IMAGE_DESC_DEFAULT;
-    }
-  }
-
-  public static ImageDescriptor getImageDescriptor(String path) {
+  private static ImageDescriptor getImageDescriptor(String path) {
     return AbstractUIPlugin.imageDescriptorFromPlugin(
           PLUGIN_ID, path);
     }
 
-  public static Image getImageFromPath(String path) {
-    return AbstractUIPlugin.imageDescriptorFromPlugin(
-        PLUGIN_ID, path).createImage();
+  public static Image getImage(ImageDescriptor descriptor) {
+    try {
+      return descriptor.createImage();
+    } catch (RuntimeException errAny) {
+      String msg = MessageFormat.format(
+          "Unable to open image from descriptor {0}", descriptor);
+      PlatformLogger.logException(msg , errAny);
+    }
+
+    return null;
   }
 }

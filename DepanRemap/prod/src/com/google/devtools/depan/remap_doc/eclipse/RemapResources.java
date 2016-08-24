@@ -1,5 +1,7 @@
 package com.google.devtools.depan.remap_doc.eclipse;
 
+import com.google.devtools.depan.platform.PlatformResources;
+
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
@@ -29,6 +31,6 @@ public class RemapResources {
   }
 
   private static Image getImage(ImageDescriptor descriptor) {
-    return descriptor.createImage();
+    return PlatformResources.getImage(descriptor);
   }
 }

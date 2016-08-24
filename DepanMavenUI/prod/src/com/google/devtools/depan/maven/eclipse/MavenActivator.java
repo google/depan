@@ -19,6 +19,7 @@ package com.google.devtools.depan.maven.eclipse;
 import com.google.devtools.depan.eclipse.preferences.PreferencesIds;
 import com.google.devtools.depan.maven.graph.ArtifactElement;
 import com.google.devtools.depan.maven.graph.PropertyElement;
+import com.google.devtools.depan.platform.PlatformResources;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -109,6 +110,6 @@ public class MavenActivator extends AbstractUIPlugin {
   }
 
   private static Image getImage(ImageDescriptor descriptor) {
-    return descriptor.createImage();
+    return PlatformResources.getImage(descriptor);
   }
 }

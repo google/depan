@@ -17,6 +17,7 @@
 package com.google.devtools.depan.ruby.eclipse;
 
 import com.google.devtools.depan.eclipse.preferences.PreferencesIds;
+import com.google.devtools.depan.platform.PlatformResources;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
@@ -131,11 +132,11 @@ public class RubyActivator extends AbstractUIPlugin {
   /////////////////////////////////////
   // Local abbreviations
 
-  private static Image getImage(ImageDescriptor descriptor) {
-    return descriptor.createImage();
-  }
-
   private static ImageDescriptor getImageDescriptor(String path) {
     return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
+  }
+
+  private static Image getImage(ImageDescriptor descriptor) {
+    return PlatformResources.getImage(descriptor);
   }
 }

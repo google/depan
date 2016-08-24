@@ -16,6 +16,8 @@
 
 package com.google.devtools.depan.filesystem.eclipse;
 
+import com.google.devtools.depan.platform.PlatformResources;
+
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -98,6 +100,6 @@ public class FileSystemActivator extends AbstractUIPlugin {
   }
 
   private static Image getImage(ImageDescriptor descriptor) {
-    return descriptor.createImage();
+    return PlatformResources.getImage(descriptor);
   }
 }

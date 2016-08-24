@@ -17,6 +17,7 @@
 package com.google.devtools.depan.java.eclipse;
 
 import com.google.devtools.depan.eclipse.preferences.PreferencesIds;
+import com.google.devtools.depan.platform.PlatformResources;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
@@ -96,6 +97,6 @@ public class JavaActivator extends AbstractUIPlugin {
   }
 
   private static Image getImage(ImageDescriptor descriptor) {
-    return descriptor.createImage();
+    return PlatformResources.getImage(descriptor);
   }
 }
