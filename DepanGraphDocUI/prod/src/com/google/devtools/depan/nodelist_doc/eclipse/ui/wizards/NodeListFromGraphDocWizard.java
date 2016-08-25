@@ -22,10 +22,10 @@ import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.nodelist_doc.eclipse.ui.editor.NodeListEditor;
 import com.google.devtools.depan.nodelist_doc.eclipse.ui.editor.NodeListEditorInput;
 import com.google.devtools.depan.nodelist_doc.model.NodeListDocument;
-
-import org.eclipse.core.resources.IFile;
+import com.google.devtools.depan.platform.PlatformTools;
 
 import java.text.MessageFormat;
+import java.util.Collection;
 
 /**
  * @author <a href="mailto:leeca@google.com">Lee Carver</a>
@@ -65,54 +65,16 @@ public class NodeListFromGraphDocWizard extends FromGraphDocWizard {
   }
 
   private String calcName() {
-    String srcBase = getSourceBase();
+    String srcBase = PlatformTools.getBaseName(getGraphFile());
     if (entireGraph()) {
       return srcBase;
     }
-    GraphNode node = getTopNode();
-    if (null == node) {
+
+    Collection<GraphNode> nodes = getNodes();
+    if ((null == nodes) || (nodes.isEmpty())) {
       return "Empty NodeList";
     }
 
-    String detail = calcDetailName(node);
-    return MessageFormat.format("{0}_{1}", srcBase, detail);
-  }
-
-  private String calcDetailName(GraphNode node) {
-    String baseName = node.friendlyString();
-    int period = baseName.lastIndexOf('.');
-    if (period > 0) {
-      String segment = baseName.substring(period + 1);
-      if (segment.length() > 3) {
-        return segment;
-      }
-    }
-
-    return baseName;
-  }
-
-  /**
-   * Indicate if the selected nodes match the nodes from the graph document.
-   */
-  private boolean entireGraph() {
-    if (null == getTopNode()) {
-      return false;
-    }
-    if (null == getNodes()) {
-      return false;
-    }
-    return getNodes().size() == getGraphDoc().getGraph().getNodes().size();
-  }
-
-  private String getSourceBase() {
-    IFile graph = getGraphFile();
-    String name = graph.getName();
-    String ext = graph.getFileExtension();
-    // If null, no period is present
-    if (null == ext) {
-      return name;
-    }
-    // remove period and extension from end
-    return name.substring(0, name.length() - 1 - ext.length());
+    return MessageFormat.format("{0}_{1}", srcBase, getDetail());
   }
 }

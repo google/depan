@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.platform;
 
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -34,5 +35,20 @@ public class PlatformTools {
     IStatus status = new Status(
         IStatus.ERROR, pluginId, IStatus.OK, message, null);
     throw new CoreException(status);
+  }
+
+  /**
+   * Provide the text of the last resource segment,
+   * with any extension removed.
+   */
+  public static String getBaseName(IResource resouce) {
+    String name = resouce.getName();
+    String ext = resouce.getFileExtension();
+    // If null, no period is present
+    if (null == ext) {
+      return name;
+    }
+    // remove period and extension from end
+    return name.substring(0, name.length() - 1 - ext.length());
   }
 }

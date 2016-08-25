@@ -54,6 +54,7 @@ public class NodeListDocumentConverter
     super(mapper);
   }
 
+  @Override
   public Class<?> getType() {
     return NodeListDocument.class;
   }

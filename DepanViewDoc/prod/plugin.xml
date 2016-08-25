@@ -2,6 +2,7 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension-point id="com.google.devtools.depan.view_doc.layout.registry.Generators" name="Layout Generators" schema="schema/com.google.devtools.depan.view_doc.layout.registry.Generators.exsd"/>
+   <extension-point id="com.google.devtools.depan.view_doc.eclipse.ui.registry.from_view_doc" name="New From View" schema="schema/com.google.devtools.depan.view_doc.eclipse.ui.registry.from_view_doc.exsd"/>
    <extension
          point="com.google.devtools.depan.graph_doc.eclipse.ui.registry.from_graph_doc">
       <contribution
@@ -223,6 +224,16 @@
             class="com.google.devtools.depan.view_doc.eclipse.ui.filters.ExcludeViewNodesFilterContribution"
             id="com.google.devtools.depan.view_doc.eclipse.ui.filters.ExcludeViewNodesFilterContribution">
       </filter>
+   </extension>
+   <extension
+         point="com.google.devtools.depan.view_doc.eclipse.ui.registry.from_view_doc">
+   </extension>
+   <extension
+         point="com.google.devtools.depan.view_doc.eclipse.ui.registry.from_view_doc">
+      <contribution
+            class="com.google.devtools.depan.view_doc.eclipse.ui.wizards.ViewFromViewDocContributor"
+            id="com.google.devtools.depan.view_doc.eclipse.ui.wizards.ViewFromViewDocContributor">
+      </contribution>
    </extension>
 
 </plugin>

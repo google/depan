@@ -42,7 +42,7 @@ import java.util.Map.Entry;
  * Provide a ComboViewer dropdown control for a {@link Map} of values.
  * The keys from the map provide the labels, and 
  * 
- * @author Lee Carver
+ * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
 public abstract class MapChoiceControl<T> extends Composite {
 
@@ -93,11 +93,11 @@ public abstract class MapChoiceControl<T> extends Composite {
   }
 
   protected StructuredSelection buildSelection(
-      T selection, Map<String, T> contributions) {
+      T selection, Map<String, ? extends T> contributions) {
     if (null == selection) {
       return null;
     }
-    for (Entry<String, T> item : contributions.entrySet()) {
+    for (Entry<String, ? extends T> item : contributions.entrySet()) {
       if (selection == item.getValue()) {
         return(new StructuredSelection(item));
       }

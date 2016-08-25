@@ -22,7 +22,6 @@ import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeListViewProvider;
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeTreeProviders;
 import com.google.devtools.depan.graph_doc.eclipse.ui.plugins.FromGraphDocContributor;
 import com.google.devtools.depan.graph_doc.eclipse.ui.plugins.FromGraphDocWizard;
-import com.google.devtools.depan.graph_doc.eclipse.ui.widgets.FromGraphDocListControl;
 import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.nodes.filters.context.MapContext;
@@ -45,7 +44,9 @@ import com.google.devtools.depan.resources.ResourceContainer;
 import com.google.devtools.depan.view_doc.eclipse.ViewDocLogger;
 import com.google.devtools.depan.view_doc.eclipse.ViewDocResources;
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
-import com.google.devtools.depan.view_doc.model.ViewDocument;
+import com.google.devtools.depan.view_doc.eclipse.ui.plugins.FromViewDocContributor;
+import com.google.devtools.depan.view_doc.eclipse.ui.plugins.FromViewDocWizard;
+import com.google.devtools.depan.view_doc.eclipse.ui.widgets.FromViewDocListControl;
 import com.google.devtools.depan.view_doc.model.ViewPrefsListener;
 
 import com.google.common.base.Joiner;
@@ -58,6 +59,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -89,7 +91,7 @@ public class NodeFilterViewPart extends AbstractViewDocViewPart {
   /////////////////////////////////////
   // UX Elements
 
-  private FromGraphDocListControl fromGraphDoc;
+  private FromViewDocListControl fromViewDoc;
 
   private GraphNodeViewer sources;
 
@@ -244,7 +246,7 @@ public class NodeFilterViewPart extends AbstractViewDocViewPart {
 
         @Override
         public void widgetSelected(SelectionEvent e) {
-          computeResults();
+          updateResults();
         }
       });
 
@@ -252,13 +254,18 @@ public class NodeFilterViewPart extends AbstractViewDocViewPart {
     }
   }
 
-  protected void computeResults() {
-    SteppingFilter filter = filterControl.buildFilter();
-    Collection<GraphNode> source = getEditor().getSelectedNodes();
+  private Collection<GraphNode> computeResults(
+      SteppingFilter filter, Collection<GraphNode> source) {
 
     Collection<ContextKey> ctxtKeys = filter.getContextKeys();
     filter.receiveContext(buildComputeContext(ctxtKeys, filter));
-    refreshResults(filter.computeNodes(source));
+    return filter.computeNodes(source);
+  }
+
+  private void updateResults() {
+    SteppingFilter filter = filterControl.buildFilter();
+    Collection<GraphNode> source = getEditor().getSelectedNodes();
+    refreshResults(computeResults(filter, source));
   }
 
   private void refreshResults(Collection<GraphNode> nodes) {
@@ -315,9 +322,7 @@ public class NodeFilterViewPart extends AbstractViewDocViewPart {
   private Composite setupNewView(Composite parent) {
     Composite result = Widgets.buildGridContainer(parent, 2);
 
-    Button create = new Button(result, SWT.PUSH);
-    create.setLayoutData(new GridData());
-    create.setText("Create view");
+    Button create = Widgets.buildCompactPushButton(result, "Create");
     create.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -333,8 +338,8 @@ public class NodeFilterViewPart extends AbstractViewDocViewPart {
       }
     });
 
-    fromGraphDoc = new FromGraphDocListControl(result);
-    fromGraphDoc.setLayoutData(Widgets.buildHorzFillData());
+    fromViewDoc = new FromViewDocListControl(result);
+    fromViewDoc.setLayoutData(Widgets.buildHorzFillData());
     return result;
   }
 
@@ -345,38 +350,49 @@ public class NodeFilterViewPart extends AbstractViewDocViewPart {
    * Create a new Graph Visualization editor from the selected tree elements
    * and other {@code GraphEditor} settings.
    */
-  protected void createViewEditor() {
-    GraphNode topNode = null; // checkNodeTreeView.getFirstNode();
-    if (null == topNode) {
-      ViewDocLogger.LOG.info("no topNode");
-      return;
-    }
+  private void createViewEditor() {
+    SteppingFilter filter = filterControl.buildFilter();
+    Collection<GraphNode> source = getEditor().getSelectedNodes();
 
-    Collection<GraphNode> nodes = null; // checkNodeTreeView.getSelectedNodes();
+    Collection<GraphNode> nodes = computeResults(filter, source);
     if (nodes.isEmpty()) {
       ViewDocLogger.LOG.info("empty nodes");
       return;
     }
 
-    runGraphFromDocWizard(topNode, nodes);
-  }
-
-  private void runGraphFromDocWizard(
-      GraphNode topNode, Collection<GraphNode> nodes) {
-
-    // Prepare the wizard.
-    FromGraphDocContributor choice = fromGraphDoc.getChoice();
-    if (null == choice) {
-      return;
-    }
-    FromGraphDocWizard wizard = choice.newWizard();
-    ViewDocument viewDoc = getEditor().buildNewViewDocument(nodes);
-    // wizard.init(null, graph, topNode, nodes);
-
-    // Run the wizard.
+    IWizard wizard = prepareWizard(nodes, filter);
     Shell shell = getSite().getWorkbenchWindow().getShell();
     WizardDialog dialog = new WizardDialog(shell, wizard);
     dialog.open();
+  }
+
+  private IWizard prepareWizard(
+      Collection<GraphNode> nodes, ContextualFilter filter) {
+    ViewEditor editor = getEditor();
+
+    Object choice = fromViewDoc.getChoice();
+    if (null == choice) {
+      return null;
+    }
+
+    String name = filter.getName();
+    if (choice instanceof FromViewDocContributor) {
+      FromViewDocWizard wizard = ((FromViewDocContributor) choice).newWizard();
+      wizard.init(editor, nodes, name);
+      return wizard;
+    }
+
+    if (choice instanceof FromGraphDocContributor) {
+      FromGraphDocWizard wizard = ((FromGraphDocContributor) choice).newWizard();
+      wizard.init(
+          (IFile) editor.getParentGraphPath(),
+          editor.getParentGraphDoc(),
+          editor.getGraphResources(),
+          nodes, name);
+      return wizard;
+    }
+
+    return null;
   }
 
   /////////////////////////////////////

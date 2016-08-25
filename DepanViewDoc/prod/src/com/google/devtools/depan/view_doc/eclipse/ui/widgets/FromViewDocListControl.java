@@ -14,28 +14,45 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.graph_doc.eclipse.ui.widgets;
+package com.google.devtools.depan.view_doc.eclipse.ui.widgets;
 
 import com.google.devtools.depan.graph_doc.eclipse.ui.plugins.FromGraphDocContributor;
 import com.google.devtools.depan.graph_doc.eclipse.ui.plugins.FromGraphDocRegistry;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.MapChoiceControl;
+import com.google.devtools.depan.view_doc.eclipse.ui.plugins.FromViewDocContributor;
+import com.google.devtools.depan.view_doc.eclipse.ui.plugins.FromViewDocRegistry;
+
+import com.google.common.collect.Maps;
 
 import org.eclipse.swt.widgets.Composite;
 
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
+ * Since this control traffics in two independent contributions,
+ * have to handle type coercion external to this class.
+ * 
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public class FromGraphDocListControl
-    extends MapChoiceControl<FromGraphDocContributor> {
+public class FromViewDocListControl
+    extends MapChoiceControl<Object> {
 
-  public FromGraphDocListControl(Composite parent) {
+  public FromViewDocListControl(Composite parent) {
     super(parent);
 
-    Map<String, FromGraphDocContributor> froms =
+    Map<String, FromViewDocContributor> byView =
+        FromViewDocRegistry.getRegistryContributionMap();
+    Map<String, FromGraphDocContributor> byNodes =
         FromGraphDocRegistry.getRegistryContributionMap();
-    setInput(getBestFrom(froms), froms);
+
+    Map<String, Object> choices = Maps.newHashMap();
+    choices.putAll(byView);
+    for (Entry<String, FromGraphDocContributor> byNode : byNodes.entrySet()) {
+      choices.put(byNode.getKey() + " (nodes)", byNode.getValue());
+    }
+
+    setInput(getBestFrom(choices), choices);
   }
 
   public void selectFrom(FromGraphDocContributor choice) {
@@ -44,16 +61,19 @@ public class FromGraphDocListControl
     setSelection(buildSelection(choice, froms));
   }
 
-  private static FromGraphDocContributor getBestFrom(
-      Map<String, FromGraphDocContributor> contribs) {
+  private static Object getBestFrom(
+      Map<String, Object> contribs) {
     if (contribs.isEmpty()) {
       return null;
     }
     return contribs.values().iterator().next();
   }
 
+  /**
+   * Due to mixed types, calls must distinguish result processing.
+   */
   @Override
-  protected FromGraphDocContributor coerceResult(Object obj) {
-    return (FromGraphDocContributor) obj;
+  protected Object coerceResult(Object obj) {
+    return obj;
   }
 }

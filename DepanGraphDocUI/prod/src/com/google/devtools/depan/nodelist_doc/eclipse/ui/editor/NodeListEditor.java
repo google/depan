@@ -441,8 +441,9 @@ public class NodeListEditor extends EditorPart {
       return;
     }
     FromGraphDocWizard wizard = choice.newWizard();
+    String detail = FromGraphDocWizard.calcDetailName(topNode);
     wizard.init(
-        file, nodeListInfo.getGraphDocument(), graphResources, topNode, nodes);
+        file, nodeListInfo.getGraphDocument(), graphResources, nodes, detail);
 
     // Run the wizard.
     Shell shell = getSite().getWorkbenchWindow().getShell();

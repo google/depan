@@ -33,17 +33,17 @@ public abstract class FromGraphDocWizard extends Wizard {
   private IFile graphFile;
   private GraphDocument graphDoc;
   private GraphResources graphResources;
-  private GraphNode topNode;
   private Collection<GraphNode> nodes;
+  private String detail;
 
   public void init(
       IFile graphFile, GraphDocument graphDoc, GraphResources graphResources,
-      GraphNode topNode, Collection<GraphNode> nodes) {
+      Collection<GraphNode> nodes, String detail) {
     this.graphFile = graphFile;
     this.graphDoc = graphDoc;
     this.graphResources = graphResources;
-    this.topNode = topNode;
     this.nodes = nodes;
+    this.detail = detail;
   }
 
   public IFile getGraphFile() {
@@ -58,11 +58,34 @@ public abstract class FromGraphDocWizard extends Wizard {
     return graphResources;
   }
 
-  public GraphNode getTopNode() {
-    return topNode;
-  }
-
   public Collection<GraphNode> getNodes() {
     return nodes;
+  }
+
+  public String getDetail() {
+    return detail;
+  }
+
+  /**
+   * Indicate if the selected nodes match the nodes from the graph document.
+   */
+  protected boolean entireGraph() {
+    if (null == getNodes()) {
+      return false;
+    }
+    return getNodes().size() == getGraphDoc().getGraph().getNodes().size();
+  }
+
+  public static String calcDetailName(GraphNode node) {
+    String baseName = node.friendlyString();
+    int period = baseName.lastIndexOf('.');
+    if (period > 0) {
+      String segment = baseName.substring(period + 1);
+      if (segment.length() > 3) {
+        return segment;
+      }
+    }
+
+    return baseName;
   }
 }

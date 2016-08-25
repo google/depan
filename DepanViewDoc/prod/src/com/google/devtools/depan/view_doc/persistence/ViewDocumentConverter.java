@@ -57,6 +57,7 @@ public class ViewDocumentConverter
     super(mapper);
   }
 
+  @Override
   public Class<?> getType() {
     return ViewDocument.class;
   }

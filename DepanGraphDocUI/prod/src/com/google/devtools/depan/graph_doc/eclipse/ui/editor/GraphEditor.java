@@ -179,8 +179,7 @@ public class GraphEditor extends MultiPageEditorPart {
       }
     });
 
-    Button create = new Button(top, SWT.PUSH);
-    create.setText("Create");
+    Button create = Widgets.buildCompactPushButton(top, "Create");
     create.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -381,7 +380,8 @@ public class GraphEditor extends MultiPageEditorPart {
       return;
     }
     FromGraphDocWizard wizard = choice.newWizard();
-    wizard.init(file, graph, graphResources, topNode, nodes);
+    String name = FromGraphDocWizard.calcDetailName(topNode);
+    wizard.init(file, graph, graphResources, nodes, name);
 
     // Run the wizard.
     Shell shell = getSite().getWorkbenchWindow().getShell();

@@ -86,6 +86,7 @@ import edu.uci.ics.jung.graph.DirectedGraph;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -399,12 +400,24 @@ public class ViewEditor extends MultiPageEditorPart {
     viewInfo.removePrefsListener(listener);
   }
 
+  public GraphDocument getParentGraphDoc() {
+    return viewInfo.getComponents().getParentGraph().getGraph();
+  }
+
+  public IResource getParentGraphPath() {
+    return viewInfo.getComponents().getParentGraph().getLocation();
+  }
+
   public GraphModel getParentGraph() {
     return viewInfo.getParentGraph();
   }
 
   public DependencyModel getDependencyModel() {
     return viewInfo.getDependencyModel();
+  }
+
+  public GraphResources getGraphResources() {
+    return viewResources;
   }
 
   public Collection<Relation> getDisplayRelations() {

@@ -37,11 +37,6 @@ import org.eclipse.ui.application.IActionBarConfigurer;
  *
  */
 public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
-  /**
-   * Separator ID that includes the Edit menu. Any item that needs to be in this
-   * area must have this text in their path field.
-   */
-  private static final String EDIT_SEPARATOR_TEXT = "edit";
 
   private IWorkbenchAction exitAction;
   private IWorkbenchAction aboutAction;
@@ -98,6 +93,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     helpMenu.add(aboutAction);
 
     menuBar.add(depanMenu);
+    // Room for Edit, View, etc.
     menuBar.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
     menuBar.add(windowMenu);
     menuBar.add(helpMenu);
