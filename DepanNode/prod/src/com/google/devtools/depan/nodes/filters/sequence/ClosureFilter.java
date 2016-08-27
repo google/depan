@@ -21,6 +21,7 @@ import com.google.devtools.depan.nodes.filters.model.ContextKey;
 import com.google.devtools.depan.nodes.filters.model.ContextualFilter;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 
 import java.text.MessageFormat;
 import java.util.Collection;
@@ -34,10 +35,13 @@ public class ClosureFilter extends BasicFilter {
 
   private ContextualFilter filter;
 
-  private ContextKey context;
-
   public ClosureFilter() {
     super(FILTER_NAME_DEFAULT);
+  }
+
+  @Override
+  public Collection<? extends ContextKey> getContextKeys() {
+    return filter.getContextKeys();
   }
 
   public ContextualFilter getFilter() {
@@ -46,14 +50,6 @@ public class ClosureFilter extends BasicFilter {
 
   public void setFilter(ContextualFilter filter) {
     this.filter = filter;
-  }
-
-  public ContextKey getContext() {
-    return context;
-  }
-
-  public void setContext(ContextKey context) {
-    this.context = context;
   }
 
   @Override
@@ -78,6 +74,16 @@ public class ClosureFilter extends BasicFilter {
 
   @Override
   public Collection<GraphNode> computeNodes(Collection<GraphNode> nodes) {
-    return null;
+    filter.receiveContext(getFilterContext());
+
+    Collection<GraphNode> result = Sets.newHashSet(nodes);
+    Collection<GraphNode> update = Sets.newHashSet(result);
+
+    while (!update.isEmpty()) {
+      update = filter.computeNodes(update);
+      update.removeAll(result);
+      result.addAll(update);
+    }
+    return result;
   }
 }
