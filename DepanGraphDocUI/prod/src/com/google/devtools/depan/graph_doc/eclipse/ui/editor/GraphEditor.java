@@ -179,7 +179,8 @@ public class GraphEditor extends MultiPageEditorPart {
       }
     });
 
-    Button create = Widgets.buildCompactPushButton(top, "Create");
+    Button create = new Button(top, SWT.PUSH);
+    create.setText("Create");
     create.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {

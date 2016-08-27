@@ -269,15 +269,24 @@ public class NodeFilterViewPart extends AbstractViewDocViewPart {
   }
 
   private void refreshResults(Collection<GraphNode> nodes) {
+    results.setNvProvider(buildProvider(nodes));
+    results.refresh();
+  }
+
+  private NodeListViewProvider<GraphNode> buildProvider(
+      Collection<GraphNode> nodes) {
+    if (null == nodes) {
+      return new NodeListViewProvider<GraphNode>(
+          "No result nodes", Collections.<GraphNode>emptyList());
+    }
+
     String label = MessageFormat.format(
         "{0} result nodes", nodes.size());
 
     NodeListViewProvider<GraphNode> provider =
         new NodeListViewProvider<GraphNode>(label, nodes);
     provider.setProvider(NodeTreeProviders.GRAPH_NODE_PROVIDER);
-
-    results.setNvProvider(provider);
-    results.refresh();
+    return provider;
   }
 
   private FilterContext buildComputeContext(

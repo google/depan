@@ -177,7 +177,8 @@ public class FilterTableEditorControl
   }
 
   private void wrapFilter() {
-    if (null == getFilter()) {
+    List<ContextualFilter> target = filterControl.getSelectedFilters();
+    if (target.isEmpty()) {
       return;
     }
     ContextualFilterContributor<? extends ContextualFilter> contrib =
@@ -185,13 +186,20 @@ public class FilterTableEditorControl
     if (null == contrib) {
       return;
     }
-    List<ContextualFilter> target = filterControl.getSelectedFilters();
+    SteppingFilter steps = getFilter();
+    if (null == steps) {
+      return;
+    }
+
+    List<ContextualFilter> result = steps.getSteps();
+    ContextualFilter filter = target.get(0);
+    int index = result.indexOf(filter);
+
     ContextualFilter wrapper =
         ContextualFilterContributors.createFilter(contrib, target);
 
-    // TODO: Inject at correct location in list 
-    List<ContextualFilter> steps = appendStep(wrapper);
-    updateSteps(steps);
+    result.set(index, wrapper);
+    updateSteps(result);
   }
 
   private void editFilter() {

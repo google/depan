@@ -227,9 +227,6 @@
    </extension>
    <extension
          point="com.google.devtools.depan.view_doc.eclipse.ui.registry.from_view_doc">
-   </extension>
-   <extension
-         point="com.google.devtools.depan.view_doc.eclipse.ui.registry.from_view_doc">
       <contribution
             class="com.google.devtools.depan.view_doc.eclipse.ui.wizards.ViewFromViewDocContributor"
             id="com.google.devtools.depan.view_doc.eclipse.ui.wizards.ViewFromViewDocContributor">

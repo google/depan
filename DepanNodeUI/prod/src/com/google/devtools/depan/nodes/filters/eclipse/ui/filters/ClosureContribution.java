@@ -16,12 +16,11 @@
 
 package com.google.devtools.depan.nodes.filters.eclipse.ui.filters;
 
-import com.google.devtools.depan.edges.matchers.GraphEdgeMatchers;
 import com.google.devtools.depan.graph_doc.model.DependencyModel;
-import com.google.devtools.depan.nodes.filters.eclipse.ui.widgets.EdgeMatcherFilterEditorControl;
+import com.google.devtools.depan.nodes.filters.eclipse.ui.widgets.ClosureFilterEditorControl;
 import com.google.devtools.depan.nodes.filters.eclipse.ui.widgets.FilterEditorDialog;
 import com.google.devtools.depan.nodes.filters.model.ContextualFilter;
-import com.google.devtools.depan.nodes.filters.sequence.EdgeMatcherFilter;
+import com.google.devtools.depan.nodes.filters.sequence.ClosureFilter;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.swt.widgets.Composite;
@@ -29,68 +28,67 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
 /**
- * Provides labels, {@link Form}s, factories, and dialog editors
- * for {@link EdgeMatcherFilter}s.
- * 
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public class EdgeMatcherContribution
-    extends DefaultingFilterContribution<EdgeMatcherFilter> {
+public class ClosureContribution
+    extends DefaultingFilterContribution<ClosureFilter> {
 
   @Override
   public String getLabel() {
-    return "Filter by edges";
+    return "Closure";
   }
 
   @Override
   public Form getForm() {
-    return Form.ELEMENT;
+    return Form.WRAPPER;
   }
 
   @Override
-  public EdgeMatcherFilter createElementFilter() {
-    return new EdgeMatcherFilter(GraphEdgeMatchers.FORWARD);
+  public ClosureFilter createWrapperFilter(ContextualFilter filter) {
+    ClosureFilter result = new ClosureFilter();
+    result.setFilter(filter);
+    return result;
   }
 
   @Override
   public boolean handlesFilterInstance(ContextualFilter filter) {
-    if (isAssignableAs(filter, EdgeMatcherFilter.class)) {
+    if (isAssignableAs(filter, ClosureFilter.class)) {
       return true;
     }
     return false;
   }
 
   @Override
-  public FilterEditorDialog<EdgeMatcherFilter> buildEditorDialog(
-      Shell shell, ContextualFilter filter,
-      DependencyModel model, IProject project) {
+  public FilterEditorDialog<ClosureFilter> buildEditorDialog(Shell shell,
+      ContextualFilter filter, DependencyModel model, IProject project) {
+
     if (handlesFilterInstance(filter)) {
       return new ContributionEditorDialog(
-          shell, (EdgeMatcherFilter) filter, model, project);
+          shell, (ClosureFilter) filter, model, project);
     }
-    throw buildNotAssignable(filter, EdgeMatcherFilter.class);
+    throw buildNotAssignable(filter, ClosureFilter.class);
   }
 
   private static class ContributionEditorDialog
-      extends FilterEditorDialog<EdgeMatcherFilter> {
+  extends FilterEditorDialog<ClosureFilter> {
 
-    private EdgeMatcherFilterEditorControl editor;
+    private ClosureFilterEditorControl editor;
 
     protected ContributionEditorDialog(
-        Shell parentShell, EdgeMatcherFilter filter,
+        Shell parentShell, ClosureFilter filter,
         DependencyModel model, IProject project) {
       super(parentShell, filter, model, project);
     }
 
     @Override
     protected Control createDialogArea(Composite parent) {
-      editor = new EdgeMatcherFilterEditorControl(parent);
+      editor = new ClosureFilterEditorControl(parent);
       editor.setInput(getFilter(), getModel(), getProject());
       return editor;
     }
 
     @Override
-    protected EdgeMatcherFilter buildFilter() {
+    protected ClosureFilter buildFilter() {
       return editor.buildFilter();
     }
   }

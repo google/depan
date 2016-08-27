@@ -28,10 +28,26 @@ package com.google.devtools.depan.nodes.filters.model;
 public interface ContextKey {
 
   /**
+   * Provide a user-sensible label for the context key.
+   */
+  String getLabel();
+
+  /**
    * Base set of keys that might be available in the context.
    */
   public enum Base implements ContextKey {
-    UNIVERSE,
-    VIEWDOC
+    UNIVERSE("Graph"),
+    VIEWDOC("View");
+
+    private final String label;
+
+    private Base(String label) {
+      this.label = label;
+    }
+
+    @Override
+    public String getLabel() {
+      return label;
+    }
   }
 }

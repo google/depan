@@ -35,17 +35,19 @@ import java.util.List;
  */
 public class SteppingFilter extends BasicFilter {
 
+  public static final String FILTER_NAME_DEFAULT = "Filter sequence";
+
   /**
    * Sequence of filters to execute.
    */
   private List<ContextualFilter> steps = Lists.newArrayList();
 
   public SteppingFilter() {
-    this("Filter sequence");
+    this(FILTER_NAME_DEFAULT);
   }
 
   public SteppingFilter(String name) {
-    this(name, null);
+    super(name);
   }
 
   public SteppingFilter(String name, String summary) {

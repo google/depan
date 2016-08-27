@@ -16,6 +16,10 @@
             class="com.google.devtools.depan.nodes.filters.eclipse.ui.filters.NodeKindContribution"
             id="com.google.devtools.depan.nodes.filters.eclipse.ui.filters.NodeKindContribution">
       </filter>
+      <filter
+            class="com.google.devtools.depan.nodes.filters.eclipse.ui.filters.ClosureContribution"
+            id="com.google.devtools.depan.nodes.filters.eclipse.ui.filters.ClosureContribution">
+      </filter>
    </extension>
    <extension
          point="org.eclipse.core.runtime.adapters">

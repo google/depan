@@ -48,7 +48,11 @@ public abstract class BasicFilter implements ContextualFilter {
   private transient FilterContext context;
 
   public BasicFilter() {
-    this("- unnamed -", null);
+    this("- unnamed -");
+  }
+
+  public BasicFilter(String name) {
+    this(name, null);
   }
 
   public BasicFilter(String name, String summary) {
