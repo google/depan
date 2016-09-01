@@ -85,7 +85,7 @@ public class NewDepanProjectWizard extends BasicNewProjectResourceWizard {
       buildContainerFolder((IFolder) parent);
     }
     try {
-      rsrcFolder.create(false, false, null);
+      rsrcFolder.create(false, true, null);
     } catch (CoreException errCore) {
       String msg = MessageFormat.format(
           "Unable to create resource folder {0}", rsrcFolder.getFullPath());
