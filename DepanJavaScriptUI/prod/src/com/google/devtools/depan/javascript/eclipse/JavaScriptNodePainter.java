@@ -24,9 +24,9 @@ import com.google.devtools.depan.javascript.graph.JavaScriptEnumElement;
 import com.google.devtools.depan.javascript.graph.JavaScriptFieldElement;
 import com.google.devtools.depan.javascript.graph.JavaScriptFunctionElement;
 import com.google.devtools.depan.javascript.graph.JavaScriptVariableElement;
-import com.google.devtools.depan.platform.Colors;
 import com.google.devtools.depan.model.Element;
 import com.google.devtools.depan.model.ElementTransformer;
+import com.google.devtools.depan.platform.Colors;
 
 import com.google.common.base.Strings;
 
@@ -54,6 +54,17 @@ public class JavaScriptNodePainter extends JavaScriptElementDispatcher<Color>
     }
 
     return Colors.getRgb(colorTxt);
+  }
+
+  private static final JavaScriptNodePainter INSTANCE =
+      new JavaScriptNodePainter();
+
+  private JavaScriptNodePainter() {
+    // Prevent instantiation by others.
+  }
+
+  public static JavaScriptNodePainter getInstance() {
+    return INSTANCE;
   }
 
   @Override

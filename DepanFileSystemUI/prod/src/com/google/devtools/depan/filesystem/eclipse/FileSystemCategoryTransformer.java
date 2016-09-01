@@ -18,6 +18,7 @@ package com.google.devtools.depan.filesystem.eclipse;
 
 import com.google.devtools.depan.filesystem.graph.DirectoryElement;
 import com.google.devtools.depan.filesystem.graph.FileElement;
+import com.google.devtools.depan.filesystem.graph.FileSystemElement;
 import com.google.devtools.depan.filesystem.graph.FileSystemElementDispatcher;
 import com.google.devtools.depan.model.Element;
 import com.google.devtools.depan.model.ElementTransformer;
@@ -69,6 +70,13 @@ public class FileSystemCategoryTransformer
    */
   public static FileSystemCategoryTransformer getInstance() {
     return INSTANCE;
+  }
+
+  /**
+   * Provides the category for the supplied {@link #element}.
+   */
+  public static int getCategory(FileSystemElement element) {
+    return getInstance().match(element);
   }
 
   private FileSystemCategoryTransformer() {

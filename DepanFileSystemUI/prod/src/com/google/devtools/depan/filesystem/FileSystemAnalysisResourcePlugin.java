@@ -33,6 +33,10 @@ import com.google.devtools.depan.resources.ResourceContainer;
  * Captures many of the capabilities provided by the legacy
  * {@code FileSystemPlugin} mechanism.
  * 
+ * Simpler then other {@link AnalysisResourceInstaller}s,
+ * since there is only one built-in {@link RelationSetDescriptor}:
+ * {@link #FILE_SYSTEM_RELSET}.
+ * 
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
 public class FileSystemAnalysisResourcePlugin implements
@@ -41,7 +45,7 @@ public class FileSystemAnalysisResourcePlugin implements
   private static final String FILE_SYSTEM_CONTAINER_LABEL =
       "Filesystem Containers";
 
-  public static final RelationSet FILE_SYSTEM_RELSET =
+  private static final RelationSet FILE_SYSTEM_RELSET =
       RelationSets.createArray(FileSystemRelation.values());
 
   @Override

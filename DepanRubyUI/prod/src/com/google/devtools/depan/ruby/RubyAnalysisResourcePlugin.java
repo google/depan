@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.java;
+package com.google.devtools.depan.ruby;
 
 import com.google.devtools.depan.analysis_doc.model.AnalysisProperties;
 import com.google.devtools.depan.edges.matchers.GraphEdgeMatchers;
@@ -29,11 +29,11 @@ import com.google.devtools.depan.resources.ResourceContainer;
 
 /**
  * Captures many of the capabilities provided by the legacy
- * {@code JavaPlugin} mechanism.
+ * {@code RubyPlugin} mechanism.
  * 
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public class JavaAnalysisResourcePlugin implements
+public class RubyAnalysisResourcePlugin implements
     AnalysisResourceInstaller {
 
   @Override
@@ -43,7 +43,7 @@ public class JavaAnalysisResourcePlugin implements
   }
 
   private void installMatchers(ResourceContainer matchers) {
-    for (RelationSetDescriptor descr : JavaRelationSets.getBuiltinSets()) {
+    for (RelationSetDescriptor descr : RubyRelationSets.getBuiltinSets()) {
       RelationSet relSet = descr.getInfo();
       GraphEdgeMatcher matcher =
           GraphEdgeMatchers.createForwardEdgeMatcher(relSet);
@@ -53,22 +53,22 @@ public class JavaAnalysisResourcePlugin implements
       matchers.addResource(descr.getName(), resource);
     }
 
-    RelationSetDescriptor defRelSet = JavaRelationSets.getDefaultDescriptor();
+    RelationSetDescriptor defRelSet = RubyRelationSets.getDefaultDescriptor();
     GraphEdgeMatcherDescriptor defResource = (GraphEdgeMatcherDescriptor)
         matchers.getResource(defRelSet.getName());
     defResource.setProperty(
-        AnalysisProperties.DEFAULT_PROP, JavaRelationContributor.ID);
+        AnalysisProperties.DEFAULT_PROP, RubyRelationContributor.ID);
   }
 
   private void installRelSets(ResourceContainer relSets) {
-    for (RelationSetDescriptor descr : JavaRelationSets.getBuiltinSets()) {
+    for (RelationSetDescriptor descr : RubyRelationSets.getBuiltinSets()) {
       relSets.addResource(descr.getName(), descr);
     }
 
-    RelationSetDescriptor defRelSet = JavaRelationSets.getDefaultDescriptor();
+    RelationSetDescriptor defRelSet = RubyRelationSets.getDefaultDescriptor();
     RelationSetDescriptor defResource = (RelationSetDescriptor)
         relSets.getResource(defRelSet.getName());
     defResource.setProperty(
-        AnalysisProperties.DEFAULT_PROP, JavaRelationContributor.ID);
+        AnalysisProperties.DEFAULT_PROP, RubyRelationContributor.ID);
   }
 }

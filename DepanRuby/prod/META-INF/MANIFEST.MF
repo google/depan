@@ -10,5 +10,9 @@ Require-Bundle: org.eclipse.core.runtime,
  com.google.devtools.depan.core,
  com.google.devtools.depan.persistence,
  com.google.devtools.depan.platform,
- depan-xstream-library
-Export-Package: com.google.devtools.depan.ruby.graph
+ depan-xstream-library,
+ com.google.guava,
+ com.google.devtools.depan.graph_doc,
+ com.google.devtools.depan.filesystem
+Export-Package: com.google.devtools.depan.ruby,
+ com.google.devtools.depan.ruby.graph

@@ -136,7 +136,7 @@ public class NodeElementPluginRegistry
   // Static Transformer Methods
 
   /**
-   * Get the correct transformer for this element.  This method ensure correct
+   * Get the correct transformer for this element.  This method ensures correct
    * allocation of the singleton instance.
    */
   private static NodeElementTransformers getTransformers(Element element) {

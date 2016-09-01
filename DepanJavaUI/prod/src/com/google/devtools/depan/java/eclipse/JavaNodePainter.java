@@ -54,11 +54,11 @@ public class JavaNodePainter extends JavaElementDispatcher<Color>
     return Colors.getRgb(colorTxt);
   }
 
-  private static final JavaNodePainter instance =
+  private static final JavaNodePainter INSTANCE =
       new JavaNodePainter();
 
   public static JavaNodePainter getInstance() {
-    return instance;
+    return INSTANCE;
   }
 
   @Override

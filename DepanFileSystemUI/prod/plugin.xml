@@ -34,4 +34,11 @@
             id="com.google.devtools.depan.filesystem.FileSystemAnalysisResourcePlugin">
       </installer>
    </extension>
+   <extension
+         point="com.google.devtools.depan.eclipse.ui.nodes.node_element">
+      <node_features
+            class="com.google.devtools.depan.filesystem.FileSystemNodePlugin"
+            id="com.google.devtools.depan.filesystem.FileSystemNodePlugin">
+      </node_features>
+   </extension>
 </plugin>

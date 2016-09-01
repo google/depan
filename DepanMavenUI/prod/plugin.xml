@@ -43,4 +43,18 @@
             name="Maven Node Colors">
       </page>
    </extension>
+   <extension
+         point="com.google.devtools.depan.graph_doc.eclipse.ui.registry.analysis_resource">
+      <installer
+            class="com.google.devtools.depan.maven.MavenAnalysisResourcePlugin"
+            id="com.google.devtools.depan.maven.MavenAnalysisResourcePlugin">
+      </installer>
+   </extension>
+   <extension
+         point="com.google.devtools.depan.eclipse.ui.nodes.node_element">
+      <node_features
+            class="com.google.devtools.depan.maven.MavenNodePlugin"
+            id="com.google.devtools.depan.maven.MavenNodePlugin">
+      </node_features>
+   </extension>
 </plugin>

@@ -17,12 +17,7 @@
 package com.google.devtools.depan.ruby.eclipse;
 
 import com.google.devtools.depan.model.Element;
-import com.google.devtools.depan.ruby.graph.ClassElement;
-import com.google.devtools.depan.ruby.graph.ClassMethodElement;
-import com.google.devtools.depan.ruby.graph.InstanceMethodElement;
 import com.google.devtools.depan.ruby.graph.RubyElement;
-import com.google.devtools.depan.ruby.graph.RubyElementDispatcher;
-import com.google.devtools.depan.ruby.graph.SingletonMethodElement;
 
 import java.util.Comparator;
 
@@ -34,72 +29,49 @@ import java.util.Comparator;
  */
 public class RubyNodeComparator implements Comparator<Element> {
 
-  public static final int CATEGORY_CLASS = 1000;
-  public static final int CATEGORY_CLASS_METHOD = 1010;
-  public static final int CATEGORY_INSTANCE_METHOD = 1020;
-  public static final int CATEGORY_SINGLETON_METHOD = 1030;
-
-  /**
-   * Returns the lowest category value for all elements in Maven Plug-in.
-   * This system must be replaced by a smarter system. Two plug-ins that use
-   * overlapping constants would cause problems.
-   *
-   * @return The lowest value of category constants.
-   */
-  public static int getLowestCategory() {
-    return CATEGORY_CLASS;
-  }
-
   /**
    * An instance of this class used by other classes.
    */
   private static final RubyNodeComparator INSTANCE =
       new RubyNodeComparator();
 
-  /**
-   * Returns the singleton instance of this class.
-   *
-   * @return The singleton instance of this class.
-   */
-  public static RubyNodeComparator getInstance() {
-    return INSTANCE;
-  }
-
   private RubyNodeComparator() {
     // prevent instantiation by others
   }
 
   /**
-   * Returns the category of the given {@link RubyElement}.
-   *
-   * @param element Element whose category is requested.
-   * @return The category of the given {@link RubyElement}.
+   * Returns the singleton instance of this class.
    */
-  public int category(RubyElement element) {
-    final RubyElementDispatcher<Integer> fsDispatcher =
-        new RubyElementDispatcher<Integer>() {
+  public static RubyNodeComparator getInstance() {
+    return INSTANCE;
+  }
 
-          @Override
-          public Integer match(ClassElement element) {
-            return CATEGORY_CLASS;
-          }
-
-          @Override
-          public Integer match(ClassMethodElement element) {
-            return CATEGORY_CLASS_METHOD;
-          }
-
-          @Override
-          public Integer match(InstanceMethodElement element) {
-            return CATEGORY_INSTANCE_METHOD;
-          }
-
-          @Override
-          public Integer match(SingletonMethodElement element) {
-            return CATEGORY_SINGLETON_METHOD;
-          }
-    };
-    return fsDispatcher.match(element);
+  /**
+   * Compares two {@link Element} objects.
+   *
+   * @param element1 The first element to compare.
+   * @param element2 The second element to compare.
+   * @return If both elements are <code>RubyElement</code>s, returns the
+   * result of comparing two <code>RubyElement</code>s.
+   * <p>
+   * Returns <code>1</code> if only the first element is a
+   * <code>RubyElement</code>.
+   * <p>
+   * Returns <code>-1</code> if only the second element is a
+   * <code>RubyElement</code>.
+   * <p>
+   * If none of the elements
+   * are <code>RubyElement</code>s, returns the subtraction of hash code
+   * of the second element from the first element.
+   */
+  @Override
+  public int compare(Element element1, Element element2) {
+    if (isRubyElement(element1)) {
+      return compare((RubyElement) element1, element2);
+    } else if (isRubyElement(element2)) {
+      return (-1) * compare((RubyElement) element2, element1);
+    }
+    return element1.hashCode() - element2.hashCode();
   }
 
   /**
@@ -112,9 +84,9 @@ public class RubyNodeComparator implements Comparator<Element> {
    * elements are of the same type, returns the String comparison of their
    * names.
    */
-  public int compare(RubyElement element1, RubyElement element2) {
-    int category1 = category(element1);
-    int category2 = category(element2);
+  private int compare(RubyElement element1, RubyElement element2) {
+    int category1 = getCategory(element1);
+    int category2 = getCategory(element2);
     if (category1 != category2) {
       return category1 - category2;
     }
@@ -126,44 +98,24 @@ public class RubyNodeComparator implements Comparator<Element> {
    * object.
    *
    * @param element1 The first element to compare which must be a
-   * <code>MavenElement</code>.
+   * <code>RubyElement</code>.
    * @param element2 The second element to compare.
-   * @return <code>1</code> if element2 is not a <code>MavenElement</code>.
+   * @return <code>1</code> if element2 is not a <code>RubyElement</code>.
    * Otherwise, returns the result of comparing two
-   * <code>MavenElement</code>s.
+   * <code>RubyElement</code>s.
    */
-  public int compare(RubyElement element1, Element element2) {
-    if (element2 instanceof RubyElement) {
+  private int compare(RubyElement element1, Element element2) {
+    if (isRubyElement(element2)) {
       return compare(element1, (RubyElement) element2);
     }
     return 1;
   }
 
-  /**
-   * Compares two {@link Element} objects.
-   *
-   * @param element1 The first element to compare.
-   * @param element2 The second element to compare.
-   * @return If both elements are <code>MavenElement</code>s, returns the
-   * result of comparing two <code>MavenElement</code>s.
-   * <p>
-   * Returns <code>1</code> if only the first element is a
-   * <code>MavenElement</code>.
-   * <p>
-   * Returns <code>-1</code> if only the second element is a
-   * <code>MavenElement</code>.
-   * <p>
-   * If none of the elements
-   * are <code>MavenElement</code>s, returns the subtraction of hash code
-   * of the second element from the first element.
-   */
-  @Override
-  public int compare(Element element1, Element element2) {
-    if (element1 instanceof RubyElement) {
-      return compare((RubyElement) element1, element2);
-    } else if (element2 instanceof RubyElement) {
-      return (-1) * compare((RubyElement) element2, element1);
-    }
-    return element1.hashCode() - element2.hashCode();
+  private static boolean isRubyElement(Object element) {
+    return (element instanceof RubyElement);
+  }
+
+  private int getCategory(RubyElement node) {
+    return RubyCategoryTransformer.getCategory(node);
   }
 }

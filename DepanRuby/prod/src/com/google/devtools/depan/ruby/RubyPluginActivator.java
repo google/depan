@@ -16,8 +16,15 @@
 
 package com.google.devtools.depan.ruby;
 
+import com.google.devtools.depan.filesystem.FileSystemRelationContributor;
+import com.google.devtools.depan.graph_doc.model.DependencyModel;
+
+import com.google.common.collect.ImmutableList;
+
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+
+import java.util.Collections;
 
 /**
  * The activator class controls the plug-in life cycle.
@@ -28,6 +35,14 @@ public class RubyPluginActivator implements BundleActivator {
 
   /** Plug-in ID used to identify this plug-in. */
   public static final String PLUGIN_ID = "com.google.devtools.depan.ruby";
+
+
+  public static final DependencyModel RUBY_MODEL =
+      new DependencyModel(
+          Collections.<String>emptyList(), 
+          ImmutableList.<String>of(
+              RubyRelationContributor.ID,
+              FileSystemRelationContributor.ID));
 
   public RubyPluginActivator() {
   }

@@ -16,41 +16,42 @@
 
 package com.google.devtools.depan.java.eclipse;
 
-import com.google.devtools.depan.java.graph.FieldElement;
-import com.google.devtools.depan.java.graph.InterfaceElement;
 import com.google.devtools.depan.java.graph.JavaElement;
-import com.google.devtools.depan.java.graph.JavaElementDispatcher;
-import com.google.devtools.depan.java.graph.MethodElement;
-import com.google.devtools.depan.java.graph.PackageElement;
-import com.google.devtools.depan.java.graph.TypeElement;
 import com.google.devtools.depan.model.Element;
 
 import java.util.Comparator;
 
 /**
  * @author ycoppel@google.com (Yohann Coppel)
- *
  */
 public class JavaNodeComparator implements Comparator<Element> {
 
-  public static final int CATEGORY_PACKAGE = 3;
-  public static final int CATEGORY_INTERFACE = 4;
-  public static final int CATEGORY_TYPE = 5;
-  public static final int CATEGORY_FIELD = 6;
-  public static final int CATEGORY_METHOD = 7;
-
-  public final static JavaNodeComparator INSTANCE = new JavaNodeComparator();
+  private final static JavaNodeComparator INSTANCE = new JavaNodeComparator();
 
   private JavaNodeComparator() {
+    // Prevent instantiation by others.
   }
 
-  private static boolean isJavaElement(Object element) {
-    return (element instanceof JavaElement);
+  /**
+   * Provide the singleton instance of this class.
+   */
+  public static JavaNodeComparator getInstance() {
+    return INSTANCE;
   }
 
-  public int compare(JavaElement e1, JavaElement e2) {
-    int cat1 = category(e1);
-    int cat2 = category(e2);
+  @Override
+  public int compare(Element element1, Element element2) {
+    if (isJavaElement(element1)) {
+      return compare((JavaElement) element1, element2);
+    } else if (isJavaElement(element2)) {
+      return (-1) * compare((JavaElement) element2, element1);
+    }
+    return element1.hashCode() - element2.hashCode();
+  }
+
+  private int compare(JavaElement e1, JavaElement e2) {
+    int cat1 = getCategory(e1);
+    int cat2 = getCategory(e2);
     if (cat1 != cat2) {
       return cat1 - cat2;
     }
@@ -58,37 +59,18 @@ public class JavaNodeComparator implements Comparator<Element> {
     return e1.friendlyString().compareTo(e2.friendlyString());
   }
 
-  public int category(Element node) {
-    final JavaElementDispatcher<Integer> d = new JavaElementDispatcher<Integer>() {
-      @Override
-      public Integer match(MethodElement e) {
-        return CATEGORY_METHOD;
-      }
-      @Override
-      public Integer match(FieldElement e) {
-        return CATEGORY_FIELD;
-      }
-      @Override
-      public Integer match(TypeElement e) {
-        return CATEGORY_TYPE;
-      }
-      @Override
-      public Integer match(InterfaceElement e) {
-        return CATEGORY_INTERFACE;
-      }
-      @Override
-      public Integer match(PackageElement e) {
-        return CATEGORY_PACKAGE;
-      }
-    };
-    return d.match(node);
+  private int compare(JavaElement element1, Element element2) {
+    if (isJavaElement(element2)) {
+      return compare(element1, (JavaElement) element2);
+    }
+    return 1;
   }
 
-  @Override
-  public int compare(Element e1, Element e2) {
-    if (isJavaElement(e1) && isJavaElement(e2)) {
-      return compare((JavaElement) e1, (JavaElement) e2);
-    }
-    return e1.hashCode() - e2.hashCode();
+  private static boolean isJavaElement(Object element) {
+    return (element instanceof JavaElement);
+  }
+
+  private int getCategory(JavaElement node) {
+    return JavaCategoryTransformer.getCategory(node);
   }
 }

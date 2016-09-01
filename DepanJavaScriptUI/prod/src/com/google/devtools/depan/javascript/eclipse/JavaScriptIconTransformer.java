@@ -41,6 +41,17 @@ public class JavaScriptIconTransformer
     extends JavaScriptElementDispatcher<ImageDescriptor>
     implements ElementTransformer<ImageDescriptor> {
 
+  private static final JavaScriptIconTransformer INSTANCE =
+      new JavaScriptIconTransformer();
+
+  private JavaScriptIconTransformer() {
+    // Prevent instantiation by others.
+  }
+
+  public static JavaScriptIconTransformer getInstance() {
+    return INSTANCE;
+  }
+
   @Override
   public ImageDescriptor match(JavaScriptBuiltinElement builtinElement) {
     return JavaActivator.IMAGE_DESC_FIELD;

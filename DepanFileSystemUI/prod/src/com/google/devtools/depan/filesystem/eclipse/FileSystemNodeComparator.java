@@ -19,7 +19,6 @@ package com.google.devtools.depan.filesystem.eclipse;
 import com.google.devtools.depan.filesystem.graph.DirectoryElement;
 import com.google.devtools.depan.filesystem.graph.FileElement;
 import com.google.devtools.depan.filesystem.graph.FileSystemElement;
-import com.google.devtools.depan.filesystem.graph.FileSystemElementDispatcher;
 import com.google.devtools.depan.model.Element;
 
 import java.util.Comparator;
@@ -31,28 +30,6 @@ import java.util.Comparator;
  * @author tugrul@google.com (Tugrul Ince)
  */
 public class FileSystemNodeComparator implements Comparator<Element> {
-  /**
-   * The category value for {@link DirectoryElement} objects. It is an integer
-   * constant to support easy comparison.
-   */
-  public static final int CATEGORY_DIRECTORY = 1000;
-
-  /**
-   * The category value for {@link FileElement} objects. It is an integer
-   * constant to support easy comparison.
-   */
-  public static final int CATEGORY_FILE = 1001;
-
-  /**
-   * Returns the lowest category value for all elements in File System Plug-in.
-   * This system must be replaced by a smarter system. Two plug-ins that use
-   * overlapping constants would cause problems.
-   *
-   * @return The lowest value of category constants.
-   */
-  public static int getLowestCategory() {
-    return CATEGORY_DIRECTORY;
-  }
 
   /**
    * An instance of this class used by other classes.
@@ -60,75 +37,15 @@ public class FileSystemNodeComparator implements Comparator<Element> {
   private static final FileSystemNodeComparator INSTANCE =
       new FileSystemNodeComparator();
 
+  private FileSystemNodeComparator() {
+    // Prevent instantiation by others.
+  }
+
   /**
-   * Returns the singleton instance of this class.
-   *
-   * @return The singleton instance of this class.
+   * Provide the singleton instance of this class.
    */
   public static FileSystemNodeComparator getInstance() {
     return INSTANCE;
-  }
-
-  private FileSystemNodeComparator() {
-    // prevent instantiation by others
-  }
-
-  /**
-   * Returns the category of the given {@link FileSystemElement}.
-   *
-   * @param element Element whose category is requested.
-   * @return The category of the given {@link FileSystemElement}.
-   */
-  public int category(FileSystemElement element) {
-    final FileSystemElementDispatcher<Integer> fsDispatcher =
-        new FileSystemElementDispatcher<Integer>() {
-      @Override
-      public Integer match(FileElement e) {
-        return CATEGORY_FILE;
-      }
-      @Override
-      public Integer match(DirectoryElement e) {
-        return CATEGORY_DIRECTORY;
-      }
-    };
-    return fsDispatcher.match(element);
-  }
-
-  /**
-   * Compares two {@link FileSystemElement} objects.
-   *
-   * @param element1 The first element to compare.
-   * @param element2 The second element to compare.
-   * @return <code>1</code> if element1 is a {@link FileElement} and element2 is
-   * a {@link DirectoryElement}; <code>-1</code> if the opposite. If both
-   * elements are of the same type, returns the String comparison of their
-   * names.
-   */
-  public int compare(FileSystemElement element1, FileSystemElement element2) {
-    int category1 = category(element1);
-    int category2 = category(element2);
-    if (category1 != category2) {
-      return category1 - category2;
-    }
-    return element1.friendlyString().compareTo(element2.friendlyString());
-  }
-
-  /**
-   * Compares one {@link FileSystemElement} object and one {@link Element}
-   * object.
-   *
-   * @param element1 The first element to compare which must be a
-   * <code>FileSystemElement</code>.
-   * @param element2 The second element to compare.
-   * @return <code>1</code> if element2 is not a <code>FileSystemElement</code>.
-   * Otherwise, returns the result of comparing two
-   * <code>FileSystemElement</code>s.
-   */
-  public int compare(FileSystemElement element1, Element element2) {
-    if (element2 instanceof FileSystemElement) {
-      return compare(element1, (FileSystemElement) element2);
-    }
-    return 1;
   }
 
   /**
@@ -151,11 +68,56 @@ public class FileSystemNodeComparator implements Comparator<Element> {
    */
   @Override
   public int compare(Element element1, Element element2) {
-    if (element1 instanceof FileSystemElement) {
+    if (isFileSystemElement(element1)) {
       return compare((FileSystemElement) element1, element2);
-    } else if (element2 instanceof FileSystemElement) {
+    } else if (isFileSystemElement(element2)) {
       return (-1) * compare((FileSystemElement) element2, element1);
     }
     return element1.hashCode() - element2.hashCode();
+  }
+
+  /**
+   * Compares two {@link FileSystemElement} objects.
+   *
+   * @param element1 The first element to compare.
+   * @param element2 The second element to compare.
+   * @return <code>1</code> if element1 is a {@link FileElement} and element2 is
+   * a {@link DirectoryElement}; <code>-1</code> if the opposite. If both
+   * elements are of the same type, returns the String comparison of their
+   * names.
+   */
+  private int compare(FileSystemElement element1, FileSystemElement element2) {
+    int category1 = getCategory(element1);
+    int category2 = getCategory(element2);
+    if (category1 != category2) {
+      return category1 - category2;
+    }
+    return element1.friendlyString().compareTo(element2.friendlyString());
+  }
+
+  /**
+   * Compares one {@link FileSystemElement} object and one {@link Element}
+   * object.
+   *
+   * @param element1 The first element to compare which must be a
+   * <code>FileSystemElement</code>.
+   * @param element2 The second element to compare.
+   * @return <code>1</code> if element2 is not a <code>FileSystemElement</code>.
+   * Otherwise, returns the result of comparing two
+   * <code>FileSystemElement</code>s.
+   */
+  private int compare(FileSystemElement element1, Element element2) {
+    if (isFileSystemElement(element2)) {
+      return compare(element1, (FileSystemElement) element2);
+    }
+    return 1;
+  }
+
+  private static boolean isFileSystemElement(Object element) {
+    return (element instanceof FileSystemElement);
+  }
+
+  private static int getCategory(FileSystemElement element) {
+    return FileSystemCategoryTransformer.getCategory(element);
   }
 }

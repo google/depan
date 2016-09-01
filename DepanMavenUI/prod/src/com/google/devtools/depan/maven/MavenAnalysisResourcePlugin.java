@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.java;
+package com.google.devtools.depan.maven;
 
 import com.google.devtools.depan.analysis_doc.model.AnalysisProperties;
 import com.google.devtools.depan.edges.matchers.GraphEdgeMatchers;
@@ -29,11 +29,11 @@ import com.google.devtools.depan.resources.ResourceContainer;
 
 /**
  * Captures many of the capabilities provided by the legacy
- * {@code JavaPlugin} mechanism.
+ * {@code MavenPlugin} mechanism.
  * 
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public class JavaAnalysisResourcePlugin implements
+public class MavenAnalysisResourcePlugin implements
     AnalysisResourceInstaller {
 
   @Override
@@ -43,7 +43,7 @@ public class JavaAnalysisResourcePlugin implements
   }
 
   private void installMatchers(ResourceContainer matchers) {
-    for (RelationSetDescriptor descr : JavaRelationSets.getBuiltinSets()) {
+    for (RelationSetDescriptor descr : MavenRelationSets.getBuiltinSets()) {
       RelationSet relSet = descr.getInfo();
       GraphEdgeMatcher matcher =
           GraphEdgeMatchers.createForwardEdgeMatcher(relSet);
@@ -53,22 +53,22 @@ public class JavaAnalysisResourcePlugin implements
       matchers.addResource(descr.getName(), resource);
     }
 
-    RelationSetDescriptor defRelSet = JavaRelationSets.getDefaultDescriptor();
+    RelationSetDescriptor defRelSet = MavenRelationSets.getDefaultDescriptor();
     GraphEdgeMatcherDescriptor defResource = (GraphEdgeMatcherDescriptor)
         matchers.getResource(defRelSet.getName());
     defResource.setProperty(
-        AnalysisProperties.DEFAULT_PROP, JavaRelationContributor.ID);
+        AnalysisProperties.DEFAULT_PROP, MavenRelationContributor.ID);
   }
 
   private void installRelSets(ResourceContainer relSets) {
-    for (RelationSetDescriptor descr : JavaRelationSets.getBuiltinSets()) {
+    for (RelationSetDescriptor descr : MavenRelationSets.getBuiltinSets()) {
       relSets.addResource(descr.getName(), descr);
     }
 
-    RelationSetDescriptor defRelSet = JavaRelationSets.getDefaultDescriptor();
+    RelationSetDescriptor defRelSet = MavenRelationSets.getDefaultDescriptor();
     RelationSetDescriptor defResource = (RelationSetDescriptor)
         relSets.getResource(defRelSet.getName());
     defResource.setProperty(
-        AnalysisProperties.DEFAULT_PROP, JavaRelationContributor.ID);
+        AnalysisProperties.DEFAULT_PROP, MavenRelationContributor.ID);
   }
 }

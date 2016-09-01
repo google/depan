@@ -36,7 +36,7 @@ public class JavaScriptRelationSets {
   /**
    * List of all built-in RelationshipSets. Make it easier to iterate.
    */
-  private static final Collection<RelationSetDescriptor> BUILTIN_SETS;
+  private static final Collection<RelationSetDescriptor> BUILT_IN_SETS;
 
   /**
    * The default RelationshipSets exported by the JavaScript plug-in.
@@ -77,35 +77,29 @@ public class JavaScriptRelationSets {
     BINDING_CONTAINMENT = bindBuilder.build();
 
     // Publish the built-in relation sets
-    BUILTIN_SETS = Lists.newArrayList();
-    BUILTIN_SETS.add(LEXICAL_CONTAINMENT);
-    BUILTIN_SETS.add(BINDING_CONTAINMENT);
+    BUILT_IN_SETS = Lists.newArrayList();
+    BUILT_IN_SETS.add(LEXICAL_CONTAINMENT);
+    BUILT_IN_SETS.add(BINDING_CONTAINMENT);
 
     // Publish the default relation set
     DEFAULT_SET = LEXICAL_CONTAINMENT;
   }
 
-  /**
-   * Prevent instantiation of this name-space class.
-   */
   private JavaScriptRelationSets() {
+    // Prevent instantiation.
   }
 
   /**
    * Returns all built-in relationship sets defined by the JavaScript plug-in.
-   *
-   * @return Built-in relationship sets provided by the JavaScript plug-in.
    */
   public static Collection<RelationSetDescriptor> getBuiltinSets() {
-    return BUILTIN_SETS;
+    return BUILT_IN_SETS;
   }
 
   /**
    * Returns the default relationship set for JavaScript graphs.
-   *
-   * @return The default relationship set provided by the JavaScript plug-in.
    */
-  public static RelationSetDescriptor getDefaultRelationshipSet() {
+  public static RelationSetDescriptor getDefaultDescriptor() {
     return DEFAULT_SET;
   }
 }

@@ -16,10 +16,7 @@
 
 package com.google.devtools.depan.maven.eclipse;
 
-import com.google.devtools.depan.maven.graph.ArtifactElement;
 import com.google.devtools.depan.maven.graph.MavenElement;
-import com.google.devtools.depan.maven.graph.MavenElementDispatcher;
-import com.google.devtools.depan.maven.graph.PropertyElement;
 import com.google.devtools.depan.model.Element;
 
 import java.util.Comparator;
@@ -32,95 +29,21 @@ import java.util.Comparator;
  */
 public class MavenNodeComparator implements Comparator<Element> {
 
-  public static final int CATEGORY_ARTIFACT = 1000;
-  public static final int CATEGORY_PROPERTY = 1010;
-
-  /**
-   * Returns the lowest category value for all elements in Maven Plug-in.
-   * This system must be replaced by a smarter system. Two plug-ins that use
-   * overlapping constants would cause problems.
-   *
-   * @return The lowest value of category constants.
-   */
-  public static int getLowestCategory() {
-    return CATEGORY_ARTIFACT;
-  }
-
   /**
    * An instance of this class used by other classes.
    */
   private static final MavenNodeComparator INSTANCE =
       new MavenNodeComparator();
 
+  private MavenNodeComparator() {
+    // Prevent instantiation by others.
+  }
+
   /**
    * Returns the singleton instance of this class.
-   *
-   * @return The singleton instance of this class.
    */
   public static MavenNodeComparator getInstance() {
     return INSTANCE;
-  }
-
-  private MavenNodeComparator() {
-    // prevent instantiation by others
-  }
-
-  /**
-   * Returns the category of the given {@link MavenElement}.
-   *
-   * @param element Element whose category is requested.
-   * @return The category of the given {@link MavenElement}.
-   */
-  public int category(MavenElement element) {
-    final MavenElementDispatcher<Integer> fsDispatcher =
-        new MavenElementDispatcher<Integer>() {
-      @Override
-      public Integer match(ArtifactElement e) {
-        return CATEGORY_ARTIFACT;
-      }
-      @Override
-      public Integer match(PropertyElement e) {
-        return CATEGORY_ARTIFACT;
-      }
-    };
-    return fsDispatcher.match(element);
-  }
-
-  /**
-   * Compares two {@link MavenElement} objects.
-   *
-   * @param element1 The first element to compare.
-   * @param element2 The second element to compare.
-   * @return <code>1</code> if element1 is a {@link MavenElement} and element2 is
-   * a {@link DirectoryElement}; <code>-1</code> if the opposite. If both
-   * elements are of the same type, returns the String comparison of their
-   * names.
-   */
-  public int compare(MavenElement element1, MavenElement element2) {
-    int category1 = category(element1);
-    int category2 = category(element2);
-    if (category1 != category2) {
-      return category1 - category2;
-    }
-    return element1.friendlyString().compareTo(element2.friendlyString());
-  }
-
-  /**
-   * Compares one {@link MavenElement} object and one {@link Element}
-   * object.
-   *
-   * @param element1 The first element to compare which must be a
-   * <code>MavenElement</code>.
-   * @param element2 The second element to compare.
-   * @return <code>1</code> if element2 is not a <code>MavenElement</code>.
-   * Otherwise, returns the result of comparing two
-   * <code>MavenElement</code>s.
-   */
-  public int compare(MavenElement element1, Element element2) {
-    if (element2 instanceof MavenElement) {
-      return compare(element1, (MavenElement) element2);
-    }
-    return 1;
   }
 
   /**
@@ -143,11 +66,56 @@ public class MavenNodeComparator implements Comparator<Element> {
    */
   @Override
   public int compare(Element element1, Element element2) {
-    if (element1 instanceof MavenElement) {
+    if (isMavenElement(element1)) {
       return compare((MavenElement) element1, element2);
-    } else if (element2 instanceof MavenElement) {
+    } else if (isMavenElement(element2)) {
       return (-1) * compare((MavenElement) element2, element1);
     }
     return element1.hashCode() - element2.hashCode();
+  }
+
+  /**
+   * Compares two {@link MavenElement} objects.
+   *
+   * @param element1 The first element to compare.
+   * @param element2 The second element to compare.
+   * @return <code>1</code> if element1 is a {@link MavenElement} and element2 is
+   * a {@link DirectoryElement}; <code>-1</code> if the opposite. If both
+   * elements are of the same type, returns the String comparison of their
+   * names.
+   */
+  private int compare(MavenElement element1, MavenElement element2) {
+    int category1 = getCategory(element1);
+    int category2 = getCategory(element2);
+    if (category1 != category2) {
+      return category1 - category2;
+    }
+    return element1.friendlyString().compareTo(element2.friendlyString());
+  }
+
+  /**
+   * Compares one {@link MavenElement} object and one {@link Element}
+   * object.
+   *
+   * @param element1 The first element to compare which must be a
+   * <code>MavenElement</code>.
+   * @param element2 The second element to compare.
+   * @return <code>1</code> if element2 is not a <code>MavenElement</code>.
+   * Otherwise, returns the result of comparing two
+   * <code>MavenElement</code>s.
+   */
+  private int compare(MavenElement element1, Element element2) {
+    if (isMavenElement(element2)) {
+      return compare(element1, (MavenElement) element2);
+    }
+    return 1;
+  }
+
+  private static boolean isMavenElement(Object element) {
+    return (element instanceof MavenElement);
+  }
+
+  private static int getCategory(MavenElement element) {
+    return MavenCategoryTransformer.getCategory(element);
   }
 }

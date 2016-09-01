@@ -24,4 +24,18 @@
             name="Ruby Node Colors">
       </page>
    </extension>
+   <extension
+         point="com.google.devtools.depan.graph_doc.eclipse.ui.registry.analysis_resource">
+      <installer
+            class="com.google.devtools.depan.ruby.RubyAnalysisResourcePlugin"
+            id="com.google.devtools.depan.ruby.RubyAnalysisResourcePlugin">
+      </installer>
+   </extension>
+   <extension
+         point="com.google.devtools.depan.eclipse.ui.nodes.node_element">
+      <node_features
+            class="com.google.devtools.depan.ruby.RubyNodePlugin"
+            id="com.google.devtools.depan.ruby.RubyNodePlugin">
+      </node_features>
+   </extension>
 </plugin>

@@ -8,6 +8,13 @@
             id="com.google.devtools.depan.java.JavaAnalysisResourcePlugin">
       </installer>
    </extension>
+   <extension
+         point="com.google.devtools.depan.eclipse.ui.nodes.node_element">
+      <node_features
+            class="com.google.devtools.depan.java.JavaNodePlugin"
+            id="com.google.devtools.depan.java.JavaNodePlugin">
+      </node_features>
+   </extension>
 
    <!-- ================ PREFERENCES =============== -->
 </plugin>

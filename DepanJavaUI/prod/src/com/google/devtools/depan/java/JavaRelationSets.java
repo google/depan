@@ -17,6 +17,8 @@
 package com.google.devtools.depan.java;
 
 import com.google.devtools.depan.filesystem.graph.FileSystemRelation;
+import com.google.devtools.depan.graph.api.Relation;
+import com.google.devtools.depan.java.graph.JavaElements;
 import com.google.devtools.depan.java.graph.JavaRelation;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor.Builder;
@@ -27,30 +29,29 @@ import java.util.Collection;
 
 /**
  * @author ycoppel@google.com (Yohann Coppel)
- *
  */
 public class JavaRelationSets {
 
   /**
    * List of all built-in RelationshipSets. Make it easier to iterate.
    */
-  public static final Collection<RelationSetDescriptor> builtins;
+  private static final Collection<RelationSetDescriptor> BUILT_IN_SETS;
 
-  public static final RelationSetDescriptor CONTAINER;
+  private static final RelationSetDescriptor CLASS_MEMBER;
 
-  public static final RelationSetDescriptor PKG_MEMBER;
+  private static final RelationSetDescriptor CONTAINER;
 
-  public static final RelationSetDescriptor CLASS_MEMBER;
+  private static final RelationSetDescriptor PKG_MEMBER;
 
-  public static final RelationSetDescriptor STATIC_MEMBER;
+  private static final RelationSetDescriptor STATIC_MEMBER;
 
-  public static final RelationSetDescriptor INSTANCE_MEMBER;
+  private static final RelationSetDescriptor INSTANCE_MEMBER;
 
-  public static final RelationSetDescriptor EXTENSION;
+  private static final RelationSetDescriptor EXTENSION;
 
-  public static final RelationSetDescriptor USES;
+  private static final RelationSetDescriptor USES;
 
-  public static final RelationSetDescriptor ALL;
+  private static final RelationSetDescriptor ALL;
 
   static {
     // class member relationships only
@@ -115,21 +116,36 @@ public class JavaRelationSets {
 
     // check all relationships
     Builder allBuilder = createRelSetBuilder("All Java");
-    for (JavaRelation relation : JavaRelation.values()) {
+    for (Relation relation : JavaElements.RELATIONS) {
       allBuilder.addRelation(relation);
     }
     ALL = allBuilder.build();
 
     // add predefined sets to the built-in list
-    builtins = Lists.newArrayList();
-    builtins.add(CLASS_MEMBER);
-    builtins.add(PKG_MEMBER);
-    builtins.add(STATIC_MEMBER);
-    builtins.add(INSTANCE_MEMBER);
-    builtins.add(EXTENSION);
-    builtins.add(USES);
-    builtins.add(CONTAINER);
-    builtins.add(ALL);
+    BUILT_IN_SETS = Lists.newArrayList();
+    BUILT_IN_SETS.add(CLASS_MEMBER);
+    BUILT_IN_SETS.add(PKG_MEMBER);
+    BUILT_IN_SETS.add(STATIC_MEMBER);
+    BUILT_IN_SETS.add(INSTANCE_MEMBER);
+    BUILT_IN_SETS.add(EXTENSION);
+    BUILT_IN_SETS.add(USES);
+    BUILT_IN_SETS.add(CONTAINER);
+    BUILT_IN_SETS.add(ALL);
+  }
+
+  /**
+   * Returns all built-in relationship sets defined by the Maven plug-in.
+   */
+  public static Collection<RelationSetDescriptor> getBuiltinSets() {
+    return BUILT_IN_SETS;
+  }
+
+  public static RelationSetDescriptor getDefaultDescriptor() {
+    return CONTAINER;
+  }
+
+  private JavaRelationSets() {
+    // Prevent instantiation.
   }
 
   private static Builder createRelSetBuilder(String name) {

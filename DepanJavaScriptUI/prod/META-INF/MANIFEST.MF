@@ -22,4 +22,7 @@ Require-Bundle: org.eclipse.core.runtime,
  com.google.devtools.depan.java.ui,
  com.google.guava,
  com.google.devtools.depan.persistence,
- com.google.devtools.depan.graph_doc
+ com.google.devtools.depan.graph_doc,
+ com.google.devtools.depan.graph_doc.ui,
+ com.google.devtools.depan.nodes.ui
+Import-Package: com.google.devtools.depan.edges.matchers

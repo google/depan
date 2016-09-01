@@ -17,15 +17,7 @@
 package com.google.devtools.depan.javascript.eclipse;
 
 import com.google.devtools.depan.filesystem.eclipse.FileSystemNodeComparator;
-import com.google.devtools.depan.java.eclipse.JavaNodeComparator;
-import com.google.devtools.depan.javascript.graph.JavaScriptBuiltinElement;
-import com.google.devtools.depan.javascript.graph.JavaScriptClassElement;
 import com.google.devtools.depan.javascript.graph.JavaScriptElement;
-import com.google.devtools.depan.javascript.graph.JavaScriptElementDispatcher;
-import com.google.devtools.depan.javascript.graph.JavaScriptEnumElement;
-import com.google.devtools.depan.javascript.graph.JavaScriptFieldElement;
-import com.google.devtools.depan.javascript.graph.JavaScriptFunctionElement;
-import com.google.devtools.depan.javascript.graph.JavaScriptVariableElement;
 import com.google.devtools.depan.model.Element;
 
 import java.util.Comparator;
@@ -39,108 +31,18 @@ import java.util.Comparator;
  */
 public class JavaScriptNodeComparator implements Comparator<Element> {
 
-  private static final class JavaScriptCategoryDispatcher extends
-      JavaScriptElementDispatcher<Integer> {
+  private final static JavaScriptNodeComparator INSTANCE =
+      new JavaScriptNodeComparator();
 
-    @Override
-    public Integer match(JavaScriptBuiltinElement builtinElement) {
-      return JavaNodeComparator.CATEGORY_FIELD;
-    }
-  
-    @Override
-    public Integer match(JavaScriptClassElement classElement) {
-      return JavaNodeComparator.CATEGORY_TYPE;
-    }
-
-    @Override
-    public Integer match(JavaScriptEnumElement enumElement) {
-      return JavaNodeComparator.CATEGORY_FIELD;
-    }
-  
-    @Override
-    public Integer match(JavaScriptFieldElement fieldElement) {
-      return JavaNodeComparator.CATEGORY_FIELD;
-    }
-  
-    @Override
-    public Integer match(JavaScriptFunctionElement functionElement) {
-      return JavaNodeComparator.CATEGORY_METHOD;
-    }
-  
-    @Override
-    public Integer match(JavaScriptVariableElement variableElement) {
-      return JavaNodeComparator.CATEGORY_FIELD;
-    }
-  }
-
-  private static final JavaScriptCategoryDispatcher CATEGORY_DISPATCHER =
-      new JavaScriptCategoryDispatcher();
-
-  /**
-   * The category value of rules. It must be less than the lowest category value
-   * of file system elements so that rules appear before file system elements.
-   */
-  public static final int CATEGORY_RULE =
-      FileSystemNodeComparator.getLowestCategory() - 1;
-
-  /**
-   * Returns the lowest category value in this plug-in. Other plug-in must use
-   * lower category values.
-   *
-   * @return Lowest category value in this plug-in.
-   */
-  public static int getLowestCategory() {
-    return CATEGORY_RULE;
+  private JavaScriptNodeComparator() {
+    // Prevent instantiation by others.
   }
 
   /**
-   * Returns the category value of the given Build Element.
-   *
-   * @param node Build Element whose category value is requested.
-   * @return Category value of the given Build Element.
+   * Provide the singleton instance of this class.
    */
-  public int category(JavaScriptElement node) {
-    return CATEGORY_DISPATCHER.match(node);
-  }
-
-  /**
-   * Compares two Build Elements. Returns a negative number if first build
-   * element has a lower category value. Returns a positive number if the first
-   * build element has a higher category value. If category values are equal,
-   * returns the string comparison of their friendly strings.
-   *
-   * @param element1 First element to compare.
-   * @param element2 Second element to compare.
-   * @return Returns a negative number if first build
-   * element has a lower category value. Returns a positive number if the first
-   * build element has a higher category value. If category values are equal,
-   * returns the string comparison of their friendly strings.
-   */
-  public int compare(JavaScriptElement element1, JavaScriptElement element2) {
-    int category1 = category(element1);
-    int category2 = category(element2);
-    if (category1 != category2) {
-      return category1 - category2;
-    }
-    return element1.friendlyString().compareTo(element2.friendlyString());
-  }
-
-  /**
-   * Compares one Build Element with another element. Returns the result of
-   * compare(BuildElement, BuildElement) if the second parameter is
-   * a Build Element as well. Returns a negative number otherwise.
-   *
-   * @param element1 First element to compare.
-   * @param element2 Second element to compare.
-   * @return Returns the result of compare(BuildElement, BuildElement)
-   * if the second parameter is a Build Element as well. Returns a negative
-   * number otherwise.
-   */
-  public int compare(JavaScriptElement element1, Element element2) {
-    if (element2 instanceof JavaScriptElement) {
-      return compare(element1, (JavaScriptElement) element2);
-    }
-    return -1;
+  public static JavaScriptNodeComparator getInstance() {
+    return INSTANCE;
   }
 
   /**
@@ -161,11 +63,59 @@ public class JavaScriptNodeComparator implements Comparator<Element> {
    */
   @Override
   public int compare(Element element1, Element element2) {
-    if (element1 instanceof JavaScriptElement) {
+    if (isJavaScriptElement(element1)) {
       return compare((JavaScriptElement) element1, element2);
-    } else if (element2 instanceof JavaScriptElement) {
+    } else if (isJavaScriptElement(element2)) {
       return (-1) * compare((JavaScriptElement) element2, element1);
     }
     return FileSystemNodeComparator.getInstance().compare(element1, element2);
+  }
+
+  private static boolean isJavaScriptElement(Object element) {
+    return (element instanceof JavaScriptElement);
+  }
+
+  /**
+   * Compares two Build Elements. Returns a negative number if first build
+   * element has a lower category value. Returns a positive number if the first
+   * build element has a higher category value. If category values are equal,
+   * returns the string comparison of their friendly strings.
+   *
+   * @param element1 First element to compare.
+   * @param element2 Second element to compare.
+   * @return Returns a negative number if first build
+   * element has a lower category value. Returns a positive number if the first
+   * build element has a higher category value. If category values are equal,
+   * returns the string comparison of their friendly strings.
+   */
+  private int compare(JavaScriptElement element1, JavaScriptElement element2) {
+    int category1 = getCategory(element1);
+    int category2 = getCategory(element2);
+    if (category1 != category2) {
+      return category1 - category2;
+    }
+    return element1.friendlyString().compareTo(element2.friendlyString());
+  }
+
+  /**
+   * Compares one Build Element with another element. Returns the result of
+   * compare(BuildElement, BuildElement) if the second parameter is
+   * a Build Element as well. Returns a negative number otherwise.
+   *
+   * @param element1 First element to compare.
+   * @param element2 Second element to compare.
+   * @return Returns the result of compare(BuildElement, BuildElement)
+   * if the second parameter is a Build Element as well. Returns a negative
+   * number otherwise.
+   */
+  private int compare(JavaScriptElement element1, Element element2) {
+    if (isJavaScriptElement(element2)) {
+      return compare(element1, (JavaScriptElement) element2);
+    }
+    return -1;
+  }
+
+  private int getCategory(JavaScriptElement node) {
+    return JavaScriptCategoryTransformer.getCategory(node);
   }
 }

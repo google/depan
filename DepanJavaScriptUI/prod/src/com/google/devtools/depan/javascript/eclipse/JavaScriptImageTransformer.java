@@ -39,6 +39,18 @@ import org.eclipse.swt.graphics.Image;
 public class JavaScriptImageTransformer extends JavaScriptElementDispatcher<Image>
     implements ElementTransformer<Image> {
 
+  private static final JavaScriptImageTransformer INSTANCE =
+      new JavaScriptImageTransformer();
+
+
+  private JavaScriptImageTransformer() {
+    // Prevent instantiation by others.
+  }
+
+  public static JavaScriptImageTransformer getInstance() {
+    return INSTANCE;
+  }
+
   @Override
   public Image match(JavaScriptBuiltinElement builtinElement) {
     return JavaActivator.IMAGE_FIELD;

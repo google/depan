@@ -2,6 +2,7 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension-point id="com.google.devtools.depan.nodes.filters.eclipse.ui.plugins.filters" name="Contextual Filters" schema="schema/com.google.devtools.depan.nodes.filters.eclipse.ui.plugins.filters.exsd"/>
+   <extension-point id="com.google.devtools.depan.eclipse.ui.nodes.node_element" name="Node Elements" schema="schema/com.google.devtools.depan.eclipse.ui.nodes.node_element.exsd"/>
    <extension
          point="com.google.devtools.depan.nodes.filters.eclipse.ui.plugins.filters">
       <filter
