@@ -466,6 +466,12 @@ public class GLPanel extends GLScene {
         node2property(child), node2property(master));
   }
 
+  public void finishSteps() {
+    for (NodeRenderingProperty nodeProp : nodesProperties) {
+      nodeProp.finishSteps();
+    }
+  }
+
   /////////////////////////////////////
   // Node and edge property methods
 

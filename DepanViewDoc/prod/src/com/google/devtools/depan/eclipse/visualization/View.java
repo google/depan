@@ -400,4 +400,8 @@ public class View {
   public void collapseUnder(GraphNode child, GraphNode master) {
     glPanel.collapseUnder(child, master);
   }
+
+  public void finishSteps() {
+    glPanel.finishSteps();
+  }
 }

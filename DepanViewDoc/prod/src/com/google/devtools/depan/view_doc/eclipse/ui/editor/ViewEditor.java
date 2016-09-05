@@ -559,7 +559,12 @@ public class ViewEditor extends MultiPageEditorPart {
     initNodeRendering();
     initSelectedNodes(getSelectedNodes());
     initEdgeRendering();
+    handleCollapseRendering(
+        getCollapseTreeModel().computeDepthFirst(), CollapseData.EMPTY_LIST);
     prepareRenderOptions();
+
+    // Force any animation to completion.
+    renderer.finishSteps();
   }
 
   protected String edgeToolTip(GraphEdge edge) {
@@ -1037,7 +1042,7 @@ public class ViewEditor extends MultiPageEditorPart {
   }
 
   /**
-   * Edges that lack an explict {@link EdgeDisplayProperty} are
+   * Edges that lack an explicit {@link EdgeDisplayProperty} are
    * updated to render with the latest {@link EdgeDisplayProperty}
    * associated with the edge's {@link Relation}.
    * 
