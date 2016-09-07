@@ -6,8 +6,12 @@
    <extension
          point="com.google.devtools.depan.nodes.filters.eclipse.ui.plugins.filters">
       <filter
-            class="com.google.devtools.depan.nodes.filters.eclipse.ui.filters.RelationCountContribution"
-            id="com.google.devtools.depan.nodes.filters.eclipse.ui.filters.RelationCountContribution">
+            class="com.google.devtools.depan.nodes.filters.eclipse.ui.filters.ClosureContribution"
+            id="com.google.devtools.depan.nodes.filters.eclipse.ui.filters.ClosureContribution">
+      </filter>
+      <filter
+            class="com.google.devtools.depan.nodes.filters.eclipse.ui.filters.ComposeContribution"
+            id="com.google.devtools.depan.nodes.filters.eclipse.ui.filters.ComposeContribution">
       </filter>
       <filter
             class="com.google.devtools.depan.nodes.filters.eclipse.ui.filters.EdgeMatcherContribution"
@@ -18,8 +22,8 @@
             id="com.google.devtools.depan.nodes.filters.eclipse.ui.filters.NodeKindContribution">
       </filter>
       <filter
-            class="com.google.devtools.depan.nodes.filters.eclipse.ui.filters.ClosureContribution"
-            id="com.google.devtools.depan.nodes.filters.eclipse.ui.filters.ClosureContribution">
+            class="com.google.devtools.depan.nodes.filters.eclipse.ui.filters.RelationCountContribution"
+            id="com.google.devtools.depan.nodes.filters.eclipse.ui.filters.RelationCountContribution">
       </filter>
    </extension>
    <extension
