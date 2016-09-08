@@ -25,7 +25,7 @@ import com.google.devtools.depan.model.builder.api.GraphBuilders;
 
 import com.google.common.collect.ImmutableList;
 
-import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IFile;
 
 import java.util.Collection;
 
@@ -77,7 +77,7 @@ public class NodeListDocument {
    * Provide the location where the parent {@link GraphModelReference} is
    * stored.  Typically, the {@link NodeListDocument} is stored near by.
    */
-  public IResource getReferenceLocation() {
+  public IFile getReferenceLocation() {
     return parentGraph.getLocation();
   }
 

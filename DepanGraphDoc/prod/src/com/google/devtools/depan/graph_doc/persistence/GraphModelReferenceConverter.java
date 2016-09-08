@@ -28,8 +28,6 @@ import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
@@ -151,8 +149,7 @@ public class GraphModelReferenceConverter implements Converter {
   private GraphModelReference unmarshalProjectGraphFile(
       String graphPath, UnmarshallingContext context) {
 
-    IResource graphRsrc = ResourcesPlugin.getWorkspace().getRoot()
-        .findMember(graphPath);
+    IFile graphRsrc = GraphModelReference.getLocation(graphPath);
     if (null == graphRsrc) {
       throw new RuntimeException(
           "Can't locate resource " + graphPath + " for dependency information");

@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.graph_doc.model;
 
-import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
 
 /**
@@ -35,7 +35,7 @@ public class GraphModelReference {
     this.graph = graph;
   }
 
-  public GraphModelReference(IResource location, GraphDocument graph) {
+  public GraphModelReference(IFile location, GraphDocument graph) {
     this(location.getFullPath().toPortableString(), graph);
   }
 
@@ -46,8 +46,8 @@ public class GraphModelReference {
   /**
    * @return the location
    */
-  public IResource getLocation() {
-    return ResourcesPlugin.getWorkspace().getRoot().findMember(path);
+  public IFile getLocation() {
+    return getLocation(path);
   }
 
   /**
@@ -55,5 +55,12 @@ public class GraphModelReference {
    */
   public GraphDocument getGraph() {
     return graph;
+  }
+
+  /**
+   * @return the location
+   */
+  public static IFile getLocation(String path) {
+    return (IFile) ResourcesPlugin.getWorkspace().getRoot().findMember(path);
   }
 }

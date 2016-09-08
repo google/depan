@@ -63,14 +63,14 @@ public class ViewFromGraphDocWizard extends FromGraphDocWizard {
   }
 
   private String calcName() {
-    String srcBase = PlatformTools.getBaseName(getGraphFile());
-    if (entireGraph()) {
-      return srcBase;
-    }
-
     Collection<GraphNode> nodes = getNodes();
     if ((null == nodes) || (nodes.isEmpty())) {
       return "Empty View";
+    }
+
+    String srcBase = PlatformTools.getBaseName(getGraphFile());
+    if (entireGraph()) {
+      return srcBase;
     }
 
     return MessageFormat.format("{0}_{1}", srcBase, getDetail());
