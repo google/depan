@@ -70,7 +70,7 @@ public class RelationCountContribution
   public FilterEditorDialog<RelationCountFilter> buildEditorDialog(
       Shell shell, ContextualFilter filter,
       DependencyModel model, IProject project) {
-    if (!handlesFilterInstance(filter)) {
+    if (handlesFilterInstance(filter)) {
       return new ContributionEditorDialog(
           shell, (RelationCountFilter) filter, model, project);
     }

@@ -20,16 +20,21 @@ import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.nodes.filters.model.ContextKey;
 import com.google.devtools.depan.nodes.filters.model.ContextualFilter;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import java.text.MessageFormat;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
  * Filter nodes by executing the individual {@link ContextualFilter}s
  * in a list in order.
+ * 
+ * Editors (e.g. {@code FilterTableEditorControl}) need to be aware that
+ * the internal list of steps from {@link #getSteps()} may not be editable.
+ * Direct access to the internal structure helps a bit with rendering.
+ * Updates to the steps should always use {@link #setSteps(List)}.
  * 
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
@@ -40,7 +45,7 @@ public class SteppingFilter extends BasicFilter {
   /**
    * Sequence of filters to execute.
    */
-  private List<ContextualFilter> steps = Lists.newArrayList();
+  private List<ContextualFilter> steps = Collections.emptyList();
 
   public SteppingFilter() {
     this(FILTER_NAME_DEFAULT);

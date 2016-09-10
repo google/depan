@@ -22,6 +22,7 @@ import com.google.devtools.depan.graph.registry.RelationRegistry;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.RelationSets;
 import com.google.devtools.depan.nodes.Graphs;
+import com.google.devtools.depan.nodes.filters.model.ContextKey;
 
 import com.google.common.collect.Sets;
 
@@ -83,6 +84,12 @@ public class RelationCountFilter extends BasicFilter {
       }
     }
     return MessageFormat.format("Tests {0} relations", count);
+  }
+
+
+  @Override
+  public Collection<? extends ContextKey> getContextKeys() {
+    return KEYS_UNIVERSE;
   }
 
   @Override

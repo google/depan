@@ -26,21 +26,15 @@ import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.nodes.filters.context.MapContext;
 import com.google.devtools.depan.nodes.filters.eclipse.ui.filters.ContextualFilterDocument;
-import com.google.devtools.depan.nodes.filters.eclipse.ui.persistence.ContextualFilterResources;
-import com.google.devtools.depan.nodes.filters.eclipse.ui.persistence.ContextualFilterXmlPersist;
+import com.google.devtools.depan.nodes.filters.eclipse.ui.widgets.ContextualFilterSaveLoadConfig;
 import com.google.devtools.depan.nodes.filters.eclipse.ui.widgets.FilterTableEditorControl;
 import com.google.devtools.depan.nodes.filters.model.ContextKey;
 import com.google.devtools.depan.nodes.filters.model.ContextKey.Base;
 import com.google.devtools.depan.nodes.filters.model.ContextualFilter;
 import com.google.devtools.depan.nodes.filters.model.FilterContext;
 import com.google.devtools.depan.nodes.filters.sequence.SteppingFilter;
-import com.google.devtools.depan.persistence.StorageTools;
-import com.google.devtools.depan.platform.WorkspaceTools;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Sasher;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
-import com.google.devtools.depan.resource_doc.eclipse.ui.persistence.LoadResourceDialog;
-import com.google.devtools.depan.resource_doc.eclipse.ui.persistence.SaveResourceDialog;
-import com.google.devtools.depan.resources.ResourceContainer;
 import com.google.devtools.depan.view_doc.eclipse.ViewDocLogger;
 import com.google.devtools.depan.view_doc.eclipse.ViewDocResources;
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
@@ -53,12 +47,8 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
@@ -360,8 +350,13 @@ public class NodeFilterViewPart extends AbstractViewDocViewPart {
    * and other {@code GraphEditor} settings.
    */
   private void createViewEditor() {
+    ViewEditor editor = getEditor();
+    if (null == editor) {
+      // control active, but no bound editor ..
+      return;
+    }
     SteppingFilter filter = filterControl.buildFilter();
-    Collection<GraphNode> source = getEditor().getSelectedNodes();
+    Collection<GraphNode> source = editor.getSelectedNodes();
 
     Collection<GraphNode> nodes = computeResults(filter, source);
     if (nodes.isEmpty()) {
@@ -409,133 +404,39 @@ public class NodeFilterViewPart extends AbstractViewDocViewPart {
 
   private void saveFilterTable() {
     // Run SaveResource dialog using current editor content.
-    ContextualFilter saveFilter = filterControl.buildFilter();
-    IFile saveFile = getSaveAsFile(saveFilter);
-    if (null == saveFile) {
-      return;
-    }
 
-    // Construct persistent document.
-    DependencyModel model = getEditor().getDependencyModel();
+    ViewEditor editor = getEditor();
+    Shell shell = editor.getSite().getShell();
+    IProject project = getEditor().getResourceProject();
+    DependencyModel model = editor.getDependencyModel();
+
+    ContextualFilter saveFilter = filterControl.buildFilter();
     FeatureMatcher matcher = new FeatureMatcher(model);
     ContextualFilterDocument result =
         new ContextualFilterDocument(matcher, saveFilter);
 
-    ContextualFilterXmlPersist persist =
-        ContextualFilterXmlPersist.build(false);
-    StorageTools.saveDocument(saveFile, result, persist, null);
+    ContextualFilterSaveLoadConfig.CONFIG.saveResource(result, shell, project);
   }
 
   private void loadFilterTable() {
-    IFile loadFile = getLoadFromFile();
-    if (null == loadFile) {
-      return;
-    }
-
-    ContextualFilterXmlPersist persist =
-        ContextualFilterXmlPersist.build(true);
-    ContextualFilterDocument result = persist.load(loadFile.getRawLocationURI());
-    DependencyModel model = result.getModel();
-    ContextualFilter filter = result.getInfo();
+    ViewEditor editor = getEditor();
+    Shell shell = editor.getSite().getShell();
     IProject project = getEditor().getResourceProject();
+    DependencyModel model = editor.getDependencyModel();
+
+    ContextualFilterDocument loadFilter =
+        ContextualFilterSaveLoadConfig.CONFIG.loadResource(shell, project);
+
+    ContextualFilter filter = loadFilter.getInfo();
     if (filter instanceof SteppingFilter) {
       filterControl.setInput((SteppingFilter) filter, model, project);
     } else {
       String name = MessageFormat.format("Wrapped {0}", filter.getName());
       String summary = MessageFormat.format("From {0}", filter.getSummary());
       SteppingFilter synth = new SteppingFilter(name, summary);
+      synth.setSteps(Collections.singletonList(filter));
       filterControl.setInput(synth, model, project);
     }
-  }
-
-  /**
-   * Get container and file name from user, with good handling for defaults.
-   */
-  private IFile getSaveAsFile(ContextualFilter filter) {
-    IFile saveAs = guessSaveAsFile(filter.getName());
-
-    SaveResourceDialog saveDlg =
-        new SaveResourceDialog(getEditor().getSite().getShell());
-    saveDlg.setInput(saveAs);
-    if (saveDlg.open() != SaveResourceDialog.OK) {
-      return null;
-    }
-
-    // get the file relatively to the workspace.
-    try {
-      return WorkspaceTools.calcFileWithExt(
-          saveDlg.getResult(), ContextualFilterDocument.EXTENSION);
-    } catch (CoreException errCore) {
-      String msg = MessageFormat.format(
-          "Error saving resource to {0}", saveAs);
-      ViewDocLogger.logException(msg, errCore);
-    }
-    return null;
-  }
-
-  /**
-   * Get container and file name from user, with good handling for defaults.
-   */
-  private IFile getLoadFromFile() {
-    IContainer rsrcRoot = guessResourceRoot();
-
-    LoadResourceDialog loadDlg =
-        new LoadResourceDialog(getEditor().getSite().getShell());
-    loadDlg.setInput(rsrcRoot, ContextualFilterDocument.EXTENSION);
-    if (loadDlg.open() != SaveResourceDialog.OK) {
-      return null;
-    }
-
-    // get the file relatively to the workspace.
-    try {
-      return WorkspaceTools.calcFileWithExt(
-          loadDlg.getResult(), ContextualFilterDocument.EXTENSION);
-    } catch (CoreException errCore) {
-      String msg = MessageFormat.format(
-          "Error loading resource from {0}", rsrcRoot);
-      ViewDocLogger.logException(msg, errCore);
-    }
-    return null;
-  }
-
-  /**
-   * Infer the expected file for the named filter.
-   * 
-   * The resulting file is obey the following storage convention:
-   *   [ViewDoc-Project][Resource-Type-Path][Resource-Name]
-   * 
-   * The user will be able to edit this result before a storage action is
-   * performed.
-   */
-  private IFile guessSaveAsFile(String filterName) {
-    IPath namePath = Path.fromOSString(filterName);
-    namePath.addFileExtension(ContextualFilterDocument.EXTENSION);
-
-    ResourceContainer filters = ContextualFilterResources.getContainer();
-    IPath treePath = filters.getPath();
-    IPath destPath = treePath.append(namePath);
-
-    IFile editPath = getEditor().getSaveAsFile();
-    IProject proj = editPath.getProject();
-    return proj.getFile(destPath);
-  }
-
-  /**
-   * Infer the expected container for filter resources.
-   * 
-   * The resulting file follow the namining conventions for porject resources.
-   *   [ViewDoc-Project][Resource-Type-Path][Resource-Name]
-   * 
-   * The user will be able to edit this result before a storage action is
-   * performed.
-   */
-  private IContainer guessResourceRoot() {
-    ResourceContainer filters = ContextualFilterResources.getContainer();
-    IPath treePath = filters.getPath();
-
-    IFile editPath = getEditor().getSaveAsFile();
-    IProject proj = editPath.getProject();
-    return proj.getFolder(treePath);
   }
 
   /////////////////////////////////////

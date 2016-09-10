@@ -23,6 +23,8 @@ import com.google.devtools.depan.nodes.filters.model.ContextualFilter;
 import com.google.devtools.depan.nodes.filters.sequence.SteppingFilter;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 
+import com.google.common.collect.Lists;
+
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -170,10 +172,12 @@ public class FilterTableEditorControl
     if (null == contrib) {
       return;
     }
-    ContextualFilter result = contrib.createElementFilter();
-    List<ContextualFilter> steps = appendStep(result);
 
-    updateSteps(steps);
+    ContextualFilter filter = contrib.createElementFilter();
+    List<ContextualFilter> result = getUpdatableSteps();
+    result.add(filter);
+
+    updateSteps(result);
   }
 
   private void wrapFilter() {
@@ -191,34 +195,37 @@ public class FilterTableEditorControl
       return;
     }
 
-    List<ContextualFilter> result = steps.getSteps();
     ContextualFilter filter = target.get(0);
+    List<ContextualFilter> result = getUpdatableSteps();
     int index = result.indexOf(filter);
 
     ContextualFilter wrapper =
         ContextualFilterContributors.createFilter(contrib, target);
-
     result.set(index, wrapper);
+
     updateSteps(result);
   }
 
   private void editFilter() {
-    SteppingFilter steps = getFilter();
-    if (null == steps) {
-      return;
-    }
-    List<ContextualFilter> result = steps.getSteps();
     List<ContextualFilter> target = filterControl.getSelectedFilters();
     if (target.isEmpty()) {
       return;
     }
+    SteppingFilter steps = getFilter();
+    if (null == steps) {
+      return;
+    }
+
+    List<ContextualFilter> result = getUpdatableSteps();
     ContextualFilter filter = target.get(0);
     int index = result.indexOf(filter);
+
     ContextualFilter update = editFilter(filter);
     if (null == update) {
       return;
     }
     result.set(index, update);
+
     updateSteps(result);
   }
 
@@ -227,9 +234,11 @@ public class FilterTableEditorControl
     if (null == steps) {
       return;
     }
-    List<ContextualFilter> result = steps.getSteps();
+
+    List<ContextualFilter> result = getUpdatableSteps();
     List<ContextualFilter> target = filterControl.getSelectedFilters();
     result.removeAll(target);
+
     updateSteps(result);
   }
 
@@ -238,11 +247,12 @@ public class FilterTableEditorControl
     if (null == steps) {
       return;
     }
-    List<ContextualFilter> result = steps.getSteps();
     List<ContextualFilter> target = filterControl.getSelectedFilters();
     if (target.isEmpty()) {
       return;
     }
+
+    List<ContextualFilter> result = getUpdatableSteps();
     ContextualFilter above = target.get(0);
     int index = result.indexOf(above);
     if (index < 1) {
@@ -259,11 +269,12 @@ public class FilterTableEditorControl
     if (null == steps) {
       return;
     }
-    List<ContextualFilter> result = steps.getSteps();
     List<ContextualFilter> target = filterControl.getSelectedFilters();
     if (target.isEmpty()) {
       return;
     }
+
+    List<ContextualFilter> result = getUpdatableSteps();
     int bound = target.size();
     ContextualFilter below = target.get(bound - 1);
     int index = result.indexOf(below);
@@ -279,9 +290,6 @@ public class FilterTableEditorControl
   /////////////////////////////////////
   // Support methods
 
-  /**
-   * @param filter
-   */
   private ContextualFilter editFilter(ContextualFilter filter) {
     ContextualFilterContributor<?> contrib =
         ContextualFilterRegistry.findRegistryContributor(filter);
@@ -300,14 +308,8 @@ public class FilterTableEditorControl
     return null;
   }
 
-  /**
-   * Only the "steps"-subset of our setInput() method.
-   * @return 
-   */
-  private List<ContextualFilter> appendStep(ContextualFilter step) {
-    List<ContextualFilter> result = getFilter().getSteps();
-    result.add(step);
-    return result;
+  private List<ContextualFilter> getUpdatableSteps() {
+    return Lists.newArrayList(getFilter().getSteps());
   }
 
   /**

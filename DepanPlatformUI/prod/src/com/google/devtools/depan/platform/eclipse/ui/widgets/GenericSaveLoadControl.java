@@ -16,27 +16,14 @@
 
 package com.google.devtools.depan.platform.eclipse.ui.widgets;
 
-import com.google.devtools.depan.persistence.AbstractDocXmlPersist;
-import com.google.devtools.depan.persistence.StorageTools;
-import com.google.devtools.depan.platform.PlatformLogger;
-import com.google.devtools.depan.platform.WorkspaceTools;
-import com.google.devtools.depan.resource_doc.eclipse.ui.persistence.LoadResourceDialog;
-import com.google.devtools.depan.resource_doc.eclipse.ui.persistence.SaveResourceDialog;
 import com.google.devtools.depan.resources.PropertyDocument;
 
-import org.eclipse.core.resources.IContainer;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-
-import java.text.MessageFormat;
 
 /**
  * Control for saving and loading many types of documents.
@@ -86,101 +73,15 @@ public abstract class GenericSaveLoadControl<T extends PropertyDocument<?>>
   private void handleSave() {
 
     T rsrc = buildSaveResource();
-    IFile saveFile = getSaveAsFile(rsrc.getName());
-    if (null == saveFile) {
-      return;
-    }
-    AbstractDocXmlPersist<T> persist = config.getDocXmlPersist(false);
-    StorageTools.saveDocument(saveFile, rsrc, persist, null);
+    config.saveResource(rsrc, getShell(), getProject());
   }
 
   /**
    * Open a dialog to load a resource.
    */
   private void handleLoad() {
-    IFile loadFile = getLoadFromFile();
-    if (null == loadFile) {
-      return;
-    }
-
-    AbstractDocXmlPersist<T> persist = config.getDocXmlPersist(false);
-    T doc = persist.load(loadFile.getRawLocationURI());
-    installLoadResource(doc);
-  }
-
-  /////////////////////////////////////
-  // SaveAs support
-
-  private IFile getSaveAsFile(String rsrcName) {
-    IFile saveAs = guessSaveAsFile(rsrcName);
-    SaveResourceDialog saveDlg = new SaveResourceDialog(getShell());
-    saveDlg.setInput(saveAs);
-    if (saveDlg.open() != SaveResourceDialog.OK) {
-      return null;
-    }
-
-    // get the file relatively to the workspace.
-    try {
-      return WorkspaceTools.calcFileWithExt(
-          saveDlg.getResult(), config.getExension());
-    } catch (CoreException errCore) {
-      String msg = MessageFormat.format(
-          "Error saving resource to {0}", saveAs);
-      PlatformLogger.logException(msg, errCore);
-    }
-    return null;
-  }
-
-  protected IFile guessSaveAsFile(String rsrcName) {
-    IPath namePath = Path.fromOSString(rsrcName);
-    namePath.addFileExtension(config.getExension());
-
-    IPath treePath = config.getContainer().getPath();
-    IPath destPath = treePath.append(namePath);
-
-    IProject proj = getProject();
-    return proj.getFile(destPath);
-  }
-
-  /////////////////////////////////////
-  // LoadFrom support
-
-  /**
-   * Get container and file name from user, with good handling for defaults.
-   */
-  private IFile getLoadFromFile() {
-    IContainer rsrcRoot = guessResourceRoot();
-
-    LoadResourceDialog loadDlg = new LoadResourceDialog(getShell());
-    loadDlg.setInput(rsrcRoot, config.getExension());
-    if (loadDlg.open() != SaveResourceDialog.OK) {
-      return null;
-    }
-
-    // get the file relatively to the workspace.
-    try {
-      return WorkspaceTools.calcFileWithExt(
-          loadDlg.getResult(), config.getExension());
-    } catch (CoreException errCore) {
-      String msg = MessageFormat.format(
-          "Error loading resource from {0}", rsrcRoot);
-      PlatformLogger.logException(msg, errCore);
-    }
-    return null;
-  }
-
-  /**
-   * Infer the expected container for filter resources.
-   * 
-   * The resulting file follow the naming conventions for project resources.
-   *   [ViewDoc-Project][Resource-Type-Path][Resource-Name]
-   * 
-   * The user will be able to edit this result before a storage action is
-   * performed.
-   */
-  private IContainer guessResourceRoot() {
-    IPath treePath = config.getContainer().getPath();
-    return getProject().getFolder(treePath);
+    T rsrc = config.loadResource(getShell(), getProject());
+    installLoadResource(rsrc);
   }
 
   /////////////////////////////////////

@@ -16,11 +16,23 @@
 
 package com.google.devtools.depan.nodes.filters.eclipse.ui.widgets;
 
+import com.google.devtools.depan.analysis_doc.model.FeatureMatcher;
 import com.google.devtools.depan.graph_doc.model.DependencyModel;
+import com.google.devtools.depan.nodes.filters.eclipse.ui.filters.ContextualFilterDocument;
 import com.google.devtools.depan.nodes.filters.model.ContextualFilter;
+import com.google.devtools.depan.platform.eclipse.ui.widgets.SaveLoadConfig;
+import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
 /**
@@ -35,17 +47,28 @@ public abstract class FilterEditorDialog<T extends ContextualFilter>
 
   private final IProject project;
 
+  private final SaveLoadConfig<ContextualFilterDocument> config;
+
   private T result;
 
   /**
    * @param parentShell
    */
   protected FilterEditorDialog(
-      Shell parentShell, T filter, DependencyModel model, IProject project) {
+      Shell parentShell, T filter, DependencyModel model, IProject project,
+      SaveLoadConfig<ContextualFilterDocument> config) {
     super(parentShell);
     this.filter = filter;
     this.model = model;
     this.project = project;
+    this.config = config;
+  }
+
+  protected FilterEditorDialog(
+      Shell parentShell, T filter, DependencyModel model, IProject project) {
+    this(
+        parentShell, filter, model, project,
+        ContextualFilterSaveLoadConfig.CONFIG);
   }
 
   @Override
@@ -76,4 +99,64 @@ public abstract class FilterEditorDialog<T extends ContextualFilter>
   }
 
   protected abstract T buildFilter();
+
+  /////////////////////////////////////
+  // UX Setup
+
+  /**
+   * Add Save As... button on left side of each FilterEditor dialog.
+   */
+  @Override
+  protected Control createButtonBar(Composite parent) {
+    Composite result = Widgets.buildGridContainer(parent, 2);
+    result.setLayoutData(Widgets.buildHorzFillData());
+
+    Composite saveAs = setUpSaveAs(result);
+    saveAs.setLayoutData(Widgets.buildHorzFillData());
+
+    // Parent's button bar on right
+    super.createButtonBar(result);
+    return result;
+  }
+
+  private Composite setUpSaveAs(Composite parent) {
+    Composite result = new Composite(parent, SWT.NONE);
+    GridLayout layout = Widgets.buildContainerLayout(1);
+    layout.marginWidth = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_MARGIN);
+    layout.marginHeight = convertVerticalDLUsToPixels(IDialogConstants.VERTICAL_MARGIN);
+    layout.horizontalSpacing = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_SPACING);
+    layout.verticalSpacing = convertVerticalDLUsToPixels(IDialogConstants.VERTICAL_SPACING);
+    result.setLayout(layout);
+
+    Button saveAs = Widgets.buildCompactPushButton(result, "Save As...");
+    setButtonLayoutData(saveAs);
+    saveAs.addSelectionListener(new SelectionAdapter() {
+      
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        handleSaveAs();
+      }
+    });
+
+    return result;
+  }
+
+  /////////////////////////////////////
+  // SaveAs support
+
+  /**
+   * Provide a document to save,
+   * based on the current state of the editor's controls.
+   */
+  protected ContextualFilterDocument buildSaveResource() {
+    FeatureMatcher matcher = new FeatureMatcher(getModel());
+    ContextualFilterDocument result =
+        new ContextualFilterDocument(matcher, buildFilter());
+    return result;
+  }
+
+  private void handleSaveAs() {
+    ContextualFilterDocument rsrc = buildSaveResource();
+    config.saveResource(rsrc, getShell(), getProject());
+  }
 }

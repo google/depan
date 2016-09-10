@@ -16,18 +16,10 @@
 
 package com.google.devtools.depan.nodes.filters.eclipse.ui.widgets;
 
-import com.google.devtools.depan.analysis_doc.model.FeatureMatcher;
 import com.google.devtools.depan.graph_doc.model.DependencyModel;
-import com.google.devtools.depan.nodes.filters.eclipse.ui.filters.ContextualFilterDocument;
-import com.google.devtools.depan.nodes.filters.eclipse.ui.persistence.ContextualFilterResources;
-import com.google.devtools.depan.nodes.filters.eclipse.ui.persistence.ContextualFilterXmlPersist;
 import com.google.devtools.depan.nodes.filters.model.ContextualFilter;
 import com.google.devtools.depan.nodes.filters.sequence.BasicFilter;
-import com.google.devtools.depan.persistence.AbstractDocXmlPersist;
-import com.google.devtools.depan.platform.eclipse.ui.widgets.GenericSaveLoadControl;
-import com.google.devtools.depan.platform.eclipse.ui.widgets.SaveLoadConfig;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
-import com.google.devtools.depan.resources.ResourceContainer;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.swt.widgets.Composite;
@@ -80,76 +72,10 @@ public class SimpleFilterEditorDialog<T extends BasicFilter>
   private Composite setupResourceEditor(Composite parent) {
     Composite result = Widgets.buildGridGroup(parent, "Resource", 1);
 
-    ControlSaveLoadControl saves = new ControlSaveLoadControl(result);
-    saves.setLayoutData(Widgets.buildHorzFillData());
-
     // Just name and summary.
     editor = new SimpleFilterEditorControl<T>(result);
     editor.setLayoutData(Widgets.buildGrabFillData());
 
     return result;
-  }
-
-  /////////////////////////////////////
-  // Integration classes
-
-  private class ControlSaveLoadControl
-      extends GenericSaveLoadControl<ContextualFilterDocument> {
-
-    ControlSaveLoadControl(Composite parent) {
-      super(parent, CONFIG);
-    }
-
-    @Override
-    protected IProject getProject() {
-      return SimpleFilterEditorDialog.this.getProject();
-    }
-
-    @Override
-    protected ContextualFilterDocument buildSaveResource() {
-      FeatureMatcher matcher = new FeatureMatcher(getModel());
-      ContextualFilterDocument result =
-          new ContextualFilterDocument(matcher, buildFilter());
-      return result;
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    protected void installLoadResource(ContextualFilterDocument doc) {
-      editor.setInput((T) doc.getInfo(), getModel(), getProject());
-    }
-  }
-
-  private static SaveLoadConfig<ContextualFilterDocument> CONFIG =
-      new ControlSaveLoadConfig();
-
-  private static class ControlSaveLoadConfig
-      extends SaveLoadConfig<ContextualFilterDocument> {
-
-    @Override
-    public ResourceContainer getContainer() {
-      return ContextualFilterResources.getContainer();
-    }
-
-    @Override
-    public AbstractDocXmlPersist<ContextualFilterDocument> getDocXmlPersist(
-        boolean readable) {
-      return ContextualFilterXmlPersist.build(readable);
-    }
-
-    @Override
-    public String getSaveLabel() {
-      return "Save filter resource...";
-    }
-
-    @Override
-    public String getLoadLabel() {
-      return "Load filter resource...";
-    }
-
-    @Override
-    public String getExension() {
-      return ContextualFilterDocument.EXTENSION;
-    }
   }
 }
