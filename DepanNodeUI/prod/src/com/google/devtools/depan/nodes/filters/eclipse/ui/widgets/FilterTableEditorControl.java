@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.nodes.filters.eclipse.ui.widgets;
 
+import com.google.devtools.depan.nodes.filters.eclipse.ui.filters.ContextualFilterDocument;
 import com.google.devtools.depan.nodes.filters.eclipse.ui.plugins.ContextualFilterContributor;
 import com.google.devtools.depan.nodes.filters.eclipse.ui.plugins.ContextualFilterContributors;
 import com.google.devtools.depan.nodes.filters.eclipse.ui.plugins.ContextualFilterRegistry;
@@ -94,7 +95,7 @@ public class FilterTableEditorControl
   }
 
   private Composite setupEditButtons(Composite parent) {
-    Composite result = Widgets.buildGridContainer(parent, 5);
+    Composite result = Widgets.buildGridContainer(parent, 6);
 
     Button editButton = Widgets.buildCompactPushButton(result, "Edit...");
     editButton.addSelectionListener(new SelectionAdapter() {
@@ -124,6 +125,14 @@ public class FilterTableEditorControl
       @Override
       public void widgetSelected(SelectionEvent e) {
         wrapFilter();
+      }
+    });
+
+    Button importButton = Widgets.buildCompactPushButton(result, "Import");
+    importButton.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        importFilter();
       }
     });
 
@@ -176,6 +185,24 @@ public class FilterTableEditorControl
     ContextualFilter filter = contrib.createElementFilter();
     List<ContextualFilter> result = getUpdatableSteps();
     result.add(filter);
+
+    updateSteps(result);
+  }
+
+
+  private void importFilter() {
+    if (null == getFilter()) {
+      return;
+    }
+    ContextualFilterDocument filterDoc =
+        ContextualFilterSaveLoadConfig.CONFIG.loadResource(
+            getShell(), getProject());
+    if (null == filterDoc) {
+      return;
+    }
+
+    List<ContextualFilter> result = getUpdatableSteps();
+    result.add(filterDoc.getInfo());
 
     updateSteps(result);
   }
