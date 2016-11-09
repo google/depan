@@ -46,6 +46,8 @@ public class NodeListViewProvider<T> implements NodeViewerProvider {
 
   private NodeTreeProvider<T> provider;
 
+  private GraphData<T> solo;
+
   public NodeListViewProvider(String listLabel, Collection<GraphNode> nodes) {
     this.listLabel = listLabel;
     this.nodes = nodes;
@@ -69,7 +71,7 @@ public class NodeListViewProvider<T> implements NodeViewerProvider {
     List<PlatformObject> result = Lists.newArrayList();
 
     TreeModel.Flat model = new TreeModel.Flat(nodes);
-    GraphData solo = new GraphData(provider, model);
+    solo = new GraphData(provider, model);
     result.add(new SolitaryRoot(solo, listLabel));
     return new ViewerRoot(result.toArray());
   }
@@ -79,5 +81,10 @@ public class NodeListViewProvider<T> implements NodeViewerProvider {
     if (nodes.size() < NodeViewerProvider.AUTO_EXPAND_LIMIT) {
       viewer.expandAll();
     }
+  }
+
+  @Override
+  public Object findNodeObject(GraphNode node) {
+    return solo.getNodeWrapper(node);
   }
 }

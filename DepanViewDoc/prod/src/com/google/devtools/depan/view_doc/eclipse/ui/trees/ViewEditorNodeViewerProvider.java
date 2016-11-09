@@ -71,6 +71,11 @@ public class ViewEditorNodeViewerProvider implements NodeViewerProvider {
   }
 
   @Override
+  public Object findNodeObject(GraphNode node) {
+    return editor.findViewerNodeObject(node);
+  }
+
+  @Override
   public void updateExpandState(TreeViewer viewer) {
     int nodeCnt = editor.getViewGraph().getNodes().size();
     if (nodeCnt < NodeViewerProvider.AUTO_EXPAND_LIMIT) {

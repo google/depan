@@ -18,6 +18,7 @@ package com.google.devtools.depan.eclipse.ui.nodes.viewers;
 
 import com.google.devtools.depan.eclipse.ui.nodes.NodesUIResources;
 import com.google.devtools.depan.eclipse.ui.nodes.trees.NodeWrapperTreeSorter;
+import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 
 import org.eclipse.core.runtime.PlatformObject;
@@ -97,6 +98,10 @@ public class GraphNodeViewer extends Composite {
 
   public void setNvProvider(NodeViewerProvider nvProvider) {
     this.provider = nvProvider;
+  }
+
+  public Object findNodeObject(GraphNode node) {
+    return provider.findNodeObject(node);
   }
 
   public void refresh() {

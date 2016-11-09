@@ -41,7 +41,7 @@ public class SolitaryRoot<E> extends PlatformObject {
     return children;
   }
 
-  protected GraphData<E> getGraphData() {
+  public GraphData<E> getGraphData() {
     return data;
   }
 }

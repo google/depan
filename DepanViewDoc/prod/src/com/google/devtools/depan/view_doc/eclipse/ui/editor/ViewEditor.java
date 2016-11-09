@@ -278,6 +278,10 @@ public class ViewEditor extends MultiPageEditorPart {
     return new ViewerRoot(new Object[] {view});
   }
 
+  public Object findViewerNodeObject(GraphNode node) {
+    return compactor.findNodeObject(node);
+  }
+
   private String buildNodeViewerLabel(int rootCnt, int nodeCnt) {
     String name = getPartName();
     if (rootCnt < nodeCnt) {

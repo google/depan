@@ -145,7 +145,8 @@ public class NodeDisplayTableControl extends Composite {
     }
 
     public void updateNodeColumns(GraphNode node, String[] cols) {
-      getTreeViewer().update(node, cols);
+      Object wrapper = findNodeObject(node);
+      getTreeViewer().update(wrapper, cols);
     }
   }
 

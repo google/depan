@@ -19,6 +19,8 @@ package com.google.devtools.depan.view_doc.eclipse.ui.trees;
 import com.google.devtools.depan.collapse.model.CollapseTreeModel;
 import com.google.devtools.depan.eclipse.ui.collapse.trees.CollapseTreeRoot;
 import com.google.devtools.depan.eclipse.ui.nodes.trees.GraphData;
+import com.google.devtools.depan.eclipse.ui.nodes.trees.NodeWrapper;
+import com.google.devtools.depan.eclipse.ui.nodes.trees.SolitaryRoot;
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeTreeProviders;
 import com.google.devtools.depan.matchers.eclipse.ui.widgets.EdgeMatcherMenuCreator;
 import com.google.devtools.depan.matchers.eclipse.ui.widgets.EdgeMatcherSelectionListener;
@@ -66,6 +68,8 @@ public class NodeCompactor {
    */
   private GraphModel exposedGraph;
 
+  private PlatformObject[] roots;
+
   public NodeCompactor(ViewEditor viewEditor) {
     editor = viewEditor;
   }
@@ -87,7 +91,8 @@ public class NodeCompactor {
   //
 
   public PlatformObject[] buildRoots(Collection<GraphNode> nodes) {
-    return buildHierarchyRoots(editor.getViewGraph(), nodes);
+    roots = buildHierarchyRoots(editor.getViewGraph(), nodes);
+    return roots;
   }
 
   public Collection<GraphNode> buildExposedNodes(
@@ -102,6 +107,19 @@ public class NodeCompactor {
   public GraphModel buildExposedGraph(
       GraphModel master, Collection<GraphNode> nodes) {
     return GraphBuilders.buildFromNodes(master, nodes);
+  }
+
+  @SuppressWarnings("unchecked")
+  public Object findNodeObject(GraphNode node) {
+    for (PlatformObject root : roots) {
+      if (root instanceof SolitaryRoot<?>) {
+        SolitaryRoot<GraphNode> check = (SolitaryRoot<GraphNode>) root;
+        NodeWrapper<GraphNode> result =
+            check.getGraphData().getNodeWrapper(node);
+        return result;
+      }
+    }
+    return null;
   }
 
   /////////////////////////////////////

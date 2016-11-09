@@ -69,4 +69,9 @@ public class GraphEditorNodeViewProvider<T> implements NodeViewerProvider {
     }
     graphData.saveExpandState(viewer.getExpandedTreePaths());
   }
+
+  @Override
+  public Object findNodeObject(GraphNode node) {
+    return graphData.getNodeWrapper(node);
+  }
 }

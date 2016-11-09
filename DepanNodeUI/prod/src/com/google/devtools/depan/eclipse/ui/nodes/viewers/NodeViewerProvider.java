@@ -1,5 +1,7 @@
 package com.google.devtools.depan.eclipse.ui.nodes.viewers;
 
+import com.google.devtools.depan.model.GraphNode;
+
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -25,6 +27,8 @@ public interface NodeViewerProvider {
   void addItemActions(IMenuManager manager, Object menuElement);
 
   PlatformObject buildViewerRoots();
+
+  Object findNodeObject(GraphNode node);
 
   void updateExpandState(TreeViewer viewer);
 }
