@@ -146,7 +146,9 @@ public class NodeDisplayTableControl extends Composite {
 
     public void updateNodeColumns(GraphNode node, String[] cols) {
       Object wrapper = findNodeObject(node);
-      getTreeViewer().update(wrapper, cols);
+      if (null != wrapper) {
+        getTreeViewer().update(wrapper, cols);
+      }
     }
   }
 
@@ -306,8 +308,8 @@ public class NodeDisplayTableControl extends Composite {
   private void updateLocationX(GraphNode node, Object update) {
     try {
       double newX = Double.parseDouble((String) update);
-      Point2D pos = posRepo.getLocation(node);
-      Point2D location = Point2dUtils.newPoint2D(newX, pos.getY());
+      double posY = getYPoint(node);
+      Point2D location = Point2dUtils.newPoint2D(newX, posY);
       posRepo.setLocation(node, location);
     } catch (NumberFormatException errNum) {
       ViewDocLogger.logException("Bad number format for X position", errNum);
@@ -318,9 +320,9 @@ public class NodeDisplayTableControl extends Composite {
 
   private void updateLocationY(GraphNode node, Object update) {
     try {
+      double posX = getXPoint(node);
       double newY = Double.parseDouble((String) update);
-      Point2D pos = posRepo.getLocation(node);
-      Point2D location = Point2dUtils.newPoint2D(pos.getX(), newY);
+      Point2D location = Point2dUtils.newPoint2D(posX, newY);
       posRepo.setLocation(node, location);
     } catch (NumberFormatException errNum) {
       ViewDocLogger.logException("Bad number format for Y position", errNum);
@@ -345,6 +347,22 @@ public class NodeDisplayTableControl extends Composite {
       return fmtDouble(position.getY());
     }
     return "";
+  }
+
+  private double getXPoint(GraphNode node) {
+    Point2D position = posRepo.getLocation(node);
+    if (null != position) {
+      return position.getX();
+    }
+    return 0.0;
+  }
+
+  private double getYPoint(GraphNode node) {
+    Point2D position = posRepo.getLocation(node);
+    if (null != position) {
+      return position.getY();
+    }
+    return 0.0;
   }
 
   private String fmtDouble(double pos) {
