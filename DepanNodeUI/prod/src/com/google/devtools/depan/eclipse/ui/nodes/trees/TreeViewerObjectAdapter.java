@@ -64,6 +64,7 @@ public class TreeViewerObjectAdapter implements IWorkbenchAdapter {
     }
     return null;
   }
+
   /////////////////////////////////////
   // Type clean accessors
 
@@ -74,6 +75,7 @@ public class TreeViewerObjectAdapter implements IWorkbenchAdapter {
   private String getLabel(TreeViewerObject root) {
     return root.getName();
   }
+
   private Object[] getChildren(TreeViewerObject root) {
     return root.getChildren();
   }

@@ -105,7 +105,13 @@ public class CollapseData {
   /////////////////////////////////////
   // Factory methods
 
-  public static Collection<CollapseData> getChildrenData(CollapseData data) {
+  /**
+   * Provide a copy of the children nodes with full {@link CollapseData},
+   * even for nodes without children.  It is safe to manipulate the result.
+   * 
+   * @return a new {@link Collection} of {@link CollapseData}.
+   */
+  public static Collection<CollapseData> buildChildrenData(CollapseData data) {
 
     if (null == data) {
       return CollapseData.EMPTY_LIST;

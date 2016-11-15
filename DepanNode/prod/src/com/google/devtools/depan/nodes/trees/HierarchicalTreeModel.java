@@ -45,11 +45,8 @@ public class HierarchicalTreeModel implements TreeModel {
   }
 
   @Override
-  public SuccessorEdges getSuccessors(GraphNode node) {
-    if (false == index.containsKey(node)) {
-      return SuccessorEdges.EMPTY;
-    }
-    return index.get(node);
+  public boolean hasSuccessorNodes(GraphNode node) {
+    return getSuccessors(node).hasSuccessors();
   }
 
   @Override
@@ -60,29 +57,6 @@ public class HierarchicalTreeModel implements TreeModel {
   @Override
   public Collection<GraphNode> computeRoots() {
     return computeRoots(index.keySet());
-  }
-
-  /**
-   * Provide a collection of nodes to serve as roots of a tree.
-   * <p>
-   * The returned set of nodes guarantees a successor path to
-   * every node in the universe.
-   * 
-   * @param universe set of node for root discovery
-   * @return collection of root nodes
-   */
-  private Collection<GraphNode> computeRoots(
-      Collection<GraphNode> universe) {
-
-    DfsState dfsState = new DfsState(this);
-
-    for (GraphNode node : universe) {
-      if (dfsState.isUnvisited(node)) {
-        dfsState.visitNode(node);
-      }
-    }
-
-    return dfsState.extractRoots();
   }
 
   /**
@@ -103,7 +77,7 @@ public class HierarchicalTreeModel implements TreeModel {
     return result;
   }
 
-
+   
   @Override
   public Set<GraphNode> computeTreeNodes() {
     Set<GraphNode> treeNodes = Sets.newHashSet();
@@ -127,5 +101,35 @@ public class HierarchicalTreeModel implements TreeModel {
   @Override
   public int countTreeNodes() {
     return computeTreeNodes().size();
+  }
+
+  private SuccessorEdges getSuccessors(GraphNode node) {
+    if (false == index.containsKey(node)) {
+      return SuccessorEdges.EMPTY;
+    }
+    return index.get(node);
+  }
+
+  /**
+   * Provide a collection of nodes to serve as roots of a tree.
+   * <p>
+   * The returned set of nodes guarantees a successor path to
+   * every node in the universe.
+   * 
+   * @param universe set of node for root discovery
+   * @return collection of root nodes
+   */
+  private Collection<GraphNode> computeRoots(
+      Collection<GraphNode> universe) {
+
+    DfsState dfsState = new DfsState(this);
+
+    for (GraphNode node : universe) {
+      if (dfsState.isUnvisited(node)) {
+        dfsState.visitNode(node);
+      }
+    }
+
+    return dfsState.extractRoots();
   }
 }

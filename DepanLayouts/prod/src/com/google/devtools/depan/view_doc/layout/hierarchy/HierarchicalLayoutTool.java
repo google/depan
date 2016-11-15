@@ -23,7 +23,6 @@ import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.nodes.Graphs;
 import com.google.devtools.depan.nodes.trees.HierarchicalTreeModel;
-import com.google.devtools.depan.nodes.trees.SuccessorEdges;
 import com.google.devtools.depan.nodes.trees.TreeModel;
 
 import com.google.common.collect.Lists;
@@ -198,8 +197,7 @@ public abstract class HierarchicalLayoutTool {
         continue;
       }
 
-     SuccessorEdges successors = treeData.getSuccessors(node);
-      if (successors.hasSuccessors()) {
+      if (treeData.hasSuccessorNodes(node)) {
         inners.add(node);
       }
       else {

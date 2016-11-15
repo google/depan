@@ -17,7 +17,6 @@
 package com.google.devtools.depan.eclipse.ui.collapse.trees;
 
 import com.google.devtools.depan.collapse.model.CollapseData;
-import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeTreeProvider;
 import com.google.devtools.depan.model.GraphNode;
 
 import org.eclipse.core.runtime.PlatformObject;
@@ -27,46 +26,48 @@ import java.util.Collection;
 /**
  * @author ycoppel@google.com (Yohann Coppel)
  *
- * @param <E> Type of data associated to each CollapseData<Element>.
+ * @param <T> Type of data associated to each CollapseData.
  */
-public class CollapseDataWrapper<E> extends PlatformObject {
+public class CollapseDataWrapper<T> extends PlatformObject {
+
   @SuppressWarnings("rawtypes")
   private static final CollapseDataWrapper[] LEAF_KIDS =
       new CollapseDataWrapper[0];
 
   private final CollapseData collapseData;
-  private final NodeTreeProvider<E> provider;
-  public final CollapseDataWrapper<E> parent;
+  private final CollapseDataWrapper<T> parent;
+  private final CollapseViewData<T> data;
+  
+  private CollapseDataWrapper<T>[] children;
 
   CollapseDataWrapper(
       CollapseData collapseData,
-      NodeTreeProvider<E> provider,
-      CollapseDataWrapper<E> parent) {
+      CollapseDataWrapper<T> parent,
+      CollapseViewData<T> data) {
     this.collapseData = collapseData;
-    this.provider = provider;
     this.parent= parent;
+    this.data = data;
   }
 
   public CollapseData getCollapseData() {
     return collapseData;
   }
 
-  public E getContent() {
+  public T getContent() {
     GraphNode node = collapseData.getMasterNode();
-    return provider.getObject(node);
+    return data.getContent(node);
   }
 
-  public CollapseDataWrapper<E> getParent() {
+  public CollapseDataWrapper<T> getParent() {
     return parent;
   }
 
-  public CollapseDataWrapper<E>[] getChildren() {
-    Collection<CollapseData> childrenData =
-        CollapseData.getChildrenData(collapseData);
+  public CollapseDataWrapper<T>[] getChildren() {
+    if (null == children) {
+      children = data.buildChildren(this);
+    }
 
-    CollapseDataWrapper<E>[] result =
-        buildCollapseDataWrapperArray(childrenData, provider, this);
-    return result;
+    return children;
   }
 
   @Override
@@ -82,10 +83,10 @@ public class CollapseDataWrapper<E> extends PlatformObject {
    * the children.
    */
   @SuppressWarnings("unchecked")
-  static <F> CollapseDataWrapper<F>[] buildCollapseDataWrapperArray(
+  public static <T> CollapseDataWrapper<T>[] buildCollapseDataWrapperArray(
       Collection<CollapseData> collapseData,
-      NodeTreeProvider<F> provider,
-      CollapseDataWrapper<F> parent) {
+      CollapseDataWrapper<T> parent,
+      CollapseViewData<T> data) {
 
     // All empty children lists look the same,
     // so early exit with the singleton
@@ -93,12 +94,12 @@ public class CollapseDataWrapper<E> extends PlatformObject {
       return LEAF_KIDS;
     }
 
-    CollapseDataWrapper<F>[] result
-        = new CollapseDataWrapper[collapseData.size()];
+    CollapseDataWrapper<T>[] result =
+        new CollapseDataWrapper[collapseData.size()];
     int index = 0;
     for (CollapseData node : collapseData) {
-      CollapseDataWrapper<F> nodeWrapper =
-          new CollapseDataWrapper<F>(node, provider, parent);
+      CollapseDataWrapper<T> nodeWrapper =
+          new CollapseDataWrapper<T>(node, parent, data);
       result[index] = nodeWrapper;
       index++;
     }

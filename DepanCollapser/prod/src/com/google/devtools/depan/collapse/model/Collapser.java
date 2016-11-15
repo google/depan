@@ -16,18 +16,17 @@ limitations under the License.
 
 package com.google.devtools.depan.collapse.model;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.builder.api.GraphBuilder;
 import com.google.devtools.depan.model.builder.api.GraphBuilders;
-import com.google.devtools.depan.nodes.trees.SuccessorEdges;
 import com.google.devtools.depan.nodes.trees.TopoSortState;
 import com.google.devtools.depan.nodes.trees.TreeModel;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -209,8 +208,7 @@ public class Collapser {
       GraphNode parent) {
 
     // Nothing to do if the node has no successors
-    SuccessorEdges successors = treeModel.getSuccessors(parent);
-    if (!successors.hasSuccessors()) {
+    if (!treeModel.hasSuccessorNodes(parent)) {
       return;
     }
 

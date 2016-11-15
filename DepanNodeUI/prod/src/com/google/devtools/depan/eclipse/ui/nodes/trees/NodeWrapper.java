@@ -16,7 +16,6 @@
 
 package com.google.devtools.depan.eclipse.ui.nodes.trees;
 
-import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeTreeProvider;
 import com.google.devtools.depan.model.GraphNode;
 
 import org.eclipse.core.runtime.PlatformObject;
@@ -33,7 +32,6 @@ public class NodeWrapper<E> extends PlatformObject {
   public static final NodeWrapper[] LEAF_KIDS = new NodeWrapper[0];
 
   private final GraphNode node;
-  private final E content;
   private final NodeWrapper<E> parent;
   private final GraphData<E> data;
 
@@ -42,11 +40,9 @@ public class NodeWrapper<E> extends PlatformObject {
 
   public NodeWrapper(
       GraphNode node,
-      E content,
       NodeWrapper<E> parent,
       GraphData<E> data) {
     this.node = node;
-    this.content = content;
     this.parent= parent;
     this.data = data;
   }
@@ -56,7 +52,7 @@ public class NodeWrapper<E> extends PlatformObject {
   }
 
   public E getContent() {
-    return content;
+    return data.getContent(node);
   }
 
   @Override
@@ -80,7 +76,7 @@ public class NodeWrapper<E> extends PlatformObject {
 
   @SuppressWarnings("unchecked")
   public static <F> NodeWrapper<F>[] buildNodeWrapperArray(
-      Collection<GraphNode> nodes, NodeTreeProvider<F> provider,
+      Collection<GraphNode> nodes,
       NodeWrapper<F> parent, GraphData<F> data) {
 
     // All empty children lists look the same,
@@ -92,22 +88,15 @@ public class NodeWrapper<E> extends PlatformObject {
     NodeWrapper<F>[] children = new NodeWrapper[nodes.size()];
     int index = 0;
     for (GraphNode node : nodes) {
-      F content = provider.getObject(node);
-      NodeWrapper<F> nodeWrapper =
-          createNodeWrapper(node, content, parent, data);
+      NodeWrapper<F> nodeWrapper = createNodeWrapper(node, parent, data);
       children[index] = nodeWrapper;
       index++;
     }
     return children;
   }
 
-  /**
-   * @param node
-   * @return
-   */
-  public static <F> NodeWrapper<F> createNodeWrapper(
-      GraphNode node, F content, NodeWrapper<F> parent, GraphData<F> data) {
-    return new NodeWrapper<F>(
-        node, content, parent, data);
+  private static <F> NodeWrapper<F> createNodeWrapper(
+      GraphNode node, NodeWrapper<F> parent, GraphData<F> data) {
+    return new NodeWrapper<F>(node, parent, data);
   }
 }

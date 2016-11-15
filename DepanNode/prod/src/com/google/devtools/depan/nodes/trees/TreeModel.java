@@ -29,13 +29,17 @@ import java.util.Collections;
 public interface TreeModel {
 
   /**
+   * Indicate whether the supplied node has successors.
+   * May be less expensive than computing full set of successors.
+   */
+  boolean hasSuccessorNodes(GraphNode node);
+
+  /**
    * Provide the Collection of successors for the given node.
    * 
    * @param node node
    * @return Collection of successor nodes
    */
-  SuccessorEdges getSuccessors(GraphNode node);
-
   Collection<GraphNode> getSuccessorNodes(GraphNode node);
 
   /**
@@ -70,8 +74,8 @@ public interface TreeModel {
   public class Empty implements TreeModel {
 
     @Override
-    public SuccessorEdges getSuccessors(GraphNode node) {
-      return SuccessorEdges.EMPTY;
+    public boolean hasSuccessorNodes(GraphNode node) {
+      return false;
     }
 
     @Override
@@ -111,8 +115,8 @@ public interface TreeModel {
     }
 
     @Override
-    public SuccessorEdges getSuccessors(GraphNode node) {
-      return SuccessorEdges.EMPTY;
+    public boolean hasSuccessorNodes(GraphNode node) {
+      return false;
     }
 
     @Override

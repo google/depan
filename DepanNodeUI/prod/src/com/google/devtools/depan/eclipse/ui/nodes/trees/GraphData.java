@@ -88,14 +88,10 @@ public class GraphData<F> {
    * @return Array of children NodeWrappers.
    */
   public NodeWrapper<F>[] getChildren(NodeWrapper<F> parent) {
-    if (null != parent.childs) {
-      return parent.childs;
-    }
     Collection<GraphNode> childList =
         treeData.getSuccessorNodes(parent.getNode());
 
-    parent.childs = buildNodeWrapperArray(childList);
-    return parent.childs;
+    return buildNodeWrapperArray(childList);
   }
 
   public TreeModel getTreeModel() {
@@ -124,7 +120,7 @@ public class GraphData<F> {
 
   private NodeWrapper<F>[] buildNodeWrapperArray(Collection<GraphNode> nodes) {
     NodeWrapper<F>[] result = NodeWrapper.buildNodeWrapperArray(
-        nodes, provider, null, this);
+        nodes, null, this);
     for (NodeWrapper<F> item : result) {
       reverseMap.put(item.getNode(), item);
     }
@@ -141,6 +137,10 @@ public class GraphData<F> {
    */
   public NodeWrapper<F> getNodeWrapper(GraphNode node) {
     return reverseMap.get(node);
+  }
+
+  public F getContent(GraphNode node) {
+    return provider.getObject(node);
   }
 
   public TreePath[] getExpandState() {

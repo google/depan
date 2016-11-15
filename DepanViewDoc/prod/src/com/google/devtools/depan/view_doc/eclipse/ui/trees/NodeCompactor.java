@@ -17,6 +17,7 @@
 package com.google.devtools.depan.view_doc.eclipse.ui.trees;
 
 import com.google.devtools.depan.collapse.model.CollapseTreeModel;
+import com.google.devtools.depan.eclipse.ui.collapse.trees.CollapseDataWrapper;
 import com.google.devtools.depan.eclipse.ui.collapse.trees.CollapseTreeRoot;
 import com.google.devtools.depan.eclipse.ui.nodes.trees.GraphData;
 import com.google.devtools.depan.eclipse.ui.nodes.trees.NodeWrapper;
@@ -118,6 +119,12 @@ public class NodeCompactor {
             check.getGraphData().getNodeWrapper(node);
         return result;
       }
+      if (root instanceof CollapseTreeRoot<?>) {
+        CollapseTreeRoot<GraphNode> check = (CollapseTreeRoot<GraphNode>) root;
+        CollapseDataWrapper<GraphNode> result =
+            check.getCollapseNodeWrapper(node);
+        return result;
+      }
     }
     return null;
   }
@@ -163,7 +170,7 @@ public class NodeCompactor {
     String label = MessageFormat.format(
         "Collapse nodes [{0} roots, {1} nodes]", rootCnt, nodeCnt);
     return CollapseTreeRoot.build(
-        treeModel, NodeTreeProviders.GRAPH_NODE_PROVIDER, label);
+        label, treeModel, NodeTreeProviders.GRAPH_NODE_PROVIDER);
   }
 
   /**

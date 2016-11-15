@@ -16,43 +16,48 @@
 
 package com.google.devtools.depan.eclipse.ui.collapse.trees;
 
-import com.google.devtools.depan.collapse.model.CollapseData;
 import com.google.devtools.depan.collapse.model.CollapseTreeModel;
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeTreeProvider;
+import com.google.devtools.depan.model.GraphNode;
 
 import org.eclipse.core.runtime.PlatformObject;
 
-import java.util.Collection;
-
 /**
- * @param <E> Type of data associated to each Node<Element>.
+ * @param <T> Type of data associated to each node.
  */
-public class CollapseTreeRoot<E>
+public class CollapseTreeRoot<T>
     extends PlatformObject {
 
-  private final CollapseDataWrapper<E>[] roots;
   private final String label;
+  private final CollapseViewData<T> data;
 
-  CollapseTreeRoot(CollapseDataWrapper<E>[] roots, String label) {
-    this.roots = roots;
+  private CollapseDataWrapper<T>[] children;
+
+  CollapseTreeRoot(String label, CollapseViewData<T> data) {
     this.label = label;
-  }
-
-  public CollapseDataWrapper<E>[] getRoots() {
-    return roots;
+    this.data = data;
   }
 
   public String getLabel() {
     return label;
   }
 
-  public static <E> CollapseTreeRoot<E> build(
+  public CollapseDataWrapper<T>[] getChildren() {
+    if (null == children) {
+      children = data.computeRootWrappers();
+    }
+    return children;
+  }
+
+  public CollapseDataWrapper<T> getCollapseNodeWrapper(GraphNode node) {
+    return data.getCollapseDataWrapper(node);
+  }
+
+  public static <T> CollapseTreeRoot<T> build(
+      String label,
       CollapseTreeModel treeModel,
-      NodeTreeProvider<E> provider,
-      String label) {
-    Collection<CollapseData> roots = treeModel.computeRoots();
-    CollapseDataWrapper<E>[] rootArray =
-        CollapseDataWrapper.buildCollapseDataWrapperArray(roots, provider, null);
-    return new CollapseTreeRoot<E>(rootArray, label);
+      NodeTreeProvider<T> provider) {
+    CollapseViewData<T> data = new CollapseViewData<T>(treeModel, provider);
+    return new CollapseTreeRoot<T>(label, data);
   }
 }

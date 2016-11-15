@@ -22,13 +22,13 @@ import org.eclipse.ui.model.IWorkbenchAdapter;
 /**
  * Adapt {@link CollapseTreeRoot}s for tree display.
  */
-class CollapseTreeRootAdapter<E> implements IWorkbenchAdapter {
+class CollapseTreeRootAdapter<T> implements IWorkbenchAdapter {
 
   @SuppressWarnings("unchecked")
   @Override
   public Object[] getChildren(Object o) {
     if (o instanceof CollapseTreeRoot) {
-      return (((CollapseTreeRoot<E>) o).getRoots());
+      return (((CollapseTreeRoot<T>) o).getChildren());
     }
     return new Object[] {};
   }
@@ -42,7 +42,7 @@ class CollapseTreeRootAdapter<E> implements IWorkbenchAdapter {
   @Override
   public String getLabel(Object o) {
     if (o instanceof CollapseTreeRoot) {
-      return (((CollapseTreeRoot<E>) o).getLabel());
+      return (((CollapseTreeRoot<T>) o).getLabel());
     }
     return o.toString();
   }

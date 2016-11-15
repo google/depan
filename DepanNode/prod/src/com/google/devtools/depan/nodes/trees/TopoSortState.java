@@ -48,9 +48,8 @@ public class TopoSortState extends DfsState {
 
     // Only keep the interior nodes of the tree.
     // Omit all the leaves.
-    SuccessorEdges successors = getSuccessors(node);
-    if (successors.hasSuccessors()) {
-      topoOrder.add(node);;
+    if (hasSuccessorNodes(node)) {
+      topoOrder.add(node);
     }
   }
 

@@ -57,8 +57,8 @@ public class DfsState {
     return ++ticks;
   }
 
-  protected SuccessorEdges getSuccessors(GraphNode parent) {
-    return treeData.getSuccessors(parent);
+  protected boolean hasSuccessorNodes(GraphNode node) {
+    return treeData.hasSuccessorNodes(node);
   }
 
   protected NodeState findNodeState(GraphNode node) {
@@ -146,7 +146,7 @@ public class DfsState {
 
   public void visitNode(GraphNode parent) {
     setDiscovered(parent);
-    for(GraphNode child : getSuccessors(parent).computeSuccessorNodes()) {
+    for(GraphNode child : treeData.getSuccessorNodes(parent)) {
       // Even if we have previously visited this node,
       // set it's predecessor if it doesn't have one.
       // This appears to be a bug in the CLR version of DFS-visit(u)
