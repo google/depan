@@ -11,7 +11,7 @@ public class MavenRelationContributor implements RelationContributor {
   public static final String LABEL = "Maven";
 
   public static final String ID =
-      "com.google.devtools.depan.java.MavenRelationContributor";
+      "com.google.devtools.depan.maven.MavenRelationContributor";
 
   @Override
   public String getLabel() {
