@@ -89,12 +89,13 @@ public class NewRelationDisplayDocWizard
   // AbstractNewResourceWizard hook methods
 
   @Override
-  protected int countBuildWork() {
+  protected int countCreateWork() {
     return 1;
   }
 
   @Override
-  protected RelationDisplayDocument buildDocument(IProgressMonitor monitor) {
+  protected RelationDisplayDocument createNewDocument(
+      IProgressMonitor monitor) {
     monitor.beginTask("Preparing edge display properties", 1);
     monitor.worked(1);
 

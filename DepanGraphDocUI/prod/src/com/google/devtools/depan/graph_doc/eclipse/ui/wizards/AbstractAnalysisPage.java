@@ -18,18 +18,12 @@ package com.google.devtools.depan.graph_doc.eclipse.ui.wizards;
 
 import com.google.devtools.depan.graph_doc.model.GraphDocument;
 import com.google.devtools.depan.persistence.StorageTools;
-import com.google.devtools.depan.platform.WorkspaceTools;
+import com.google.devtools.depan.platform.eclipse.ui.wizards.AbstractNewDocumentOutputPart;
+import com.google.devtools.depan.platform.eclipse.ui.wizards.AbstractNewDocumentPage;
+import com.google.devtools.depan.platform.eclipse.ui.wizards.NewDocumentOutputPart;
 
 import org.eclipse.core.resources.IContainer;
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
 
 /**
  * A standard page for accepting user input in an analysis wizard.
@@ -40,26 +34,15 @@ import org.eclipse.swt.widgets.Label;
  * {@link AbstractResouceWizardPage.createSourceControl(Composite)} method to
  * define user's content to analyze.
  */
-public abstract class AbstractAnalysisPage extends WizardPage {
-
-  private final ISelection selection;
+public abstract class AbstractAnalysisPage extends AbstractNewDocumentPage {
 
   private final String defaultFilename;
 
-  private AnalysisOutputPart outputPart;
-
-  /**
-   * @param selection
-   */
   public AbstractAnalysisPage(
       ISelection selection, String pageLabel, String pageDescription,
       String defaultFilename) {
-    super(pageLabel);
-    this.selection = selection;
+    super(selection, pageLabel, pageDescription);
     this.defaultFilename =  defaultFilename;
-
-    setTitle(pageLabel);
-    setDescription(pageDescription);
   }
 
   /**
@@ -70,89 +53,14 @@ public abstract class AbstractAnalysisPage extends WizardPage {
   }
 
   @Override
-  public void createControl(Composite parent) {
-    Composite container = new Composite(parent, SWT.NONE);
-
-    GridLayout layout = new GridLayout(1, true);
-    layout.marginWidth = 0;
-    layout.verticalSpacing = 9;
-    container.setLayout(layout);
-
-    IContainer outputContainer = WorkspaceTools.guessContainer(selection);
+  protected NewDocumentOutputPart createOutputPart() {
+    IContainer outputContainer = guessContainer();
     String outputFilename = StorageTools.guessNewFilename(
         outputContainer, defaultFilename, 1, 10);
-    outputPart = new AnalysisOutputPart(this, outputContainer, outputFilename);
-    Composite outputGroup = outputPart.createControl(container);
-    outputGroup.setLayoutData(createHorzFillData());
 
-    Composite sourceGroup = createSourceControl(container);
-    sourceGroup.setLayoutData(createHorzFillData());
 
-    updateStatus(getPageErrorMsg());
-    setControl(container);
-  }
-
-  /**
-   * Provide a GridData instance that should expand to fill any available
-   * horizontal space.
-   */
-  protected GridData createHorzFillData() {
-    return new GridData(SWT.FILL, SWT.FILL, true, false);
-  }
-
-  /**
-   * Provide a GridData instance that should span multiple columns.
-   * @return
-   */
-  protected GridData createColSpanData(int columns) {
-    return new GridData(SWT.FILL, SWT.FILL, true, false, columns, 1);
-  }
-
-  protected Label createSimpleLabel(Composite parent, String text) {
-    Label result = new Label(parent, SWT.NONE);
-    result.setText(text);
-    return result;
-  }
-
-  protected Label createPlaceholder(Composite parent) {
-    return new Label(parent, SWT.NONE);
-  }
-
-  public IFile getOutputFile() throws CoreException {
-    return outputPart.getOutputFile();
-  }
-
-  public String getOutputFileName () {
-    return outputPart.getFileName();
-  }
-
-  @Override
-  public boolean isPageComplete() {
-    return outputPart.isComplete()
-        && hasCompleteAnalysisSource();
-  }
-
-  protected String getPageErrorMsg() {
-    String result = outputPart.getErrorMsg();
-    if (null != result) {
-      return result;
-    }
-    return getAnalysisSourceErrorMsg();
-  }
-
-  protected void updateStatus(String message) {
-    setErrorMessage(message);
-    setPageComplete(isPageComplete());
-  }
-
-  /**
-   * @param container
-   */
-  protected abstract Composite createSourceControl(Composite container);
-
-  protected abstract String getAnalysisSourceErrorMsg();
-
-  protected boolean hasCompleteAnalysisSource() {
-    return (null == getAnalysisSourceErrorMsg());
+    return new AbstractNewDocumentOutputPart(
+        "Analysis Output File", this, outputContainer,
+        GraphDocument.EXTENSION, outputFilename);
   }
 }

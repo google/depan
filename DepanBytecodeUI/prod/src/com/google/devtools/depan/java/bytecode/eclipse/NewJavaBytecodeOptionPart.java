@@ -16,21 +16,22 @@
 
 package com.google.devtools.depan.java.bytecode.eclipse;
 
-import com.google.devtools.depan.graph_doc.eclipse.ui.wizards.AbstractAnalysisPage;
+import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
+import com.google.devtools.depan.platform.eclipse.ui.wizards.AbstractNewDocumentPage;
+import com.google.devtools.depan.platform.eclipse.ui.wizards.NewWizardOptionPart;
 
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 
@@ -41,9 +42,9 @@ import java.io.File;
  * as the file name. The page will only accept file name without the extension
  * OR with the extension that matches the expected one (dgi).
  */
-public class NewGraphPage extends AbstractAnalysisPage {
+public class NewJavaBytecodeOptionPart implements NewWizardOptionPart {
 
-  private static final String PAGE_LABEL = "New Java Analysis";
+  private final AbstractNewDocumentPage containingPage;
 
   private Text dirPath;
   private Text jarPath;
@@ -56,43 +57,75 @@ public class NewGraphPage extends AbstractAnalysisPage {
   private Button infer;
   private Button dirFilterButton;
 
-  private String errorMsg;
+  /////////////////////////////////////
+  // Public API
+
+  public NewJavaBytecodeOptionPart(
+      AbstractNewDocumentPage containingPage) {
+    this.containingPage = containingPage;
+  }
+
+  public String getClassPath() {
+    if (jarRadio.getSelection()) {
+      return jarPath.getText();
+    } else {
+      return dirPath.getText();
+    }
+  }
+
+  public String getDirectoryFilter() {
+    return directoryFilter.getText();
+  }
+
+  public String getPackageFilter() {
+    return packageFilter.getText();
+  }
+
+  @Override
+  public boolean isComplete() {
+    return (null == getErrorMsg());
+  }
 
   /**
-   * @param selection
+   * Determine if the current set of analysis inputs are valid.
+   * If not, provide an error message that describes the problem.
+   * @return {@code null} if error free, or a non-null error String if
+   *     there are problems.
    */
-  public NewGraphPage(ISelection selection) {
-    super(selection, PAGE_LABEL,
-        "This wizard creates a new dependency graph"
-        + " from an analysis of Java .class files.",
-        createFilename("Java"));
+  @Override
+  public String getErrorMsg() {
+    if (jarRadio.getSelection()) {
+      File f = new File(jarPath.getText());
+      if (!f.exists()) {
+        return "Jar file doesn't exists";
+      }
+      if (!f.canRead()) {
+        return "Can't read Jar file directory";
+      }
+    } else {
+      File f = new File(dirPath.getText());
+      if (!f.exists()) {
+        return "Base Path directory doesn't exists";
+      }
+      if (!f.canRead()) {
+        return "Can't read Base Path directory";
+      }
+    }
+
+    return null;
   }
 
   @Override
-  public String getAnalysisSourceErrorMsg() {
-    return errorMsg;
-  }
-
-  @Override
-  protected Composite createSourceControl(Composite parent) {
-
-    // Outer composite for both the class path group and the
-    // filter definition group
-    Composite result = new Composite(parent, SWT.NONE);
-
-    GridLayout layout = new GridLayout(1, true);
-    layout.marginHeight = 0;
-    layout.marginWidth = 0;
-    result.setLayout(layout);
+  public Composite createPartControl(Composite parent) {
+    Composite result = Widgets.buildGridContainer(parent, 1);
 
     Composite classpathGroup = createClasspathGroup(result);
-    classpathGroup.setLayoutData(createHorzFillData());
+    classpathGroup.setLayoutData(Widgets.buildHorzFillData());
 
     Composite filterGroup = createFilterGroup(result);
-    filterGroup.setLayoutData(createHorzFillData());
+    filterGroup.setLayoutData(Widgets.buildHorzFillData());
 
     enable(true);
-    errorMsg = validateInputs();
 
     // install listeners after full configuration of all controls
     // this minimizes the "chatter" during initialization
@@ -101,68 +134,51 @@ public class NewGraphPage extends AbstractAnalysisPage {
     return result;
   }
 
+  /**
+   * Provide group for selecting jar file or Directory as input.
+   */
   private Composite createClasspathGroup(Composite parent) {
-    // group for selecting jar file or Directory as input
-    Group result = new Group(parent, SWT.NONE);
-    result.setText("Class Path");
-
-    GridLayout grid = new GridLayout(3, false);
-    grid.verticalSpacing = 9;
-    result.setLayout(grid);
+    Group result = Widgets.buildGridGroup(parent, "Class Path", 3);
 
     // jar file as source
-    jarRadio = new Button(result, SWT.RADIO);
-    jarRadio.setText("From a .jar file");
-    jarRadio.setLayoutData(createColSpanData(3));
+    jarRadio = Widgets.buildCompactRadio(result, "From a .jar file");
+    jarRadio.setLayoutData(Widgets.buildHorzSpanData(3));
 
-    createSimpleLabel(result, "&Jar File:");
-    jarPath = new Text(result, SWT.BORDER | SWT.SINGLE);
-    jarPath.setLayoutData(createHorzFillData());
+    Widgets.buildCompactLabel(result, "&Jar File:");
+    jarPath = Widgets.buildGridBoxedText(result);
 
-    jarBrowse = new Button(result, SWT.PUSH);
-    jarBrowse.setText("Browse...");
+    jarBrowse = Widgets.buildCompactPushButton(result, "Browse...");
 
     // directory as source
-    dirRadio = new Button(result, SWT.RADIO);
-    dirRadio.setText("From a directory");
-    dirRadio.setLayoutData(createColSpanData(3));
+    dirRadio = Widgets.buildCompactRadio(result, "From a directory");
+    dirRadio.setLayoutData(Widgets.buildHorzSpanData(3));
 
-    createSimpleLabel(result, "&Directory:");
-    dirPath = new Text(result, SWT.BORDER | SWT.SINGLE);
-    dirPath.setLayoutData(createHorzFillData());
+    Widgets.buildCompactLabel(result, "&Directory:");
+    dirPath = Widgets.buildGridBoxedText(result);
 
-    dirBrowse = new Button(result, SWT.PUSH);
-    dirBrowse.setText("Browse...");
+    dirBrowse = Widgets.buildCompactPushButton(result, "Browse...");
 
     return result;
   }
 
+  private Label createPlaceholder(Composite parent) {
+    return new Label(parent, SWT.NONE);
+  }
+
   private Composite createFilterGroup(Composite parent) {
-
-    Group result = new Group(parent, SWT.NONE);
-    result.setText("Filters");
-
-    GridLayout gridFilters = new GridLayout(3, false);
-    gridFilters.verticalSpacing = 9;
-    result.setLayout(gridFilters);
+    Group result = Widgets.buildGridGroup(parent, "Filters", 3);
 
     // Filter by package name
-    createSimpleLabel(result, "&Package name:");
-    packageFilter = new Text(result, SWT.BORDER | SWT.SINGLE);
-    packageFilter.setLayoutData(createHorzFillData());
+    Widgets.buildCompactLabel(result, "&Package name:");
+    packageFilter = Widgets.buildGridBoxedText(result);
 
     createPlaceholder(result);
 
     // Filter by directory name
-    createSimpleLabel(result, "&Directory:");
-    directoryFilter = new Text(result, SWT.BORDER | SWT.SINGLE);
-    directoryFilter.setLayoutData(createHorzFillData());
-
-    dirFilterButton = new Button(result, SWT.PUSH);
-    dirFilterButton.setText("Browse...");
-
-    infer = new Button(result, SWT.PUSH);
-    infer.setText("infer");
+    Widgets.buildCompactLabel(result, "&Directory:");
+    directoryFilter = Widgets.buildGridBoxedText(result);
+    dirFilterButton = Widgets.buildCompactPushButton(result, "Browse...");
+    infer = Widgets.buildCompactPushButton(result, "infer");
 
     return result;
   }
@@ -281,7 +297,8 @@ public class NewGraphPage extends AbstractAnalysisPage {
    * Open a directory and write the name in the given {@link Text} object.
    */
   private void handleBrowse(Text cell) {
-    cell.setText(new DirectoryDialog(getShell()).open());
+    cell.setText(new DirectoryDialog(containingPage.getShell()).open());
+    dialogChanged();
   }
 
 
@@ -289,60 +306,16 @@ public class NewGraphPage extends AbstractAnalysisPage {
    * Open a File and write the name in the given {@link Text} object.
    */
   private void handleFileBrowse(Text cell) {
-    FileDialog dialog = new FileDialog(getShell());
+    FileDialog dialog = new FileDialog(containingPage.getShell());
     dialog.setFilterExtensions(new String[] {"*.jar", "*.zip", "*.*"});
     cell.setText(dialog.open());
+    dialogChanged();
   }
 
-  /**
-   * Ensures that both text fields are set.
-   */
+  /////////////////////////////////////
+  // UX utilities
+
   private void dialogChanged() {
-    errorMsg = validateInputs();
-    updateStatus(errorMsg);
-  }
-
-  /**
-   * Determine if the current set of analysis inputs are valid.
-   * If not, provide an error message that describes the problem.
-   * @return {@code null} if error free, or a non-null error String if
-   *     there are problems.
-   */
-  private String validateInputs() {
-    if (jarRadio.getSelection()) {
-      File f = new File(jarPath.getText());
-      if (!f.exists()) {
-        return "Jar file doesn't exists";
-      }
-      if (!f.canRead()) {
-        return "Can't read Jar file directory";
-      }
-    } else {
-      File f = new File(dirPath.getText());
-      if (!f.exists()) {
-        return "Base Path directory doesn't exists";
-      }
-      if (!f.canRead()) {
-        return "Can't read Base Path directory";
-      }
-    }
-
-    return null;
-  }
-
-  public String getClassPath() {
-    if (jarRadio.getSelection()) {
-      return jarPath.getText();
-    } else {
-      return dirPath.getText();
-    }
-  }
-
-  public String getDirectoryFilter() {
-    return directoryFilter.getText();
-  }
-
-  public String getPackageFilter() {
-    return packageFilter.getText();
+    containingPage.updatePageStatus();
   }
 }

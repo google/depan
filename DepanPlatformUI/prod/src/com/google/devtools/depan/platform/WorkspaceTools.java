@@ -30,6 +30,9 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.ContainerSelectionDialog;
+import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
+import org.eclipse.ui.model.WorkbenchContentProvider;
+import org.eclipse.ui.model.WorkbenchLabelProvider;
 
 /**
  * A utility class that provides static methods for manipulating Eclipse
@@ -42,6 +45,19 @@ public final class WorkspaceTools {
 
   private WorkspaceTools() {
     // Prevent instantiation.
+  }
+
+  public static IFile buildResourceFile(IPath path) {
+    return ResourcesPlugin.getWorkspace().getRoot().getFile(path);
+  }
+
+  public static IResource buildWorkspaceResource(IPath path) {
+    return ResourcesPlugin.getWorkspace().getRoot().findMember(path);
+  }
+
+  public static IFile buildResourceFile(String saveFilename) {
+    IPath savePath = Path.fromOSString(saveFilename);
+    return buildResourceFile(savePath);
   }
 
   /**
@@ -58,7 +74,7 @@ public final class WorkspaceTools {
     } else if (!saveExt.equals(ext)) {
       savePath = savePath.addFileExtension(ext);
     }
-    return ResourcesPlugin.getWorkspace().getRoot().getFile(savePath);
+    return buildResourceFile(savePath);
   }
 
   /**
@@ -74,7 +90,7 @@ public final class WorkspaceTools {
     } else if (!saveExt.equals(ext)) {
       savePath = savePath.addFileExtension(ext);
     }
-    return ResourcesPlugin.getWorkspace().getRoot().getFile(savePath);
+    return buildResourceFile(savePath);
   }
 
   /**
@@ -98,6 +114,31 @@ public final class WorkspaceTools {
       }
     }
     return defaultValue;
+  }
+
+  /**
+   * Open a dialog box asking the user to select an existing project under the
+   * current workspace.
+   *
+   * @param parentShell
+   * @param title 
+   */
+  public static IResource selectFile(Shell parentShell, String title) {
+    ElementTreeSelectionDialog dialog =
+        new ElementTreeSelectionDialog(
+            parentShell,
+            new WorkbenchLabelProvider(),
+            new WorkbenchContentProvider()
+        );
+
+    dialog.setInput(ResourcesPlugin.getWorkspace().getRoot());
+    dialog.setTitle(title);
+    dialog.setAllowMultiple(false);
+
+    if(dialog.open() == ElementTreeSelectionDialog.OK) {
+      return (IResource) dialog.getFirstResult();
+    }
+    return null;
   }
 
   /**

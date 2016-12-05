@@ -1,5 +1,5 @@
 /*
- * Copyright 2008 The Depan Project Authors
+ * Copyright 2007 The Depan Project Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,49 +14,49 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.filesystem.eclipse;
+package com.google.devtools.depan.java.bytecode.eclipse;
 
 import com.google.devtools.depan.graph_doc.eclipse.ui.wizards.AbstractAnalysisPage;
 
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.widgets.Composite;
 
-import java.io.File;
-
 /**
  * The "New" wizard page allows setting the container for the new file as well
  * as the file name. The page will only accept file name without the extension
  * OR with the extension that matches the expected one (dgi).
  */
+public class NewJavaBytecodePage extends AbstractAnalysisPage {
 
-public class NewFileSystemPage extends AbstractAnalysisPage {
+  private static final String PAGE_LABEL = "New Java Analysis";
 
-  public static final String PAGE_LABEL = "New File System Analysis";
+  private NewJavaBytecodeOptionPart javaBytecodeOptions;
 
-  private NewFileSystemOptionPart fileSystemOptions;
-
-  public NewFileSystemPage(ISelection selection) {
+  /**
+   * @param selection
+   */
+  public NewJavaBytecodePage(ISelection selection) {
     super(selection, PAGE_LABEL,
         "This wizard creates a new dependency graph"
-        + " from an analysis of a file system tree.",
-        createFilename("Tree"));
+        + " from an analysis of Java .class files.",
+        createFilename("Java"));
   }
 
   @Override
   protected void createOptionsParts(Composite container) {
-    fileSystemOptions = new NewFileSystemOptionPart(this);
-    addOptionPart(container, fileSystemOptions);
+    javaBytecodeOptions = new NewJavaBytecodeOptionPart(this);
+    addOptionPart(container, javaBytecodeOptions);
   }
 
-  public String getPathText() {
-    return fileSystemOptions.getPathText();
+  public String getClassPath() {
+    return javaBytecodeOptions.getClassPath();
   }
 
-  public File getPathFile() {
-    return fileSystemOptions.getPathFile();
+  public String getDirectoryFilter() {
+    return javaBytecodeOptions.getDirectoryFilter();
   }
 
-  public String getTreePrefix() {
-    return fileSystemOptions.getTreePrefix();
+  public String getPackageFilter() {
+    return javaBytecodeOptions.getPackageFilter();
   }
 }

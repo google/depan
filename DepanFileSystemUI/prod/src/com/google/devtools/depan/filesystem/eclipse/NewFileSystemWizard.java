@@ -42,14 +42,6 @@ public class NewFileSystemWizard extends AbstractAnalysisWizard {
   public NewFileSystemPage page;
 
   /**
-   * Constructor for FileSystem wizard.
-   */
-  public NewFileSystemWizard() {
-    super();
-    setNeedsProgressMonitor(true);
-  }
-
-  /**
    * Adding the page to the wizard.
    */
   @Override
@@ -59,8 +51,8 @@ public class NewFileSystemWizard extends AbstractAnalysisWizard {
   }
 
   @Override
-  protected String getOutputFileName() {
-    return page.getOutputFileName();
+  protected String getOutputFilename() {
+    return page.getOutputFilename();
   }
 
   @Override
@@ -69,18 +61,17 @@ public class NewFileSystemWizard extends AbstractAnalysisWizard {
   }
 
   @Override
-  protected int countAnalysisWork() {
-    return 2;
+  protected int countCreateWork() {
+    return FileSystemAnalyzer.countAnalysisWork(
+        page.getTreePrefix(), page.getPathText());
   }
 
   /**
    * Create an analysis graph by traversing the file system tree from
    * the named starting point.
-   *
-   * Note that this generates two (2) monitor.worked() calls.
    */
   @Override
-  protected GraphDocument generateAnalysisDocument(IProgressMonitor monitor)
+  protected GraphDocument createNewDocument(IProgressMonitor monitor)
       throws IOException {
 
     // TODO(leeca): Add filters, etc.

@@ -31,7 +31,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
  * or to create a new file with this set.
  *
  * @author ycoppel@google.com (Yohann Coppel)
- *
  */
 public class NewRelationSetWizard
     extends AbstractNewResourceWizard<RelationSetDescriptor> {
@@ -75,12 +74,12 @@ public class NewRelationSetWizard
   // AbstractNewResourceWizard hook methods
 
   @Override
-  protected int countBuildWork() {
+  protected int countCreateWork() {
     return 1;
   }
 
   @Override
-  protected RelationSetDescriptor buildDocument(IProgressMonitor monitor) {
+  protected RelationSetDescriptor createNewDocument(IProgressMonitor monitor) {
     monitor.beginTask("Preparing edge matcher", 1);
     monitor.worked(1);
     return relSetDescr;

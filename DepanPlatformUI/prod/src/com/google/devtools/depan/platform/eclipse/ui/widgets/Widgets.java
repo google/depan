@@ -118,6 +118,13 @@ public class Widgets {
     return result;
   }
 
+  public static Button buildCompactRadio(Composite parent, String label) {
+    Button result = new Button(parent, SWT.RADIO);
+    result.setLayoutData(new GridData());
+    result.setText(label);
+    return result;
+  }
+
   /////////////////////////////////////
   // Layout Factories
 
@@ -141,6 +148,15 @@ public class Widgets {
    */
   public static GridData buildHorzFillData() {
     return new GridData(SWT.FILL, SWT.FILL, true, false);
+  }
+
+  /**
+   * Provide a GridData instance that spans multiple horizontal columns.
+   */
+  public static GridData buildHorzSpanData(int span) {
+    GridData result = Widgets.buildHorzFillData();
+    result.horizontalSpan = span;
+    return result;
   }
 
   /**

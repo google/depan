@@ -19,23 +19,8 @@ package com.google.devtools.depan.maven.eclipse;
 import com.google.devtools.depan.graph_doc.eclipse.ui.wizards.AbstractAnalysisPage;
 import com.google.devtools.depan.maven.builder.PomProcessing;
 
-import com.google.common.base.Strings;
-
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 
 import java.io.File;
 
@@ -49,14 +34,8 @@ import java.io.File;
 public class NewMavenPomPage extends AbstractAnalysisPage {
 
   public static final String PAGE_LABEL = "New Maven POM Analysis";
-  private static final String[] POM_FILTER = new String[] { "*.xml" };
 
-  // UI elements for embedded analysis source part
-  private Text pathEntry;
-  private Button pathBrowse;
-  private Combo processCombo;
-
-  private String errorMsg;
+  private NewMavenPomOptionPart mavenPomOptions;
 
   /**
    * @param selection
@@ -69,120 +48,24 @@ public class NewMavenPomPage extends AbstractAnalysisPage {
   }
 
   @Override
-  public String getAnalysisSourceErrorMsg() {
-    return errorMsg;
-  }
-
-  /**
-   * @param container
-   */
-  @Override
-  protected Composite createSourceControl(Composite container) {
-
-    // group for selecting jar file or Directory as input
-    Group source = new Group(container, SWT.NONE);
-    source.setText("Maven POM");
-
-    GridLayout grid = new GridLayout();
-    grid.numColumns = 3;
-    grid.verticalSpacing = 9;
-    source.setLayout(grid);
-
-    // First row: directory path selector
-    @SuppressWarnings("unused")
-    Label pathLabel = createSimpleLabel(source, "&Maven POM:");
-    pathEntry = new Text(source, SWT.BORDER | SWT.SINGLE);
-    pathEntry.setLayoutData(createHorzFillData());
-    pathEntry.addModifyListener(new ModifyListener() {
-
-      @Override
-      public void modifyText(ModifyEvent e) {
-        dialogChanged();
-      }
-    });
-    pathBrowse = new Button(source, SWT.PUSH);
-    pathBrowse.setText("Browse...");
-    pathBrowse.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        handleBrowse();
-      }
-    });
-
-    // Second row: compute or use
-    @SuppressWarnings("unused")
-    Label procLabel = createSimpleLabel(source, "Processing:");
-    processCombo = createProcessCombo(source);
-    GridData processData = createColSpanData(2);
-    processData.grabExcessHorizontalSpace = false;
-    processCombo.setLayoutData(processData);
-
-    errorMsg = validateInputs();
-
-    return source;
-  }
-  private Combo createProcessCombo(Composite container) {
-    Combo result = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-
-    for (PomProcessing item : PomProcessing.values()) {
-      result.add(item.label);
-    }
-    result.select(0);
-    return result;
-  }
-
-  /**
-   * Ensures that all inputs are valid.
-   */
-  private void dialogChanged() {
-    errorMsg = validateInputs();
-    updateStatus(errorMsg);
-  }
-
-  /**
-   * Determine if the page has been filled in correctly.
-   */
-  private String validateInputs() {
-    String pomPath = pathEntry.getText();
-    if (Strings.isNullOrEmpty(pomPath)) {
-      return "Maven POM cannot be empty";
-    }
-    File pathFile = new File(pomPath);
-    if (!pathFile.exists()) {
-      return "Maven POM file doesn't exist";
-    }
-
-    // No problems.
-    return null;
-  }
-
-  /**
-   * Open a directory and write the name in the given {@link Text} object.
-   */
-  private void handleBrowse() {
-    FileDialog dialog = new FileDialog(getShell(), SWT.OPEN);
-    dialog.setFilterExtensions(POM_FILTER);
-    dialog.setFileName("pom.xml");
-    // dialog.setFilterPath();
-    pathEntry.setText(dialog.open());
+  protected void createOptionsParts(Composite container) {
+    mavenPomOptions = new NewMavenPomOptionPart(this);
+    addOptionPart(container, mavenPomOptions);
   }
 
   public String getPathText() {
-    return pathEntry.getText();
+    return mavenPomOptions.getPathText();
   }
 
   public File getPathFile() {
-    return new File(getPathText());
+    return mavenPomOptions.getPathFile();
   }
 
   public String getTreePrefix() {
-    File path = getPathFile();
-
-    return path.getPath();
+    return mavenPomOptions.getTreePrefix();
   }
 
   public PomProcessing getProcessing() {
-    int select = processCombo.getSelectionIndex();
-    return PomProcessing.values()[select];
+    return mavenPomOptions.getProcessing();
   }
 }

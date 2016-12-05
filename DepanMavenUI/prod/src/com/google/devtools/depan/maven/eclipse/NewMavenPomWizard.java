@@ -74,8 +74,8 @@ public class NewMavenPomWizard extends AbstractAnalysisWizard {
   }
 
   @Override
-  protected String getOutputFileName() {
-    return page.getOutputFileName();
+  protected String getOutputFilename() {
+    return page.getOutputFilename();
   }
 
   @Override
@@ -84,7 +84,7 @@ public class NewMavenPomWizard extends AbstractAnalysisWizard {
   }
 
   @Override
-  protected int countAnalysisWork() {
+  protected int countCreateWork() {
     return 3;
   }
 
@@ -95,7 +95,7 @@ public class NewMavenPomWizard extends AbstractAnalysisWizard {
    * Note that this generates two (2) monitor.worked() calls.
    */
   @Override
-  protected GraphDocument generateAnalysisDocument(IProgressMonitor monitor)
+  protected GraphDocument createNewDocument(IProgressMonitor monitor)
       throws IOException {
 
     // Step 1) Create the GraphModel to hold the analysis results
@@ -156,15 +156,18 @@ public class NewMavenPomWizard extends AbstractAnalysisWizard {
     File mavenDir = pomFile.getParentFile();
 
     IPreferenceStore prefs = MavenActivator.getDefault().getPreferenceStore();
-    String mavenExe = prefs.getString(AnalysisPreferenceIds.MVN_ANALYSIS_EXECUTABLE);
-    String effPomCmd = prefs.getString(AnalysisPreferenceIds.MVN_ANALYSIS_EFFECTIVEPOM);
+    String mavenExe =
+        prefs.getString(AnalysisPreferenceIds.MVN_ANALYSIS_EXECUTABLE);
+    String effPomCmd =
+        prefs.getString(AnalysisPreferenceIds.MVN_ANALYSIS_EFFECTIVEPOM);
     String javaHome = getJavaHome(prefs);
 
     return new MavenContext(builder, mavenDir, javaHome, mavenExe, effPomCmd);
   }
 
   private String getJavaHome(IPreferenceStore prefs) {
-    boolean useSystemJava = prefs.getBoolean(AnalysisPreferenceIds.MVN_ANALYSIS_SYSTEMJAVA);
+    boolean useSystemJava =
+        prefs.getBoolean(AnalysisPreferenceIds.MVN_ANALYSIS_SYSTEMJAVA);
     if (useSystemJava) {
       return System.getProperty("java.home");
     }

@@ -56,14 +56,6 @@ public class NewGraphMLWizard extends AbstractAnalysisWizard {
   public NewGraphMLPage page;
 
   /**
-   * Constructor for FileSystem wizard.
-   */
-  public NewGraphMLWizard() {
-    super();
-    setNeedsProgressMonitor(true);
-  }
-
-  /**
    * Adding the page to the wizard.
    */
   @Override
@@ -73,8 +65,8 @@ public class NewGraphMLWizard extends AbstractAnalysisWizard {
   }
 
   @Override
-  protected String getOutputFileName() {
-    return page.getOutputFileName();
+  protected String getOutputFilename() {
+    return page.getOutputFilename();
   }
 
   @Override
@@ -83,7 +75,7 @@ public class NewGraphMLWizard extends AbstractAnalysisWizard {
   }
 
   @Override
-  protected int countAnalysisWork() {
+  protected int countCreateWork() {
     return 3;
   }
 
@@ -94,7 +86,7 @@ public class NewGraphMLWizard extends AbstractAnalysisWizard {
    * Note that this generates two (2) monitor.worked() calls.
    */
   @Override
-  protected GraphDocument generateAnalysisDocument(IProgressMonitor monitor)
+  protected GraphDocument createNewDocument(IProgressMonitor monitor)
       throws IOException {
 
     // Step 1) Create the GraphModel to hold the analysis results

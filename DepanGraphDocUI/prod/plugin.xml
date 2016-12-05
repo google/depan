@@ -29,5 +29,15 @@
             id="com.google.devtools.depan.nodelist_doc.eclipse.ui.wizards.NodeListFromGraphDocContributor">
       </contribution>
    </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <wizard
+            category="com.google.devtools.depan.eclipse.ui.wizards"
+            class="com.google.devtools.depan.nodelist_doc.eclipse.ui.wizards.NewSubtractNodesWizard"
+            id="com.google.devtools.depan.nodelist_doc.eclipse.ui.wizards.NewSubtractNodesWizard"
+            name="Subtract Nodes"
+            project="true">
+      </wizard>
+   </extension>
 
 </plugin>

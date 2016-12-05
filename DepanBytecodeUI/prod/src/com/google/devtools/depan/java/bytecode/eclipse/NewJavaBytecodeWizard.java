@@ -49,19 +49,19 @@ import java.util.zip.ZipFile;
  * analysis graph.  Based on user input, it can read for a {@code .jar} file
  * or a directory tree.
  */
-public class NewGraphWizard extends AbstractAnalysisWizard {
+public class NewJavaBytecodeWizard extends AbstractAnalysisWizard {
 
   private static final Logger logger =
-      Logger.getLogger(NewGraphWizard.class.getName());
+      Logger.getLogger(NewJavaBytecodeWizard.class.getName());
 
   private final ClassAnalysisStats analysisStats = new ClassAnalysisStats();
 
-  private NewGraphPage page;
+  private NewJavaBytecodePage page;
 
   /**
    * Constructor for NewGraphWizard.
    */
-  public NewGraphWizard() {
+  public NewJavaBytecodeWizard() {
     super();
     setNeedsProgressMonitor(true);
   }
@@ -71,13 +71,13 @@ public class NewGraphWizard extends AbstractAnalysisWizard {
    */
   @Override
   public void addPages() {
-    page = new NewGraphPage(getSelection());
+    page = new NewJavaBytecodePage(getSelection());
     addPage(page);
   }
 
   @Override
-  protected String getOutputFileName() {
-    return page.getOutputFileName();
+  protected String getOutputFilename() {
+    return page.getOutputFilename();
   }
 
   @Override
@@ -86,7 +86,7 @@ public class NewGraphWizard extends AbstractAnalysisWizard {
   }
 
   @Override
-  protected int countAnalysisWork() {
+  protected int countCreateWork() {
     return 2;
   }
 
@@ -94,7 +94,7 @@ public class NewGraphWizard extends AbstractAnalysisWizard {
    * Create an analysis graph by analyzing the .class files on the classpath.
    */
   @Override
-  protected GraphDocument generateAnalysisDocument(IProgressMonitor monitor)
+  protected GraphDocument createNewDocument(IProgressMonitor monitor)
       throws IOException {
 
     // Step 1) Create the GraphModel to hold the analysis results

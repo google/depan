@@ -43,6 +43,10 @@ public class FileSystemAnalyzer {
     this.pathText = pathText;
   }
 
+  public static int countAnalysisWork(String treePrefix, String pathText) {
+    return 2;
+  }
+
   /**
    * Create {@link GraD} graph by traversing the file system tree from
    * the named starting point.
