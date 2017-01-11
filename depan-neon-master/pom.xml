@@ -1,0 +1,97 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.pnambic.depan</groupId>
+    <artifactId>depan-parent</artifactId>
+    <version>0.0.2-SNAPSHOT</version>
+    <relativePath>../depan-parent</relativePath>
+  </parent>
+
+  <artifactId>depan-neon-master</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <name>DepAn Neon Master</name>
+  <description>Master project for DepAn Neon builds</description>
+
+  <modules>
+    <module>../depan-parent</module>
+    <module>../depan-neon-parent</module>
+    <module>../depan-neon-test-parent</module>
+
+    <!-- Plugins -->
+    <!-- Platform components -->
+    <module>../DepanBuilder/prod</module>
+    <module>../DepanBuilder/test</module>
+    <module>../DepanCore/prod</module>
+    <module>../DepanCore/test</module>
+    <module>../DepanEdge/prod</module>
+    <module>../DepanEdge/test</module>
+    <module>../DepanGraphDoc/prod</module>
+    <module>../DepanGraphDoc/test</module>
+    <module>../DepanNode/prod</module>
+    <module>../DepanNode/test</module>
+    <module>../DepanPersistence/prod</module>
+    <module>../DepanPersistence/test</module>
+    <module>../DepanPlatform/prod</module>
+    <module>../DepanTest/prod</module>
+
+    <!-- App/UI components -->
+    <module>../DepanApp/prod</module>
+    <module>../DepanCollapser/prod</module>
+    <module>../DepanCollapser/test</module>
+    <module>../DepanEdgeUI/prod</module>
+    <module>../DepanGraphDocUI/prod</module>
+    <module>../DepanGraphDocUI/test</module>
+    <module>../DepanLayouts/prod</module>
+    <module>../DepanNodeUI/prod</module>
+    <module>../DepanPlatformUI/prod</module>
+    <module>../DepanRemap/prod</module>
+    <module>../DepanViewDoc/prod</module>
+    <module>../JungLayouts/prod</module>
+
+    <!-- Dependency modeling components-->
+    <module>../DepanFileSystem/prod</module>
+    <module>../DepanFileSystem/test</module>
+    <module>../DepanFileSystemUI/prod</module>
+
+    <module>../DepanJava/prod</module>
+    <module>../DepanJavaUI/prod</module>
+    <module>../DepanBytecode/prod</module>
+    <module>../DepanBytecode/test</module>
+    <module>../DepanBytecodeUI/prod</module>
+
+    <module>../DepanJavaScript/prod</module>
+    <module>../DepanJavaScriptUI/prod</module>
+
+    <module>../DepanMaven/prod</module>
+    <module>../DepanMavenUI/prod</module>
+
+    <module>../DepanRuby/prod</module>
+    <module>../DepanGraphML/prod</module>
+    <module>../DepanRubyUI/prod</module>
+
+    <!-- Features -->
+    <module>../depan-app-feature</module>
+    <module>../depan-analyzers-feature</module>
+    <module>../depan-graph-feature</module>
+    <module>../depan-filesystem-feature</module>
+    <module>../depan-java-feature</module>
+    <module>../depan-javascript-feature</module>
+    <module>../depan-maven-feature</module>
+    <module>../depan-ruby-feature</module>
+
+    <!-- Win64 Release -->
+    <module>../depan-win64-feature</module>
+    <module>../depan-win64-release</module>
+
+    <!-- CLI Release -->
+    <module>../DepanCmd/prod</module>
+    <module>../DepanCmd/test</module>
+    <module>../depan-cmd-feature</module>
+    <module>../depan-cli-feature</module>
+    <module>../depan-cli-release</module>
+  </modules>
+</project>
+

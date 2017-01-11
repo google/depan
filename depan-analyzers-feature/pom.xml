@@ -3,14 +3,14 @@
 
   <parent>
     <groupId>com.pnambic.depan</groupId>
-    <artifactId>depan-luna-parent</artifactId>
+    <artifactId>depan-neon-parent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <relativePath>../depan-luna-parent</relativePath>
+    <relativePath>../depan-neon-parent</relativePath>
   </parent>
 
   <artifactId>com.pnambic.depan.analyzers.feature</artifactId>
+  <version>2.1.0-SNAPSHOT</version>
   <packaging>eclipse-feature</packaging>
-  <version>2.0.0-SNAPSHOT</version>
 
   <name>DepAn Analyzers Feature</name>
   <description>DepAn Analyzers Feature</description>
@@ -20,25 +20,25 @@
     <dependency>
       <groupId>com.pnambic.depan</groupId>
       <artifactId>com.google.devtools.depan.filesystem</artifactId>
-      <version>2.0.0-SNAPSHOT</version>
+      <version>2.1.0-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>com.pnambic.depan</groupId>
       <artifactId>com.google.devtools.depan.java.bytecode</artifactId>
-      <version>2.0.0-SNAPSHOT</version>
+      <version>2.1.0-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>com.pnambic.depan</groupId>
       <artifactId>com.google.devtools.depan.javascript</artifactId>
-      <version>2.0.0-SNAPSHOT</version>
+      <version>2.1.0-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>com.pnambic.depan</groupId>
       <artifactId>com.google.devtools.depan.ruby</artifactId>
-      <version>2.0.0-SNAPSHOT</version>
+      <version>2.1.0-SNAPSHOT</version>
     </dependency>
   </dependencies>
 </project>

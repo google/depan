@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: DepanMaven
 Bundle-SymbolicName: com.google.devtools.depan.maven;singleton:=true
-Bundle-Version: 2.0.0.qualifier
+Bundle-Version: 2.1.0.qualifier
 Bundle-Vendor: Pnambic Computing
 Bundle-Activator: com.google.devtools.depan.maven.MavenPluginActivator
 Bundle-ActivationPolicy: lazy

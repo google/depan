@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?pde version="3.8"?><target name="DepAn RCP Target" sequenceNumber="13">
+<locations>
+<location path="${resource_loc:/depan-osgi-library/target/dependency}" type="Directory"/>
+<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
+<unit id="org.eclipse.equinox.p2.user.ui.feature.group" version="2.2.201.v20161124-1529"/>
+<unit id="org.eclipse.equinox.executable.feature.group" version="3.6.300.v20161122-1740"/>
+<unit id="org.eclipse.rcp.sdk.id" version="4.6.2.M20161124-1400"/>
+<unit id="org.eclipse.jdt.source.feature.group" version="3.12.2.v20161124-1400"/>
+<repository location="http://download.eclipse.org/releases/neon"/>
+</location>
+</locations>
+</target>

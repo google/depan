@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: DepanEdge
 Bundle-SymbolicName: com.google.devtools.depan.edges;singleton:=true
-Bundle-Version: 2.0.0.qualifier
+Bundle-Version: 2.1.0.qualifier
 Bundle-Vendor: Pnambic Computing
 Require-Bundle: com.google.guava,
  com.google.devtools.depan.core

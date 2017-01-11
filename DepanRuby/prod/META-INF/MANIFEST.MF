@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: DepanRuby
 Bundle-SymbolicName: com.google.devtools.depan.ruby;singleton:=true
-Bundle-Version: 2.0.0.qualifier
+Bundle-Version: 2.1.0.qualifier
 Bundle-Vendor: Pnambic Computing
 Bundle-Activator: com.google.devtools.depan.ruby.RubyPluginActivator
 Bundle-ActivationPolicy: lazy

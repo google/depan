@@ -8,16 +8,16 @@
     <relativePath>../depan-parent</relativePath>
   </parent>
 
-  <artifactId>depan-luna-master</artifactId>
+  <artifactId>depan-neon-master</artifactId>
   <packaging>pom</packaging>
 
-  <name>DepAn Luna Master</name>
-  <description>Master project for DepAn Luna builds</description>
+  <name>DepAn Neon Master</name>
+  <description>Master project for DepAn Neon builds</description>
 
   <modules>
     <module>../depan-parent</module>
-    <module>../depan-luna-parent</module>
-    <module>../depan-luna-test-parent</module>
+    <module>../depan-neon-parent</module>
+    <module>../depan-neon-test-parent</module>
 
     <!-- Plugins -->
     <!-- Platform components -->
