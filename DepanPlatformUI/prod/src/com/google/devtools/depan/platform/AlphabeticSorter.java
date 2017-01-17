@@ -17,7 +17,7 @@
 package com.google.devtools.depan.platform;
 
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerSorter;
+import org.eclipse.jface.viewers.ViewerComparator;
 
 /**
  * Sort the viewer data in a alphabetic order (using
@@ -29,7 +29,7 @@ import org.eclipse.jface.viewers.ViewerSorter;
  * @author ycoppel@google.com (Yohann Coppel)
  *
  */
-public class AlphabeticSorter extends ViewerSorter {
+public class AlphabeticSorter extends ViewerComparator {
 
   /**
    * {@link ViewerObjectToString} used to get a String for a given object to

@@ -206,7 +206,7 @@ public class MigrationTaskEditor extends MigrationTaskAdapter {
     removeEngineer.setLayoutData(
         new GridData(SWT.FILL, SWT.FILL, false, false));
 
-    engineersTable.setSorter(new AlphabeticSorter(true));
+    engineersTable.setComparator(new AlphabeticSorter(true));
 
     // actions
     addEngineer.addSelectionListener(new SelectionAdapter() {

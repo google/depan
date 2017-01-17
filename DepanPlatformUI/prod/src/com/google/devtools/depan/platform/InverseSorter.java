@@ -18,14 +18,13 @@ package com.google.devtools.depan.platform;
 
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
-import org.eclipse.jface.viewers.ViewerSorter;
 
 /**
  * Reverse the collation order for an existing comparator.
  *
  * @author <a href="leeca@google.com">Lee Carver</a>
  */
-public class InverseSorter extends ViewerSorter {
+public class InverseSorter extends ViewerComparator {
 
   private ViewerComparator sorter;
 

@@ -50,7 +50,7 @@ public class ComposeModeControl extends Composite {
     viewer = new ComboViewer(this, SWT.READ_ONLY | SWT.FLAT);
     viewer.setContentProvider(new ArrayContentProvider());
     viewer.setLabelProvider(CONTROL_LABEL_PROVIDER);
-    viewer.setSorter(new AlphabeticSorter(new ViewerObjectToString() {
+    viewer.setComparator(new AlphabeticSorter(new ViewerObjectToString() {
 
         @Override
         public String getString(Object object) {

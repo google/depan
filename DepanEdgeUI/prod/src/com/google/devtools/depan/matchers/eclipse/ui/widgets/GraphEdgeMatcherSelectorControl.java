@@ -82,7 +82,7 @@ public class GraphEdgeMatcherSelectorControl extends Composite {
     setsViewer.setContentProvider(new ArrayContentProvider());
     setsViewer.setLabelProvider(GraphEdgeMatcherLabelProvider.PROVIDER);
 
-    setsViewer.setSorter(new AlphabeticSorter(new ViewerObjectToString() {
+    setsViewer.setComparator(new AlphabeticSorter(new ViewerObjectToString() {
 
       @Override
       public String getString(Object object) {

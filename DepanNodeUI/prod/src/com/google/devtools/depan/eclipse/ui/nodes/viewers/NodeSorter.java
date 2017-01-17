@@ -20,13 +20,13 @@ import com.google.devtools.depan.eclipse.ui.nodes.plugins.NodeElementPluginRegis
 import com.google.devtools.depan.model.Element;
 
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerSorter;
+import org.eclipse.jface.viewers.ViewerComparator;
 
 /**
  * @author ycoppel@google.com (Yohann Coppel)
  *
  */
-public class NodeSorter extends ViewerSorter {
+public class NodeSorter extends ViewerComparator {
 
   @Override
   public int compare(Viewer viewer, Object e1, Object e2) {

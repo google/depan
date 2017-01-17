@@ -130,7 +130,7 @@ public class GraphNodeViewer extends Composite {
     TreeViewer result = new TreeViewer(parent, style);
     result.setLabelProvider(new WorkbenchLabelProvider());
     result.setContentProvider(new BaseWorkbenchContentProvider());
-    result.setSorter(SORTER);
+    result.setComparator(SORTER);
 
     setupHierarchyMenu(result);
 

@@ -155,7 +155,7 @@ public class EdgeMatcherTableControl extends Composite {
     viewer.setCellModifier(new CellModifier());
     viewer.setContentProvider(ArrayContentProvider.getInstance());
 
-    viewer.setSorter(new AlphabeticSorter(new ViewerObjectToString() {
+    viewer.setComparator(new AlphabeticSorter(new ViewerObjectToString() {
 
       @Override
       public String getString(Object object) {

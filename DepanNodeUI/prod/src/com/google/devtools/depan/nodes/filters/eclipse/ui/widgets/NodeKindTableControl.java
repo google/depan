@@ -34,7 +34,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.ViewerSorter;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -297,14 +297,14 @@ public class NodeKindTableControl extends Composite {
 
     ITableLabelProvider labelProvider =
         (ITableLabelProvider) kindViewer.getLabelProvider();
-    ViewerSorter sorter = new AlphabeticSorter(
+    ViewerComparator sorter = new AlphabeticSorter(
         new LabelProviderToString(labelProvider, colIndex));
     if (SWT.UP == direction) {
       sorter = new InverseSorter(sorter);
     }
 
     Table tableControl = (Table) kindViewer.getControl();
-    kindViewer.setSorter(sorter);
+    kindViewer.setComparator(sorter);
     tableControl.setSortColumn(column);
     tableControl.setSortDirection(direction);
   }

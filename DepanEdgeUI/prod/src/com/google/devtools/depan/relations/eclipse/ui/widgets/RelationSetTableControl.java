@@ -42,7 +42,7 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerSorter;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -321,18 +321,18 @@ public class RelationSetTableControl extends Composite {
   private void setSortColumn(
       TableColumn column, int colIndex, int direction) {
 
-    ViewerSorter sorter = buildColumnSorter(colIndex);
+    ViewerComparator sorter = buildColumnSorter(colIndex);
     if (SWT.UP == direction) {
       sorter = new InverseSorter(sorter);
     }
 
     Table tableControl = (Table) relSetViewer.getControl();
-    relSetViewer.setSorter(sorter);
+    relSetViewer.setComparator(sorter);
     tableControl.setSortColumn(column);
     tableControl.setSortDirection(direction);
   }
 
-  private ViewerSorter buildColumnSorter(int colIndex) {
+  private ViewerComparator buildColumnSorter(int colIndex) {
     if (INDEX_VISIBLE == colIndex) {
       return new BooleanViewSorter();
     }
@@ -340,12 +340,12 @@ public class RelationSetTableControl extends Composite {
     // By default, use an alphabetic sort over the column labels.
     ITableLabelProvider labelProvider =
         (ITableLabelProvider) relSetViewer.getLabelProvider();
-    ViewerSorter result = new AlphabeticSorter(
+    ViewerComparator result = new AlphabeticSorter(
         new LabelProviderToString(labelProvider, colIndex));
     return result;
   }
 
-  private class BooleanViewSorter extends ViewerSorter {
+  private class BooleanViewSorter extends ViewerComparator {
 
     @Override
     public int compare(Viewer viewer, Object e1, Object e2) {

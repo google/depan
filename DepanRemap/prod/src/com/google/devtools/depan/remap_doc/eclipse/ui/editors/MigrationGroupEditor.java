@@ -139,10 +139,10 @@ public class MigrationGroupEditor extends MigrationTaskAdapter {
 
     labelGroupDetails.setText("Group Details");
     labelName.setText("Name");
-    groupSelect.setSorter(new AlphabeticSorter(false));
+    groupSelect.setComparator(new AlphabeticSorter(false));
     labelDependencies.setText("Dependencies");
     labelCompletedBefore.setText("Groups that must be completed before");
-    checkBoxTableViewer.setSorter(new AlphabeticSorter(false));
+    checkBoxTableViewer.setComparator(new AlphabeticSorter(false));
 
     initGroupLists();
 

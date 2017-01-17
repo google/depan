@@ -53,7 +53,7 @@ public class CheckNodeTreeView extends GraphNodeViewer {
     CheckboxTreeViewer result = new CheckboxTreeViewer(parent, style);
     result.setLabelProvider(new WorkbenchLabelProvider());
     result.setContentProvider(new BaseWorkbenchContentProvider());
-    result.setSorter(new NodeWrapperTreeSorter());
+    result.setComparator(new NodeWrapperTreeSorter());
 
     result.addCheckStateListener(new ICheckStateListener() {
       @Override

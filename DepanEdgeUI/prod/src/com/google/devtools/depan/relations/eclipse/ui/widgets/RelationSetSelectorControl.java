@@ -82,7 +82,7 @@ public class RelationSetSelectorControl extends Composite {
     setsViewer.setContentProvider(new ArrayContentProvider());
     setsViewer.setLabelProvider(RelationSetLabelProvider.PROVIDER);
 
-    setsViewer.setSorter(new AlphabeticSorter(new ViewerObjectToString() {
+    setsViewer.setComparator(new AlphabeticSorter(new ViewerObjectToString() {
 
         @Override
         public String getString(Object object) {

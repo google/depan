@@ -40,7 +40,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.ViewerSorter;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -291,23 +291,23 @@ public class RelationDisplayTableControl extends Composite {
   private void setSortColumn(
       TableColumn column, int colIndex, int direction) {
 
-    ViewerSorter sorter = buildColumnSorter(colIndex);
+    ViewerComparator sorter = buildColumnSorter(colIndex);
     if (SWT.UP == direction) {
       sorter = new InverseSorter(sorter);
     }
 
     Table tableControl = (Table) propViewer.getControl();
-    propViewer.setSorter(sorter);
+    propViewer.setComparator(sorter);
     tableControl.setSortColumn(column);
     tableControl.setSortDirection(direction);
   }
 
-  private ViewerSorter buildColumnSorter(int colIndex) {
+  private ViewerComparator buildColumnSorter(int colIndex) {
 
     // By default, use an alphabetic sort over the column labels.
     ITableLabelProvider labelProvider =
         (ITableLabelProvider) propViewer.getLabelProvider();
-    ViewerSorter result = new AlphabeticSorter(
+    ViewerComparator result = new AlphabeticSorter(
         new LabelProviderToString(labelProvider, colIndex));
     return result;
   }
