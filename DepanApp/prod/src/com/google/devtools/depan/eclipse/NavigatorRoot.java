@@ -35,7 +35,7 @@ public class NavigatorRoot implements IAdaptable, IPersistableElement,
   // suppress the warning for the Class, which should be parameterized.
   // We can't here: getAdapter is not declared with a parameterized Class.
   @Override
-  @SuppressWarnings("rawtypes")
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   public Object getAdapter(Class adapter) {
     if (adapter == IPersistableElement.class) {
       return this;

@@ -42,7 +42,7 @@ public class NodeListEditorInput implements IEditorInput {
     this.baseName = baseName;
   }
 
-  @SuppressWarnings("rawtypes")
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   @Override
   public Object getAdapter(Class adapter) {
     return null;

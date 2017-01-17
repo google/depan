@@ -111,7 +111,7 @@ public class ViewEditorInput implements IEditorInput {
   @Override
   // warning suppressed because Class should be parameterized. however the
   // implemented method doesn't use parameter here.
-  @SuppressWarnings("rawtypes")
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   public Object getAdapter(Class adapter) {
     return null;
   }

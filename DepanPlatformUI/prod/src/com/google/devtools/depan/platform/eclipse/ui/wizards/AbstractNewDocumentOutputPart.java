@@ -35,7 +35,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 /**
@@ -98,7 +97,7 @@ public class AbstractNewDocumentOutputPart implements NewDocumentOutputPart {
     Group output = Widgets.buildGridGroup(container, groupName, 3);
 
     // Row 1) Container selection
-    Label label = Widgets.buildCompactLabel(output, "&Container:");
+    Widgets.buildCompactLabel(output, "&Container:");
     containerText = Widgets.buildGridBoxedText(output);
     if (null != outputContainer) {
       containerText.setText(outputContainer.getFullPath().toString());
@@ -106,7 +105,7 @@ public class AbstractNewDocumentOutputPart implements NewDocumentOutputPart {
     Button browse = Widgets.buildCompactPushButton(output, "Browse...");
 
     // Row 2) File selection
-    label = Widgets.buildCompactLabel(output, "&File name:");
+    Widgets.buildCompactLabel(output, "&File name:");
     fileText = Widgets.buildGridBoxedText(output);
     fileText.setText(defaultFilename);
 

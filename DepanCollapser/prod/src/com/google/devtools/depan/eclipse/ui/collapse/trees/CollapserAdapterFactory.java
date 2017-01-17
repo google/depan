@@ -50,7 +50,7 @@ public class CollapserAdapterFactory<E> implements IAdapterFactory {
   // suppressWarning, because getAdapter have a Class as parameter, but
   // Class should be parameterized. To update if the IAdapterFactory is updated.
   @Override
-  @SuppressWarnings("rawtypes")
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   public Object getAdapter(Object adaptableObject, Class adapterType) {
     if (adapterType != IWorkbenchAdapter.class) {
       return null;

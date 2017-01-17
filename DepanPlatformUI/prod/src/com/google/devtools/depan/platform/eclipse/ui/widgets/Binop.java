@@ -525,7 +525,7 @@ public class Binop<T extends BinaryOperators<T>>
   // suppress the warning for the Class, which should be parameterized.
   // We can't here: getAdapter is not declared with a parameterized Class.
   @Override
-  @SuppressWarnings("rawtypes")
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   public Object getAdapter(Object adaptableObject, Class adapterType) {
     if (adapterType != IWorkbenchAdapter.class) {
       return null;
@@ -537,7 +537,7 @@ public class Binop<T extends BinaryOperators<T>>
   }
 
   @Override
-  @SuppressWarnings("rawtypes")
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   public Class[] getAdapterList() {
     return new Class[] {IWorkbenchAdapter.class};
   }
