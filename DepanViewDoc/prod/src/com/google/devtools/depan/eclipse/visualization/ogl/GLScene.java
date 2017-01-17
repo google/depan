@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.eclipse.visualization.ogl;
 
+import com.google.common.base.Strings;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLContext;
@@ -50,6 +51,8 @@ import java.util.logging.Logger;
  * @author Yohann Coppel
  */
 public abstract class GLScene {
+  private static final double ZOOM_BASE = 100.0;
+
   private static final int[] EMPTY_HIT_LIST = new int[0];
 
   private static final Logger logger =
@@ -180,7 +183,11 @@ public abstract class GLScene {
     context.makeCurrent();
 
     Rectangle rect = canvas.getClientArea();
-    gl.glViewport(0, 0, rect.width, rect.height);
+    double scale = getDPIScale();
+
+    gl.glViewport(0, 0,
+        (int) (rect.width * scale),
+        (int) (rect.height * scale));
 
     gl.glMatrixMode(GL2.GL_PROJECTION);
     gl.glLoadIdentity();
@@ -190,6 +197,29 @@ public abstract class GLScene {
     gl.glLoadIdentity();
 
     context.release();
+  }
+
+  /**
+   * Repair DPI adjustments made by DPIUtil.autoScaleDown().
+   * 
+   * It would be much better to get the actual pixel sizes via some
+   * varient getClientArea(), but those semantics are not available
+   * in Neon.2
+   */
+  private double getDPIScale() {
+    String zoomText =
+        System.getProperty("org.eclipse.swt.internal.deviceZoom");
+    if (Strings.isNullOrEmpty(zoomText)) {
+      return 1.0;
+    }
+    try {
+      int zoomVal = Integer.parseInt(zoomText);
+      return zoomVal / ZOOM_BASE;
+    } catch (NumberFormatException errNumb) {
+      logger.warning("Bad DPI scaling term " + zoomText
+          + ". Using 1.0 for OGL scaling");
+    }
+    return 1.0;
   }
 
   private void updateViewpoint(Rectangle rect) {
