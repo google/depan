@@ -88,7 +88,9 @@ public abstract class GLScene {
 
   public static boolean hyperbolic = false;
 
-  /** Latest received mouse positions. */
+  /**
+   * Latest received mouse positions,
+   * converted from SWT units to OGL units. */
   private int mouseX, mouseY;
 
   /** Latest mouse coordinate when rectangle selection started */
@@ -186,9 +188,7 @@ public abstract class GLScene {
 
     Rectangle rect = canvas.getClientArea();
 
-    gl.glViewport(0, 0,
-        (int) (rect.width * dpiScale),
-        (int) (rect.height * dpiScale));
+    gl.glViewport(0, 0, scaleDpiUp(rect.width), scaleDpiUp(rect.height));
 
     gl.glMatrixMode(GL2.GL_PROJECTION);
     gl.glLoadIdentity();
