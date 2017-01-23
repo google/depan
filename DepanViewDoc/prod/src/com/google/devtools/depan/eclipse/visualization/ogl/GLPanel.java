@@ -257,6 +257,28 @@ public class GLPanel extends GLScene {
     }
   }
 
+
+  /**
+   * Draw the pickable elements in the scene.
+   * No updates for rendering metrics.
+   * Scene management is not required.
+   * 
+   * [2017] Omit non-pickable edges for faster rendering and better pick
+   * resolution on busy diagrams.
+   */
+  @Override
+  protected void drawPickables() {
+    super.drawPickables(); // clean up, setup background, camera, etc....
+    renderer.preFrame(0.0f);
+
+    // only draw nodes
+    for (NodeRenderingProperty p : nodesProperties) {
+      renderer.render(p);
+    }
+
+    renderer.postFrame();
+  }
+
   @Override
   public void uncaughtKey(KeyEvent event,
       boolean keyCtrlState, boolean keyAltState, boolean keyShiftState) {

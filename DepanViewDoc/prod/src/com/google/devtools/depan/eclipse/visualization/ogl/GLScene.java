@@ -43,7 +43,6 @@ import java.awt.Color;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.nio.IntBuffer;
-import java.util.logging.Logger;
 
 /**
  * An abstract GLScene. Handling OpenGL specific details.
@@ -51,21 +50,21 @@ import java.util.logging.Logger;
  * @author Yohann Coppel
  */
 public abstract class GLScene {
+
   private static final double ZOOM_BASE = 100.0;
-
   private static final int[] EMPTY_HIT_LIST = new int[0];
-
-  private static final Logger logger =
-      Logger.getLogger(GLScene.class.getName());
 
   // For OSX, get profile early
   private static GLProfile DEFAULT_PROFILE = GLProfile.getDefault();
 
-  private GLCanvas canvas;
   private final GLContext context;
   public final GL2 gl;
   public final GLU glu;
   private final SceneGrip grip;
+  private final double dpiScale;
+
+  // Can't be final, need to dispose
+  private GLCanvas canvas;
 
   /** eye position */
   private float xoff;
@@ -122,6 +121,7 @@ public abstract class GLScene {
     canvas.setCurrent();
 
     context = createGLContext();
+    dpiScale = getDPIScale();
 
     GL rawGL = context.getGL();
     if (rawGL.isGL2()) {
@@ -166,13 +166,15 @@ public abstract class GLScene {
   private GLContext createGLContext() {
 
     try {
-      logger.info("Create context...");
+      GLLogger.LOG.info("Create context...");
       GLDrawableFactory drawableFactory = GLDrawableFactory.getFactory(DEFAULT_PROFILE);
       GLContext result = drawableFactory.createExternalGLContext();
-      logger.info("    Done.");
+      GLLogger.LOG.info("    Done.");
 
       return result;
     } catch (Throwable errGl) {
+      GLLogger.logException(
+          "Unable to create GL Context", errGl);
       errGl.printStackTrace();
       throw new RuntimeException(errGl);
     }
@@ -183,11 +185,10 @@ public abstract class GLScene {
     context.makeCurrent();
 
     Rectangle rect = canvas.getClientArea();
-    double scale = getDPIScale();
 
     gl.glViewport(0, 0,
-        (int) (rect.width * scale),
-        (int) (rect.height * scale));
+        (int) (rect.width * dpiScale),
+        (int) (rect.height * dpiScale));
 
     gl.glMatrixMode(GL2.GL_PROJECTION);
     gl.glLoadIdentity();
@@ -216,10 +217,19 @@ public abstract class GLScene {
       int zoomVal = Integer.parseInt(zoomText);
       return zoomVal / ZOOM_BASE;
     } catch (NumberFormatException errNumb) {
-      logger.warning("Bad DPI scaling term " + zoomText
+      GLLogger.LOG.warning(
+          "Bad DPI scaling term " + zoomText
           + ". Using 1.0 for OGL scaling");
     }
     return 1.0;
+  }
+
+  private int scaleDpiUp(int swtCoord) {
+    // Skip autoboxing, etc., for easy case.
+    if (dpiScale == 1.0) {
+      return swtCoord;
+    }
+    return (int) (dpiScale * swtCoord);
   }
 
   private void updateViewpoint(Rectangle rect) {
@@ -287,6 +297,24 @@ public abstract class GLScene {
   protected void allocateResources() {
   }
 
+  /////////////////////////////////////
+  // Draw the scene
+
+  /**
+   * Clear the scene and adjust the camera position.
+   * 
+   * Hook method for derived types to render the image.  Extending types
+   * should call the super-method first to establish a clear image and
+   * the proper grip.
+   * 
+   * @param elapsedTime time since previous frame.
+   */
+  protected void drawScene(float elapsedTime) {
+    step();
+    gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
+    prepareCamera();
+  }
+
   /**
    * @param elapsedTime time since previous frame.
    */
@@ -303,6 +331,21 @@ public abstract class GLScene {
     }
     canvas.swapBuffers();
     context.release();
+  }
+
+  /////////////////////////////////////
+  // Element picking
+
+  /**
+   * Clear the scene and adjust the camera position for element picking.
+   * 
+   * Hook method for derived types to render the pickable elements in the
+   * diagram.  Derived types should call the super-method first to establish
+   * a clear image and the proper grip.
+   */
+  protected void drawPickables() {
+    gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
+    prepareCamera();
   }
 
   private int[] renderWithPicking() {
@@ -329,7 +372,7 @@ public abstract class GLScene {
         selectionHeight, viewPort, 0);
     updateViewpoint(canvas.getClientArea());
 
-    drawScene(0f);
+    drawPickables();
 
     gl.glPopMatrix();
     gl.glFlush();
@@ -395,11 +438,11 @@ public abstract class GLScene {
   public void zoomToCamera(float zOffset) {
     if (zOffset > (GLConstants.Z_FAR - 1.0f)) {
       zOffset = GLConstants.Z_FAR - 1.0f;
-      logger.info("clamped zoom at " + zOffset);
+      GLLogger.LOG.info("clamped zoom at " + zOffset);
     }
     if (zOffset < (GLConstants.ZOOM_MAX)) {
       zOffset = GLConstants.ZOOM_MAX;
-      logger.info("clamped zoom at " + zOffset);
+      GLLogger.LOG.info("clamped zoom at " + zOffset);
     }
 
     targetZoff = zOffset;
@@ -596,8 +639,6 @@ public abstract class GLScene {
    * Establish the position and direction of the camera.
    */
   private void prepareCamera() {
-    step();
-
     if (!GLScene.hyperbolic) {
       // logger.info("position: " + xoff + ", " + yoff + ", " + zoff);
       // logger.info("rotation: " + xrot + ", " + yrot + ", " + zrot);
@@ -612,26 +653,9 @@ public abstract class GLScene {
     //gl.glRotatef(this.yrot, 0.0f, 1.0f, 0.0f);
   }
 
-  /////////////////////////////////////
-  // Draw the scene
-
-  /**
-   * Clear the scene and adjust the camera position.
-   * 
-   * Hook method for derived types to render the image.  Extending types
-   * should call the super-method first to establish a clear image and
-   * the proper grip.
-   * 
-   * @param elapsedTime time since previous frame.
-   */
-  protected void drawScene(float elapsedTime) {
-    gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
-    prepareCamera();
-  }
-
   public void printMousePos(int x, int y) {
     double[] m = getOGLPos(x, y);
-    logger.info("Mouse " + m[0] + " : " + m[1] + " - " + m[2]);
+    GLLogger.LOG.info("Mouse " + m[0] + " : " + m[1] + " - " + m[2]);
   }
 
   /**
@@ -828,7 +852,7 @@ public abstract class GLScene {
     }
 
     buf.append(")");
-    logger.info(buf.toString());
+    GLLogger.LOG.info(buf.toString());
   }
 
   /**
@@ -843,7 +867,7 @@ public abstract class GLScene {
       return EMPTY_HIT_LIST;
     }
     if (hits < 0) {
-      logger.warning("Too many hits!!" +
+      GLLogger.LOG.warning("Too many hits!!" +
           " IntBuffer capacity = " + buffer.capacity());
       return EMPTY_HIT_LIST;
     }
@@ -862,7 +886,7 @@ public abstract class GLScene {
         offset++;
       }
     }
-    logger.fine("hits = " + hits + "; offset = " + offset);
+    GLLogger.LOG.fine("hits = " + hits + "; offset = " + offset);
     return hitsResults;
   }
 
@@ -870,13 +894,13 @@ public abstract class GLScene {
    * Pick the object at the given mouse position (in window-relative
    * coordinates)
    *
-   * @param mouseX
-   * @param mouseY
+   * @param mouseX - SWT mouse coordinates
+   * @param mouseY - SWT mouse coordinates
    * @return ids of picked objects.
    */
   public int[] pickObjectsAt(int mouseX, int mouseY) {
-    this.mouseX = mouseX;
-    this.mouseY = mouseY;
+    this.mouseX = scaleDpiUp(mouseX);
+    this.mouseY = scaleDpiUp(mouseY);
     this.selectionWidth = 1;
     this.selectionHeight = 1;
     return renderWithPicking();
@@ -885,13 +909,20 @@ public abstract class GLScene {
   /**
    * The same as pickObjectAt, but with a rectangle.
    *
-   * @param startX
-   * @param startY
-   * @param toX
-   * @param toY
+   * @param startX - SWT mouse coordinates
+   * @param startY - SWT mouse coordinates
+   * @param toX - SWT mouse coordinates
+   * @param toY - SWT mouse coordinates
    * @return ids of picked objects.
    */
   public int[] pickRectangle(int startX, int startY, int toX, int toY) {
+
+    // Convert from SWT to OGL coordinates first
+    startX = scaleDpiUp(startX);
+    startY = scaleDpiUp(startY);
+    toX = scaleDpiUp(toX);
+    toY = scaleDpiUp(toY);
+
     if (startX < toX) {
       this.selectionWidth = toX - startX;
       this.mouseX = startX + selectionWidth / 2;
@@ -913,18 +944,18 @@ public abstract class GLScene {
   /**
    * Activate and define an overlay rectangle that shows the selection area.
    *
-   * @param fromX
-   * @param fromY
-   * @param mouseX
-   * @param mouseY
+   * @param fromX - SWT mouse coordinates
+   * @param fromY - SWT mouse coordinates
+   * @param mouseX - SWT mouse coordinates
+   * @param mouseY - SWT mouse coordinates
    */
   public void activateSelectionRectangle(
       int fromX, int fromY, int mouseX, int mouseY) {
     drawSelectRectangle = true;
-    this.mouseX = mouseX;
-    this.mouseY = mouseY;
-    this.startSelectX = fromX;
-    this.startSelectY = fromY;
+    this.mouseX = scaleDpiUp(mouseX);
+    this.mouseY = scaleDpiUp(mouseY);
+    this.startSelectX = scaleDpiUp(fromX);
+    this.startSelectY = scaleDpiUp(fromY);
   }
 
   /**
