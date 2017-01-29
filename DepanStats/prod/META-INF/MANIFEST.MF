@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: DepanStats
+Bundle-SymbolicName: com.google.devtools.depan.stats;singleton:=true
+Bundle-Version: 2.1.0.qualifier
+Bundle-Vendor: Pnambic Computing
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.jface,
+ org.eclipse.ui.ide,
+ com.google.devtools.depan.core,
+ com.google.devtools.depan.platform.ui,
+ com.google.guava
+Bundle-ClassPath: .
+Bundle-ActivationPolicy: lazy
