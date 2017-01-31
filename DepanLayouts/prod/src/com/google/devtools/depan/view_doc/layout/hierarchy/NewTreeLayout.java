@@ -17,14 +17,11 @@
 package com.google.devtools.depan.view_doc.layout.hierarchy;
 
 import com.google.devtools.depan.graph.api.EdgeMatcher;
-import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.view_doc.model.Point2dUtils;
 
 import com.google.common.collect.Maps;
-
-import edu.uci.ics.jung.graph.Graph;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -62,7 +59,7 @@ public class NewTreeLayout {
    * @param edgeMatcher edge matcher that defines the hierarchy
    * @param size available rendering space (ignored)
    */
-  protected NewTreeLayout(Graph<GraphNode, GraphEdge> graph,
+  protected NewTreeLayout(
       GraphModel graphModel, EdgeMatcher<String> edgeMatcher,
       Rectangle2D region) {
     this.graphModel = graphModel;

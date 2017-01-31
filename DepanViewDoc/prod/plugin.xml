@@ -3,6 +3,7 @@
 <plugin>
    <extension-point id="com.google.devtools.depan.view_doc.layout.registry.Generators" name="Layout Generators" schema="schema/com.google.devtools.depan.view_doc.layout.registry.Generators.exsd"/>
    <extension-point id="com.google.devtools.depan.view_doc.eclipse.ui.registry.from_view_doc" name="New From View" schema="schema/com.google.devtools.depan.view_doc.eclipse.ui.registry.from_view_doc.exsd"/>
+   <extension-point id="com.google.devtools.depan.view_doc.eclipse.ui.registry.view_extension" name="ViewExtension" schema="schema/com.google.devtools.depan.view_doc.eclipse.ui.registry.view_extension.exsd"/>
    <extension
          point="com.google.devtools.depan.graph_doc.eclipse.ui.registry.from_graph_doc">
       <contribution
@@ -98,41 +99,48 @@
    <extension
          point="org.eclipse.ui.commands">
       <command
-            defaultHandler="com.google.devtools.depan.view_doc.eclipse.ui.handlers.ViewEditorOptionHandler"
-            description="Ratio from degrees"
-            id="com.google.devtools.depan.eclipse.actions.view.StretchRatio"
-            name="Node ratio">
-      </command>
-      <command
-            defaultHandler="com.google.devtools.depan.view_doc.eclipse.ui.handlers.ViewEditorOptionHandler"
-            description="Node shape from role"
-            id="com.google.devtools.depan.eclipse.actions.view.Shape"
-            name="Shape by role">
-      </command>
-      <command
-            defaultHandler="com.google.devtools.depan.view_doc.eclipse.ui.handlers.ViewEditorOptionHandler"
-            description="Highlight root nodes"
-            id="com.google.devtools.depan.eclipse.actions.view.RootHighlight"
-            name="Root highlight">
-      </command>
-      <command
-            defaultHandler="com.google.devtools.depan.view_doc.eclipse.ui.handlers.ViewEditorOptionHandler"
-            description="Node size from degree"
-            id="com.google.devtools.depan.eclipse.actions.view.Size"
-            name="Size from degree">
-      </command>
-      <command
-            defaultHandler="com.google.devtools.depan.view_doc.eclipse.ui.handlers.ViewEditorOptionHandler"
             description="Node stroke for select"
-            id="com.google.devtools.depan.eclipse.actions.view.StrokeHighlight"
+            id="com.google.devtools.depan.view_doc.eclipse.ui.option.StrokeHighlight"
             name="Stroke highlight">
       </command>
       <command
-            defaultHandler="com.google.devtools.depan.view_doc.eclipse.ui.handlers.TakeScreenshotHandler"
             description="Take screenshot of current View Editor window"
-            id="com.google.devtools.depan.eclipse.actions.view.TakeScreenshot"
+            id="com.google.devtools.depan.view_doc.eclipse.ui.command.TakeScreenshot"
             name="Take screenshot...">
       </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="com.google.devtools.depan.view_doc.eclipse.ui.handlers.ViewEditorOptionHandler"
+            commandId="com.google.devtools.depan.view_doc.eclipse.ui.command.TakeScreenshot">
+         <activeWhen>
+            <reference
+                  definitionId="com.google.devtools.depan.view_doc.eclipse.ui.editor.isViewEditorActive">
+            </reference>
+         </activeWhen>
+      </handler>
+      <handler
+            class="com.google.devtools.depan.view_doc.eclipse.ui.handlers.ViewEditorOptionHandler"
+            commandId="com.google.devtools.depan.view_doc.eclipse.ui.option.StrokeHighlight">
+         <activeWhen>
+            <reference
+                  definitionId="com.google.devtools.depan.view_doc.eclipse.ui.editor.isViewEditorActive">
+            </reference>
+         </activeWhen>
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.core.expressions.definitions">
+      <definition
+            id="com.google.devtools.depan.view_doc.eclipse.ui.editor.isViewEditorActive">
+         <with
+               variable="activeEditorId">
+            <equals
+                  value="com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor">
+            </equals>
+         </with>
+      </definition>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -140,47 +148,37 @@
             allPopups="false"
             locationURI="menu:org.eclipse.ui.main.menu">
          <menu
+               id="eclipse.ui.main.menu.Edit"
                label="Edit">
             <command
-                  commandId="com.google.devtools.depan.eclipse.actions.view.TakeScreenshot"
+                  commandId="com.google.devtools.depan.view_doc.eclipse.ui.command.TakeScreenshot"
                   icon="icons/screenshot_16x16.png"
+                  id="com.google.devtools.depan.view_doc.eclipse.ui.command.StrokeHighlight"
                   label="Take screenshot..."
                   mnemonic="T"
                   style="push"
                   tooltip="Take a screenshot of the view, and save it to a file">
+               <visibleWhen>
+                  <reference
+                        definitionId="com.google.devtools.depan.view_doc.eclipse.ui.editor.isViewEditorActive">
+                  </reference>
+               </visibleWhen>
             </command>
          </menu>
          <menu
+               id="eclipse.ui.main.menu.View"
                label="View">
             <command
-                  commandId="com.google.devtools.depan.eclipse.actions.view.RootHighlight"
-                  icon="icons/flag_red.png"
-                  label="Root highlight"
-                  style="toggle">
-            </command>
-            <command
-                  commandId="com.google.devtools.depan.eclipse.actions.view.StrokeHighlight"
+                  commandId="com.google.devtools.depan.view_doc.eclipse.ui.option.StrokeHighlight"
                   icon="icons/link_go.png"
+                  id="com.google.devtools.depan.view_doc.eclipse.ui.option.StrokeHighlight"
                   label="Stroke highlight"
                   style="toggle">
-            </command>
-            <command
-                  commandId="com.google.devtools.depan.eclipse.actions.view.Shape"
-                  icon="icons/plugin.png"
-                  label="Shape by role"
-                  style="toggle">
-            </command>
-            <command
-                  commandId="com.google.devtools.depan.eclipse.actions.view.StretchRatio"
-                  icon="icons/shape_handles.png"
-                  label="Ratio from degrees"
-                  style="toggle">
-            </command>
-            <command
-                  commandId="com.google.devtools.depan.eclipse.actions.view.Size"
-                  icon="icons/lightning.png"
-                  label="Size from degree"
-                  style="toggle">
+               <visibleWhen>
+                  <reference
+                        definitionId="com.google.devtools.depan.view_doc.eclipse.ui.editor.isViewEditorActive">
+                  </reference>
+               </visibleWhen>
             </command>
          </menu>
       </menuContribution>

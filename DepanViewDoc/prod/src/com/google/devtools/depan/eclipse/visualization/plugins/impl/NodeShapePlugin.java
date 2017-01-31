@@ -19,9 +19,14 @@ package com.google.devtools.depan.eclipse.visualization.plugins.impl;
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeRenderingProperty;
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeShapeSupplier;
 import com.google.devtools.depan.eclipse.visualization.plugins.core.NodeRenderingPlugin;
+import com.google.devtools.depan.view_doc.model.NodeShapeMode;
+
+import com.google.common.collect.Maps;
+
+import java.util.Map;
 
 /**
- * A plugin that setup the shape for nodes.
+ * A plugin that sets up and changes the shape for nodes.
  *
  * @author Yohann Coppel
  */
@@ -29,14 +34,26 @@ public class NodeShapePlugin extends NodeRenderingPlugin.Simple {
 
   private boolean hasChanged = true;
 
+  private NodeShapeMode mode = null;
+
   @Override
   public boolean apply(NodeRenderingProperty p) {
     if (!hasChanged) {
       return true;
     }
 
-    NodeShapeSupplier supplier = (NodeShapeSupplier) p.pluginStore.get(this);
-    p.shape = supplier.getShape(p.node);
+    @SuppressWarnings("unchecked")
+    Map<NodeShapeMode, NodeShapeSupplier> modeMap =
+        (Map<NodeShapeMode, NodeShapeSupplier>) p.pluginStore.get(this);
+    NodeShapeSupplier supplier = null;
+    if (null != modeMap ) {
+      supplier = modeMap.get(mode);
+    }
+    if (null == supplier) {
+      supplier = NodeShapeSupplier.DEFAULT;
+    }
+
+    p.shape = supplier.getShape();
     return true;
   }
 
@@ -45,9 +62,24 @@ public class NodeShapePlugin extends NodeRenderingPlugin.Simple {
     hasChanged = false;
   }
 
-  public void setShapeSupplier(
-      NodeRenderingProperty p, NodeShapeSupplier supplier) {
-    p.pluginStore.put(this, supplier);
+  public void setNodeShapeMode(NodeShapeMode mode) {
+    this.mode = mode;
     hasChanged = true;
+  }
+
+  public void setNodeShapeByMode(
+      NodeRenderingProperty p, NodeShapeMode mode, NodeShapeSupplier supplier) {
+    @SuppressWarnings("unchecked")
+    Map<NodeShapeMode, NodeShapeSupplier> modeMap =
+        (Map<NodeShapeMode, NodeShapeSupplier>) p.pluginStore.get(this);
+    if (null == modeMap) {
+      modeMap = Maps.newHashMap();
+      p.pluginStore.put(this, modeMap);
+    }
+    modeMap.put(mode, supplier);
+
+    if (this.mode == mode) {
+      hasChanged = true;
+    }
   }
 }

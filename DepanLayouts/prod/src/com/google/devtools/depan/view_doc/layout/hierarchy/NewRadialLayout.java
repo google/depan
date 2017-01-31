@@ -17,7 +17,6 @@
 package com.google.devtools.depan.view_doc.layout.hierarchy;
 
 import com.google.devtools.depan.graph.api.EdgeMatcher;
-import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.view_doc.model.Point2dUtils;
@@ -25,8 +24,6 @@ import com.google.devtools.depan.view_doc.model.Point2dUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
-import edu.uci.ics.jung.graph.Graph;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -49,17 +46,14 @@ import java.util.Set;
 public class NewRadialLayout extends NewTreeLayout {
 
   /**
-   * Create a JUNG Layout object from the available data.
-   * 
-   * @param graph JUNG graph for layout (ignored)
    * @param viewModel source of nodes (exposed graph) to layout
    * @param edgeMatcher edge matcher that defines the hierarchy
    * @param size available rendering space (ignored)
    */
   protected NewRadialLayout(
-      Graph<GraphNode, GraphEdge> graph, GraphModel graphModel,
-      EdgeMatcher<String> edgeMatcher, Rectangle2D region) {
-    super(graph, graphModel, edgeMatcher, region);
+      GraphModel graphModel, EdgeMatcher<String> edgeMatcher,
+      Rectangle2D region) {
+    super(graphModel, edgeMatcher, region);
   }
 
   /**

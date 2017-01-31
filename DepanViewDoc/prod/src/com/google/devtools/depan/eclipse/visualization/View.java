@@ -16,7 +16,6 @@
 
 package com.google.devtools.depan.eclipse.visualization;
 
-import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds;
 import com.google.devtools.depan.eclipse.visualization.ogl.ArrowHead;
 import com.google.devtools.depan.eclipse.visualization.ogl.Arrowheads;
 import com.google.devtools.depan.eclipse.visualization.ogl.GLPanel;
@@ -28,16 +27,18 @@ import com.google.devtools.depan.eclipse.visualization.ogl.RendererChangeListene
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
+import com.google.devtools.depan.nodes.trees.SuccessorEdges;
 import com.google.devtools.depan.view_doc.model.CameraDirPreference;
 import com.google.devtools.depan.view_doc.model.CameraPosPreference;
 import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty;
 import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty.ArrowheadStyle;
 import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty.LineStyle;
+import com.google.devtools.depan.view_doc.model.NodeColorMode;
 import com.google.devtools.depan.view_doc.model.NodeDisplayProperty;
-import com.google.devtools.depan.view_doc.model.NodeDisplayProperty.Size;
+import com.google.devtools.depan.view_doc.model.NodeRatioMode;
+import com.google.devtools.depan.view_doc.model.NodeShapeMode;
+import com.google.devtools.depan.view_doc.model.NodeSizeMode;
 import com.google.devtools.depan.view_doc.model.ScenePreferences;
-
-import edu.uci.ics.jung.graph.Graph;
 
 import org.eclipse.swt.widgets.Composite;
 
@@ -106,10 +107,13 @@ public class View {
     }
   }
 
-  public void setGraphModel(GraphModel viewGraph) {
+  public void setGraphModel(
+      GraphModel viewGraph,
+      Map<GraphNode, ? extends SuccessorEdges> edgeMap) {
 
     // Creates the rendering pipe
     glPanel.setGraphModel(viewGraph);
+    glPanel.setNodeNeighbors(edgeMap);
 
     prefUpdater = RendererPreferences.preparePreferences(glPanel);
   }
@@ -206,11 +210,9 @@ public class View {
     glPanel.setNodeVisible(node, property.isVisible());
 
     // Set the size of this node
-    Size nodeSize = property.getSize();
+    NodeSizeSupplier nodeSize = property.getSize();
     if (nodeSize != null) {
-      NodePreferencesIds.NodeSize sizeRepresentation =
-          NodePreferencesIds.NodeSize.convertSizeRepresentation(nodeSize);
-      glPanel.setNodeSize(node, sizeRepresentation);
+      glPanel.setNodeSize(node, nodeSize);
     }
   }
 
@@ -369,28 +371,48 @@ public class View {
     glPanel.clearChanges();
   }
 
-  public void setNodeColorSupplier(GraphNode node, NodeColorSupplier supplier) {
-    glPanel.setNodeColorSupplier(node, supplier);
+  public void setNodeColorMode(NodeColorMode mode) {
+    glPanel.setNodeColorMode(mode);
   }
 
-  public void setNodeRatioSupplier(GraphNode node, NodeRatioSupplier supplier) {
-    glPanel.setNodeRatioSupplier(node, supplier);
+  public void setNodeColorByMode(
+      GraphNode node, NodeColorMode mode, NodeColorSupplier supplier) {
+    glPanel.setNodeColorByMode(node, mode, supplier);
   }
 
-  public void setNodeSizeSupplier(GraphNode node, NodeSizeSupplier supplier) {
-    glPanel.setNodeSizeSupplier(node, supplier);
+  public void setRootColorMode(NodeColorMode mode) {
+    glPanel.setRootColorMode(mode);
   }
 
-  public void setNodeShapeSupplier(GraphNode node, NodeShapeSupplier supplier) {
-    glPanel.setNodeShapeSupplier(node, supplier);
+  public void setNodeRatioMode(NodeRatioMode mode) {
+    glPanel.setNodeRatioMode(mode);
+  }
+
+  public void setNodeRatioByMode(
+      GraphNode node, NodeRatioMode mode, NodeRatioSupplier supplier) {
+    glPanel.setNodeRatioByMode(node, mode, supplier);
+  }
+
+  public void setNodeShapeMode(NodeShapeMode mode) {
+    glPanel.setNodeShapeMode(mode);
+  }
+
+  public void setNodeShapeByMode(
+      GraphNode node, NodeShapeMode mode, NodeShapeSupplier supplier) {
+    glPanel.setNodeShapeByMode(node, mode, supplier);
+  }
+
+  public void setNodeSizeMode(NodeSizeMode mode) {
+    glPanel.setNodeSizeMode(mode);
+  }
+
+  public void setNodeSizeByMode(
+      GraphNode node, NodeSizeMode mode, NodeSizeSupplier supplier) {
+    glPanel.setNodeSizeByMode(node, mode, supplier);
   }
 
   public void activateNodeStroke(boolean enable) {
     glPanel.activateNodeStroke(enable);
-  }
-
-  public void setNodeNeighbors(Graph<GraphNode, GraphEdge> jungGraph) {
-    glPanel.setNodeNeighbors(jungGraph);
   }
 
   public void unCollapse(GraphNode child, GraphNode master) {

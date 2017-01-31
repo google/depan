@@ -15,16 +15,12 @@
  */
 package com.google.devtools.depan.view_doc.layout.hierarchy;
 
-import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.view_doc.layout.LayoutContext;
 import com.google.devtools.depan.view_doc.layout.LayoutGenerator;
 import com.google.devtools.depan.view_doc.layout.LayoutRunner;
-import com.google.devtools.depan.view_doc.layout.LayoutUtil;
 
 import com.google.common.collect.Maps;
-
-import edu.uci.ics.jung.graph.DirectedGraph;
 
 import java.awt.geom.Point2D;
 import java.util.Collection;
@@ -100,32 +96,22 @@ public abstract class TreeLayoutGenerator implements LayoutGenerator {
 
     @Override
     protected NewTreeLayout buildTreeLayout(LayoutContext context) {
-      // TODO:  Use GraphModel more directly
-      DirectedGraph<GraphNode, GraphEdge> jungGraph =
-              LayoutUtil.buildJungGraph(context);
-
       return new NewTreeLayout(
-              jungGraph,
-              context.getGraphModel(),
-              context.getEdgeMatcher().getInfo(),
-              context.getViewport());
+          context.getGraphModel(),
+          context.getEdgeMatcher().getInfo(),
+          context.getViewport());
     }
   };
 
   public static TreeLayoutGenerator NewRadialLayoutBuilder =
-          new TreeLayoutGenerator() {
+      new TreeLayoutGenerator() {
 
     @Override
     protected NewTreeLayout buildTreeLayout(LayoutContext context) {
-      // TODO:  Use GraphModel more directly
-      DirectedGraph<GraphNode, GraphEdge> jungGraph =
-              LayoutUtil.buildJungGraph(context);
-
       return new NewRadialLayout(
-              jungGraph,
-              context.getGraphModel(),
-              context.getEdgeMatcher().getInfo(),
-              context.getViewport());
+          context.getGraphModel(),
+          context.getEdgeMatcher().getInfo(),
+          context.getViewport());
     }
   };
 }

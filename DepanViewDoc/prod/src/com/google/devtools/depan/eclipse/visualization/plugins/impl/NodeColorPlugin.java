@@ -16,14 +16,15 @@
 
 package com.google.devtools.depan.eclipse.visualization.plugins.impl;
 
-import com.google.devtools.depan.eclipse.cm.ColorMapDefJet;
-import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeColors;
-import com.google.devtools.depan.eclipse.visualization.ogl.ColorMap;
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeColorSupplier;
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeRenderingProperty;
 import com.google.devtools.depan.eclipse.visualization.plugins.core.NodeRenderingPlugin;
+import com.google.devtools.depan.view_doc.model.NodeColorMode;
+
+import com.google.common.collect.Maps;
 
 import java.awt.Color;
+import java.util.Map;
 
 /**
  * A plugin coloring a node and it's stroke. This plugin must be the last one,
@@ -35,25 +36,32 @@ import java.awt.Color;
  */
 public class NodeColorPlugin extends NodeRenderingPlugin.Simple {
 
-  private ColorMap cm = new ColorMap(ColorMapDefJet.CM, 256);
-
   private boolean isColorEnabled = true;
 
-  private NodeColors nodeColors = NodeColors.getDefault();
+  private Color defaultColor = Color.BLUE;
+
+  private NodeColorMode nodeMode = null;
+
+  private NodeColorMode rootMode = null;
 
   public NodeColorPlugin() {
   }
 
+  /**
+   * Run every time, because {@link NodeRenderingProperty#isSelected()}
+   * can change for may reasons (selection, collapse).
+   */
   @Override
   public boolean apply(NodeRenderingProperty p) {
     if (!isColorEnabled) {
-      p.targetFillColor = NodeColors.getDefaultColor();
+      p.targetFillColor = defaultColor;
       return true;
     }
 
-    NodeColorSupplier supplier = (NodeColorSupplier) p.pluginStore.get(this);
-    Color stroke = supplier.getStrokeColor(nodeColors, p.node, cm);
-    Color fill = supplier.getFillColor(nodeColors, p.node, cm);
+    NodeColorSupplier supplier = getColorSupplier(p);
+    Color stroke = supplier.getStrokeColor();
+    Color fill = supplier.getFillColor();
+
     if (null != p.overriddenColor) {
       fill = p.overriddenColor;
     }
@@ -69,8 +77,32 @@ public class NodeColorPlugin extends NodeRenderingPlugin.Simple {
     return true;
   }
 
+  private NodeColorSupplier getColorSupplier(NodeRenderingProperty p) {
+    @SuppressWarnings("unchecked")
+    Map<NodeColorMode, NodeColorSupplier> modeMap =
+        (Map<NodeColorMode, NodeColorSupplier>) p.pluginStore.get(this);
+    if (null == modeMap) {
+      return NodeColorSupplier.DEFAULT;
+    }
+
+    NodeColorSupplier result = null;
+    if (null != rootMode) {
+      result = modeMap.get(rootMode);
+    }
+    if (null == result) {
+      result = modeMap.get(nodeMode);
+    }
+    if (null != result) {
+      return result;
+    }
+    return NodeColorSupplier.DEFAULT;
+  }
+
   //////////////////////////////////////
   // Rendering attributes
+
+  public void setNodeSelected() {
+  }
 
   /**
    * Normally set from Eclipse workspace preference
@@ -84,12 +116,23 @@ public class NodeColorPlugin extends NodeRenderingPlugin.Simple {
    * Normally set from Eclipse workspace preference
    * {@code NodePreferencesIds.NODE_COLOR}
    */
-  public void setColorMode(NodeColors color) {
-    this.nodeColors = color;
+  public void setNodeColorMode(NodeColorMode nodeMode) {
+    this.nodeMode = nodeMode;
   }
 
-  public void setColorSupplier(
-      NodeRenderingProperty p, NodeColorSupplier supplier) {
-    p.pluginStore.put(this, supplier);
+  public void setRootColorMode(NodeColorMode rootMode) {
+    this.rootMode = rootMode;
+  }
+
+  public void setNodeColorByMode(
+      NodeRenderingProperty p, NodeColorMode mode, NodeColorSupplier supplier) {
+    @SuppressWarnings("unchecked")
+    Map<NodeColorMode, NodeColorSupplier> modeMap =
+        (Map<NodeColorMode, NodeColorSupplier>) p.pluginStore.get(this);
+    if (null == modeMap) {
+      modeMap = Maps.newHashMap();
+      p.pluginStore.put(this, modeMap);
+    }
+    modeMap.put(mode, supplier);
   }
 }

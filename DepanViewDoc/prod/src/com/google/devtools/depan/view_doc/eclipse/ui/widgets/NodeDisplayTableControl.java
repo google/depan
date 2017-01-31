@@ -20,6 +20,8 @@ import com.google.devtools.depan.eclipse.ui.collapse.trees.CollapseDataWrapper;
 import com.google.devtools.depan.eclipse.ui.nodes.trees.NodeWrapper;
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.GraphNodeViewer;
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeViewerProvider;
+import com.google.devtools.depan.eclipse.visualization.ogl.NodeSizeSupplier;
+import com.google.devtools.depan.eclipse.visualization.ogl.NodeSizeSupplier.Fixed;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.platform.AlphabeticSorter;
 import com.google.devtools.depan.platform.Colors;
@@ -29,10 +31,12 @@ import com.google.devtools.depan.platform.PlatformResources;
 import com.google.devtools.depan.platform.eclipse.ui.tables.EditColTableDef;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 import com.google.devtools.depan.view_doc.eclipse.ViewDocLogger;
+import com.google.devtools.depan.view_doc.eclipse.ui.plugins.ViewExtensionRegistry;
 import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty;
 import com.google.devtools.depan.view_doc.model.NodeDisplayProperty;
 import com.google.devtools.depan.view_doc.model.NodeDisplayRepository;
 import com.google.devtools.depan.view_doc.model.NodeLocationRepository;
+import com.google.devtools.depan.view_doc.model.NodeSizeMode;
 import com.google.devtools.depan.view_doc.model.Point2dUtils;
 
 import org.eclipse.core.runtime.IAdaptable;
@@ -61,6 +65,7 @@ import org.eclipse.ui.model.IWorkbenchAdapter;
 
 import java.awt.Color;
 import java.awt.geom.Point2D;
+import java.util.Collection;
 
 /**
  * Show a table of the nodes, with their attributes.  The attributes
@@ -119,9 +124,8 @@ public class NodeDisplayTableControl extends Composite {
       cellEditors[INDEX_XPOS] = new TextCellEditor(tree);
       cellEditors[INDEX_YPOS] = new TextCellEditor(tree);
       cellEditors[INDEX_VISIBLE] = new CheckboxCellEditor(tree);
-      cellEditors[INDEX_SIZE] = new ComboBoxCellEditor(tree,
-          NodeDisplayTableControl.toString(
-              NodeDisplayProperty.Size.values(), true));
+      cellEditors[INDEX_SIZE] = new ComboBoxCellEditor(
+          tree, buildSizeOptions());
       cellEditors[INDEX_COLOR] = new ColorCellEditor(tree);
 
       result.setCellEditors(cellEditors);
@@ -196,6 +200,19 @@ public class NodeDisplayTableControl extends Composite {
   // UX Elements
 
   private final ControlGraphNodeViewer propViewer;
+
+  private String[] buildSizeOptions() {
+    Collection<NodeSizeMode> choices = 
+        ViewExtensionRegistry.getRegistryNodeSizeModes();
+    String[] result = new String[choices.size() + 1];
+    result[0] = "diagram";
+    int ndx = 1;
+    for(NodeSizeMode choice : choices) {
+      result[ndx] = choice.getLabel();
+      ndx++;
+    }
+    return result;
+  }
 
   /////////////////////////////////////
   // Public methods
@@ -299,7 +316,11 @@ public class NodeDisplayTableControl extends Composite {
 
   private String getSizeName(GraphNode node) {
     NodeDisplayProperty prop = getDisplayProperty(node);
-    return prop.getSize().toString().toLowerCase();
+    NodeSizeSupplier size = prop.getSize();
+    if (null == size) {
+      return "diagram";
+    }
+    return Float.toString(size.getSize());
   }
 
   /////////////////////////////////////
@@ -500,6 +521,7 @@ public class NodeDisplayTableControl extends Composite {
     }
   }
 
+
   /////////////////////////////////////
   // Label provider for table cell text
 
@@ -591,7 +613,7 @@ public class NodeDisplayTableControl extends Composite {
         return Boolean.valueOf(nodeProp.isVisible());
       }
       if (COL_SIZE.equals(property)) {
-        return nodeProp.getSize().ordinal();
+        return nodeProp.getSize();
       }
       return null;
     }
@@ -624,7 +646,9 @@ public class NodeDisplayTableControl extends Composite {
       if (COL_VISIBLE.equals(property) && (value instanceof Boolean)) {
         nodeProp.setVisible(((Boolean) value).booleanValue());
       } else if (COL_SIZE.equals(property) && (value instanceof Integer)) {
-        nodeProp.setSize(NodeDisplayProperty.Size.values()[(Integer) value]);
+        Fixed supplier =
+            new NodeSizeSupplier.Fixed(((Integer) value).floatValue());
+        nodeProp.setSize(supplier);
       } else if (COL_COLOR.equals(property) && (value instanceof RGB)) {
         Color newColor = Colors.colorFromRgb((RGB) value);
         nodeProp.setColor(newColor);

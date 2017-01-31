@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="com.google.devtools.depan.view_doc.eclipse.ui.registry.view_extension">
+      <view_extension
+            class="com.google.devtools.depan.stats.eclipse.ui.StatsViewExtension"
+            id="com.google.devtools.depan.stats.eclipse.ui.StatsViewExtension">
+      </view_extension>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            categoryId="com.google.devtools.depan.stats.eclipse.ui.StatsViewExtension"
+            description="Ratio from degrees"
+            id="com.google.devtools.depan.view_doc.eclipse.ui.option.StretchRatio"
+            name="Node ratio">
+      </command>
+      <command
+            categoryId="com.google.devtools.depan.stats.eclipse.ui.StatsViewExtension"
+            description="Node shape from role"
+            id="com.google.devtools.depan.view_doc.eclipse.ui.option.Shape"
+            name="Shape by role">
+      </command>
+      <command
+            categoryId="com.google.devtools.depan.stats.eclipse.ui.StatsViewExtension"
+            description="Highlight root nodes"
+            id="com.google.devtools.depan.view_doc.eclipse.ui.option.RootHighlight"
+            name="Root highlight">
+      </command>
+      <command
+            categoryId="com.google.devtools.depan.stats.eclipse.ui.StatsViewExtension"
+            description="Node size from degree"
+            id="com.google.devtools.depan.view_doc.eclipse.ui.option.Size"
+            name="Size from degree">
+      </command>
+      <category
+            id="com.google.devtools.depan.stats.eclipse.ui.StatsViewExtension"
+            name="Stats">
+      </category>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="com.google.devtools.depan.stats.eclipse.ui.handlers.StatsRatioOptionHandler"
+            commandId="com.google.devtools.depan.view_doc.eclipse.ui.option.StretchRatio">
+         <activeWhen>
+            <reference
+                  definitionId="com.google.devtools.depan.view_doc.eclipse.ui.editor.isViewEditorActive">
+            </reference>
+         </activeWhen>
+      </handler>
+      <handler
+            class="com.google.devtools.depan.stats.eclipse.ui.handlers.StatsShapeOptionHandler"
+            commandId="com.google.devtools.depan.view_doc.eclipse.ui.option.Shape">
+         <activeWhen>
+            <reference
+                  definitionId="com.google.devtools.depan.view_doc.eclipse.ui.editor.isViewEditorActive">
+            </reference>
+         </activeWhen>
+      </handler>
+      <handler
+            class="com.google.devtools.depan.stats.eclipse.ui.handlers.StatsRootOptionHandler"
+            commandId="com.google.devtools.depan.view_doc.eclipse.ui.option.RootHighlight">
+         <activeWhen>
+            <reference
+                  definitionId="com.google.devtools.depan.view_doc.eclipse.ui.editor.isViewEditorActive">
+            </reference>
+         </activeWhen>
+      </handler>
+      <handler
+            class="com.google.devtools.depan.stats.eclipse.ui.handlers.StatsSizeOptionHandler"
+            commandId="com.google.devtools.depan.view_doc.eclipse.ui.option.Size">
+         <activeWhen>
+            <reference
+                  definitionId="com.google.devtools.depan.view_doc.eclipse.ui.editor.isViewEditorActive">
+            </reference>
+         </activeWhen>
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="menu:org.eclipse.ui.main.menu?after=com.google.devtools.depan.view_doc.eclipse.ui.option.StrokeHighlight">
+         <menu
+               id="eclipse.ui.main.menu.View"
+               label="View">
+            <command
+                  commandId="com.google.devtools.depan.view_doc.eclipse.ui.option.RootHighlight"
+                  icon="icons/flag_red.png"
+                  label="Root highlight"
+                  style="toggle">
+               <visibleWhen>
+                  <reference
+                        definitionId="com.google.devtools.depan.view_doc.eclipse.ui.editor.isViewEditorActive">
+                  </reference>
+               </visibleWhen>
+            </command>
+            <command
+                  commandId="com.google.devtools.depan.view_doc.eclipse.ui.option.Shape"
+                  icon="icons/plugin.png"
+                  label="Shape by role"
+                  style="toggle">
+               <visibleWhen>
+                  <reference
+                        definitionId="com.google.devtools.depan.view_doc.eclipse.ui.editor.isViewEditorActive">
+                  </reference>
+               </visibleWhen>
+            </command>
+            <command
+                  commandId="com.google.devtools.depan.view_doc.eclipse.ui.option.StretchRatio"
+                  icon="icons/shape_handles.png"
+                  label="Ratio from degrees"
+                  style="toggle">
+               <visibleWhen>
+                  <reference
+                        definitionId="com.google.devtools.depan.view_doc.eclipse.ui.editor.isViewEditorActive">
+                  </reference>
+               </visibleWhen>
+            </command>
+            <command
+                  commandId="com.google.devtools.depan.view_doc.eclipse.ui.option.Size"
+                  icon="icons/lightning.png"
+                  label="Size from degree"
+                  style="toggle">
+               <visibleWhen>
+                  <reference
+                        definitionId="com.google.devtools.depan.view_doc.eclipse.ui.editor.isViewEditorActive">
+                  </reference>
+               </visibleWhen>
+            </command>
+         </menu>
+      </menuContribution>
+   </extension>
+
+</plugin>

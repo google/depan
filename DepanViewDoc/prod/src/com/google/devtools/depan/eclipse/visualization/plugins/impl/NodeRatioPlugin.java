@@ -19,28 +19,67 @@ package com.google.devtools.depan.eclipse.visualization.plugins.impl;
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeRatioSupplier;
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeRenderingProperty;
 import com.google.devtools.depan.eclipse.visualization.plugins.core.NodeRenderingPlugin;
+import com.google.devtools.depan.view_doc.model.NodeRatioMode;
+
+import com.google.common.collect.Maps;
+
+import java.util.Map;
 
 /**
- * A plugin that modifies node size and ratio.
+ * A plugin that modifies node ratio.
  *
  * @author Yohann Coppel
  */
 public class NodeRatioPlugin extends NodeRenderingPlugin.Simple {
 
+  private boolean hasChanged = true;
+
+  private NodeRatioMode mode = null;
+
   @Override
   public boolean apply(NodeRenderingProperty p) {
-    NodeRatioSupplier supplier = (NodeRatioSupplier) p.pluginStore.get(this);
+    if (!hasChanged) {
+      return true;
+    }
 
-    // ratio
+    @SuppressWarnings("unchecked")
+    Map<NodeRatioMode, NodeRatioSupplier> modeMap =
+        (Map<NodeRatioMode, NodeRatioSupplier>) p.pluginStore.get(this);
+    NodeRatioSupplier supplier = null;
+    if (null != modeMap ) {
+      supplier = modeMap.get(mode);
+    }
+    if (null == supplier) {
+      supplier = NodeRatioSupplier.DEFAULT;
+    }
+
     p.targetRatio = supplier.getRatio();
     return true;
   }
 
-  /////////////////////////////////////
-  // size
+  @Override
+  public void postFrame() {
+    hasChanged = false;
+  }
 
-  public void setRatioSupplier(
-      NodeRenderingProperty p, NodeRatioSupplier supplier) {
-    p.pluginStore.put(this, supplier);
+  public void setNodeRatioMode(NodeRatioMode mode) {
+    this.mode = mode;
+    hasChanged = true;
+  }
+
+  public void setNodeRatioByMode(
+      NodeRenderingProperty p, NodeRatioMode mode, NodeRatioSupplier supplier) {
+    @SuppressWarnings("unchecked")
+    Map<NodeRatioMode, NodeRatioSupplier> modeMap =
+        (Map<NodeRatioMode, NodeRatioSupplier>) p.pluginStore.get(this);
+    if (null == modeMap) {
+      modeMap = Maps.newHashMap();
+      p.pluginStore.put(this, modeMap);
+    }
+    modeMap.put(mode, supplier);
+
+    if (this.mode == mode) {
+      hasChanged = true;
+    }
   }
 }

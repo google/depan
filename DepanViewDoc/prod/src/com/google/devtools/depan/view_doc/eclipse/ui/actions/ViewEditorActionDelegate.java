@@ -87,12 +87,6 @@ public class ViewEditorActionDelegate implements IEditorActionDelegate {
       applyLayout(null); // TreeLayoutGenerator.NewRadialLayoutBuilder);
 
     // visualization options
-    } else if (id.equals(OptionPreferences.ROOTHIGHLIGHT_ID)) {
-      toggleOptions(action, OptionPreferences.ROOTHIGHLIGHT_ID);
-    } else if (id.equals(OptionPreferences.STRETCHRATIO_ID)) {
-      toggleOptions(action, OptionPreferences.STRETCHRATIO_ID);
-    } else if (id.equals(OptionPreferences.SIZE_ID)) {
-      toggleOptions(action, OptionPreferences.SIZE_ID);
     } else if (id.equals(OptionPreferences.STROKEHIGHLIGHT_ID)) {
       toggleOptions(action, OptionPreferences.STROKEHIGHLIGHT_ID);
     } else if (id.equals(OptionPreferences.SHAPE_ID)) {

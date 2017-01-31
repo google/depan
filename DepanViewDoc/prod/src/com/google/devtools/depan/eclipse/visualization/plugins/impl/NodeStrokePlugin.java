@@ -23,10 +23,11 @@ import com.google.devtools.depan.eclipse.visualization.ogl.NodeRenderingProperty
 import com.google.devtools.depan.eclipse.visualization.plugins.core.NodeRenderingPlugin;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphNode;
+import com.google.devtools.depan.nodes.trees.SuccessorEdges;
 
-import edu.uci.ics.jung.graph.Graph;
-
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A plugin that modifies the stroke width and color for nodes.
@@ -40,9 +41,11 @@ public class NodeStrokePlugin extends NodeRenderingPlugin.Simple {
   protected static final float MEDIUM = 2.0f;
   protected static final float LIGHT = 1.0f;
 
+  private boolean hasChanged = true;
+
   protected final GLPanel view;
 
-  protected Graph<GraphNode, GraphEdge> jungGraph;
+  protected Map<GraphNode, ? extends SuccessorEdges> edgeMap;
 
   /**
    * Say if node stroke should highlight the selection state.
@@ -56,17 +59,38 @@ public class NodeStrokePlugin extends NodeRenderingPlugin.Simple {
   @Override
   public void dryRun(NodeRenderingProperty p) {
     // during the dry run, store a list of neighbors in the node properties.
-    List<NodeRenderingProperty> props = Lists.newArrayList();
-    for (GraphNode node : jungGraph.getNeighbors(p.node)) {
-      props.add(view.node2property(node));
+    p.pluginStore.put(this, buildNeighbors(p));
+  }
+
+  private List<NodeRenderingProperty> buildNeighbors(NodeRenderingProperty p) {
+    SuccessorEdges edges = edgeMap.get(p.node);
+    if (null == edges) {
+      return Collections.emptyList();
     }
-    p.pluginStore.put(this, props);
+
+    List<NodeRenderingProperty> result = Lists.newArrayList();
+    for (GraphEdge edge : edges.getForwardEdges()) {
+      result.add(view.node2property(edge.getTail()));
+    }
+    for (GraphEdge edge : edges.getReverseEdges()) {
+      result.add(view.node2property(edge.getHead()));
+    }
+    return result;
   }
 
   @Override
   public boolean apply(NodeRenderingProperty p) {
+    if (!hasChanged) {
+      return true;
+    }
+
     p.targetStrokeWidth = getStrokeWidth(p);
     return true;
+  }
+
+  @Override
+  public void postFrame() {
+    hasChanged = false;
   }
 
   private float getStrokeWidth(NodeRenderingProperty p) {
@@ -95,9 +119,11 @@ public class NodeStrokePlugin extends NodeRenderingPlugin.Simple {
 
   public void activate(boolean on) {
     highlight = on;
+    hasChanged = true;
   }
 
-  public void setNodeNeighbors(Graph<GraphNode, GraphEdge> jungGraph) {
-    this.jungGraph = jungGraph;
+  public void setNodeNeighbors(
+      Map<GraphNode, ? extends SuccessorEdges> edgeMap) {
+    this.edgeMap = edgeMap;
   }
 }

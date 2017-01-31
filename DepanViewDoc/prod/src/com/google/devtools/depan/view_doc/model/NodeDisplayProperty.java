@@ -16,12 +16,9 @@
 
 package com.google.devtools.depan.view_doc.model;
 
-import com.google.devtools.depan.model.GraphNode;
-
-import edu.uci.ics.jung.graph.Graph;
+import com.google.devtools.depan.eclipse.visualization.ogl.NodeSizeSupplier;
 
 import java.awt.Color;
-import java.util.Map;
 
 /**
  * Class handling displaying properties for a Node.
@@ -33,69 +30,9 @@ public class NodeDisplayProperty {
   public static final int DEFAULT_SIZE = 20;
 
   private boolean isVisible = true;
-  private Size size = Size.getDefault();
+  private NodeSizeSupplier size = null;
   private int givenSize = DEFAULT_SIZE;
   private Color color = null;
-
-  /**
-   * Possible size functions for a node.
-   * 
-   * @author ycoppel@google.com (Yohann Coppel)
-   */
-  public static enum Size {
-    NONE {
-      @Override
-      public <E> Integer getSize(
-          NodeDisplayProperty property,
-          Graph<GraphNode, E> graph,
-          Map<GraphNode, Number> voltages,
-          GraphNode node) {
-        return null;
-      }
-    },
-    GIVEN {
-      @Override
-      public <E> Integer getSize(
-          NodeDisplayProperty property,
-          Graph<GraphNode, E> graph,
-          Map<GraphNode, Number> voltages, 
-          GraphNode node) {
-        return property.givenSize;
-      }
-    },
-    VOLTAGE {
-      @Override
-      public <E> Integer getSize(
-          NodeDisplayProperty property, 
-          Graph<GraphNode, E> graph,
-          Map<GraphNode, Number> voltages,
-          GraphNode node) {
-        return voltages.get(node).intValue();
-      }
-    },
-    DEGREE {
-      @Override
-      public <E> Integer getSize(
-          NodeDisplayProperty property,
-          Graph<GraphNode, E> graph,
-          Map<GraphNode, Number> voltages,
-          GraphNode node) {
-        int degree = graph.getPredecessorCount(node)
-            + graph.getSuccessorCount(node);
-        return 2 * degree;
-      }  
-    };
-
-    public static Size getDefault() {
-      return NONE;
-    }
-
-    public abstract <E> Integer getSize(
-        NodeDisplayProperty property,
-        Graph<GraphNode, E> graph,
-        Map<GraphNode, Number> voltages,
-        GraphNode node);
-  }
 
   /**
    * Default constructor. Construct a {@link NodeDisplayProperty} with default
@@ -111,7 +48,8 @@ public class NodeDisplayProperty {
    * @param size method used to give a size to a node.
    * @param color node's color
    */
-  public NodeDisplayProperty(boolean isVisible, Size size, Color color) {
+  public NodeDisplayProperty(
+      boolean isVisible, NodeSizeSupplier size, Color color) {
     this.isVisible = isVisible;
     this.size = size;
     this.color = color;
@@ -134,14 +72,14 @@ public class NodeDisplayProperty {
   /**
    * @return the size
    */
-  public Size getSize() {
+  public NodeSizeSupplier getSize() {
     return size;
   }
   
   /**
-   * @param size the size to set
+   * Use {@code null} to use diagram's mode for size.
    */
-  public void setSize(Size size) {
+  public void setSize(NodeSizeSupplier size) {
     this.size = size;
   }
   

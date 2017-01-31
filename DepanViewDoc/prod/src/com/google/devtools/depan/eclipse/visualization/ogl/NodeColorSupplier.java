@@ -16,19 +16,21 @@
 
 package com.google.devtools.depan.eclipse.visualization.ogl;
 
-import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeColors;
-import com.google.devtools.depan.model.GraphNode;
-
 import java.awt.Color;
 
 /**
  * Provide fill and stroke colors for nodes.
  * 
+ * Instances exist for each node.
+ * 
  * @author Lee Carver
  */
 public interface NodeColorSupplier {
-  Color getFillColor(NodeColors nodeColors, GraphNode node, ColorMap cm);
-  Color getStrokeColor(NodeColors nodeColors, GraphNode node, ColorMap cm);
+  Color getFillColor();
+  Color getStrokeColor();
+
+  public static final NodeColorSupplier DEFAULT =
+      new Monochrome(GLConstants.FOREGROUND);
 
   public static class Monochrome implements NodeColorSupplier {
     private final Color color;
@@ -38,14 +40,12 @@ public interface NodeColorSupplier {
     }
 
     @Override
-    public Color getFillColor(
-        NodeColors nodeColors, GraphNode node, ColorMap cm) {
+    public Color getFillColor() {
       return color;
     }
 
     @Override
-    public Color getStrokeColor(
-        NodeColors nodeColors, GraphNode node, ColorMap cm) {
+    public Color getStrokeColor() {
       return color;
     }
   }
@@ -60,14 +60,12 @@ public interface NodeColorSupplier {
     }
 
     @Override
-    public Color getFillColor(
-        NodeColors nodeColors, GraphNode node, ColorMap cm ) {
+    public Color getFillColor() {
       return fillColor;
     }
 
     @Override
-    public Color getStrokeColor(
-        NodeColors nodeColors, GraphNode node, ColorMap cm ) {
+    public Color getStrokeColor() {
       return strokeColor;
     }
   }

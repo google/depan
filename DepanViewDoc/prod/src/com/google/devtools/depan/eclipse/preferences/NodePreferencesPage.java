@@ -15,9 +15,10 @@
  */
 package com.google.devtools.depan.eclipse.preferences;
 
-import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeColors;
-import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeShape;
-import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeSize;
+import com.google.devtools.depan.view_doc.eclipse.ui.plugins.ViewExtensionRegistry;
+import com.google.devtools.depan.view_doc.model.NodeColorMode;
+import com.google.devtools.depan.view_doc.model.NodeShapeMode;
+import com.google.devtools.depan.view_doc.model.NodeSizeMode;
 
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.RadioGroupFieldEditor;
@@ -25,6 +26,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
 
 /**
  * Preference page for node rendering options.
@@ -48,30 +53,71 @@ public class NodePreferencesPage extends FieldEditorPreferencePage
 
     // color: mode
     RadioGroupFieldEditor colorSelect = new RadioGroupFieldEditor(
-        NodePreferencesIds.NODE_COLOR, "...shows...", 3, new String[][] {
-            {"Degree", NodeColors.DEGREE.toString()},
-            {"Role", NodeColors.ROLE.toString()},
-            {"Voltage", NodeColors.VOLTAGE.toString()}
-        }, parent, true);
+        NodePreferencesIds.NODE_COLOR, "...shows...", 3,
+        buildNodeColorModeOptions(), parent, true);
 
     // shape: mode
     RadioGroupFieldEditor shapeSelect = new RadioGroupFieldEditor(
-        NodePreferencesIds.NODE_SHAPE, "...shows...", 2, new String[][] {
-            {"Degree", NodeShape.DEGREE.toString()},
-            {"Role", NodeShape.ROLE.toString()},
-        }, parent, true);
+        NodePreferencesIds.NODE_SHAPE, "...shows...", 2, 
+        buildNodeShapeModeOptions(), parent, true);
 
     // size: mode
     RadioGroupFieldEditor sizeSelect = new RadioGroupFieldEditor(
-        NodePreferencesIds.NODE_SIZE, "...shows...", 2, new String[][] {
-            {"Degree", NodeSize.DEGREE.toString()},
-            {"Voltage", NodeSize.VOLTAGE.toString()},
-        }, parent, true);
+        NodePreferencesIds.NODE_SIZE, "...shows...", 2,
+        buildNodeSizeModeOptions(), parent, true);
 
     // add fields to the page
     addField(colorSelect);
     addField(shapeSelect);
     addField(sizeSelect);
+  }
+
+  private static Comparator<String[]> LABEL_ORDER =
+      new Comparator<String[]>() {
+
+    @Override
+    public int compare(String[] arg0, String[] arg1) {
+      return (arg0[0].compareTo(arg1[0]));
+    }
+  };
+
+  private String[][] buildNodeColorModeOptions() {
+    Collection<NodeColorMode> modes =
+        ViewExtensionRegistry.getRegistryNodeColorModes();
+    String[][] result = new String[modes.size()][];
+    int curr = 0;
+    for (NodeColorMode mode : modes) {
+      result[curr] = new String[] { mode.getLabel(), mode.getLabel() };
+      curr++;
+    }
+    Arrays.sort(result, LABEL_ORDER);
+    return result;
+  }
+
+  private String[][] buildNodeShapeModeOptions() {
+    Collection<NodeShapeMode> modes =
+        ViewExtensionRegistry.getRegistryNodeShapeModes();
+    String[][] result = new String[modes.size()][];
+    int curr = 0;
+    for (NodeShapeMode mode : modes) {
+      result[curr] = new String[] { mode.getLabel(), mode.getLabel() };
+      curr++;
+    }
+    Arrays.sort(result, LABEL_ORDER);
+    return result;
+  }
+
+  private String[][] buildNodeSizeModeOptions() {
+    Collection<NodeSizeMode> modes =
+        ViewExtensionRegistry.getRegistryNodeSizeModes();
+    String[][] result = new String[modes.size()][];
+    int curr = 0;
+    for (NodeSizeMode mode : modes) {
+      result[curr] = new String[] { mode.getLabel(), mode.getLabel() };
+      curr++;
+    }
+    Arrays.sort(result, LABEL_ORDER);
+    return result;
   }
 
   @Override

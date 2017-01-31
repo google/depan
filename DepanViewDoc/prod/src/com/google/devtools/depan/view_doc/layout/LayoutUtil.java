@@ -1,12 +1,9 @@
 package com.google.devtools.depan.view_doc.layout;
 
-import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.view_doc.model.Point2dUtils;
 
 import com.google.common.collect.Maps;
-
-import edu.uci.ics.jung.graph.DirectedGraph;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -95,17 +92,5 @@ public class LayoutUtil {
           LayoutScaler scaler, Rectangle2D viewport) {
     return FULLSCALE_MARGIN
             * scaler.getFullViewScale(viewport, ZERO_THRESHOLD);
-  }
-
-  public static DirectedGraph<GraphNode, GraphEdge> buildJungGraph(
-      LayoutContext context) {
-    JungBuilder builder = new JungBuilder(context.getGraphModel());
-
-    builder.setMovableNodes(context.getMovableNodes());
-    builder.setFixedNodes(context.getFixedNodes());
-    builder.setEdgeMatcher(context.getEdgeMatcher());
-
-    DirectedGraph<GraphNode, GraphEdge> result = builder.build();
-    return result;
   }
 }

@@ -19,10 +19,6 @@ package com.google.devtools.depan.view_doc.eclipse.ui.editor;
 import com.google.devtools.depan.collapse.model.CollapseData;
 import com.google.devtools.depan.collapse.model.CollapseTreeModel;
 import com.google.devtools.depan.collapse.model.Collapser;
-import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds;
-import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeShape;
-import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeSize;
-import com.google.devtools.depan.eclipse.preferences.PreferencesIds;
 import com.google.devtools.depan.eclipse.ui.nodes.cache.HierarchyCache;
 import com.google.devtools.depan.eclipse.ui.nodes.trees.GraphData;
 import com.google.devtools.depan.eclipse.ui.nodes.trees.TreeViewerObject;
@@ -31,7 +27,6 @@ import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeTreeProvider;
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeViewerProvider;
 import com.google.devtools.depan.eclipse.visualization.View;
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeColorSupplier;
-import com.google.devtools.depan.eclipse.visualization.ogl.NodeColorSupplier.Monochrome;
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeRatioSupplier;
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeShapeSupplier;
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeSizeSupplier;
@@ -54,6 +49,7 @@ import com.google.devtools.depan.nodes.Graphs;
 import com.google.devtools.depan.nodes.filters.model.ContextualFilter;
 import com.google.devtools.depan.nodes.filters.sequence.SteppingFilter;
 import com.google.devtools.depan.nodes.trees.HierarchicalTreeModel;
+import com.google.devtools.depan.nodes.trees.SuccessorEdges;
 import com.google.devtools.depan.nodes.trees.TreeModel;
 import com.google.devtools.depan.persistence.StorageTools;
 import com.google.devtools.depan.platform.ListenerManager;
@@ -61,6 +57,7 @@ import com.google.devtools.depan.platform.WorkspaceTools;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 import com.google.devtools.depan.view_doc.eclipse.ViewDocLogger;
+import com.google.devtools.depan.view_doc.eclipse.ui.plugins.ViewExtensionRegistry;
 import com.google.devtools.depan.view_doc.eclipse.ui.trees.NodeCompactor;
 import com.google.devtools.depan.view_doc.eclipse.ui.trees.ViewEditorNodeViewerProvider;
 import com.google.devtools.depan.view_doc.eclipse.ui.views.NodeFilterViewPart;
@@ -70,7 +67,11 @@ import com.google.devtools.depan.view_doc.layout.LayoutGenerators;
 import com.google.devtools.depan.view_doc.layout.LayoutUtil;
 import com.google.devtools.depan.view_doc.layout.grid.GridLayoutGenerator;
 import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty;
+import com.google.devtools.depan.view_doc.model.NodeColorMode;
 import com.google.devtools.depan.view_doc.model.NodeDisplayProperty;
+import com.google.devtools.depan.view_doc.model.NodeRatioMode;
+import com.google.devtools.depan.view_doc.model.NodeShapeMode;
+import com.google.devtools.depan.view_doc.model.NodeSizeMode;
 import com.google.devtools.depan.view_doc.model.OptionPreferences;
 import com.google.devtools.depan.view_doc.model.Point2dUtils;
 import com.google.devtools.depan.view_doc.model.ScenePreferences;
@@ -80,8 +81,6 @@ import com.google.devtools.depan.view_doc.persistence.ViewDocXmlPersist;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-
-import edu.uci.ics.jung.graph.DirectedGraph;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -112,7 +111,6 @@ import org.eclipse.ui.dialogs.SaveAsDialog;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.MultiPageEditorPart;
 
-import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -215,7 +213,7 @@ public class ViewEditor extends MultiPageEditorPart {
    */
   private GraphModel viewGraph;
 
-  private NodeSupplierFactory nodeSupplierFactory;
+  //$ private NodeSupplierFactory nodeSupplierFactory;
 
   /**
    * The active {@link ContextualFilter} for this editing session.
@@ -232,7 +230,7 @@ public class ViewEditor extends MultiPageEditorPart {
    */
   private NodeCompactor compactor = new NodeCompactor(this);
 
-  NodeViewerProvider nvProvider =
+  private NodeViewerProvider nvProvider =
       new ViewEditorNodeViewerProvider(this);
 
   /////////////////////////////////////
@@ -436,10 +434,6 @@ public class ViewEditor extends MultiPageEditorPart {
     return viewResources.getDefaultRelationSet();
   }
 
-  public GraphEdgeMatcherDescriptor getTreeEdgeMatcher() {
-    return viewInfo.getLayoutFinder();
-  }
-
   public GraphEdgeMatcherDescriptor getLayoutEdgeMatcher() {
     GraphEdgeMatcherDescriptor result = viewInfo.getLayoutFinder();
     if (null != result) {
@@ -459,6 +453,23 @@ public class ViewEditor extends MultiPageEditorPart {
 
   public ScenePreferences getScenePrefs() {
     return viewInfo.getScenePrefs();
+  }
+
+  public String getOption(String optionId) {
+    return viewInfo.getOption(optionId);
+  }
+
+  public boolean isOptionChecked(String optionId) {
+    String value = viewInfo.getOption(optionId);
+    return OptionPreferences.isOptionChecked(optionId, value);
+  }
+
+  public void setOption(String optionId, String value) {
+    viewInfo.setOption(optionId, value);
+  }
+
+  public void setBooleanOption(String optionId, boolean value) {
+    viewInfo.setOption(optionId, OptionPreferences.booleanValue(value));
   }
 
   /**
@@ -547,28 +558,6 @@ public class ViewEditor extends MultiPageEditorPart {
       ViewDocLogger.logException("Unable to create View pages", err);
       throw err;
     }
-  }
-
-  /**
-   * Everything that should happen before the dry-run and the start.
-   * Since {@link #setGraphModel} is invoked early, all display property
-   * entities should be defined.
-   */
-  private void prepareView() {
-    // Prepare renderer with full set of nodes and edges.
-    renderer.setGraphModel(getViewGraph());
-    renderer.initializeScenePrefs(getScenePrefs());
-    renderer.initializeNodeLocations(viewInfo.getNodeLocations());
-    renderer.setNodeNeighbors(nodeSupplierFactory.getJungGraph());
-    initNodeRendering();
-    initSelectedNodes(getSelectedNodes());
-    initEdgeRendering();
-    handleCollapseRendering(
-        getCollapseTreeModel().computeDepthFirst(), CollapseData.EMPTY_LIST);
-    prepareRenderOptions();
-
-    // Force any animation to completion.
-    renderer.finishSteps();
   }
 
   protected String edgeToolTip(GraphEdge edge) {
@@ -707,25 +696,7 @@ public class ViewEditor extends MultiPageEditorPart {
     viewResources = viewInfo.buildGraphResources();
 
     updateExposedGraph();
-
-    nodeSupplierFactory = buildNodeSupplierFactory();
-  }
-
-  private NodeSupplierFactory buildNodeSupplierFactory() {
-
-    // Setup factory for all nodes in view.
-    GraphModel graph = getViewGraph();
-    Collection<GraphNode> nodes = graph.getNodes();
-
-    LayoutContext context = new LayoutContext();
-    context.setGraphModel(graph);
-    context.setMovableNodes(nodes);
-    // TODO: Compute ranking based on selected edge matcher
-    context.setEdgeMatcher(GraphEdgeMatcherDescriptors.FORWARD);
-
-    DirectedGraph<GraphNode, GraphEdge> jungGraph =
-        LayoutUtil.buildJungGraph(context);
-    return new NodeSupplierFactory(nodes, jungGraph);
+    ViewExtensionRegistry.deriveRegistryDetails(this);
   }
 
   /**
@@ -758,19 +729,6 @@ public class ViewEditor extends MultiPageEditorPart {
 
   /////////////////////////////////////
   // Actions on the rendering system
-
-  public boolean isOptionChecked(String optionId) {
-    String value = viewInfo.getOption(optionId);
-    return OptionPreferences.isOptionChecked(optionId, value);
-  }
-
-  public void setOption(String optionId, String value) {
-    viewInfo.setOption(optionId, value);
-  }
-
-  public void setBooleanOption(String optionId, boolean value) {
-    viewInfo.setOption(optionId, OptionPreferences.booleanValue(value));
-  }
 
   /**
    * Take a screenshot of the given view. Ask the user a filename, and use
@@ -1001,78 +959,8 @@ public class ViewEditor extends MultiPageEditorPart {
     viewInfo.setRelationProperty(relation, relProp);
   }
 
-  /**
-   * Initialize rendering properties for those nodes in the view graph that
-   * have explicit property settings.
-   */
-  private void initNodeRendering() {
-    for (GraphNode node : viewGraph.getNodes()) {
-      NodeDisplayProperty prop = viewInfo.getNodeProperty(node);
-      if (null != prop) {
-        renderer.updateNodeProperty(node, prop);
-      }
-    }
-  }
-
-  private void initEdgeRendering() {
-    for (GraphEdge edge : viewGraph.getEdges()) {
-
-      boolean isVisible = isVisibleRelation(edge.getRelation());
-      renderer.setEdgeVisible(edge, isVisible);
-
-      // If the edge has explicit display properties, use those.
-      EdgeDisplayProperty edgeProp = viewInfo.getEdgeProperty(edge);
-      if (null != edgeProp) {
-        renderer.updateEdgeProperty(edge, edgeProp);
-        continue;
-      }
-
-      EdgeDisplayProperty relationProp =
-          getRelationProperty(edge.getRelation());
-      if (null != relationProp) {
-        renderer.updateEdgeProperty(edge, relationProp);
-      }
-    }
-  }
-
-  private void updateEdgesToVisible(RelationSet relationSet) {
-    for (GraphEdge edge : viewGraph.getEdges()) {
-      if (relationSet.contains(edge.getRelation())) {
-        // Set edge visibility
-        boolean isVisible = isVisibleRelation(edge.getRelation());
-        renderer.setEdgeVisible(edge, isVisible);
-      }
-    }
-  }
-
-  /**
-   * Edges that lack an explicit {@link EdgeDisplayProperty} are
-   * updated to render with the latest {@link EdgeDisplayProperty}
-   * associated with the edge's {@link Relation}.
-   * 
-   * This does not directly affect edge visibility, which is
-   * handled separately. (However, poor rendering choices
-   * may lead to invisibly rendered lines.)
-   */
-  private void updateEdgesToRelationProperties() {
-    for (GraphEdge edge : viewGraph.getEdges()) {
-
-      // If the edge has explicit display properties, leave those.
-      EdgeDisplayProperty edgeProp = viewInfo.getEdgeProperty(edge);
-      if (null != edgeProp) {
-        continue;
-      }
-
-      EdgeDisplayProperty relationProp =
-          getRelationProperty(edge.getRelation());
-      if (null != relationProp) {
-        renderer.updateEdgeProperty(edge, relationProp);
-        continue;
-      }
-
-      // Nothing to do if no properties have changed.
-    }
-  }
+  /////////////////////////////////////
+  // Rendering details and render access
 
   /////////////////////////////////////
   // Update Graph Layouts
@@ -1463,126 +1351,219 @@ public class ViewEditor extends MultiPageEditorPart {
   /////////////////////////////////////
   // Handle configuration and changes from options
 
+  /**
+   * Everything that should happen before the dry-run and the start.
+   * Since {@link #setGraphModel} is invoked early, all display property
+   * entities should be defined.
+   */
+  private void prepareView() {
+    // Prepare renderer with full set of nodes and edges.
+    renderer.initializeScenePrefs(getScenePrefs());
+    initGraphRenderer();
+    initEdgeRendering();
+
+    initNodeRendering();
+    initSelectedNodes(getSelectedNodes());
+    renderer.initializeNodeLocations(viewInfo.getNodeLocations());
+    handleCollapseRendering(
+        getCollapseTreeModel().computeDepthFirst(), CollapseData.EMPTY_LIST);
+
+    prepareRenderOptions();
+    ViewExtensionRegistry.prepareRegistryView(this);
+
+    // Force any animation to completion.
+    renderer.finishSteps();
+  }
+
+  private void initGraphRenderer() {
+    GraphModel view = getViewGraph();
+    Map<GraphNode, ? extends SuccessorEdges> edgeMap =
+        Graphs.computeSuccessorHierarchy(
+            view, GraphEdgeMatcherDescriptors.FORWARD.getInfo());
+
+    renderer.setGraphModel(view, edgeMap);
+  }
+
+  /**
+   * Initialize rendering properties for those nodes in the view graph that
+   * have explicit property settings.
+   */
+  private void initNodeRendering() {
+    for (GraphNode node : viewGraph.getNodes()) {
+      NodeDisplayProperty prop = viewInfo.getNodeProperty(node);
+      if (null != prop) {
+        renderer.updateNodeProperty(node, prop);
+      }
+    }
+  }
+
+  private void initEdgeRendering() {
+    for (GraphEdge edge : viewGraph.getEdges()) {
+
+      boolean isVisible = isVisibleRelation(edge.getRelation());
+      renderer.setEdgeVisible(edge, isVisible);
+
+      // If the edge has explicit display properties, use those.
+      EdgeDisplayProperty edgeProp = viewInfo.getEdgeProperty(edge);
+      if (null != edgeProp) {
+        renderer.updateEdgeProperty(edge, edgeProp);
+        continue;
+      }
+
+      EdgeDisplayProperty relationProp =
+          getRelationProperty(edge.getRelation());
+      if (null != relationProp) {
+        renderer.updateEdgeProperty(edge, relationProp);
+      }
+    }
+  }
+
+  private void updateEdgesToVisible(RelationSet relationSet) {
+    for (GraphEdge edge : viewGraph.getEdges()) {
+      if (relationSet.contains(edge.getRelation())) {
+        // Set edge visibility
+        boolean isVisible = isVisibleRelation(edge.getRelation());
+        renderer.setEdgeVisible(edge, isVisible);
+      }
+    }
+  }
+
+  /**
+   * Edges that lack an explicit {@link EdgeDisplayProperty} are
+   * updated to render with the latest {@link EdgeDisplayProperty}
+   * associated with the edge's {@link Relation}.
+   * 
+   * This does not directly affect edge visibility, which is
+   * handled separately. (However, poor rendering choices
+   * may lead to invisibly rendered lines.)
+   */
+  private void updateEdgesToRelationProperties() {
+    for (GraphEdge edge : viewGraph.getEdges()) {
+
+      // If the edge has explicit display properties, leave those.
+      EdgeDisplayProperty edgeProp = viewInfo.getEdgeProperty(edge);
+      if (null != edgeProp) {
+        continue;
+      }
+
+      EdgeDisplayProperty relationProp =
+          getRelationProperty(edge.getRelation());
+      if (null != relationProp) {
+        renderer.updateEdgeProperty(edge, relationProp);
+        continue;
+      }
+
+      // Nothing to do if no properties have changed.
+    }
+  }
+
+  /////////////////////////////////////
+  // Rendering options from user preferences
+
+  public void setNodeColorByMode(
+      GraphNode node, NodeColorMode mode, NodeColorSupplier supplier) {
+    renderer.setNodeColorByMode(node, mode, supplier);
+  }
+
+  public void setNodeRatioByMode(
+      GraphNode node, NodeRatioMode mode, NodeRatioSupplier supplier) {
+    renderer.setNodeRatioByMode(node, mode, supplier);
+  }
+
+  public void setNodeShapeByMode(
+      GraphNode node, NodeShapeMode mode, NodeShapeSupplier supplier) {
+    renderer.setNodeShapeByMode(node, mode, supplier);
+  }
+
+  public void setNodeSizeByMode(
+      GraphNode node, NodeSizeMode mode, NodeSizeSupplier supplier) {
+    renderer.setNodeSizeByMode(node, mode, supplier);
+  }
+
   private void prepareRenderOptions() {
-    prepareColorSupplier();
-    updateRootHighlight(
-        isOptionChecked(OptionPreferences.ROOTHIGHLIGHT_ID));
-    updateNodeStretchRatio(
-        isOptionChecked(OptionPreferences.STRETCHRATIO_ID));
-    updateNodeSize(
-        isOptionChecked(OptionPreferences.SIZE_ID));
     updateNodeStrokeHighlight(
         isOptionChecked(OptionPreferences.STROKEHIGHLIGHT_ID));
-    updateNodeShape(
-        isOptionChecked(OptionPreferences.SHAPE_ID));
-  }
+
+    updateRootColorMode(
+        viewInfo.getOption(OptionPreferences.ROOTHIGHLIGHT_ID));
+
+    updateNodeColorMode(
+        viewInfo.getOption(OptionPreferences.COLOR_MODE_ID));
+    updateNodeShapeMode(
+        viewInfo.getOption(OptionPreferences.SHAPE_ID));
+    updateNodeSizeMode(
+        viewInfo.getOption(OptionPreferences.SIZE_ID));
+    updateNodeRatioMode(
+        viewInfo.getOption(OptionPreferences.STRETCHRATIO_ID));
+    ViewExtensionRegistry.prepareRegistryView(this);
+ }
 
   private void handleOptionChange(String optionId, String value) {
     markDirty();
-    if (OptionPreferences.ROOTHIGHLIGHT_ID.equals(optionId)) {
-      updateRootHighlight(Boolean.parseBoolean(value));
-      return;
-    }
-    if (OptionPreferences.STRETCHRATIO_ID.equals(optionId)) {
-      updateNodeStretchRatio(Boolean.parseBoolean(value));
-      return;
-    }
-    if (OptionPreferences.SIZE_ID.equals(optionId)) {
-      updateNodeSize(Boolean.parseBoolean(value));
-      return;
-    }
     if (OptionPreferences.STROKEHIGHLIGHT_ID.equals(optionId)) {
       updateNodeStrokeHighlight(Boolean.parseBoolean(value));
-      return;
-    }
-    if (OptionPreferences.SHAPE_ID.equals(optionId)) {
-      updateNodeShape(Boolean.parseBoolean(value));
       return;
     }
     if (OptionPreferences.OPTION_DESCRIPTION.equals(optionId)) {
       updateOptionDescription(value);
       return;
     }
-  }
-
-  private void prepareColorSupplier() {
-    for (GraphNode root : nodeSupplierFactory.getNodes()) {
-      renderer.setNodeColorSupplier(root, nodeSupplierFactory.getColorSupplier(root));
-    }
-    return;
-  }
-
-  private void updateRootHighlight(boolean enable) {
-    List<GraphNode> roots = nodeSupplierFactory.getRoots();
-    if (enable) {
-      Monochrome seedColor = new NodeColorSupplier.Monochrome(Color.GREEN);
-      for (GraphNode root : roots) {
-        renderer.setNodeColorSupplier(root, seedColor);
-      }
+    if (OptionPreferences.ROOTHIGHLIGHT_ID.equals(optionId)) {
+      updateRootColorMode(value);
       return;
     }
-
-    for (GraphNode root : roots) {
-      renderer.setNodeColorSupplier(root, nodeSupplierFactory.getColorSupplier(root));
+    if (OptionPreferences.COLOR_MODE_ID.equals(optionId)) {
+      updateNodeColorMode(value);
     }
-    return;
-  }
-
-  private void updateNodeStretchRatio(boolean enable) {
-    if (enable) {
-      for (GraphNode node : nodeSupplierFactory.getNodes()) {
-        renderer.setNodeRatioSupplier(node, nodeSupplierFactory.getRatioSupplier(node));
-      }
+    if (OptionPreferences.SHAPE_ID.equals(optionId)) {
+      updateNodeShapeMode(value);
       return;
     }
-
-    for (GraphNode node : nodeSupplierFactory.getNodes()) {
-      renderer.setNodeRatioSupplier(node, NodeRatioSupplier.FULL);
-    }
-  }
-
-  private void updateNodeSize(boolean enable) {
-    if (enable) {
-      NodeSize size = NodeSize.valueOf(
-          PreferencesIds.getInstanceNode().get(
-              NodePreferencesIds.NODE_SIZE,
-              NodeSize.getDefault().toString()));
-
-      for (GraphNode node : nodeSupplierFactory.getNodes()) {
-        NodeSizeSupplier supplier =
-            nodeSupplierFactory.getSizeSupplier(node, size);
-        renderer.setNodeSizeSupplier(node, supplier);
-      }
+    if (OptionPreferences.SIZE_ID.equals(optionId)) {
+      updateNodeSizeMode(value);
       return;
     }
-
-    for (GraphNode node : nodeSupplierFactory.getNodes()) {
-      renderer.setNodeSizeSupplier(node, NodeSizeSupplier.STANDARD);
-    }
-  }
-
-  private void updateNodeShape(boolean enable) {
-    if (enable) {
-      for (GraphNode node : nodeSupplierFactory.getNodes()) {
-        NodeShape mode = NodeShape.valueOf(
-            PreferencesIds.getInstanceNode().get(
-                NodePreferencesIds.NODE_SHAPE,
-                NodeShape.getDefault().toString()));
-
-        NodeShapeSupplier nodeShape =
-            nodeSupplierFactory.getShapeSupplier(node, mode);
-        renderer.setNodeShapeSupplier(node, nodeShape);
-      }
+    if (OptionPreferences.STRETCHRATIO_ID.equals(optionId)) {
+      updateNodeRatioMode(value);
       return;
     }
-
-    for (GraphNode node : nodeSupplierFactory.getNodes()) {
-      renderer.setNodeShapeSupplier(node, NodeShapeSupplier.STANDARD);
-    }
+    ViewDocLogger.LOG.info(MessageFormat.format(
+        "Unrecognized option $1 cannot be set to value $2",
+         optionId, value));
   }
 
   private void updateNodeStrokeHighlight(boolean enable) {
     renderer.activateNodeStroke(enable);
+  }
+
+  private void updateNodeColorMode(String value) {
+    NodeColorMode mode =
+        ViewExtensionRegistry.getRegistryGetNodeColorMode(value);
+    renderer.setNodeColorMode(mode);
+  }
+
+  private void updateRootColorMode(String value) {
+    NodeColorMode mode =
+        ViewExtensionRegistry.getRegistryGetNodeColorMode(value);
+    renderer.setRootColorMode(mode);
+  }
+
+  private void updateNodeShapeMode(String value) {
+    NodeShapeMode mode =
+        ViewExtensionRegistry.getRegistryGetNodeShapeMode(value);
+    renderer.setNodeShapeMode(mode);
+  }
+
+  private void updateNodeSizeMode(String value) {
+    NodeSizeMode mode =
+        ViewExtensionRegistry.getRegistryGetNodeSizeMode(value);
+    renderer.setNodeSizeMode(mode);
+  }
+
+  private void updateNodeRatioMode(String value) {
+    NodeRatioMode mode =
+        ViewExtensionRegistry.getRegistryGetNodeRatioMode(value);
+    renderer.setNodeRatioMode(mode);
   }
 
   private void updateOptionDescription(String value) {

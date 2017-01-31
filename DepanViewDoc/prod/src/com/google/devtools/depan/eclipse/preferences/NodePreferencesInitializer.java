@@ -15,9 +15,7 @@
  */
 package com.google.devtools.depan.eclipse.preferences;
 
-import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeColors;
-import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeShape;
-import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeSize;
+import com.google.devtools.depan.view_doc.eclipse.ui.plugins.ViewExtensionRegistry;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
@@ -34,12 +32,12 @@ public class NodePreferencesInitializer extends AbstractPreferenceInitializer {
     IEclipsePreferences defaults = PreferencesIds.getDefaultNode();
 
     defaults.put(NodePreferencesIds.NODE_COLOR,
-        NodeColors.getDefault().toString());
+        ViewExtensionRegistry.getRegistryGetDefaultColorMode().getLabel());
 
     defaults.put(NodePreferencesIds.NODE_SHAPE,
-        NodeShape.getDefault().toString());
+        ViewExtensionRegistry.getRegistryGetDefaultShapeMode().getLabel());
 
     defaults.put(NodePreferencesIds.NODE_SIZE,
-        NodeSize.getDefault().toString());
+        ViewExtensionRegistry.getRegistryGetDefaultSizeMode().getLabel());
   }
 }

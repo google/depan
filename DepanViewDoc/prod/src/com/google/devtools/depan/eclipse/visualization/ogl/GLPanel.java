@@ -16,15 +16,17 @@
 
 package com.google.devtools.depan.eclipse.visualization.ogl;
 
-import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
+import com.google.devtools.depan.nodes.trees.SuccessorEdges;
+import com.google.devtools.depan.view_doc.model.NodeColorMode;
+import com.google.devtools.depan.view_doc.model.NodeRatioMode;
+import com.google.devtools.depan.view_doc.model.NodeShapeMode;
+import com.google.devtools.depan.view_doc.model.NodeSizeMode;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
-import edu.uci.ics.jung.graph.Graph;
 
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.widgets.Composite;
@@ -85,7 +87,7 @@ public class GLPanel extends GLScene {
 
   /**
    * The graph that should be rendered.  This must be configured before
-   * rendering is started via {@link #setGraphModel(GraphModel, Graph, Map)}.  
+   * rendering is started via {@link #setGraphModel(GraphModel)}.
    */
   private GraphModel viewGraph;
 
@@ -548,60 +550,64 @@ public class GLPanel extends GLScene {
   }
 
   /**
-   * Sets the color of the given node.
-   *
-   * @param node Node whose color is updated on graph.
-   * @param newNodeColor The new color of this node.
+   * Selects the set of colors to use
    */
-  public void setNodeColorSupplier(GraphNode node, NodeColorSupplier supplier) {
-    NodeRenderingProperty nodeProperty = node2property(node);
-    renderer.getNodeColors().setColorSupplier(nodeProperty, supplier);
+  public void setNodeColorMode(NodeColorMode mode) {
+    renderer.getNodeColors().setNodeColorMode(mode);
   }
 
   /**
-   * Sets the color of the given node.
-   *
-   * @param node Node whose color is updated on graph.
-   * @param newNodeColor The new color of this node.
+   * Selects the set of colors to use
    */
-  public void setNodeRatioSupplier(GraphNode node, NodeRatioSupplier supplier) {
-    NodeRenderingProperty nodeProperty = node2property(node);
-    renderer.getNodeRatio().setRatioSupplier(nodeProperty, supplier);
+  public void setRootColorMode(NodeColorMode mode) {
+    renderer.getNodeColors().setRootColorMode(mode);
   }
 
   /**
-   * Sets the color of the given node.
-   *
-   * @param node Node whose color is updated on graph.
-   * @param newNodeColor The new color of this node.
+   * Sets an alternate color for the given node.
    */
-  public void setNodeShapeSupplier(GraphNode node, NodeShapeSupplier supplier) {
+  public void setNodeColorByMode(
+      GraphNode node, NodeColorMode mode, NodeColorSupplier supplier) {
     NodeRenderingProperty nodeProperty = node2property(node);
-    renderer.getNodeShape().setShapeSupplier(nodeProperty, supplier);
+    renderer.getNodeColors().setNodeColorByMode(nodeProperty, mode, supplier);
+  }
+
+  public void setNodeRatioMode(NodeRatioMode mode) {
+    renderer.getNodeRatio().setNodeRatioMode(mode);
+  }
+
+  public void setNodeRatioByMode(
+      GraphNode node, NodeRatioMode mode, NodeRatioSupplier supplier) {
+    NodeRenderingProperty nodeProperty = node2property(node);
+    renderer.getNodeRatio().setNodeRatioByMode(nodeProperty, mode, supplier);
+  }
+
+  public void setNodeShapeMode(NodeShapeMode mode) {
+    renderer.getNodeShape().setNodeShapeMode(mode);
+  }
+
+  public void setNodeShapeByMode(
+      GraphNode node, NodeShapeMode mode, NodeShapeSupplier supplier) {
+    NodeRenderingProperty nodeProperty = node2property(node);
+    renderer.getNodeShape().setNodeShapeByMode(nodeProperty, mode, supplier);
+  }
+
+  public void setNodeSizeMode(NodeSizeMode mode) {
+    renderer.getNodeSize().setNodeSizeMode(mode);
+  }
+
+  public void setNodeSizeByMode(
+      GraphNode node, NodeSizeMode mode, NodeSizeSupplier supplier) {
+    NodeRenderingProperty nodeProperty = node2property(node);
+    renderer.getNodeSize().setNodeSizeByMode(nodeProperty, mode, supplier);
   }
 
   /**
-   * Sets how the size of this node is determined with the given size model.
-   *
-   * @param node Node whose size model is modified.
-   * @param newSizeModel The new size model to be used while computing node
-   * size.
+   * Override the size supplier for individual nodes.
    */
-  public void setNodeSize(
-      GraphNode node, NodePreferencesIds.NodeSize newSizeModel) {
+  public void setNodeSize(GraphNode node, NodeSizeSupplier supplier) {
     NodeRenderingProperty nodeProperty = node2property(node);
-    nodeProperty.overriddenSize = newSizeModel;
-  }
-
-  /**
-   * Sets the color of the given node.
-   *
-   * @param node Node whose color is updated on graph.
-   * @param newNodeColor The new color of this node.
-   */
-  public void setNodeSizeSupplier(GraphNode node, NodeSizeSupplier supplier) {
-    NodeRenderingProperty nodeProperty = node2property(node);
-    renderer.getNodeSize().setNodeSizeSupplier(nodeProperty, supplier);
+    renderer.getNodeSize().setOverriddenSize(nodeProperty, supplier);
   }
 
   /**
@@ -614,8 +620,9 @@ public class GLPanel extends GLScene {
     node2property(node).isVisible = isVisible;
   }
 
-  public void setNodeNeighbors(Graph<GraphNode, GraphEdge> jungGraph) {
-    renderer.getNodeStroke().setNodeNeighbors(jungGraph);
+  public void setNodeNeighbors(
+      Map<GraphNode, ? extends SuccessorEdges> edgeMap) {
+    renderer.getNodeStroke().setNodeNeighbors(edgeMap);
   }
 
   public void activateNodeStroke(boolean value) {

@@ -20,7 +20,6 @@ import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.view_doc.layout.LayoutContext;
 import com.google.devtools.depan.view_doc.layout.LayoutGenerator;
 import com.google.devtools.depan.view_doc.layout.LayoutRunner;
-import com.google.devtools.depan.view_doc.layout.LayoutUtil;
 
 import edu.uci.ics.jung.algorithms.layout.FRLayout;
 import edu.uci.ics.jung.algorithms.layout.FRLayout2;
@@ -63,7 +62,7 @@ public abstract class JungLayoutGenerator implements LayoutGenerator {
   // Template method, with hook runnerBuilder()
   public final LayoutRunner buildRunner(LayoutContext context) {
     DirectedGraph<GraphNode, GraphEdge> jungGraph =
-        LayoutUtil.buildJungGraph(context);
+        JungBuilder.buildJungGraph(context);
 
     Rectangle2D region = context.getViewport();
     Dimension size = new Dimension((int) region.getWidth(), (int) region.getHeight());

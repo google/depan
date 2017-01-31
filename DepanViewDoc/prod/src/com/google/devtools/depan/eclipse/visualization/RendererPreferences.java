@@ -19,13 +19,14 @@ import com.google.devtools.depan.eclipse.preferences.ColorPreferencesIds;
 import com.google.devtools.depan.eclipse.preferences.LabelPreferencesIds;
 import com.google.devtools.depan.eclipse.preferences.LabelPreferencesIds.LabelPosition;
 import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds;
-import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeColors;
 import com.google.devtools.depan.eclipse.preferences.PreferencesIds;
 import com.google.devtools.depan.eclipse.visualization.ogl.GLPanel;
 import com.google.devtools.depan.eclipse.visualization.ogl.RenderingPipe;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeColorPlugin;
 import com.google.devtools.depan.eclipse.visualization.plugins.impl.NodeLabelPlugin;
 import com.google.devtools.depan.platform.Colors;
+import com.google.devtools.depan.view_doc.eclipse.ui.plugins.ViewExtensionRegistry;
+import com.google.devtools.depan.view_doc.model.NodeColorMode;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
@@ -89,11 +90,11 @@ public class RendererPreferences implements IPreferenceChangeListener {
     NodeColorPlugin nodeColor = getNodeColor();
 
     // set color mode color
+    String label = node.get(NodePreferencesIds.NODE_COLOR, null);
     try {
-      NodeColors color = NodeColors.valueOf(node.get(
-          NodePreferencesIds.NODE_COLOR,
-          NodeColors.getDefault().toString()));
-      nodeColor.setColorMode(color);
+      NodeColorMode mode =
+          ViewExtensionRegistry.getRegistryGetNodeColorMode(label);
+      nodeColor.setNodeColorMode(mode);
     } catch (IllegalArgumentException ex) {
       // bad node rendering option. ignore.
       System.err.println("Bad node rendering option (color) in preferences.");

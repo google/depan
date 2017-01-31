@@ -22,22 +22,24 @@ import java.util.Map;
 
 /**
  * @author Lee Carver
- *
  */
 public class OptionPreferences {
   public static final String OPTION_DESCRIPTION = "option/description";
 
   // rendering options
-  public static final String ROOTHIGHLIGHT_ID =
-      "com.google.devtools.depan.eclipse.actions.view.RootHighlight";
-  public static final String SHAPE_ID =
-      "com.google.devtools.depan.eclipse.actions.view.Shape";
-  public static final String STRETCHRATIO_ID =
-      "com.google.devtools.depan.eclipse.actions.view.StretchRatio";
-  public static final String SIZE_ID =
-      "com.google.devtools.depan.eclipse.actions.view.Size";
   public static final String STROKEHIGHLIGHT_ID =
-      "com.google.devtools.depan.eclipse.actions.view.StrokeHighlight";
+      "com.google.devtools.depan.view_doc.eclipse.ui.option.StrokeHighlight";
+  public static final String COLOR_MODE_ID =
+      "com.google.devtools.depan.view_doc.eclipse.ui.option.ColorMode";
+
+  public static final String ROOTHIGHLIGHT_ID =
+      "com.google.devtools.depan.view_doc.eclipse.ui.option.RootHighlight";
+  public static final String STRETCHRATIO_ID =
+      "com.google.devtools.depan.view_doc.eclipse.ui.option.StretchRatio";
+  public static final String SIZE_ID =
+      "com.google.devtools.depan.view_doc.eclipse.ui.option.Size";
+  public static final String SHAPE_ID =
+      "com.google.devtools.depan.view_doc.eclipse.ui.option.Shape";
 
   /**
    * Various options where the default is not a {@code null} {@link String}

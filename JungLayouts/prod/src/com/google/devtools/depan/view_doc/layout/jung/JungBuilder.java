@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.google.devtools.depan.view_doc.layout;
+package com.google.devtools.depan.view_doc.layout.jung;
 
 import com.google.devtools.depan.graph.api.EdgeMatcher;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
@@ -21,6 +21,7 @@ import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptors;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
+import com.google.devtools.depan.view_doc.layout.LayoutContext;
 
 import com.google.common.collect.Sets;
 
@@ -114,5 +115,17 @@ public class JungBuilder {
           Graph<GraphNode, GraphEdge> graph,
           GraphEdge edge) {
     graph.addEdge(edge, edge.getTail(), edge.getHead());
+  }
+
+  public static DirectedGraph<GraphNode, GraphEdge> buildJungGraph(
+      LayoutContext context) {
+    JungBuilder builder = new JungBuilder(context.getGraphModel());
+
+    builder.setMovableNodes(context.getMovableNodes());
+    builder.setFixedNodes(context.getFixedNodes());
+    builder.setEdgeMatcher(context.getEdgeMatcher());
+
+    DirectedGraph<GraphNode, GraphEdge> result = builder.build();
+    return result;
   }
 }

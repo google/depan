@@ -16,6 +16,8 @@
 
 package com.google.devtools.depan.eclipse.visualization.ogl;
 
+import java.awt.Color;
+
 /**
  * Define constants for rendering without any OGL member variables.
  * This helps defer JOGL initialization until the first instance of
@@ -52,4 +54,10 @@ public class GLConstants {
   public static final float ZOOM_QUANTA = 1.0f;
   public static final float ZOOM_MAX = 1.1f;
   public static final float ROTATE_QUANTA = 0.001f;
+
+  public static final Color FOREGROUND = Color.BLUE;
+
+  private GLConstants() {
+    // Prevent instantiation.
+  }
 }

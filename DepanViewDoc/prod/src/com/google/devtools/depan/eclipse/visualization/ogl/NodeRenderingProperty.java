@@ -16,12 +16,11 @@
 
 package com.google.devtools.depan.eclipse.visualization.ogl;
 
-import com.google.common.collect.Maps;
-import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds;
-import com.google.devtools.depan.eclipse.preferences.NodePreferencesIds.NodeShape;
 import com.google.devtools.depan.eclipse.visualization.plugins.core.NodeRenderingPlugin;
 import com.google.devtools.depan.model.GraphNode;
+import com.google.devtools.depan.view_doc.model.NodeShapeMode;
 
+import com.google.common.collect.Maps;
 import com.jogamp.opengl.util.awt.TextureRenderer;
 import com.jogamp.opengl.util.texture.Texture;
 
@@ -81,7 +80,7 @@ public class NodeRenderingProperty extends RenderingProperty {
   /**
    * Used when the size computation method of this node is overridden.
    */
-  public NodePreferencesIds.NodeSize overriddenSize = null;
+  public NodeSizeSupplier overriddenSize = null;
 
   /**
    * If the node is collapsed, this is the parent.
@@ -143,7 +142,7 @@ public class NodeRenderingProperty extends RenderingProperty {
     strokeWidth = 1.0f;
     textColor = Color.WHITE;
 
-    shape = NodeShape.getDefaultShape();
+    shape = NodeShapeMode.DEFAULT_SHAPE;
     isFilled = true;
     isTextVisible = true;
 
