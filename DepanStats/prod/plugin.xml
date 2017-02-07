@@ -133,5 +133,16 @@
          </menu>
       </menuContribution>
    </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            category="com.google.devtools.depan.view_doc.eclipse.ui.views"
+            class="com.google.devtools.depan.stats.eclipse.ui.views.NodeStatsViewPart"
+            icon="icons/infos.png"
+            id="com.google.devtools.depan.stats.eclipse.ui.views.NodeStatsViewPart"
+            name="Node Statistics"
+            restorable="true">
+      </view>
+   </extension>
 
 </plugin>

@@ -78,6 +78,14 @@ public class ViewExtensionRegistry
         "View extension registry load failure for " + entryId, err);
   }
 
+  private ViewExtension getExtension(String extensionId) {
+    ContributionEntry<ViewExtension> result = getContribution(extensionId);
+    if (null != result) {
+      return result.getInstance();
+    }
+    return null;
+  }
+
   /////////////////////////////////////
   // Participate in rendering
 
@@ -201,7 +209,6 @@ public class ViewExtensionRegistry
     return null;
   }
 
-
   /////////////////////////////////////
   // Static access methods
 
@@ -215,6 +222,11 @@ public class ViewExtensionRegistry
       INSTANCE.load(EXTENTION_POINT);
     }
     return INSTANCE;
+  }
+
+
+  public static ViewExtension getRegistryExtension(String extensionId) {
+    return getInstance().getExtension(extensionId);
   }
 
   public static void deriveRegistryDetails(ViewEditor editor) {

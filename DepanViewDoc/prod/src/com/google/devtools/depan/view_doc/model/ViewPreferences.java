@@ -30,6 +30,8 @@ import com.google.devtools.depan.model.RelationSets;
 import com.google.devtools.depan.nodes.trees.TreeModel;
 import com.google.devtools.depan.platform.ListenerManager;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
+import com.google.devtools.depan.view_doc.eclipse.ViewDocLogger;
+import com.google.devtools.depan.view_doc.eclipse.ui.plugins.ViewExtension;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -43,7 +45,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.logging.Logger;
 
 /**
  * Persistent user preferences for presentation of a graph view.  This is the
@@ -53,9 +54,6 @@ import java.util.logging.Logger;
  * @author <a href="mailto:leeca@google.com">Lee Carver</a>
  */
 public class ViewPreferences {
-
-  private static final Logger logger =
-      Logger.getLogger(ViewPreferences.class.getName());
 
   public static final String EMPTY_DESCRIPTION = "";
 
@@ -118,6 +116,36 @@ public class ViewPreferences {
   private Collapser collapser;
 
   /**
+   * Extension data is stored as a list, but retrieved via hash
+   * tables when the document is opened.
+   */
+  private List<ExtensionData> extensionData;
+
+  /**
+   * Provide efficient lookup for {@link ExtensionData}.
+   * Initialization moved to an explicit public method since XStream
+   * unmarshalling does not set this.
+   */
+  private transient Map<ViewExtension, Map<Object, ExtensionData>>
+      extDataByView;
+
+  /**
+   * Manage objects that are interested in preference changes.
+   * Initialization moved to an explicit public method since XStream
+   * unmarshalling does not set this.
+   */
+  private transient ListenerManager<ExtensionDataListener> extListeners;
+
+  private abstract static class SimpleDataDispatcher
+      implements ListenerManager.Dispatcher<ExtensionDataListener> {
+
+    @Override
+    public void captureException(RuntimeException errAny) {
+      ViewDocLogger.LOG.warning(errAny.toString());
+    }
+  }
+
+  /**
    * Defines the edge matcher used to define the view hierarchy
    */
   @SuppressWarnings("unused")  // Should be useful soon.
@@ -141,7 +169,7 @@ public class ViewPreferences {
 
     @Override
     public void captureException(RuntimeException errAny) {
-      logger.warning(errAny.toString());
+      ViewDocLogger.LOG.warning(errAny.toString());
     }
   }
 
@@ -199,17 +227,10 @@ public class ViewPreferences {
   }
 
   /**
-   * Initialize transient fields.  This is used directly in the XStream
-   * unmarshalling converter, since none of the constructors are actually
-   * invoked.
-   */
-  public void initTransients() {
-    listeners = new ListenerManager<ViewPrefsListener>();
-  }
-
-  /**
    * Populate any required fields after an unmarshall(), since that process
-   * by-passes the constructors.
+   * by-passes the constructors.  This method should execute before any other
+   * operations (e.g. {@link #initTransients()} to ensure the object is
+   * semantically complete.
    */
   public void afterUnmarshall() {
     if (null == scenePrefs) {
@@ -242,6 +263,23 @@ public class ViewPreferences {
     if (null == collapser) {
       collapser = new Collapser();
     }
+    if (null == extensionData) {
+      extensionData = Lists.newArrayList();
+    }
+  }
+
+  /**
+   * Initialize transient fields.  This is used directly in the XStream
+   * unmarshalling converter, since none of the constructors are actually
+   * invoked.  This method should run after {@link #afterUnmarshall()}, since
+   * that methods ensures a complete object state.
+   */
+  public void initTransients() {
+    listeners = new ListenerManager<ViewPrefsListener>();
+
+    // Extension-data transient fields
+    extDataByView = buildExtensionLookup(extensionData);
+    extListeners = new ListenerManager<ExtensionDataListener>();
   }
 
   /**
@@ -668,5 +706,147 @@ public class ViewPreferences {
             Collections.<CollapseData> emptyList(), delta, null);
       }
     });
+  }
+
+  /////////////////////////////////////
+  // Manipulate the extension data
+
+  public ExtensionData getExtensionData(
+      ViewExtension ext, Object instance) {
+    Map<Object, ExtensionData> result = extDataByView.get(ext);
+    if (null == result) {
+      return null;
+    }
+    return result.get(instance);
+  }
+
+  public ExtensionData getExtensionData(ViewExtension ext) {
+    Map<Object, ExtensionData> result = extDataByView.get(ext);
+    if (null == result) {
+      return null;
+    }
+    int size = result.size();
+    if (0 == size) {
+      return null;
+    }
+    if (1 == size) {
+      return result.values().iterator().next();
+    }
+    throw new IllegalStateException(
+        "At most one extension data element allowed.  Found " + size + ".");
+  }
+
+  public void setExtensionData(
+      ViewExtension ext, Object instance, ExtensionData data) {
+    Map<Object, ExtensionData> insts = extDataByView.get(ext);
+    if (null == insts) {
+      insts = Maps.newHashMap();
+      extDataByView.put(ext, insts);
+    }
+    insts.put(instance, data);
+    updateData(ext, instance, data);
+
+    fireExtensionDataChange(ext, instance, data);
+  }
+
+  public void setExtensionData(
+      ViewExtension ext, Object instance, ExtensionData data,
+      Object propId, Object updates) {
+    Map<Object, ExtensionData> insts = extDataByView.get(ext);
+    if (null == insts) {
+      insts = Maps.newHashMap();
+      extDataByView.put(ext, insts);
+    }
+    insts.put(instance, data);
+    updateData(ext, instance, data);
+
+    // Fire specific change event
+    extListeners.fireEvent(new SimpleDataDispatcher() {
+      @Override
+      public void dispatch(ExtensionDataListener listener) {
+        listener.extensionDataChanged(ext, instance, propId, updates);
+      }
+    });
+
+    // Also fire generic data change event
+    fireExtensionDataChange(ext, instance, data);
+  }
+
+  public void addExtensionDataListener(ExtensionDataListener listener) {
+    extListeners.addListener(listener);
+  }
+
+  public void removeExtensionDataListener(ExtensionDataListener listener) {
+    extListeners.removeListener(listener);
+  }
+
+  private void fireExtensionDataChange(
+      ViewExtension ext, Object instance, ExtensionData data) {
+    extListeners.fireEvent(new SimpleDataDispatcher() {
+      @Override
+      public void dispatch(ExtensionDataListener listener) {
+        listener.extensionDataChanged(ext, instance, null, data);
+      }
+    });
+  }
+
+  /**
+   * Build a new extension map from the supplied list of extensions.
+   */
+  private Map<ViewExtension, Map<Object, ExtensionData>>
+      buildExtensionLookup(List<ExtensionData> buildData) {
+    Map<ViewExtension, Map<Object, ExtensionData>> result = Maps.newHashMap();
+    for (ExtensionData data : buildData) {
+      ViewExtension extension = data.getExtension();
+
+      Map<Object, ExtensionData> insts = result.get(extension);
+      if (null == insts) {
+        insts = Maps.newHashMap();
+        result.put(extension, insts);
+      }
+      insts.put(data.getInstance(), data);
+    }
+    return result;
+  }
+
+  private void updateData(
+      ViewExtension ext, Object instance, ExtensionData data) {
+    if (null != data) {
+      insertData(ext, instance, data);
+      return;
+    }
+    removeData(ext, instance);
+  }
+
+  private void insertData(
+      ViewExtension ext, Object instance, ExtensionData data) {
+    int item = findData(ext, instance);
+    if (item >= 0) {
+      extensionData.set(item, data);
+    }
+    extensionData.add(data);
+  }
+
+  private void removeData(ViewExtension ext, Object instance) {
+    int item = findData(ext, instance);
+    if (item >=0) {
+      extensionData.remove(item);
+    }
+  }
+
+  private int findData(ViewExtension ext, Object instance) {
+    for (int index = 0; index < extensionData.size(); index++) {
+      ExtensionData test = extensionData.get(index);
+      if (!ext.equals(test.getExtension())) {
+        return -1;
+      }
+      if (null == instance) {
+        return (null == test.getInstance() ? -1 : index);
+      }
+      if (instance.equals(test.getInstance())) {
+        return index;
+      }
+    }
+    return -1;
   }
 }

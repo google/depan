@@ -21,9 +21,11 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Widget;
 
 /**
  * Utility methods for SWT widgets and JFace viewers.
@@ -173,5 +175,12 @@ public class Widgets {
    */
   public static GridData buildTrailFillData() {
     return new GridData(SWT.TRAIL, SWT.FILL, true, false);
+  }
+
+  /**
+   * When you need to tweak a layout.
+   */
+  public static GridData getLayoutData(Control control) {
+    return (GridData) control.getLayoutData();
   }
 }

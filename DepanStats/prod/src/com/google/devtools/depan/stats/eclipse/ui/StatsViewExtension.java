@@ -24,30 +24,22 @@ import com.google.devtools.depan.eclipse.visualization.ogl.NodeRatioSupplier;
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeShapeSupplier;
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeSizeSupplier;
 import com.google.devtools.depan.eclipse.visualization.ogl.ShapeFactory;
-import com.google.devtools.depan.graph.api.EdgeMatcher;
-import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptors;
-import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
+import com.google.devtools.depan.stats.jung.JungStatistics;
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
 import com.google.devtools.depan.view_doc.eclipse.ui.plugins.ViewExtension;
+import com.google.devtools.depan.view_doc.eclipse.ui.plugins.ViewExtensionRegistry;
 import com.google.devtools.depan.view_doc.model.NodeColorMode;
 import com.google.devtools.depan.view_doc.model.NodeRatioMode;
 import com.google.devtools.depan.view_doc.model.NodeShapeMode;
 import com.google.devtools.depan.view_doc.model.NodeSizeMode;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 import java.awt.Color;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import edu.uci.ics.jung.algorithms.importance.KStepMarkov;
-import edu.uci.ics.jung.graph.DirectedGraph;
 
 /**
  * Install metrics-base rendering criteria.
@@ -56,8 +48,12 @@ import edu.uci.ics.jung.graph.DirectedGraph;
  */
 public class StatsViewExtension implements ViewExtension {
 
+  public static final String EXTENSION_ID =
+      "com.google.devtools.depan.stats.eclipse.ui.StatsViewExtension";
+
   private static final ColorMap DEFAULT_CM =
       new ColorMap(ColorMapDefJet.CM, 256);
+
   private static final NodeColorSupplier ROOT_COLOR =
       new NodeColorSupplier.Monochrome(Color.GREEN);
 
@@ -108,6 +104,12 @@ public class StatsViewExtension implements ViewExtension {
   /////////////////////////////////////
   // Public API
 
+  public static StatsViewExtension getInstance() {
+    ViewExtension result =
+        ViewExtensionRegistry.getRegistryExtension(EXTENSION_ID);
+    return (StatsViewExtension) result;
+  }
+
   @Override
   public Collection<NodeColorMode> getNodeColorModes() {
     return NODE_COLOR_MODES;
@@ -136,47 +138,47 @@ public class StatsViewExtension implements ViewExtension {
   public void prepareView(ViewEditor editor) {
     // Step 1: Build Jung graph.
     GraphModel model = editor.getViewGraph();
-    EdgeMatcher<String> matcher = getEdgeMatcher(editor);
-    DirectedGraph<GraphNode, GraphEdge> jungInfo =
-        JungBuilder.build(model, matcher);
+    StatsExtensionData data = StatsExtensionData.getStatsData(editor, this);
+    data.calcJungStatistics(model);
+    JungStatistics stats = data.getJungStatistics();
 
-    // Step 2: Rank nodes and extract summary statistics.
-    int maxDegree = calcMaxDegree(model.getNodes(), jungInfo);
+    // Step 2: Extract summary statistics.
+    int maxDegree = stats.getMaxDegree(model.getNodes());
+    double maxRank = stats.getMaxRank(model.getNodes());
 
-    Map<GraphNode, Double> ranking = rankGraph(model.getNodesSet(), jungInfo);
-    Collection<GraphNode> roots = calcRoots(ranking);
-    float maxRank = calcMaxRank(ranking);
+    // Hoist auto-boxing out of loop.
+    float maxDegreeFlt = (float) maxDegree;
+    float maxRankFlt = (float) maxRank;
 
     // Step 3:  Assign analysis results to rendering properties.
-    float maxDegFlt = maxDegree;  // Hoist autoboxing out of loop.
     for (GraphNode node : model.getNodes()) {
-      int degree = getNodeDegree(jungInfo, node);
+      int degree = stats.getDegree(node);
+      double rank = stats.getRank(node);
 
-      Double rankVal = ranking.get(node);
-      float rank = (null == rankVal) ? 0.0f : rankVal.floatValue();
+      float degreeFlt = (float) degree;
+      float rankFlt = (float) rank;
 
       NodeColorSupplier degreeColor =
-          getColorSupplier(DEFAULT_CM, degree, maxDegFlt);
+          getColorSupplier(DEFAULT_CM, degreeFlt, maxDegreeFlt);
       editor.setNodeColorByMode(node, COLOR_DEGREE_MODE_ID, degreeColor);
       NodeColorSupplier voltageColor =
-          getColorSupplier(DEFAULT_CM, rank, maxRank);
+          getColorSupplier(DEFAULT_CM, rankFlt, maxRankFlt);
       editor.setNodeColorByMode(node, COLOR_VOLTAGE_MODE_ID, voltageColor);
 
       editor.setNodeShapeByMode(
           node, SHAPE_DEGREE_MODE_ID, getShapeSupplier(degree));
 
-      NodeSizeSupplier degreeSize = getSizeSupplier(degree, maxDegFlt);
+      NodeSizeSupplier degreeSize = getSizeSupplier(degreeFlt, maxDegreeFlt);
       editor.setNodeSizeByMode(node, SIZE_DEGREE_MODE_ID, degreeSize);
-      NodeSizeSupplier voltageSize = getSizeSupplier(rank, maxRank);
+      NodeSizeSupplier voltageSize = getSizeSupplier(rankFlt, maxRankFlt);
       editor.setNodeSizeByMode(node, SIZE_VOLTAGE_MODE_ID, voltageSize);
 
-      NodeRatioSupplier degreeRatio = getRatioSupplier(degree, maxDegFlt);
+      NodeRatioSupplier degreeRatio = getRatioSupplier(degreeFlt, maxDegreeFlt);
       editor.setNodeRatioByMode(node, RATIO_DEGREE_MODE_ID, degreeRatio);
     }
 
-    for (GraphNode node : roots) {
+    for (GraphNode node : stats.getRootNodes()) {
       editor.setNodeColorByMode(node, COLOR_ROOT_MODE_ID, ROOT_COLOR);
-      
     }
   }
 
@@ -232,70 +234,5 @@ public class StatsViewExtension implements ViewExtension {
       return alt;
     }
     return num / den;
-  }
-
-  private EdgeMatcher<String> getEdgeMatcher(ViewEditor editor) {
-    String matcher = editor.getOption(StatsPreferences.STATS_MATCHER_ID);
-    return GraphEdgeMatcherDescriptors.FORWARD.getInfo();
-  }
-
-  private Map<GraphNode, Double> rankGraph(
-      Set<GraphNode> nodes,
-      DirectedGraph<GraphNode, GraphEdge> jungInfo) {
-
-    KStepMarkov<GraphNode, GraphEdge> ranker =
-        new KStepMarkov<GraphNode, GraphEdge>(jungInfo, nodes, 6, null);
-    ranker.setRemoveRankScoresOnFinalize(false);
-    ranker.evaluate();
-
-    Map<GraphNode, Double> result = Maps.newHashMap();
-    for (GraphNode node : nodes) {
-      result.put(node, ranker.getVertexRankScore(node));
-    }
-    return result;
-  }
-
-  /**
-   * Degree could vary, based on ins or outs only, or based on edges
-   * instead of successors.
-   */
-  private int getNodeDegree(
-      DirectedGraph<GraphNode, GraphEdge> jungInfo, GraphNode node) {
-    return jungInfo.getPredecessorCount(node)
-        + jungInfo.getSuccessorCount(node);
-  }
-
-  private int calcMaxDegree(
-      Collection<GraphNode> nodes,
-      DirectedGraph<GraphNode, GraphEdge> jungInfo) {
-    int result = 0;
-
-    for (GraphNode node : nodes) {
-      int degree = getNodeDegree(jungInfo, node);
-      result = Math.max(result, degree);
-    }
-    return result;
-  }
-
-  private Collection<GraphNode> calcRoots(Map<GraphNode, Double> ranking) {
-    List<GraphNode> result = Lists.newArrayList();
-    for (Entry<GraphNode, Double> entry : ranking.entrySet()) {
-      if (0.0 == entry.getValue()) {
-        result.add(entry.getKey());
-      }
-    }
-    return result;
-  }
-
-  private float calcMaxRank(Map<GraphNode, Double> ranking) {
-    double result = 0.0;
-
-    for (Double rank : ranking.values()) {
-      if (null != rank) {
-        result = Math.max(result, rank.doubleValue());
-      }
-    }
-
-    return (float) result;
   }
 }

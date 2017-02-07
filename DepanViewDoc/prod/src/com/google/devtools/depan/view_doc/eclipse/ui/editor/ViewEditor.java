@@ -57,6 +57,7 @@ import com.google.devtools.depan.platform.WorkspaceTools;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 import com.google.devtools.depan.view_doc.eclipse.ViewDocLogger;
+import com.google.devtools.depan.view_doc.eclipse.ui.plugins.ViewExtension;
 import com.google.devtools.depan.view_doc.eclipse.ui.plugins.ViewExtensionRegistry;
 import com.google.devtools.depan.view_doc.eclipse.ui.trees.NodeCompactor;
 import com.google.devtools.depan.view_doc.eclipse.ui.trees.ViewEditorNodeViewerProvider;
@@ -67,6 +68,8 @@ import com.google.devtools.depan.view_doc.layout.LayoutGenerators;
 import com.google.devtools.depan.view_doc.layout.LayoutUtil;
 import com.google.devtools.depan.view_doc.layout.grid.GridLayoutGenerator;
 import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty;
+import com.google.devtools.depan.view_doc.model.ExtensionData;
+import com.google.devtools.depan.view_doc.model.ExtensionDataListener;
 import com.google.devtools.depan.view_doc.model.NodeColorMode;
 import com.google.devtools.depan.view_doc.model.NodeDisplayProperty;
 import com.google.devtools.depan.view_doc.model.NodeRatioMode;
@@ -488,6 +491,31 @@ public class ViewEditor extends MultiPageEditorPart {
       nodeFilter = new SteppingFilter(name);
     }
     return nodeFilter;
+  }
+
+  /////////////////////////////////////
+  // Extension Data API
+
+  public ExtensionData getExtensionData(ViewExtension extension) {
+    return viewInfo.getExtensionData(extension);
+  }
+
+  public ExtensionData getExtensionData(
+      ViewExtension extension, Object instance) {
+    return viewInfo.getExtensionData(extension, instance);
+  }
+
+  public void setExtensionData(
+      ViewExtension extension, Object instance, ExtensionData data) {
+    viewInfo.setExtensionData(extension, instance, data);
+  }
+
+  public void addExtensionDataListener(ExtensionDataListener listener) {
+    viewInfo.addExtensionDataListener(listener);
+  }
+
+  public void removeExtensionDataListener(ExtensionDataListener listener) {
+    viewInfo.removeExtensionDataListener(listener);
   }
 
   /////////////////////////////////////

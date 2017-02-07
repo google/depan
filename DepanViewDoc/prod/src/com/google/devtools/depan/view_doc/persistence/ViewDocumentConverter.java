@@ -114,8 +114,8 @@ public class ViewDocumentConverter
 
       // TODO: Converter for ViewPreferences
       ViewPreferences viewPrefs = (ViewPreferences) unmarshalObject(reader, context);
-      viewPrefs.initTransients();
       viewPrefs.afterUnmarshall();
+      viewPrefs.initTransients();
 
       return new ViewDocument(viewInfo, viewNodes, viewPrefs);
     } finally {

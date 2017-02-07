@@ -31,6 +31,7 @@ import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.builder.api.GraphBuilders;
 import com.google.devtools.depan.nodes.trees.TreeModel;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
+import com.google.devtools.depan.view_doc.eclipse.ui.plugins.ViewExtension;
 
 import com.google.common.collect.ImmutableList;
 
@@ -240,6 +241,37 @@ public class ViewDocument {
 
   public void setOption(String optionId, String value) {
     userPrefs.setOption(optionId, value);
+  }
+
+  /////////////////////////////////////
+  // Extension Data API
+
+  public ExtensionData getExtensionData(ViewExtension extension) {
+    return userPrefs.getExtensionData(extension);
+  }
+
+  public ExtensionData getExtensionData(
+      ViewExtension extension, Object instance) {
+    return userPrefs.getExtensionData(extension, instance);
+  }
+
+  public void setExtensionData(
+      ViewExtension ext, Object instance, ExtensionData data) {
+    userPrefs.setExtensionData(ext, instance, data);
+  }
+
+  public void setExtensionData(
+      ViewExtension ext, Object instance, ExtensionData data,
+      Object propId, Object updates) {
+    userPrefs.setExtensionData(ext, instance, data, propId, updates);
+  }
+
+  public void addExtensionDataListener(ExtensionDataListener listener) {
+    userPrefs.addExtensionDataListener(listener);
+  }
+
+  public void removeExtensionDataListener(ExtensionDataListener listener) {
+    userPrefs.removeExtensionDataListener(listener);
   }
 
   /////////////////////////////////////
