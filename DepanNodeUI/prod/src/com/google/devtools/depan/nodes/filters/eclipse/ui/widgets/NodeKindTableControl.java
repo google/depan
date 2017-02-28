@@ -21,16 +21,15 @@ import com.google.devtools.depan.platform.AlphabeticSorter;
 import com.google.devtools.depan.platform.InverseSorter;
 import com.google.devtools.depan.platform.LabelProviderToString;
 import com.google.devtools.depan.platform.eclipse.ui.tables.EditColTableDef;
+import com.google.devtools.depan.platform.eclipse.ui.widgets.Selections;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.BaseLabelProvider;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
@@ -47,7 +46,6 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 
 import java.util.Collection;
-import java.util.Iterator;
 
 /**
  * A control for selecting a set of Element types.
@@ -148,19 +146,8 @@ public class NodeKindTableControl extends Composite {
   }
 
   private Collection<ElementKindDescriptor> getSelectedDescr() {
-
     ISelection selection = kindViewer.getSelection();
-    if (!(selection instanceof IStructuredSelection)) {
-      return ImmutableList.of();
-    }
-
-    Collection<ElementKindDescriptor> result = Sets.newHashSet();
-    @SuppressWarnings("rawtypes")
-    Iterator iter = ((IStructuredSelection) selection).iterator();
-    while (iter.hasNext()) {
-      result.add((ElementKindDescriptor) iter.next());
-    }
-    return result;
+    return Selections.getSelection(selection, ElementKindDescriptor.class);
   }
 
   public void setInput(Collection<ElementKindDescriptor> elementKinds) {

@@ -31,11 +31,6 @@ import com.google.devtools.depan.graph_doc.model.DependencyModel;
 public class GraphEdgeMatcherDescriptor
     extends ModelAnalysisDocument<EdgeMatcher<String>>{
 
-  /**
-   * Preferred file extension for documents.
-   */
-  public static final String EXTENSION = "gemxml";
-
   public GraphEdgeMatcherDescriptor(
       String name, DependencyModel model, EdgeMatcher<String> info) {
     super(name, model, info);

@@ -17,8 +17,8 @@
 package com.google.devtools.depan.matchers.eclipse.ui.widgets;
 
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
-import com.google.devtools.depan.matchers.models.MatcherResources;
 import com.google.devtools.depan.matchers.persistence.EdgeMatcherDocXmlPersist;
+import com.google.devtools.depan.matchers.persistence.GraphEdgeMatcherResources;
 import com.google.devtools.depan.persistence.AbstractDocXmlPersist;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.GenericSaveLoadControl;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.SaveLoadConfig;
@@ -50,7 +50,7 @@ public abstract class EdgeMatcherSaveLoadControl
 
     @Override
     public ResourceContainer getContainer() {
-      return MatcherResources.getContainer();
+      return GraphEdgeMatcherResources.getContainer();
     }
 
     @Override
@@ -70,8 +70,13 @@ public abstract class EdgeMatcherSaveLoadControl
     }
 
     @Override
+    public String getBaseName() {
+      return GraphEdgeMatcherResources.EXTENSION;
+    }
+
+    @Override
     public String getExension() {
-      return GraphEdgeMatcherDescriptor.EXTENSION;
+      return GraphEdgeMatcherResources.EXTENSION;
     }
   }
 }

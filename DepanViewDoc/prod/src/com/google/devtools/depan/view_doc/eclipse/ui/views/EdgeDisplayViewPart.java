@@ -16,19 +16,27 @@
 
 package com.google.devtools.depan.view_doc.eclipse.ui.views;
 
+import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 import com.google.devtools.depan.view_doc.eclipse.ViewDocResources;
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
+import com.google.devtools.depan.view_doc.eclipse.ui.widgets.EdgeDisplaySaveLoadControl;
 import com.google.devtools.depan.view_doc.eclipse.ui.widgets.EdgeDisplayTableControl;
+import com.google.devtools.depan.view_doc.model.EdgeDisplayDocument;
 import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty;
 import com.google.devtools.depan.view_doc.model.EdgeDisplayRepository;
 import com.google.devtools.depan.view_doc.model.ViewPrefsListener;
 
+import com.google.common.collect.Maps;
+
+import org.eclipse.core.resources.IProject;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 
 import java.util.Collection;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Tool for setting display properties for individual edges.
@@ -49,14 +57,14 @@ public class EdgeDisplayViewPart extends AbstractViewDocViewPart {
 
   private EdgeDisplayRepository propRepo;
 
-  private static class ToolEdgeDisplayRepo
+  private static class PartEdgeDisplayRepo
       implements EdgeDisplayRepository {
 
     private final ViewEditor editor;
 
-    private EdgeDisplayListener prefsListener;
+    private PartPrefsListener prefsListener;
 
-    public ToolEdgeDisplayRepo(ViewEditor editor) {
+    public PartEdgeDisplayRepo(ViewEditor editor) {
       this.editor = editor;
     }
 
@@ -72,7 +80,7 @@ public class EdgeDisplayViewPart extends AbstractViewDocViewPart {
 
     @Override
     public void addChangeListener(ChangeListener listener) {
-      prefsListener = new EdgeDisplayListener(listener);
+      prefsListener = new PartPrefsListener(listener);
       editor.addViewPrefsListener(prefsListener);
     }
 
@@ -84,11 +92,11 @@ public class EdgeDisplayViewPart extends AbstractViewDocViewPart {
     }
   }
 
-  private static class EdgeDisplayListener extends ViewPrefsListener.Simple {
+  private static class PartPrefsListener extends ViewPrefsListener.Simple {
 
     private EdgeDisplayRepository.ChangeListener listener;
 
-    public EdgeDisplayListener(EdgeDisplayRepository.ChangeListener listener) {
+    public PartPrefsListener(EdgeDisplayRepository.ChangeListener listener) {
       this.listener = listener;
     }
 
@@ -121,11 +129,37 @@ public class EdgeDisplayViewPart extends AbstractViewDocViewPart {
 
     propEditor = new EdgeDisplayTableControl(result);
     propEditor.setLayoutData(Widgets.buildGrabFillData());
+
+    Composite saves = setupSaveButtons(result);
+    saves.setLayoutData(Widgets.buildHorzFillData());
   }
 
   @Override
   protected void disposeGui() {
     releaseResources();
+  }
+
+  private Composite setupSaveButtons(Composite parent) {
+    EdgeDisplaySaveLoadControl result =
+        new EdgeDisplaySaveLoadControl(parent) {
+
+          @Override
+          protected IProject getProject() {
+            return EdgeDisplayViewPart.this.getProject();
+          }
+
+          @Override
+          protected EdgeDisplayDocument buildSaveResource() {
+            return EdgeDisplayViewPart.this.buildSaveResource();
+          }
+
+          @Override
+          protected void installLoadResource(EdgeDisplayDocument doc) {
+            EdgeDisplayViewPart.this.installLoadResource(doc);
+          }
+      
+    };
+    return result;
   }
 
   /////////////////////////////////////
@@ -136,10 +170,9 @@ public class EdgeDisplayViewPart extends AbstractViewDocViewPart {
 
     ViewEditor editor = getEditor();
 
-    propRepo = new ToolEdgeDisplayRepo(editor);
+    propRepo = new PartEdgeDisplayRepo(editor);
     propEditor.setEdgeDisplayRepository(propRepo);
 
-    // TODO: Should come from editor
     Collection<GraphEdge> edges = editor.getExposedGraph().getEdges();
     propEditor.setInput(edges);
     propEditor.update();
@@ -149,5 +182,41 @@ public class EdgeDisplayViewPart extends AbstractViewDocViewPart {
   protected void releaseResources() {
     propEditor.removeEdgeDisplayRepository(propRepo);
     propRepo = null;
+  }
+
+  private IProject getProject() {
+    return getEditor().getResourceProject();
+  }
+
+  protected EdgeDisplayDocument buildSaveResource() {
+    Collection<GraphEdge> relations = propEditor.getSelection();
+    Map<GraphEdge, EdgeDisplayProperty> props =
+        buildEdgeDisplayProperties(relations);
+
+    ViewEditor ed = getEditor();
+    String name = ed.getBaseName();
+    DependencyModel model = ed.getDependencyModel();
+    return new EdgeDisplayDocument(name, model, props);
+  }
+
+  protected void installLoadResource(EdgeDisplayDocument doc) {
+    if (null == doc) {
+      return;
+    }
+
+    Map<GraphEdge, EdgeDisplayProperty> info = doc.getInfo();
+    for (Entry<GraphEdge, EdgeDisplayProperty> entry : info.entrySet()) {
+      propRepo.setDisplayProperty(entry.getKey(), entry.getValue());
+    }
+  }
+
+  private Map<GraphEdge, EdgeDisplayProperty> buildEdgeDisplayProperties(
+      Collection<GraphEdge> edges) {
+
+    Map<GraphEdge, EdgeDisplayProperty> result = Maps.newHashMap();
+    for (GraphEdge edge : edges) {
+      result.put(edge, propRepo.getDisplayProperty(edge));
+    }
+    return result;
   }
 }

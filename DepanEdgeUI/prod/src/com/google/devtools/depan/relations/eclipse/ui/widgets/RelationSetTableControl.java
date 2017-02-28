@@ -24,10 +24,10 @@ import com.google.devtools.depan.platform.InverseSorter;
 import com.google.devtools.depan.platform.LabelProviderToString;
 import com.google.devtools.depan.platform.PlatformResources;
 import com.google.devtools.depan.platform.eclipse.ui.tables.EditColTableDef;
+import com.google.devtools.depan.platform.eclipse.ui.widgets.Selections;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 import com.google.devtools.depan.relations.models.RelationSetRepository;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -36,7 +36,6 @@ import org.eclipse.jface.viewers.CheckboxCellEditor;
 import org.eclipse.jface.viewers.ICellModifier;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -54,7 +53,6 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
 import java.util.Collection;
-import java.util.Iterator;
 
 /**
  * Show a table of {@link Relation}s, marked visible/included.  The
@@ -227,17 +225,7 @@ public class RelationSetTableControl extends Composite {
 
   public Collection<Relation> getSelectedRelations() {
     ISelection selection = relSetViewer.getSelection();
-    if (!(selection instanceof IStructuredSelection)) {
-      return ImmutableList.of();
-    }
-
-    Collection<Relation> result = Sets.newHashSet();
-    @SuppressWarnings("rawtypes")
-    Iterator iter = ((IStructuredSelection) selection).iterator();
-    while (iter.hasNext()) {
-      result.add((Relation) iter.next());
-    }
-    return result;
+    return Selections.getSelection(selection, Relation.class);
   }
 
   public void setSelectedRelations(

@@ -44,6 +44,8 @@ public final class PlatformResources {
       getImageDescriptor("icons/not.png");
   public static final ImageDescriptor IMAGE_DESC_DEFAULT =
       getImageDescriptor("icons/sample.gif");
+  public static final ImageDescriptor IMAGE_DESC_LIBRARY_OBJ =
+      getImageDescriptor("icons/library_obj.png");
 
   public static final Image IMAGE_HANDTOOL =
       getImage(getImageDescriptor("icons/hand.png"));

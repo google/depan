@@ -17,9 +17,11 @@
 package com.google.devtools.depan.remap_doc.eclipse.ui.editors;
 
 import com.google.devtools.depan.platform.CollectionContentProvider;
+import com.google.devtools.depan.platform.eclipse.ui.widgets.Selections;
 import com.google.devtools.depan.remap_doc.model.MigrationGroup;
 import com.google.devtools.depan.remap_doc.model.MigrationTask;
 
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
@@ -98,9 +100,8 @@ public class MigrationGroupListViewer {
    * @return the first element selected in the list, or null if none.
    */
   public MigrationGroup getSelected() {
-    IStructuredSelection selection =
-        (IStructuredSelection) table.getSelection();
-    return (MigrationGroup) selection.getFirstElement();
+    ISelection selection = table.getSelection();
+    return Selections.getFirstElement(selection, MigrationGroup.class);
   }
 
   /**

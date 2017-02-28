@@ -21,6 +21,7 @@ import com.google.devtools.depan.resource_doc.eclipse.ui.wizards.AbstractResouce
 import com.google.devtools.depan.resource_doc.eclipse.ui.wizards.ResourceOptionWizard;
 import com.google.devtools.depan.resource_doc.eclipse.ui.wizards.ResourceOutputPart;
 import com.google.devtools.depan.view_doc.model.RelationDisplayDocument;
+import com.google.devtools.depan.view_doc.persistence.RelationDisplayResources;
 
 import com.google.common.base.Strings;
 
@@ -41,9 +42,6 @@ import org.eclipse.swt.widgets.Text;
  * @author ycoppel@google.com (Yohann Coppel)
  */
 public class NewRelationDisplayDocPage extends AbstractResouceWizardPage {
-
-  public static final String DEFAULT_FILENAME =
-      "edges." + RelationDisplayDocument.EXTENSION;
 
   private final RelationDisplayDocument propInfo;
 
@@ -66,14 +64,17 @@ public class NewRelationDisplayDocPage extends AbstractResouceWizardPage {
   @Override
   protected ResourceOutputPart createOutputPart(
       AbstractResouceWizardPage containingPage) {
-    IContainer outputContainer = guessContainer();
+
+    IContainer outputContainer = getResourceContainer(
+        RelationDisplayResources.getContainer());
+    String filename = RelationDisplayResources.getBaseNameExt();
     String outputFilename = StorageTools.guessNewFilename(
-        outputContainer, DEFAULT_FILENAME, 1, 10);
+        outputContainer, filename, 1, 10);
 
     return new ResourceOutputPart(
         this, "Edge display properties location",
         outputContainer, outputFilename,
-        RelationDisplayDocument.EXTENSION);
+        RelationDisplayResources.EXTENSION);
   }
 
   @Override

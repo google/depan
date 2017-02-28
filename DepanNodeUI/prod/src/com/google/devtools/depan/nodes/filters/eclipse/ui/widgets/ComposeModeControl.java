@@ -19,12 +19,12 @@ package com.google.devtools.depan.nodes.filters.eclipse.ui.widgets;
 import com.google.devtools.depan.nodes.filters.sequence.ComposeMode;
 import com.google.devtools.depan.platform.AlphabeticSorter;
 import com.google.devtools.depan.platform.ViewerObjectToString;
+import com.google.devtools.depan.platform.eclipse.ui.widgets.Selections;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -92,21 +92,16 @@ public class ComposeModeControl extends Composite {
   private class ControlSelectionChangedListener
       implements ISelectionChangedListener {
 
-    private Object choice;
+    private ComposeMode choice;
 
     @Override
     public void selectionChanged(SelectionChangedEvent event) {
       ISelection selection = event.getSelection();
-      if (!(selection instanceof IStructuredSelection)) {
-        choice = null;
-      }
-
-      IStructuredSelection select = (IStructuredSelection) selection;
-      choice = select.getFirstElement();
+      choice = Selections.getFirstElement(selection, ComposeMode.class);
     }
 
     public ComposeMode getChoice() {
-      return (ComposeMode) choice;
+      return choice;
     }
   }
 }

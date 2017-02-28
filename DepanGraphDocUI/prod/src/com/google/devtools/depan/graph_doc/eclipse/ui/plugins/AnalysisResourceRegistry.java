@@ -17,19 +17,18 @@
 package com.google.devtools.depan.graph_doc.eclipse.ui.plugins;
 
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptors;
-import com.google.devtools.depan.matchers.models.MatcherResources;
+import com.google.devtools.depan.matchers.persistence.GraphEdgeMatcherResources;
 import com.google.devtools.depan.platform.PlatformLogger;
 import com.google.devtools.depan.platform.plugin.ContributionEntry;
 import com.google.devtools.depan.platform.plugin.ContributionRegistry;
 import com.google.devtools.depan.relations.models.RelationSetDescriptors;
-import com.google.devtools.depan.relations.models.RelationSetResources;
+import com.google.devtools.depan.relations.persistence.RelationSetResources;
 import com.google.devtools.depan.resources.PropertyDocument;
 import com.google.devtools.depan.resources.ResourceContainer;
 import com.google.devtools.depan.resources.analysis.AnalysisResources;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
-
 
 /**
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
@@ -90,7 +89,7 @@ public class AnalysisResourceRegistry
   }
 
   private static void installBuiltInResources(ResourceContainer root) {
-    ResourceContainer matchers = MatcherResources.getContainer();
+    ResourceContainer matchers = GraphEdgeMatcherResources.getContainer();
     addResource(matchers, GraphEdgeMatcherDescriptors.FORWARD);
     addResource(matchers, GraphEdgeMatcherDescriptors.EMPTY);
 

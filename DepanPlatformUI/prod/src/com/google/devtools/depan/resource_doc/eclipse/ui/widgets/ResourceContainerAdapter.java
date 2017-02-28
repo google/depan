@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 The Depan Project Authors
+ * Copyright 2017 The Depan Project Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -16,17 +16,21 @@
 
 package com.google.devtools.depan.resource_doc.eclipse.ui.widgets;
 
+import com.google.devtools.depan.platform.PlatformResources;
 import com.google.devtools.depan.resources.ResourceContainer;
+
+import com.google.common.collect.Lists;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 /**
- * [Aug-2016] Based on {@code NodeWrapperAdapter}.
+ * Adapts a {@link ResourceContainer()} to a {@link IWorkbenchAdapter}.
+ * 
+ * Orders children as other containers first, then documents.
  * 
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
@@ -43,8 +47,7 @@ class ResourceContainerAdapter implements IWorkbenchAdapter {
   @Override
   public ImageDescriptor getImageDescriptor(Object element) {
     if (element instanceof ResourceContainer) {
-      // TODO: Support plugin contributed resource types
-      return null;
+      return PlatformResources.IMAGE_DESC_LIBRARY_OBJ;
     }
     return null;
   }
@@ -52,7 +55,7 @@ class ResourceContainerAdapter implements IWorkbenchAdapter {
   @Override
   public String getLabel(Object element) {
     if (element instanceof ResourceContainer) {
-      ((ResourceContainer) element).getLabel();
+      return ((ResourceContainer) element).getLabel();
     }
     return element.toString();
   }
@@ -71,10 +74,10 @@ class ResourceContainerAdapter implements IWorkbenchAdapter {
   private Object[] buildDescendants(ResourceContainer rsrcCntr) {
     Collection<ResourceContainer> children = rsrcCntr.getChildren();
     Collection<Object> resources = rsrcCntr.getResources();
-    Object[] result = new Object[children.size() + resources.size()];
-    List<Object> builder = Arrays.asList(result);
-    builder.addAll(children);
-    builder.addAll(resources);
-    return result;
+    int size = children.size() + resources.size();
+    List<Object> result = Lists.newArrayListWithExpectedSize(size);
+    result.addAll(children);
+    result.addAll(resources);
+    return result.toArray();
   }
 }

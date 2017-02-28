@@ -21,10 +21,10 @@ import com.google.devtools.depan.edges.matchers.GraphEdgeMatchers;
 import com.google.devtools.depan.graph.api.RelationSet;
 import com.google.devtools.depan.graph_doc.eclipse.ui.plugins.AnalysisResourceInstaller;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
-import com.google.devtools.depan.matchers.models.MatcherResources;
+import com.google.devtools.depan.matchers.persistence.GraphEdgeMatcherResources;
 import com.google.devtools.depan.model.GraphEdgeMatcher;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
-import com.google.devtools.depan.relations.models.RelationSetResources;
+import com.google.devtools.depan.relations.persistence.RelationSetResources;
 import com.google.devtools.depan.resources.ResourceContainer;
 
 /**
@@ -38,7 +38,7 @@ public class JavaAnalysisResourcePlugin implements
 
   @Override
   public void installResource(ResourceContainer installRoot) {
-    installMatchers(MatcherResources.getContainer());
+    installMatchers(GraphEdgeMatcherResources.getContainer());
     installRelSets(RelationSetResources.getContainer());
   }
 

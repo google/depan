@@ -16,10 +16,10 @@
 
 package com.google.devtools.depan.nodes.filters.eclipse.ui.widgets;
 
-import com.google.devtools.depan.nodes.filters.eclipse.ui.filters.ContextualFilterDocument;
-import com.google.devtools.depan.nodes.filters.eclipse.ui.persistence.ContextualFilterResources;
-import com.google.devtools.depan.nodes.filters.eclipse.ui.persistence.ContextualFilterXmlPersist;
 import com.google.devtools.depan.nodes.filters.model.ContextualFilter;
+import com.google.devtools.depan.nodes.filters.model.ContextualFilterDocument;
+import com.google.devtools.depan.nodes.filters.persistence.ContextualFilterResources;
+import com.google.devtools.depan.nodes.filters.persistence.ContextualFilterXmlPersist;
 import com.google.devtools.depan.persistence.AbstractDocXmlPersist;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.SaveLoadConfig;
 import com.google.devtools.depan.resources.ResourceContainer;
@@ -57,7 +57,12 @@ public class ContextualFilterSaveLoadConfig
   }
 
   @Override
+  public String getBaseName() {
+    return ContextualFilterResources.BASE_NAME;
+  }
+
+  @Override
   public String getExension() {
-    return ContextualFilterDocument.EXTENSION;
+    return ContextualFilterResources.EXTENSION;
   }
 }

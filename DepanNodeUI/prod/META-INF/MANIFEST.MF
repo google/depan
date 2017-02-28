@@ -27,9 +27,10 @@ Export-Package:
  com.google.devtools.depan.eclipse.ui.nodes.trees,
  com.google.devtools.depan.eclipse.ui.nodes.viewers,
  com.google.devtools.depan.nodes.filters.eclipse.ui.filters,
- com.google.devtools.depan.nodes.filters.eclipse.ui.persistence,
  com.google.devtools.depan.nodes.filters.eclipse.ui.plugins,
- com.google.devtools.depan.nodes.filters.eclipse.ui.widgets
+ com.google.devtools.depan.nodes.filters.eclipse.ui.widgets,
+ com.google.devtools.depan.nodes.filters.model,
+ com.google.devtools.depan.nodes.filters.persistence
 Bundle-ClassPath: .
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: com.google.devtools.depan.eclipse.ui.nodes.NodesUIActivator

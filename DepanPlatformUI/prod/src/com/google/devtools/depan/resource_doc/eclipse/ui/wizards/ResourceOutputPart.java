@@ -224,6 +224,12 @@ public class ResourceOutputPart {
     return fileText.getText();
   }
 
+
+  public String getResourceName() {
+    return new Path(fileText.getText())
+        .removeFileExtension().toPortableString();
+  }
+
   /**
    * @param containerName
    * @param fileName

@@ -55,12 +55,12 @@ public class RelationDisplayDocumentXmlPersist
   @Override
   protected String logLoadException(URI uri, Exception err) {
     return logException(
-        "Unable to load edge display properties from {0}", uri, err);
+        "Unable to load relation display properties from {0}", uri, err);
   }
 
   @Override
   public String logSaveException(URI uri, Exception err) {
     return logException(
-        "Unable to load edge display properties to {0}", uri, err);
+        "Unable to load relation display properties to {0}", uri, err);
   }
 }

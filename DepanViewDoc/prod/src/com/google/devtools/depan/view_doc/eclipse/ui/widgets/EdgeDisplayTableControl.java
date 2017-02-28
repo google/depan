@@ -23,6 +23,7 @@ import com.google.devtools.depan.platform.Colors;
 import com.google.devtools.depan.platform.InverseSorter;
 import com.google.devtools.depan.platform.LabelProviderToString;
 import com.google.devtools.depan.platform.eclipse.ui.tables.EditColTableDef;
+import com.google.devtools.depan.platform.eclipse.ui.widgets.Selections;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty;
 import com.google.devtools.depan.view_doc.model.EdgeDisplayRepository;
@@ -33,6 +34,7 @@ import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColorCellEditor;
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
 import org.eclipse.jface.viewers.ICellModifier;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
@@ -179,6 +181,11 @@ public class EdgeDisplayTableControl extends Composite {
    */
   public void setInput(Collection<GraphEdge> edges) {
     propViewer.setInput(edges);
+  }
+
+  public Collection<GraphEdge> getSelection() {
+    ISelection selection = propViewer.getSelection();
+    return Selections.getSelection(selection, GraphEdge.class);
   }
 
   public void setEdgeDisplayRepository(EdgeDisplayRepository edgeDisplayRepo) {

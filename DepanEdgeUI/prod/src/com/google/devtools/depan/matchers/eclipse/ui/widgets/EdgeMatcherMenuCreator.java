@@ -21,7 +21,7 @@ import com.google.devtools.depan.platform.ListenerManager.Dispatcher;
 import com.google.devtools.depan.edge_ui.EdgeUILogger;
 import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
-import com.google.devtools.depan.matchers.models.MatcherResources;
+import com.google.devtools.depan.matchers.persistence.GraphEdgeMatcherResources;
 
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.swt.SWT;
@@ -119,7 +119,7 @@ public class EdgeMatcherMenuCreator implements IMenuCreator {
 
     menu = newMenu;
 
-    List<GraphEdgeMatcherDescriptor> matchers = MatcherResources.getMatchers(model);
+    List<GraphEdgeMatcherDescriptor> matchers = GraphEdgeMatcherResources.getMatchers(model);
     if (matchers.isEmpty()) {
       return null;
     }

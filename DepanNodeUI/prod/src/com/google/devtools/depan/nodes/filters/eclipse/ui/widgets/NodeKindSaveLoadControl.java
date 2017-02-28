@@ -17,9 +17,10 @@
 package com.google.devtools.depan.nodes.filters.eclipse.ui.widgets;
 
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
-import com.google.devtools.depan.matchers.models.MatcherResources;
-import com.google.devtools.depan.nodes.filters.eclipse.ui.filters.NodeKindDocument;
-import com.google.devtools.depan.nodes.filters.eclipse.ui.persistence.NodeKindDocXmlPersist;
+import com.google.devtools.depan.matchers.persistence.GraphEdgeMatcherResources;
+import com.google.devtools.depan.nodes.filters.model.NodeKindDocument;
+import com.google.devtools.depan.nodes.filters.persistence.NodeKindDocXmlPersist;
+import com.google.devtools.depan.nodes.filters.persistence.NodeKindResources;
 import com.google.devtools.depan.persistence.AbstractDocXmlPersist;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.GenericSaveLoadControl;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.SaveLoadConfig;
@@ -54,7 +55,7 @@ public abstract class NodeKindSaveLoadControl
 
     @Override
     public ResourceContainer getContainer() {
-      return MatcherResources.getContainer();
+      return GraphEdgeMatcherResources.getContainer();
     }
 
     @Override
@@ -74,8 +75,13 @@ public abstract class NodeKindSaveLoadControl
     }
 
     @Override
+    public String getBaseName() {
+      return NodeKindResources.BASE_NAME;
+    }
+
+    @Override
     public String getExension() {
-      return GraphEdgeMatcherDescriptor.EXTENSION;
+      return GraphEdgeMatcherResources.EXTENSION;
     }
   }
 }

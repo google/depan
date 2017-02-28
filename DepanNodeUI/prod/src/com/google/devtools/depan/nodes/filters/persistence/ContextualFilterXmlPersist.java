@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.nodes.filters.eclipse.ui.persistence;
+package com.google.devtools.depan.nodes.filters.persistence;
 
-import com.google.devtools.depan.nodes.filters.eclipse.ui.filters.ContextualFilterDocument;
+import com.google.devtools.depan.nodes.filters.model.ContextualFilterDocument;
 import com.google.devtools.depan.persistence.AbstractDocXmlPersist;
 import com.google.devtools.depan.persistence.ObjectXmlPersist;
 import com.google.devtools.depan.persistence.XStreamFactory;

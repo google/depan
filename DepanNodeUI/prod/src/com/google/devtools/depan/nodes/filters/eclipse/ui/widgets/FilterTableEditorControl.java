@@ -16,11 +16,11 @@
 
 package com.google.devtools.depan.nodes.filters.eclipse.ui.widgets;
 
-import com.google.devtools.depan.nodes.filters.eclipse.ui.filters.ContextualFilterDocument;
 import com.google.devtools.depan.nodes.filters.eclipse.ui.plugins.ContextualFilterContributor;
 import com.google.devtools.depan.nodes.filters.eclipse.ui.plugins.ContextualFilterContributors;
 import com.google.devtools.depan.nodes.filters.eclipse.ui.plugins.ContextualFilterRegistry;
 import com.google.devtools.depan.nodes.filters.model.ContextualFilter;
+import com.google.devtools.depan.nodes.filters.model.ContextualFilterDocument;
 import com.google.devtools.depan.nodes.filters.sequence.SteppingFilter;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 

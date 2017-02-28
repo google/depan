@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 The Depan Project Authors
+ * Copyright 2017 The Depan Project Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package com.google.devtools.depan.resource_doc.eclipse.ui.widgets;
 
 import com.google.devtools.depan.platform.TypeAdapter;
+import com.google.devtools.depan.resources.PropertyDocument;
 import com.google.devtools.depan.resources.ResourceContainer;
 
 import com.google.common.collect.Lists;
@@ -31,7 +32,7 @@ import java.util.List;
  * 
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public class ResourceContainerAdapterFactory implements IAdapterFactory {
+public class ResourcesAdapterFactory implements IAdapterFactory {
 
   private static List<TypeAdapter> knownAdapters = buildKnownAdapters();
 
@@ -42,7 +43,11 @@ public class ResourceContainerAdapterFactory implements IAdapterFactory {
   private static List<TypeAdapter> buildKnownAdapters() {
     List<TypeAdapter> result = Lists.newArrayList();
     result.add(new TypeAdapter(
+        ResourceRoot.class, new ResourceRootAdapter()));
+    result.add(new TypeAdapter(
         ResourceContainer.class, new ResourceContainerAdapter()));
+    result.add(new TypeAdapter(
+        PropertyDocument.class, new PropertyDocumentAdapter()));
     return result;
   }
 

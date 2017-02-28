@@ -22,26 +22,17 @@ import com.google.devtools.depan.graph.registry.RelationRegistry;
 import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 import com.google.devtools.depan.relations.eclipse.ui.widgets.RelationSetEditorControl;
-import com.google.devtools.depan.relations.eclipse.ui.wizards.NewRelationSetWizard;
+import com.google.devtools.depan.relations.eclipse.ui.widgets.RelationSetSaveLoadControl;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 import com.google.devtools.depan.relations.models.RelationSetRepository;
-import com.google.devtools.depan.relations.persistence.RelationSetDescriptorXmlPersist;
 import com.google.devtools.depan.view_doc.eclipse.ViewDocResources;
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
 import com.google.devtools.depan.view_doc.model.ViewPrefsListener;
 
-import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Shell;
 
-import java.io.File;
-import java.net.URI;
 import java.util.Collection;
 
 /**
@@ -57,7 +48,7 @@ public class VisibleRelationsViewPart extends AbstractViewDocViewPart {
   // UX Elements
 
   /**
-   * The <code>RelationSetEditorControl</code> that controls the UX.
+   * The {@code RelationSetEditorControl} that controls the UX.
    */
   private RelationSetEditorControl relationSetEditor;
 
@@ -154,64 +145,26 @@ public class VisibleRelationsViewPart extends AbstractViewDocViewPart {
   }
 
   private Composite setupSaveButtons(Composite parent) {
-    Composite result = Widgets.buildGridContainer(parent, 2);
+    RelationSetSaveLoadControl result =
+        new RelationSetSaveLoadControl(parent) {
 
-    Button saveRels = Widgets.buildGridPushButton(
-        result, "Save visible as RelationSet...");
-    saveRels.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        saveSelection();
-      }
-    });
+          @Override
+          protected IProject getProject() {
+            return VisibleRelationsViewPart.this.getProject();
+          }
 
-    Button loadRels = Widgets.buildGridPushButton(
-        result, "Load visible from RelationSet...");
-    loadRels.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        loadSelection();
-      }
-    });
+          @Override
+          protected RelationSetDescriptor buildSaveResource() {
+            return VisibleRelationsViewPart.this.buildSaveResource();
+          }
 
+          @Override
+          protected void installLoadResource(RelationSetDescriptor doc) {
+            VisibleRelationsViewPart.this.installLoadResource(doc);
+          }
+      
+    };
     return result;
-  }
-
-  /**
-   * Open a dialog to save the current selection under a new name.
-   */
-  private void saveSelection() {
-
-    RelationSet vizRelSet = getEditor().getVisibleRelationSet();
-    DependencyModel model = getEditor().getDependencyModel();
-    RelationSetDescriptor relSetDescr = new RelationSetDescriptor(
-        "- unnamed -", model, vizRelSet);
-    NewRelationSetWizard wizard = new NewRelationSetWizard(relSetDescr);
-
-    Shell shell = getSite().getWorkbenchWindow().getShell();
-    WizardDialog dialog = new WizardDialog(shell, wizard);
-    dialog.open();
-  }
-
-  private void loadSelection() {
-    Shell shell = getSite().getWorkbenchWindow().getShell();
-    FileDialog dialog = new FileDialog(shell, SWT.OPEN);
-    dialog.setFilterExtensions(new String[] {RelationSetDescriptor.EXTENSION});
-    String visFilename = dialog.open();
-    if (null == visFilename) {
-      return;
-    }
-
-    URI visURI = new File(visFilename).toURI();
-    RelationSetDescriptorXmlPersist loader =
-        RelationSetDescriptorXmlPersist.build(true);
-    RelationSetDescriptor visDescr = loader.load(visURI);
-    RelationSet visRels = visDescr.getInfo();
-
-    ViewEditor ed = getEditor();
-    for (Relation relation : RelationRegistry.getRegistryRelations()) {
-      ed.setVisibleRelation(relation, visRels.contains(relation));
-    }
   }
 
   /////////////////////////////////////
@@ -233,5 +186,29 @@ public class VisibleRelationsViewPart extends AbstractViewDocViewPart {
   protected void releaseResources() {
     relationSetEditor.removeRelationSetRepository(vizRepo);
     vizRepo = null;
+  }
+
+  private IProject getProject() {
+    return vizRepo.editor.getResourceProject();
+  }
+
+  private RelationSetDescriptor buildSaveResource() {
+    ViewEditor editor = getEditor();
+    RelationSet vizRelSet = editor.getVisibleRelationSet();
+
+    String name = editor.getBaseName();
+    DependencyModel model = editor.getDependencyModel();
+    return new RelationSetDescriptor(name, model, vizRelSet);
+  }
+
+  private void installLoadResource(RelationSetDescriptor doc) {
+    if (null == doc) {
+      return;
+    }
+
+    ViewEditor ed = getEditor();
+    for (Relation relation : RelationRegistry.getRegistryRelations()) {
+      ed.setVisibleRelation(relation, doc.getInfo().contains(relation));
+    }
   }
 }

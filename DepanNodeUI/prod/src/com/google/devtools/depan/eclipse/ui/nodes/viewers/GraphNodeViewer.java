@@ -19,6 +19,7 @@ package com.google.devtools.depan.eclipse.ui.nodes.viewers;
 import com.google.devtools.depan.eclipse.ui.nodes.NodesUIResources;
 import com.google.devtools.depan.eclipse.ui.nodes.trees.NodeWrapperTreeSorter;
 import com.google.devtools.depan.model.GraphNode;
+import com.google.devtools.depan.platform.eclipse.ui.widgets.Selections;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 
 import org.eclipse.core.runtime.PlatformObject;
@@ -26,7 +27,6 @@ import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -42,6 +42,8 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
+
+import java.util.List;
 
 /**
  * Provide tree structured viewer for all node lists.
@@ -147,20 +149,16 @@ public class GraphNodeViewer extends Composite {
       @Override
       public void menuAboutToShow(IMenuManager manager) {
         ISelection selection = viewer.getSelection();
-        if (selection.isEmpty()) {
+        List<?> choices = Selections.getObjects(selection);
+        if (choices.isEmpty()) {
           return;
         }
-
-        if (!(selection instanceof IStructuredSelection)) {
-          return;
-        }
-        IStructuredSelection items = (IStructuredSelection) selection;
-        if (items.size() > 1) {
+        if (choices.size() > 1) {
           addMultiActions(manager);
           return;
         }
 
-        Object menuElement = items.getFirstElement();
+        Object menuElement = Selections.getFirstObject(selection);
         addItemActions(manager, menuElement);
       }});
 

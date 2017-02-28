@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.matchers.models;
+package com.google.devtools.depan.matchers.persistence;
 
 import com.google.devtools.depan.graph_doc.model.DependencyModel;
+import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
+import com.google.devtools.depan.persistence.StorageTools;
 import com.google.devtools.depan.resources.ResourceContainer;
 import com.google.devtools.depan.resources.analysis.AnalysisResources;
 
@@ -27,20 +29,31 @@ import java.util.List;
 /**
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public class MatcherResources {
+public class GraphEdgeMatcherResources {
 
+  /** Name of resource tree container for matcher resources. */
   public static final String MATCHERS = "matchers";
+
+  /** Base file name for a new matcher resource. */
+  public static final String BASE_NAME = "Edge Matcher";
+
+  /** Expected extensions for a matcher resource. */
+  public static final String EXTENSION = "gemxml";
 
   static {
     AnalysisResources.getRoot().addChild(MATCHERS);
   }
 
-  private MatcherResources() {
+  private GraphEdgeMatcherResources() {
     // Prevent instantiation.
   }
 
   public static ResourceContainer getContainer() {
     return AnalysisResources.getRoot().getChild(MATCHERS);
+  }
+
+  public static String getBaseNameExt() {
+    return StorageTools.getBaseNameExt(BASE_NAME, EXTENSION);
   }
 
   public static List<GraphEdgeMatcherDescriptor> getMatchers(

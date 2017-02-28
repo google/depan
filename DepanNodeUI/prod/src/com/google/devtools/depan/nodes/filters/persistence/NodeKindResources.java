@@ -14,53 +14,32 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.nodes.filters.eclipse.ui.persistence;
+package com.google.devtools.depan.nodes.filters.persistence;
 
-import com.google.devtools.depan.graph_doc.model.DependencyModel;
-import com.google.devtools.depan.nodes.filters.eclipse.ui.filters.ContextualFilterDocument;
 import com.google.devtools.depan.resources.ResourceContainer;
 import com.google.devtools.depan.resources.analysis.AnalysisResources;
-
-import com.google.common.collect.Lists;
-
-import java.util.List;
 
 /**
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public class ContextualFilterResources {
+public class NodeKindResources {
 
-  public static final String FILTERS = "filters";
+  public static final String FILTERS = "nodes";
+
+  public static final String BASE_NAME = null;
+
+  /** Preferred file extension for documents. */
+  public static final String EXTENSION = "nkxml";
 
   static {
     AnalysisResources.getRoot().addChild(FILTERS);
   }
 
-  private ContextualFilterResources() {
+  private NodeKindResources() {
     // Prevent instantiation.
   }
 
   public static ResourceContainer getContainer() {
     return AnalysisResources.getRoot().getChild(FILTERS);
-  }
-
-  public static List<ContextualFilterDocument> getMatchers(
-      DependencyModel model) {
-
-    List<ContextualFilterDocument> result = Lists.newArrayList();
-
-    // Filter for GEMs with the supplied model.
-    for (Object resource : getContainer().getResources()) {
-        if (resource instanceof ContextualFilterDocument) {
-          ContextualFilterDocument checkFilter =
-              (ContextualFilterDocument) resource;
-
-          if (checkFilter.forModel(model)) {
-            result.add(checkFilter);
-          }
-        }
-      }
-
-    return result;
   }
 }

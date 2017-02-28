@@ -17,16 +17,17 @@
 package com.google.devtools.depan.relations.eclipse.ui.widgets;
 
 import com.google.devtools.depan.edge_ui.EdgeUILogger;
+import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.platform.AlphabeticSorter;
 import com.google.devtools.depan.platform.ListenerManager;
 import com.google.devtools.depan.platform.ViewerObjectToString;
+import com.google.devtools.depan.platform.eclipse.ui.widgets.Selections;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
@@ -166,14 +167,8 @@ public class RelationSetSelectorControl extends Composite {
    *   {@code null} in case of error.
    */
   private RelationSetDescriptor extractFromSelection(ISelection selection) {
-    if (!(selection instanceof IStructuredSelection)) {
-      return null;
-    }
-    IStructuredSelection select = (IStructuredSelection) selection;
-    if (select.getFirstElement() instanceof RelationSetDescriptor) {
-      return (RelationSetDescriptor) select.getFirstElement();
-    }
-    return null;
+    return Selections.getFirstElement(
+        selection, RelationSetDescriptor.class);
   }
 
   /////////////////////////////////////

@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 
 import java.net.URI;
+import java.text.MessageFormat;
 
 /**
  * A utility class that provides static methods for manipulating Eclipse
@@ -111,6 +112,48 @@ public final class StorageTools {
 
     // Fall back to the bare filename
     return newFilename;
+  }
+
+  public static IPath guessNewFilename(
+      IContainer container, IPath srcPath, int start, int limit) {
+    // Quick exit if container is no help
+    if (null == container) {
+      return srcPath;
+    }
+
+    // No point in testing if no variants are allowed
+    if (limit < start) {
+      return srcPath;
+    }
+
+    // Quick exit if proposed name does not exist
+    if (!container.exists(srcPath)) {
+      return srcPath;
+    }
+
+    // Try to find an unused numbered variant
+    int trial = 1;
+    String ext = srcPath.getFileExtension();
+    String base = srcPath.removeFileExtension().toPortableString();
+    do {
+      String name = MessageFormat.format("{0} ({1})", base, trial);
+      IPath newPath = Path.fromPortableString(name).addFileExtension(ext);
+      if (!container.exists(newPath)) {
+        return newPath;
+      }
+      ++trial;
+    } while (trial < limit);
+
+    // Fall back to the bare filename
+    return srcPath;
+  }
+
+  public static String getBaseNameExt(String baseName, String ext) {
+    return getBaseNameExtPath(baseName, ext).toPortableString();
+  }
+
+  public static IPath getBaseNameExtPath(String baseName, String ext) {
+    return new Path(baseName).addFileExtension(ext);
   }
 
   /**

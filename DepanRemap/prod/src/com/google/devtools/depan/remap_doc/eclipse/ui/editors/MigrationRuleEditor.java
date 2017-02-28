@@ -18,14 +18,15 @@ package com.google.devtools.depan.remap_doc.eclipse.ui.editors;
 
 import com.google.devtools.depan.platform.CollectionContentProvider;
 import com.google.devtools.depan.platform.TableContentProvider;
+import com.google.devtools.depan.platform.eclipse.ui.widgets.Selections;
 import com.google.devtools.depan.remap_doc.eclipse.ui.widgets.DoubleElementEditorChooser;
 import com.google.devtools.depan.remap_doc.model.MigrationGroup;
 import com.google.devtools.depan.remap_doc.model.MigrationRule;
 import com.google.devtools.depan.remap_doc.model.MigrationTask;
 
 import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -173,11 +174,11 @@ public class MigrationRuleEditor extends MigrationTaskAdapter {
 
       @Override
       public void selectionChanged(SelectionChangedEvent event) {
-        IStructuredSelection selection =
-          (IStructuredSelection) groupSelect.getSelection();
-        if ((selection.size() > 0)
-            && (selection.getFirstElement() instanceof MigrationGroup)) {
-          newGroupSelection((MigrationGroup) selection.getFirstElement());
+        ISelection selection = groupSelect.getSelection();
+        MigrationGroup group =
+            Selections.getFirstElement(selection, MigrationGroup.class);
+        if (null != group) {
+          newGroupSelection(group);
         } else {
           newGroupSelection(null);
           deselectRule();
@@ -189,11 +190,11 @@ public class MigrationRuleEditor extends MigrationTaskAdapter {
 
       @Override
       public void selectionChanged(SelectionChangedEvent event) {
-        IStructuredSelection selection =
-            (IStructuredSelection) rules.getSelection();
-        if ((selection.size() > 0)
-            && (selection.getFirstElement() instanceof MigrationRule)) {
-          newRuleSelection((MigrationRule<?>) selection.getFirstElement());
+        ISelection selection = rules.getSelection();
+        MigrationRule<?> rule =
+            Selections.getFirstElement(selection, MigrationRule.class);
+        if (rule != null) {
+          newRuleSelection(rule);
         }
       }
     });

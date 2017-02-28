@@ -22,6 +22,7 @@ Bundle-ClassPath: .
 Export-Package: com.google.devtools.depan.matchers.eclipse.ui.widgets,
  com.google.devtools.depan.matchers.eclipse.ui.wizards,
  com.google.devtools.depan.matchers.models,
+ com.google.devtools.depan.matchers.persistence,
  com.google.devtools.depan.relations.eclipse.ui.widgets,
  com.google.devtools.depan.relations.eclipse.ui.wizards,
  com.google.devtools.depan.relations.models,

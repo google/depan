@@ -40,8 +40,6 @@ import java.util.Set;
 public class RelationSetDescriptor
     extends ModelAnalysisDocument<RelationSet>{
 
-  public static final String EXTENSION = "relxml";
-
   public RelationSetDescriptor(
       String name, ModelMatcher matcher, RelationSet info) {
     super(name, matcher, info);
@@ -82,7 +80,7 @@ public class RelationSetDescriptor
      */
     public Builder(String name, DependencyModel model) {
       this.name = name;
-      this.model =model;
+      this.model = model;
     }
 
     public void addRelation(Relation relation) {

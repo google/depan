@@ -27,7 +27,7 @@ import com.google.devtools.depan.relations.eclipse.ui.widgets.RelationSetSaveLoa
 import com.google.devtools.depan.relations.models.RelationSetDescrRepo;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 import com.google.devtools.depan.relations.models.RelationSetDescriptors;
-import com.google.devtools.depan.relations.models.RelationSetResources;
+import com.google.devtools.depan.relations.persistence.RelationSetResources;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.swt.SWT;

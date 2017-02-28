@@ -27,16 +27,16 @@ import com.google.devtools.depan.platform.ListenerManager;
 import com.google.devtools.depan.platform.PlatformResources;
 import com.google.devtools.depan.platform.ViewerObjectToString;
 import com.google.devtools.depan.platform.eclipse.ui.tables.EditColTableDef;
+import com.google.devtools.depan.platform.eclipse.ui.widgets.Selections;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CheckboxCellEditor;
 import org.eclipse.jface.viewers.ICellModifier;
-import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
@@ -47,7 +47,6 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -267,16 +266,9 @@ public class EdgeMatcherTableControl extends Composite {
     invertReverseRelations(getSelectedRelations());
   }
 
-  private List<Relation> getSelectedRelations() {
-    List<?> selection = ((IStructuredSelection) viewer.getSelection()).toList();
-    List<Relation> result =
-        Lists.newArrayListWithExpectedSize(selection.size());
-    for (Object item : selection) {
-      if (item instanceof Relation) {
-        result.add((Relation) item);
-      }
-    }
-    return result;
+  private Collection<Relation> getSelectedRelations() {
+    ISelection selection = viewer.getSelection();
+    return Selections.getSelection(selection, Relation.class);
   }
 
   @SuppressWarnings("unchecked")

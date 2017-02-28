@@ -11,6 +11,14 @@
             name="Edge Matcher"
             project="true">
       </wizard>
+      <wizard
+            category="com.google.devtools.depan.eclipse.ui.wizards"
+            class="com.google.devtools.depan.relations.eclipse.ui.wizards.NewRelationSetWizard"
+            icon="icons/relpicker.png"
+            id="com.google.devtools.depan.relations.eclipse.ui.wizards.NewRelationSetWizard"
+            name="Relation Set"
+            project="true">
+      </wizard>
    </extension>
    <extension
          point="org.eclipse.ui.editors">
@@ -23,7 +31,6 @@
       </editor>
       <editor
             class="com.google.devtools.depan.relations.eclipse.ui.editors.RelationSetDescriptorEditor"
-            default="false"
             extensions="relxml"
             icon="icons/relpicker.png"
             id="com.google.devtools.depan.relations.eclipse.ui.editors.RelationSetDescriptorEditor"
@@ -36,6 +43,10 @@
       <xstream_config
             class="com.google.devtools.depan.matchers.persistence.EdgeMatcherDocXStreamConfig"
             id="com.google.devtools.depan.matchers.persistence.EdgeMatcherDocXStreamConfig">
+      </xstream_config>
+      <xstream_config
+            class="com.google.devtools.depan.relations.persistence.RelationSetDescriptorXStreamConfig"
+            id="com.google.devtools.depan.relations.persistence.RelationSetDescriptorXStreamConfig">
       </xstream_config>
    </extension>
 

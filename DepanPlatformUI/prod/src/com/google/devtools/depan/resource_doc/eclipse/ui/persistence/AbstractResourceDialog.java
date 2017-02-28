@@ -19,7 +19,7 @@ package com.google.devtools.depan.resource_doc.eclipse.ui.persistence;
 import com.google.devtools.depan.platform.PlatformLogger;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 import com.google.devtools.depan.resource_doc.eclipse.ui.widgets.ProjectResourceControl;
-import com.google.devtools.depan.resource_doc.eclipse.ui.widgets.ProjectResourceControl.UpdateListener;
+import com.google.devtools.depan.resources.ResourceContainer;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -38,11 +38,17 @@ import org.eclipse.swt.widgets.Shell;
  */
 public abstract class AbstractResourceDialog extends TitleAreaDialog {
 
-  private ProjectResourceControl rsrcLoc;
-  private IContainer container;
+  private ResourceContainer container;
+  private IContainer rsrcRoot;
   private String fileName;
   private String fileExt;
+
   private IFile result;
+
+  /////////////////////////////////////
+  // UX Elements
+
+  private ProjectResourceControl rsrcLoc;
 
   public AbstractResourceDialog(Shell parentShell) {
     super(parentShell);
@@ -52,12 +58,18 @@ public abstract class AbstractResourceDialog extends TitleAreaDialog {
   /**
    * Hook method to {@link #configureShell(Shell)}.
    */
-  abstract protected void decorateShell(Shell shell);
+  protected abstract void decorateShell(Shell shell);
 
   /**
    * Hook method to {@link #createContents(Composite)}.
    */
-  abstract protected void decorateDialog();
+  protected abstract void decorateDialog();
+
+  /**
+   * Hook method to {@link #createContents(Composite)}.
+   */
+  protected abstract ProjectResourceControl buildResourceControl(
+      Composite parent);
 
   @Override
   protected boolean isResizable() {
@@ -83,16 +95,7 @@ public abstract class AbstractResourceDialog extends TitleAreaDialog {
   protected Control createDialogArea(Composite parent) {
     Composite result = (Composite) super.createDialogArea(parent);
 
-    UpdateListener relay = new UpdateListener() {
-
-      @Override
-      public void onUpdate() {
-        onResourceUpdate();
-      }
-    };
-
-    rsrcLoc = new ProjectResourceControl(
-        result, getShell(), relay, container, fileName, fileExt);
+    rsrcLoc = buildResourceControl(result);
     rsrcLoc.setLayoutData(Widgets.buildGrabFillData());
     return result;
   }
@@ -109,26 +112,50 @@ public abstract class AbstractResourceDialog extends TitleAreaDialog {
     super.okPressed();
   }
 
-  public IFile getResult() throws CoreException {
-    return result;
-  }
-
-  public void setInput(IFile input) {
-    container = input.getParent();
-    fileName = input.getName();
-    fileExt = input.getFileExtension();
-  }
-
-  public void setInput(IContainer container, String fileExt) {
-    this.container = container;
-    fileName = "";
-    this.fileExt = fileExt;
-  }
-
-  private void onResourceUpdate() {
+  protected void onResourceUpdate() {
     String msg = rsrcLoc.validateInputs();
     setErrorMessage(msg);
 
     getButton(IDialogConstants.OK_ID).setEnabled(null == msg);
+  }
+
+  public IFile getResult() {
+    return result;
+  }
+
+  /////////////////////////////////////
+  // Accessors
+
+  public ResourceContainer getContainer() {
+    return container;
+  }
+
+  public IContainer getResourceRoot() {
+    return rsrcRoot;
+  }
+
+  public String getFileName() {
+    return fileName;
+  }
+
+  public String getFileExt() {
+    return fileExt;
+  }
+
+  public void setInput(
+      ResourceContainer container,
+      IContainer rsrcRoot,
+      String fileName,
+      String fileExt) {
+    this.container = container;
+    this.rsrcRoot = rsrcRoot;
+    this.fileName = fileName;
+    this.fileExt = fileExt;
+  }
+
+  public void setInput(ResourceContainer container, IFile input) {
+    setInput(
+        container, input.getParent(),
+        input.getName(), input.getFileExtension());
   }
 }

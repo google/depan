@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.nodes.filters.eclipse.ui.persistence;
+package com.google.devtools.depan.nodes.filters.persistence;
 
-import com.google.devtools.depan.eclipse.ui.nodes.NodesUIResources;
-import com.google.devtools.depan.nodes.filters.eclipse.ui.filters.ContextualFilterDocument;
+import com.google.devtools.depan.nodes.filters.model.NodeKindDocument;
 import com.google.devtools.depan.persistence.XStreamConfig;
-import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -29,24 +27,24 @@ import java.util.Collection;
 import java.util.Collections;
 
 /**
- * Prepare an {@link XStream} for serializing an {@link RelationSetDescriptor}.
+ * Prepare an {@link XStream} for serializing a {@link NodeKindDocument}.
  * 
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public class ContextualFilterXStreamConfig implements XStreamConfig {
+public class NodeKindDocXStreamConfig implements XStreamConfig {
 
-  public static final String CONTEXTUAL_FILTER_DOCUMENT_INFO_TAG =
-      "filter-info";
+  public static final String NODE_KIND_INFO_TAG = "node-kind-info";
 
   @Override
   public void config(XStream xstream) {
     xstream.setMode(XStream.NO_REFERENCES);
-    xstream.alias(
-        CONTEXTUAL_FILTER_DOCUMENT_INFO_TAG, ContextualFilterDocument.class);
+    xstream.alias(NODE_KIND_INFO_TAG, NodeKindDocument.class);
   }
 
   @Override
   public Collection<? extends Bundle> getDocumentBundles() {
-    return Collections.singletonList(NodesUIResources.BUNDLE);
+    // Bundle for document module is provided by
+    // contribution to XStreamConfigRegistry.
+    return Collections.emptyList();
   }
 }

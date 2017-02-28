@@ -16,44 +16,26 @@
 
 package com.google.devtools.depan.view_doc.model;
 
+import com.google.devtools.depan.analysis_doc.model.ModelAnalysisDocument;
 import com.google.devtools.depan.graph.api.Relation;
+import com.google.devtools.depan.graph_doc.model.DependencyModel;
 
 import java.util.Map;
 
 /**
- * Define a persistent document for edge display properties.
+ * Define a persistent document for relation display properties.
  * This document type is intentionally consistent with the
  * {@link ViewDocument}'s relation display properties data structure,
  * and can be created from or inserted into that component.
  * 
- * This should be a project managed resource document.
- * 
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public class RelationDisplayDocument {
+public class RelationDisplayDocument
+  extends ModelAnalysisDocument<Map<Relation, EdgeDisplayProperty>> {
 
-  public static final String EXTENSION = "vrdxml";
-
-  /**
-   * Hash map that contains a list of edge display property objects
-   * for known relations.
-   */
-  private final Map<Relation, EdgeDisplayProperty> relationProperties;
-
-  private final String name;
-
-  public RelationDisplayDocument(String name,
+  public RelationDisplayDocument(
+      String name, DependencyModel model,
       Map<Relation, EdgeDisplayProperty> relationProperties) {
-    super();
-    this.name = name;
-    this.relationProperties = relationProperties;
-  }
-
-  public Map<Relation, EdgeDisplayProperty> getRelationProperties() {
-    return relationProperties;
-  }
-
-  public String getName() {
-    return name;
+    super(name, model, relationProperties);
   }
 }

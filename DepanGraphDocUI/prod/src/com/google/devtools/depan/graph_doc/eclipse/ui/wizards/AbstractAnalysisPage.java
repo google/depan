@@ -58,7 +58,6 @@ public abstract class AbstractAnalysisPage extends AbstractNewDocumentPage {
     String outputFilename = StorageTools.guessNewFilename(
         outputContainer, defaultFilename, 1, 10);
 
-
     return new AbstractNewDocumentOutputPart(
         "Analysis Output File", this, outputContainer,
         GraphDocument.EXTENSION, outputFilename);

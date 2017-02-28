@@ -20,10 +20,10 @@ import com.google.devtools.depan.analysis_doc.model.AnalysisProperties;
 import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptors;
-import com.google.devtools.depan.matchers.models.MatcherResources;
+import com.google.devtools.depan.matchers.persistence.GraphEdgeMatcherResources;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 import com.google.devtools.depan.relations.models.RelationSetDescriptors;
-import com.google.devtools.depan.relations.models.RelationSetResources;
+import com.google.devtools.depan.relations.persistence.RelationSetResources;
 import com.google.devtools.depan.resources.PropertyDocument;
 
 import com.google.common.collect.LinkedHashMultimap;
@@ -34,7 +34,7 @@ import java.util.Set;
 
 /**
  * Provide a {@link GraphResource} Builder that uses the "well-known"
- * {@link MatcherResources} and {@link RelationSetResources} suppliers.
+ * {@link GraphEdgeMatcherResources} and {@link RelationSetResources} suppliers.
  * 
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
@@ -65,7 +65,7 @@ public class GraphResourceBuilder {
 
   public GraphResources build() {
 
-    buildMatcherSets(MatcherResources.getMatchers(model));
+    buildMatcherSets(GraphEdgeMatcherResources.getMatchers(model));
     buildRelationSets(RelationSetResources.getRelationSets(model));
 
     GraphEdgeMatcherDescriptor defMatcher = calcDefMatcher();

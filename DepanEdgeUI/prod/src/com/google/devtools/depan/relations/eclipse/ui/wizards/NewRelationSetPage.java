@@ -18,6 +18,7 @@ package com.google.devtools.depan.relations.eclipse.ui.wizards;
 
 import com.google.devtools.depan.persistence.StorageTools;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
+import com.google.devtools.depan.relations.persistence.RelationSetResources;
 import com.google.devtools.depan.resource_doc.eclipse.ui.wizards.AbstractResouceWizardPage;
 import com.google.devtools.depan.resource_doc.eclipse.ui.wizards.ResourceOptionWizard;
 import com.google.devtools.depan.resource_doc.eclipse.ui.wizards.ResourceOutputPart;
@@ -39,38 +40,41 @@ import org.eclipse.swt.widgets.Text;
  * A wizard page to create a new named relationship set.
  *
  * @author ycoppel@google.com (Yohann Coppel)
- *
  */
 public class NewRelationSetPage extends AbstractResouceWizardPage {
-
-  public static final String DEFAULT_FILENAME =
-      "relset." + RelationSetDescriptor.EXTENSION;
 
   /**
    * The new name for the set.
    */
   private Text setName = null;
 
+  /** Source of initial state. */
+  private RelationSetDescriptor relationSet;
+
   /**
    * Construct the new Wizard page.
    */
-  protected NewRelationSetPage() {
+  protected NewRelationSetPage(RelationSetDescriptor relationSet) {
     super(null,
         "New named set of Relations",
         "Save a RelationSet as a resource.");
+    this.relationSet = relationSet;
   }
 
   @Override
   protected ResourceOutputPart createOutputPart(
       AbstractResouceWizardPage containingPage) {
-    IContainer outputContainer = guessContainer();
+
+    IContainer outputContainer = getResourceContainer(
+        RelationSetResources.getContainer());
+    String filename = RelationSetResources.getBaseNameExt();
     String outputFilename = StorageTools.guessNewFilename(
-        outputContainer, DEFAULT_FILENAME, 1, 10);
+        outputContainer, filename, 1, 10);
 
     return new ResourceOutputPart(
         this, "Relation Set location",
         outputContainer, outputFilename,
-        RelationSetDescriptor.EXTENSION);
+        RelationSetResources.EXTENSION);
   }
 
   @Override
@@ -99,6 +103,7 @@ public class NewRelationSetPage extends AbstractResouceWizardPage {
 
       setName = new Text(result, SWT.BORDER | SWT.SINGLE);
       setName.setLayoutData(fillHorz);
+      setName.setText(guessSetName());
       setName.addModifyListener(new ModifyListener() {
 
         @Override
@@ -108,6 +113,13 @@ public class NewRelationSetPage extends AbstractResouceWizardPage {
       });
 
       return result;
+    }
+
+    private String guessSetName() {
+      if (null != relationSet) {
+        return relationSet.getName();
+      }
+      return getResourceName();
     }
 
     @Override

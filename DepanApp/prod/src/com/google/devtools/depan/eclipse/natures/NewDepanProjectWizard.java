@@ -17,10 +17,13 @@
 package com.google.devtools.depan.eclipse.natures;
 
 import com.google.devtools.depan.eclipse.ApplicationLogger;
-import com.google.devtools.depan.matchers.models.MatcherResources;
-import com.google.devtools.depan.nodes.filters.eclipse.ui.persistence.ContextualFilterResources;
-import com.google.devtools.depan.relations.models.RelationSetResources;
+import com.google.devtools.depan.matchers.persistence.GraphEdgeMatcherResources;
+import com.google.devtools.depan.nodes.filters.persistence.ContextualFilterResources;
+import com.google.devtools.depan.nodes.filters.persistence.NodeKindResources;
+import com.google.devtools.depan.relations.persistence.RelationSetResources;
 import com.google.devtools.depan.resources.ResourceContainer;
+import com.google.devtools.depan.view_doc.persistence.EdgeDisplayResources;
+import com.google.devtools.depan.view_doc.persistence.RelationDisplayResources;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
@@ -28,6 +31,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
 
 import java.text.MessageFormat;
@@ -36,6 +40,8 @@ import java.text.MessageFormat;
  * @author <a href="mailto:leeca@google.com">Lee Carver</a>
  */
 public class NewDepanProjectWizard extends BasicNewProjectResourceWizard {
+
+  private static final String ANALYSIS_FOLDER = "Analysis";
 
   public static final String WIZARD_ID =
       "com.google.devtools.depan.eclipse.natures.NewDepanProjectWizard";
@@ -55,6 +61,7 @@ public class NewDepanProjectWizard extends BasicNewProjectResourceWizard {
       description.setNatureIds(DEPAN_NATURES);
       project.setDescription(description, null);
       buildAnalysisResources();
+      buildWorkResources();
     } catch (CoreException errCore) {
       ApplicationLogger.logException("Failed to create new project", errCore);
     }
@@ -64,13 +71,26 @@ public class NewDepanProjectWizard extends BasicNewProjectResourceWizard {
 
   private void buildAnalysisResources() {
     // TODO: from registered resource containers.
-    buildContainerFolder(MatcherResources.getContainer());
+    buildContainerFolder(GraphEdgeMatcherResources.getContainer());
     buildContainerFolder(ContextualFilterResources.getContainer());
     buildContainerFolder(RelationSetResources.getContainer());
+    buildContainerFolder(RelationDisplayResources.getContainer());
+    buildContainerFolder(EdgeDisplayResources.getContainer());
+    buildContainerFolder(NodeKindResources.getContainer());
+  }
+
+  private void buildWorkResources() {
+    buildContainerFolder(ANALYSIS_FOLDER);
   }
 
   private void buildContainerFolder(ResourceContainer rsrcCntr) {
     IPath rsrcPath = rsrcCntr.getPath();
+    IFolder rsrcFolder = getNewProject().getFolder(rsrcPath);
+    buildContainerFolder(rsrcFolder);
+  }
+
+  private void buildContainerFolder(String path) {
+    IPath rsrcPath = new Path(path);
     IFolder rsrcFolder = getNewProject().getFolder(rsrcPath);
     buildContainerFolder(rsrcFolder);
   }
@@ -88,7 +108,7 @@ public class NewDepanProjectWizard extends BasicNewProjectResourceWizard {
       rsrcFolder.create(false, true, null);
     } catch (CoreException errCore) {
       String msg = MessageFormat.format(
-          "Unable to create resource folder {0}", rsrcFolder.getFullPath());
+          "Unable to create project folder {0}", rsrcFolder.getFullPath());
       ApplicationLogger.logException(msg, errCore);
     }
   }

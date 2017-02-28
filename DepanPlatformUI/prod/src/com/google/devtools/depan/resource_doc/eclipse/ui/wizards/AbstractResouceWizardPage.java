@@ -16,8 +16,8 @@
 
 package com.google.devtools.depan.resource_doc.eclipse.ui.wizards;
 
-import com.google.devtools.depan.graph_doc.model.GraphDocument;
 import com.google.devtools.depan.platform.WorkspaceTools;
+import com.google.devtools.depan.resources.ResourceContainer;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -57,13 +57,6 @@ public abstract class AbstractResouceWizardPage extends WizardPage {
 
     setTitle(pageLabel);
     setDescription(pageDescription);
-  }
-
-  /**
-   * Add the graph document's file extension to the filename.
-   */
-  protected static String createFilename(String filename) {
-    return filename + '.' + GraphDocument.EXTENSION;
   }
 
   @Override
@@ -178,8 +171,10 @@ public abstract class AbstractResouceWizardPage extends WizardPage {
     return new Label(parent, SWT.NONE);
   }
 
-  protected IContainer guessContainer() {
-    return WorkspaceTools.guessContainer(selection);
+  protected IContainer getResourceContainer(
+      ResourceContainer container) {
+    IContainer resources = WorkspaceTools.guessContainer(selection);
+    return resources.getFolder(container.getPath());
   }
 
   /////////////////////////////////////
@@ -189,7 +184,11 @@ public abstract class AbstractResouceWizardPage extends WizardPage {
     return outputPart.getOutputFile();
   }
 
-  public String getOutputFilename () {
+  public String getOutputFilename() {
     return outputPart.getFilename();
+  }
+
+  public String getResourceName() {
+    return outputPart.getResourceName();
   }
 }

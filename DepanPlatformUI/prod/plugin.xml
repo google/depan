@@ -12,7 +12,21 @@
          point="org.eclipse.core.runtime.adapters">
       <factory
             adaptableType="com.google.devtools.depan.resources.ResourceContainer"
-            class="com.google.devtools.depan.resource_doc.eclipse.ui.widgets.ResourceContainerAdapterFactory">
+            class="com.google.devtools.depan.resource_doc.eclipse.ui.widgets.ResourcesAdapterFactory">
+         <adapter
+               type="org.eclipse.ui.model.IWorkbenchAdapter">
+         </adapter>
+      </factory>
+      <factory
+            adaptableType="com.google.devtools.depan.resource_doc.eclipse.ui.widgets.ResourceRoot"
+            class="com.google.devtools.depan.resource_doc.eclipse.ui.widgets.ResourcesAdapterFactory">
+         <adapter
+               type="org.eclipse.ui.model.IWorkbenchAdapter">
+         </adapter>
+      </factory>
+      <factory
+            adaptableType="com.google.devtools.depan.resources.PropertyDocument"
+            class="com.google.devtools.depan.resource_doc.eclipse.ui.widgets.ResourcesAdapterFactory">
          <adapter
                type="org.eclipse.ui.model.IWorkbenchAdapter">
          </adapter>

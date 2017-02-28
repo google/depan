@@ -16,32 +16,22 @@
 
 package com.google.devtools.depan.resource_doc.eclipse.ui.widgets;
 
-import com.google.devtools.depan.platform.PlatformTools;
+import com.google.devtools.depan.platform.WorkspaceTools;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
+import com.google.devtools.depan.resources.ResourceContainer;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.model.IWorkbenchAdapter;
 import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.part.DrillDownComposite;
@@ -56,34 +46,27 @@ import java.text.MessageFormat;
  *
  * @author <a href="leeca@google.com">Lee Carver</a>
  */
-public class ProjectResourceControl extends Composite {
+public abstract class ProjectResourceControl extends Composite {
 
   public static interface UpdateListener {
     void onUpdate();
   }
 
-  private final Shell shell;
-
   // [Aug-2016] Assume only one interested party.
   private final UpdateListener client;
 
-  // External context for this part
-  private String fileName;
+  private final ResourceContainer container;
 
   private IContainer rsrcContainer;
+
+  private String fileName;
 
   private String requiredExt;
 
   /////////////////////////////////////
   // UX elements
 
-  private Text containerText;
-
-  private DrillDownComposite containerControl;
-
   private TreeViewer containerViewer;
-
-  private Text fileText;
 
   /////////////////////////////////////
   // Public methods
@@ -94,60 +77,61 @@ public class ProjectResourceControl extends Composite {
    * @param parent window context for the UI
    */
   public ProjectResourceControl(
-      Composite parent, Shell shell, UpdateListener client,
-      IContainer rsrcContainer, String fileName, String requiredExt) {
+      Composite parent, UpdateListener client,
+      ResourceContainer container, IContainer rsrcContainer,
+      String fileName, String requiredExt) {
     super(parent, SWT.NONE);
     setLayout(Widgets.buildContainerLayout(1));
- 
-    this.shell = shell;
+
     this.client = client;
+    this.container = container;
     this.rsrcContainer = rsrcContainer;
     this.fileName = fileName;
     this.requiredExt = requiredExt;
-
-    Composite contents = setupContents(this);
-    contents.setLayoutData(Widgets.buildGrabFillData());
-
-    validateInputs();
   }
 
-  public String getContainerName() {
-    return containerText.getText();
+  protected String getFileName() {
+    return fileName;
   }
 
-  public String getFileName() {
-    return fileText.getText();
-  }
-
-  public IFile getResourceLocation() throws CoreException {
-    IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-    IResource resource = root.findMember(new Path(getContainerName()));
-    if (!(resource instanceof IContainer) || !resource.exists()) {
-      String msg = MessageFormat.format(
-          "Container \'{0}\' does not exist.", getContainerName());
-      PlatformTools.throwCoreException(
-          msg, "com.google.devtools.depan.platform.ui");
+  public IContainer getSelectedContainer() {
+    ITreeSelection blix = containerViewer.getStructuredSelection();
+    Object item = blix.getFirstElement();
+    if (item instanceof IContainer) {
+      return (IContainer) item;
     }
-
-    IContainer container = (IContainer) resource;
-    final IFile file = container.getFile(new Path(getFileName()));
-    return file;
+    return null;
   }
+
+  public IFile getSelectedDocument() {
+    ITreeSelection blix = containerViewer.getStructuredSelection();
+    Object item = blix.getFirstElement();
+    if (item instanceof IFile) {
+      return (IFile) item;
+    }
+    return null;
+  }
+
+  public abstract IFile getResourceLocation() throws CoreException;
+
+  public abstract String validateInputs();
+
+  /////////////////////////////////////
+  // Support methods for derived types
 
   /**
    * Determine if the inputs are consistent.
    * 
    * @return error string if problems exist, or null if inputs are valid
    */
-  public String validateInputs() {
-    IPath containerPath = Path.fromOSString(getContainerName());
-    IWorkspaceRoot wkspRoot = ResourcesPlugin.getWorkspace().getRoot();
-    IResource container = wkspRoot.findMember(containerPath);
-    String fileName = getFileName();
+  public static String validateInputs(String containerName, String fileName) {
 
-    if (getContainerName().length() == 0) {
+    if (containerName.length() == 0) {
       return "File container must be specified";
     }
+
+    IPath containerPath = WorkspaceTools.buildPath(containerName);
+    IResource container = WorkspaceTools.buildWorkspaceResource(containerPath);
     if (container == null
         || (container.getType()
             & (IResource.PROJECT | IResource.FOLDER)) == 0) {
@@ -159,19 +143,16 @@ public class ProjectResourceControl extends Composite {
     if (fileName.length() == 0) {
       return "File name must be specified";
     }
-    IPath filePath = Path.fromOSString(fileName);
+    IPath filePath = WorkspaceTools.buildPath(fileName);
     if ((1 != filePath.segmentCount()) || (filePath.hasTrailingSeparator())) {
       return "File name cannot be a path";
     }
-    String extCheck = validateExtension(filePath.getFileExtension());
-    if (null != extCheck) {
-      return extCheck;
-    }
+    filePath.getFileExtension();
 
     return null;
   }
 
-  private String validateExtension(String fileExt) {
+  public String validateExtension(String fileExt) {
     if (null == requiredExt) {
       return null;
     }
@@ -197,90 +178,39 @@ public class ProjectResourceControl extends Composite {
   /////////////////////////////////////
   // UX Setup
 
-  private Composite setupContents(Composite parent) {
-    Group result = Widgets.buildGridGroup(parent, "Resource Location", 1);
+  protected abstract Composite setupContents(Composite parent);
 
-    // Container by name
-    containerText = Widgets.buildGridBoxedText(result);
-    containerText.setText(rsrcContainer.getFullPath().toString());
-
-    // Container by tree
-    containerControl = setupContainerControl(result);
-    containerControl.setLayoutData(Widgets.buildGrabFillData());
-
-    // File name selection
-    Composite fileGrp = setupFilenameControl(result);
-    fileGrp.setLayoutData(Widgets.buildHorzFillData());
-
+  protected Text buildContainerText(Composite parent) {
+    Text result = Widgets.buildGridBoxedText(parent);
+    result.setText(rsrcContainer.getFullPath().toString());
     return result;
   }
 
-  private DrillDownComposite setupContainerControl(Composite parent) {
+  protected DrillDownComposite setupContainerControl(Composite parent) {
     DrillDownComposite result = new DrillDownComposite(parent, SWT.BORDER);
 
     containerViewer = new TreeViewer(result, SWT.NONE);
     result.setChildTree(containerViewer);
 
-    IContentProvider provider =
-        new ControlContentProvider(rsrcContainer.getProject());
-    containerViewer.setContentProvider(provider);
+    containerViewer.setContentProvider(new WorkbenchContentProvider());
     containerViewer.setLabelProvider(new WorkbenchLabelProvider());
     containerViewer.setComparator(new ViewerComparator());
     containerViewer.setUseHashlookup(true);
-    containerViewer.setInput(rsrcContainer);
-
-    containerViewer.addSelectionChangedListener(new ISelectionChangedListener () {
-
-      @Override
-      public void selectionChanged(SelectionChangedEvent event) {
-        IStructuredSelection selection =
-            (IStructuredSelection) event .getSelection();
-        handleSelectionChange(selection.getFirstElement());
-      }});
+    containerViewer.setInput(prepareInput());
     return result;
   }
 
-  private void handleSelectionChange(Object selection) {
-    if (selection instanceof IFile) {
-      IFile file = (IFile) selection;
-      fileName = file.getName();
-      rsrcContainer = file.getParent();
-
-      containerText.setText(rsrcContainer.getFullPath().toString());
-      fileText.setText(fileName);
-    }
+  protected void addSelectionChangedListener(
+      ISelectionChangedListener listener) {
+    containerViewer.addSelectionChangedListener(listener);
   }
 
-  private Composite setupFilenameControl(Composite parent) {
-
-    Composite result = Widgets.buildGridContainer(parent, 2);
-    result.setLayoutData(Widgets.buildHorzFillData());
-    Widgets.buildCompactLabel(result, "&File name:");
-
-    fileText = Widgets.buildGridBoxedText(result);
-    fileText.setText(fileName);
-
-    fileText.addModifyListener(new ModifyListener() {
-
-      @Override
-      public void modifyText(ModifyEvent e) {
-        ProjectResourceControl.this.client.onUpdate();
-      }
-    });
-    return result;
+  protected void fireClientOnUpdate() {
+    client.onUpdate();
   }
 
-  private static class ControlContentProvider extends WorkbenchContentProvider {
-
-    private final IProject proj;
-
-    public ControlContentProvider(IProject proj) {
-      this.proj = proj;
-    }
-
-    @Override
-    protected IWorkbenchAdapter getAdapter(Object element) {
-      return super.getAdapter(element);
-    }
+  private ResourceRoot prepareInput() {
+    return new ResourceRoot(
+        ResourceRoot.DEFAULT_LABEL, container, rsrcContainer);
   }
 }

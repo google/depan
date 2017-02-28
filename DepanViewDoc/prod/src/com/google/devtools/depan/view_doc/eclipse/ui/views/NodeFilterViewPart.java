@@ -25,12 +25,12 @@ import com.google.devtools.depan.graph_doc.eclipse.ui.plugins.FromGraphDocWizard
 import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.nodes.filters.context.MapContext;
-import com.google.devtools.depan.nodes.filters.eclipse.ui.filters.ContextualFilterDocument;
 import com.google.devtools.depan.nodes.filters.eclipse.ui.widgets.ContextualFilterSaveLoadConfig;
 import com.google.devtools.depan.nodes.filters.eclipse.ui.widgets.FilterTableEditorControl;
 import com.google.devtools.depan.nodes.filters.model.ContextKey;
 import com.google.devtools.depan.nodes.filters.model.ContextKey.Base;
 import com.google.devtools.depan.nodes.filters.model.ContextualFilter;
+import com.google.devtools.depan.nodes.filters.model.ContextualFilterDocument;
 import com.google.devtools.depan.nodes.filters.model.FilterContext;
 import com.google.devtools.depan.nodes.filters.sequence.SteppingFilter;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Sasher;
@@ -422,12 +422,16 @@ public class NodeFilterViewPart extends AbstractViewDocViewPart {
     ViewEditor editor = getEditor();
     Shell shell = editor.getSite().getShell();
     IProject project = getEditor().getResourceProject();
-    DependencyModel model = editor.getDependencyModel();
 
     ContextualFilterDocument loadFilter =
         ContextualFilterSaveLoadConfig.CONFIG.loadResource(shell, project);
+    // Bail out on aborted load
+    if (null == loadFilter) {
+      return;
+    }
 
     ContextualFilter filter = loadFilter.getInfo();
+    DependencyModel model = editor.getDependencyModel();
     if (filter instanceof SteppingFilter) {
       filterControl.setInput((SteppingFilter) filter, model, project);
     } else {

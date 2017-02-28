@@ -21,13 +21,13 @@ import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.platform.AlphabeticSorter;
 import com.google.devtools.depan.platform.ListenerManager;
 import com.google.devtools.depan.platform.ViewerObjectToString;
+import com.google.devtools.depan.platform.eclipse.ui.widgets.Selections;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
@@ -94,13 +94,12 @@ public class GraphEdgeMatcherSelectorControl extends Composite {
 
       @Override
       public void selectionChanged(SelectionChangedEvent event) {
-        GraphEdgeMatcherDescriptor edgeMatcher = extractFromSelection(event.getSelection());
-        if (null == edgeMatcher) {
-          return;
-        }
-
         // Notify interested parties about the change
-        fireSelectionChange(edgeMatcher);
+        GraphEdgeMatcherDescriptor edgeMatcher =
+            getFirstElement(event.getSelection());
+        if (edgeMatcher != null) {
+          fireSelectionChange(edgeMatcher);
+        }
       }
     });
   }
@@ -149,31 +148,21 @@ public class GraphEdgeMatcherSelectorControl extends Composite {
   }
 
   /**
-   * @return the currently selected GraphEdgeMatcherDescriptor,
-   *    or {@code null} if nothing is selected.
+   * Provide the {@link GraphEdgeMatcherDescriptor} for the current 
+   * {@link #setsViewer} selection, or {@code null} if an error happens.
    */
   public GraphEdgeMatcherDescriptor getSelection() {
-    return extractFromSelection(setsViewer.getSelection());
+    return getFirstElement(setsViewer.getSelection());
   }
 
   /**
-   * return the {@link GraphEdgeMatcherDescriptor} for the given selection,
+   * Provide the {@link GraphEdgeMatcherDescriptor} for the supplied selection,
    * or {@code null} if an error happens.
-   * 
-   * @param selection selection object containing a
-   *   {@link GraphEdgeMatcherDescriptor}
-   * @return the extracted {@link GraphEdgeMatcherDescriptor} or
-   *   {@code null} in case of error.
    */
-  private GraphEdgeMatcherDescriptor extractFromSelection(ISelection selection) {
-    if (!(selection instanceof IStructuredSelection)) {
-      return null;
-    }
-    IStructuredSelection select = (IStructuredSelection) selection;
-    if (select.getFirstElement() instanceof GraphEdgeMatcherDescriptor) {
-      return (GraphEdgeMatcherDescriptor) select.getFirstElement();
-    }
-    return null;
+  private GraphEdgeMatcherDescriptor getFirstElement(
+      ISelection selection) {
+    return Selections.getFirstElement(
+        selection, GraphEdgeMatcherDescriptor.class);
   }
 
   /////////////////////////////////////

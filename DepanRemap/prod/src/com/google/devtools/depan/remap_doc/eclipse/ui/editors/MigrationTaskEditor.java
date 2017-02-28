@@ -18,10 +18,10 @@ package com.google.devtools.depan.remap_doc.eclipse.ui.editors;
 
 import com.google.devtools.depan.platform.AlphabeticSorter;
 import com.google.devtools.depan.platform.TableContentProvider;
+import com.google.devtools.depan.platform.eclipse.ui.widgets.Selections;
 import com.google.devtools.depan.remap_doc.model.MigrationTask;
 
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -36,7 +36,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import java.util.Calendar;
-import java.util.Iterator;
+import java.util.Collection;
 
 /**
  * An editor for a {@link MigrationTask}. Permit editing information fields,
@@ -286,17 +286,11 @@ public class MigrationTaskEditor extends MigrationTaskAdapter {
    * Remove the selected engineers in the table from the list and the model.
    * Works with multiple names selected.
    */
-  // SupperssWarnings: IStructuredSelection.iterator() is not parameterized.
-  @SuppressWarnings("unchecked")
   protected void removeSelectedEngineers() {
     ISelection selection = engineersTable.getSelection();
-    if (!(selection instanceof IStructuredSelection)) {
-      return;
-    }
-    IStructuredSelection structuredSelection = (IStructuredSelection) selection;
-    Iterator<String> iterator = structuredSelection.iterator();
-    while (iterator.hasNext()) {
-      String engineerName = iterator.next();
+    Collection<String> names =
+        Selections.getSelection(selection, String.class);
+    for (String engineerName : names) {
       engineers.remove(engineerName);
       migrationTask.removeEngineer(engineerName);
     }

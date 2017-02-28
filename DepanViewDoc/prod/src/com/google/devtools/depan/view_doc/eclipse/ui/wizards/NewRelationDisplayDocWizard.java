@@ -17,11 +17,13 @@
 package com.google.devtools.depan.view_doc.eclipse.ui.wizards;
 
 import com.google.devtools.depan.graph.api.Relation;
+import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.persistence.AbstractDocXmlPersist;
 import com.google.devtools.depan.resource_doc.eclipse.ui.wizards.AbstractNewResourceWizard;
 import com.google.devtools.depan.view_doc.model.RelationDisplayDocument;
 import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty;
 import com.google.devtools.depan.view_doc.persistence.RelationDisplayDocumentXmlPersist;
+import com.google.devtools.depan.view_doc.persistence.RelationDisplayResources;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -69,9 +71,16 @@ public class NewRelationDisplayDocWizard
 
   public NewRelationDisplayDocWizard(
       Map<Relation, EdgeDisplayProperty> edgeProps) {
-    this(new RelationDisplayDocument("unnamed", edgeProps));
+    this(new RelationDisplayDocument(
+        RelationDisplayResources.BASE_NAME,
+        DependencyModel.createFromRegistry(),
+        edgeProps));
   }
 
+  /**
+   * Constructor for a new wizard, for the creation of a new edge
+   * display property bundle from the standard menu item.
+   */
   public NewRelationDisplayDocWizard() {
     this(Collections.<Relation, EdgeDisplayProperty>emptyMap());
   }
@@ -105,7 +114,8 @@ public class NewRelationDisplayDocWizard
     }
 
     RelationDisplayDocument result =
-        new RelationDisplayDocument(docName, propInfo.getRelationProperties());
+        new RelationDisplayDocument(
+            docName, propInfo.getModel(), propInfo.getInfo());
     return result;
   }
 

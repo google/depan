@@ -18,6 +18,7 @@ package com.google.devtools.depan.nodelist_doc.eclipse.ui.wizards;
 
 import com.google.devtools.depan.platform.ListContentProvider;
 import com.google.devtools.depan.platform.WorkspaceTools;
+import com.google.devtools.depan.platform.eclipse.ui.widgets.Selections;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 import com.google.devtools.depan.platform.eclipse.ui.wizards.AbstractNewDocumentPage;
 import com.google.devtools.depan.platform.eclipse.ui.wizards.NewWizardOptionPart;
@@ -28,7 +29,6 @@ import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.ListViewer;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -242,12 +242,8 @@ public class SubtractOptionPart implements NewWizardOptionPart {
    * Remove all the selected items from the list of terms.
    */
   private void handleTermsRemove() {
-    ISelection items = sources.getSelection();
-    if (items.isEmpty()) {
-      return;
-    }
-    StructuredSelection choices = (StructuredSelection) items;
-    for (Object choice : choices.toList()) {
+    ISelection selection = sources.getSelection();
+    for (Object choice : Selections.getObjects(selection)) {
       sources.remove(choice);
     }
     containingPage.updatePageStatus();

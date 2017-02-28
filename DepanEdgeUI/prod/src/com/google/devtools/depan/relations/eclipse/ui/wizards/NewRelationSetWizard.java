@@ -17,9 +17,12 @@
 package com.google.devtools.depan.relations.eclipse.ui.wizards;
 
 import com.google.devtools.depan.graph.api.RelationSet;
+import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.persistence.AbstractDocXmlPersist;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
+import com.google.devtools.depan.relations.models.RelationSetDescriptor.Builder;
 import com.google.devtools.depan.relations.persistence.RelationSetDescriptorXmlPersist;
+import com.google.devtools.depan.relations.persistence.RelationSetResources;
 import com.google.devtools.depan.resource_doc.eclipse.ui.wizards.AbstractNewResourceWizard;
 
 import org.eclipse.core.resources.IFile;
@@ -61,12 +64,27 @@ public class NewRelationSetWizard
     this.relSetDescr = relationSet;
   }
 
+  /**
+   * Constructor for a new wizard, for the creation of a new RelSet
+   * from the standard menu item.
+   */
+  public NewRelationSetWizard() {
+    this(buildNewRelSetDescriptor());
+  }
+
+  private static RelationSetDescriptor buildNewRelSetDescriptor() {
+    DependencyModel model = DependencyModel.createFromRegistry();
+    Builder result = RelationSetDescriptor.createBuilder(
+        RelationSetResources.BASE_NAME, model);
+    return result.build();
+  }
+
   /////////////////////////////////////
   // Wizard hook methods
 
   @Override
   public void addPages() {
-    page = new NewRelationSetPage();
+    page = new NewRelationSetPage(relSetDescr);
     addPage(page);
   }
 

@@ -16,6 +16,8 @@
 
 package com.google.devtools.depan.platform;
 
+import com.google.devtools.depan.platform.eclipse.ui.widgets.Selections;
+
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -23,16 +25,18 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.ContainerSelectionDialog;
 import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
 import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
+
+import java.text.MessageFormat;
 
 /**
  * A utility class that provides static methods for manipulating Eclipse
@@ -47,6 +51,22 @@ public final class WorkspaceTools {
     // Prevent instantiation.
   }
 
+  /**
+   * Do all string to path conversions here, to ensure consistency throughout
+   * DepAn.
+   */
+  public static IPath buildPath(String pathText) {
+    return Path.fromOSString(pathText);
+  }
+
+  /**
+   * Do all path to string conversions here, to ensure consistency throughout
+   * DepAn.
+   */
+  public static String fromPath(IPath path) {
+    return path.toOSString();
+  }
+
   public static IFile buildResourceFile(IPath path) {
     return ResourcesPlugin.getWorkspace().getRoot().getFile(path);
   }
@@ -58,6 +78,11 @@ public final class WorkspaceTools {
   public static IFile buildResourceFile(String saveFilename) {
     IPath savePath = Path.fromOSString(saveFilename);
     return buildResourceFile(savePath);
+  }
+
+  public static IFile buildResourceFile(IContainer container, String fileName) {
+    IFile result = container.getFile(buildPath(fileName));
+    return result;
   }
 
   /**
@@ -164,8 +189,8 @@ public final class WorkspaceTools {
   public static IContainer guessContainer(ISelection selection) {
     // If the selection is no help, and the workspace has only one
     // project, use that.
-    if ((null == selection) || selection.isEmpty() ||
-        !(selection instanceof IStructuredSelection)) {
+    Object obj = Selections.getFirstObject(selection);
+    if (obj == null) {
       IWorkspace workspace = ResourcesPlugin.getWorkspace();
       IProject[] projects = workspace.getRoot().getProjects();
       if (null == projects) {
@@ -178,11 +203,9 @@ public final class WorkspaceTools {
     }
 
     // Multiple selections make it hard to guess the user's intent.
-    IStructuredSelection ssel = (IStructuredSelection) selection;
-    if (ssel.size() != 1) {
+    if (Selections.getObjects(selection).size() > 1) {
       return null;
     }
-    Object obj = ssel.getFirstElement();
 
     // A selected container is a good answer
     if (obj instanceof IContainer) {
@@ -190,7 +213,7 @@ public final class WorkspaceTools {
     }
 
     // If the selected container is any other kind of resource,
-    // guess that the user meant that resoure's container.
+    // guess that the user meant that resource's container.
     if (obj instanceof IResource) {
       return ((IResource) obj).getParent();
     }

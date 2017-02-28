@@ -22,6 +22,7 @@ import com.google.devtools.depan.matchers.eclipse.ui.widgets.EdgeMatcherEditorCo
 import com.google.devtools.depan.matchers.eclipse.ui.widgets.ModificationListener;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.matchers.persistence.EdgeMatcherDocXmlPersist;
+import com.google.devtools.depan.matchers.persistence.GraphEdgeMatcherResources;
 import com.google.devtools.depan.model.GraphEdgeMatcher;
 import com.google.devtools.depan.persistence.StorageTools;
 import com.google.devtools.depan.platform.WorkspaceTools;
@@ -107,7 +108,7 @@ public class EdgeMatcherEditor extends EditorPart {
 
     // get the file relatively to the workspace.
     IFile saveFile = WorkspaceTools.calcViewFile(
-        saveas.getResult(), GraphEdgeMatcherDescriptor.EXTENSION);
+        saveas.getResult(), GraphEdgeMatcherResources.EXTENSION);
     // TODO: set up a progress monitor
     file = saveFile;
     handleDocumentChange();

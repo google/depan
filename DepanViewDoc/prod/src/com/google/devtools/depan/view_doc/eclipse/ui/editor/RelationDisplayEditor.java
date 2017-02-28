@@ -18,10 +18,11 @@ package com.google.devtools.depan.view_doc.eclipse.ui.editor;
 
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.registry.RelationRegistry;
+import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.persistence.StorageTools;
 import com.google.devtools.depan.platform.WorkspaceTools;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
-import com.google.devtools.depan.relations.models.RelationSetDescriptor;
+import com.google.devtools.depan.relations.persistence.RelationSetResources;
 import com.google.devtools.depan.view_doc.eclipse.ui.widgets.RelationDisplayTableControl;
 import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty;
 import com.google.devtools.depan.view_doc.model.RelationDisplayDocument;
@@ -107,7 +108,7 @@ public class RelationDisplayEditor extends EditorPart {
 
     // get the file relatively to the workspace.
     IFile saveFile = WorkspaceTools.calcViewFile(
-        saveas.getResult(), RelationSetDescriptor.EXTENSION);
+        saveas.getResult(), RelationSetResources.EXTENSION);
     // TODO: set up a progress monitor
     file = saveFile;
     handleDocumentChange();
@@ -174,7 +175,7 @@ public class RelationDisplayEditor extends EditorPart {
 
       propRepo = new RelationDisplayDocumentRepo(
           RelationRegistry.getRegistryRelations());
-      propRepo.setEdgeDisplayProperties(propInfo.getRelationProperties());
+      propRepo.setEdgeDisplayProperties(propInfo.getInfo());
 
       setPartName(buildPartName());
       setDirtyState(false);
@@ -230,7 +231,7 @@ public class RelationDisplayEditor extends EditorPart {
     props.setLayoutData(Widgets.buildHorzFillData());
 
     propEditor = new RelationDisplayTableControl(container);
-    propEditor.setLayoutData(Widgets.buildHorzFillData());
+    propEditor.setLayoutData(Widgets.buildGrabFillData());
     propRepo.addChangeListener(new RelationDisplayRepository.ChangeListener() {
       @Override
       public void edgeDisplayChanged(
@@ -283,16 +284,16 @@ public class RelationDisplayEditor extends EditorPart {
    */
   private RelationDisplayDocument buildRelationDisplayDocument() {
 
-    Map<Relation, EdgeDisplayProperty> props =
-        propInfo.getRelationProperties();
+    DependencyModel model = propInfo.getModel();
+    Map<Relation, EdgeDisplayProperty> props = propInfo.getInfo();
     RelationDisplayDocument result =
-        new RelationDisplayDocument(relSetName.getText(), props);
+        new RelationDisplayDocument(relSetName.getText(), model, props);
     return result;
   }
 
   private void handleDocumentChange() {
     propInfo = buildRelationDisplayDocument();
-    propRepo.setEdgeDisplayProperties(propInfo.getRelationProperties());
+    propRepo.setEdgeDisplayProperties(propInfo.getInfo());
     setPartName(buildPartName());
   }
 }

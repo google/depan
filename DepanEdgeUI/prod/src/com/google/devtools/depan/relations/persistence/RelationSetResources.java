@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.relations.models;
+package com.google.devtools.depan.relations.persistence;
 
 import com.google.devtools.depan.graph_doc.model.DependencyModel;
+import com.google.devtools.depan.persistence.StorageTools;
+import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 import com.google.devtools.depan.resources.ResourceContainer;
 import com.google.devtools.depan.resources.analysis.AnalysisResources;
 
@@ -29,10 +31,17 @@ import java.util.List;
  */
 public class RelationSetResources {
 
-  public static final String RELATION_SETS = "relation_sets";
+  /** Name of resource tree container for relation resources. */
+  public static final String RELATIONS = "relations";
+
+  /** Base file name for a new RelSet resource. */
+  public static final String BASE_NAME = "relset";
+
+  /** Expected extensions for a RelSet resource. */
+  public static final String EXTENSION = "relxml";
 
   static {
-    AnalysisResources.getRoot().addChild(RELATION_SETS);
+    AnalysisResources.getRoot().addChild(RELATIONS);
   }
 
   private RelationSetResources() {
@@ -40,7 +49,11 @@ public class RelationSetResources {
   }
 
   public static ResourceContainer getContainer() {
-    return AnalysisResources.getRoot().getChild(RELATION_SETS);
+    return AnalysisResources.getRoot().getChild(RELATIONS);
+  }
+
+  public static String getBaseNameExt() {
+    return StorageTools.getBaseNameExt(BASE_NAME, EXTENSION);
   }
 
   public static List<RelationSetDescriptor> getRelationSets(

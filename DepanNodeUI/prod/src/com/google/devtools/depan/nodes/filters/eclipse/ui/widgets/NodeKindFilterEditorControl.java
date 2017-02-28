@@ -16,8 +16,8 @@
 
 package com.google.devtools.depan.nodes.filters.eclipse.ui.widgets;
 
-import com.google.devtools.depan.nodes.filters.eclipse.ui.filters.NodeKindDocument;
 import com.google.devtools.depan.nodes.filters.eclipse.ui.widgets.NodeKindTableControl.ElementKindDescriptor;
+import com.google.devtools.depan.nodes.filters.model.NodeKindDocument;
 import com.google.devtools.depan.nodes.filters.sequence.NodeKindFilter;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 

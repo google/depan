@@ -19,14 +19,13 @@ package com.google.devtools.depan.nodes.filters.eclipse.ui.widgets;
 import com.google.devtools.depan.nodes.filters.model.ContextualFilter;
 import com.google.devtools.depan.nodes.filters.sequence.BasicFilter;
 import com.google.devtools.depan.platform.eclipse.ui.tables.EditColTableDef;
+import com.google.devtools.depan.platform.eclipse.ui.widgets.Selections;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
-
-import com.google.common.collect.Lists;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ICellModifier;
-import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
@@ -127,15 +126,8 @@ public class FilterTableControl extends Composite {
   }
 
   public List<ContextualFilter> getSelectedFilters() {
-    List<?> selection = ((IStructuredSelection) filterViewer.getSelection()).toList();
-    List<ContextualFilter> result =
-        Lists.newArrayListWithExpectedSize(selection.size());
-    for (Object item : selection) {
-      if (item instanceof ContextualFilter) {
-        result.add((ContextualFilter) item);
-      }
-    }
-    return result;
+    ISelection selection = filterViewer.getSelection();
+    return Selections.getSelectionList(selection, ContextualFilter.class);
   }
 
   /////////////////////////////////////

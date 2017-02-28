@@ -20,8 +20,8 @@ import com.google.devtools.depan.persistence.AbstractDocXmlPersist;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.GenericSaveLoadControl;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.SaveLoadConfig;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
-import com.google.devtools.depan.relations.models.RelationSetResources;
 import com.google.devtools.depan.relations.persistence.RelationSetDescriptorXmlPersist;
+import com.google.devtools.depan.relations.persistence.RelationSetResources;
 import com.google.devtools.depan.resources.ResourceContainer;
 
 import org.eclipse.swt.widgets.Composite;
@@ -69,8 +69,13 @@ public abstract class RelationSetSaveLoadControl
     }
 
     @Override
+    public String getBaseName() {
+      return RelationSetResources.BASE_NAME;
+    }
+
+    @Override
     public String getExension() {
-      return RelationSetDescriptor.EXTENSION;
+      return RelationSetResources.EXTENSION;
     }
   }
 }

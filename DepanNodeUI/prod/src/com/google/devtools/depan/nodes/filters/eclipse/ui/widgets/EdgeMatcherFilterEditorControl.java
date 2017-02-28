@@ -121,6 +121,9 @@ public class EdgeMatcherFilterEditorControl
 
     @Override
     protected void installLoadResource(GraphEdgeMatcherDescriptor doc) {
+      if (null == doc) {
+        return;
+      }
       edgeMatcherEditor.updateEdgeMatcher(doc.getInfo());
     }
   }

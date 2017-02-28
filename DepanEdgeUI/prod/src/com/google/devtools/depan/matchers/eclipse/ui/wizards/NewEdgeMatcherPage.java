@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.matchers.eclipse.ui.wizards;
 
-import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
+import com.google.devtools.depan.matchers.persistence.GraphEdgeMatcherResources;
 import com.google.devtools.depan.persistence.StorageTools;
 import com.google.devtools.depan.resource_doc.eclipse.ui.wizards.AbstractResouceWizardPage;
 import com.google.devtools.depan.resource_doc.eclipse.ui.wizards.ResourceOptionWizard;
@@ -42,12 +42,8 @@ import org.eclipse.swt.widgets.Text;
  * same Toolkit persistance model with it.
  * 
  * @author ycoppel@google.com (Yohann Coppel)
- *
  */
 public class NewEdgeMatcherPage extends AbstractResouceWizardPage {
-
-  public static final String DEFAULT_FILENAME =
-      "matcher." + GraphEdgeMatcherDescriptor.EXTENSION;
 
   /**
    * Name for new Edge Matcher.  Populated by the internal type
@@ -71,14 +67,16 @@ public class NewEdgeMatcherPage extends AbstractResouceWizardPage {
   @Override
   protected ResourceOutputPart createOutputPart(
       AbstractResouceWizardPage containingPage) {
-    IContainer outputContainer = guessContainer();
+    IContainer outputContainer = getResourceContainer(
+        GraphEdgeMatcherResources.getContainer());
+    String filename = GraphEdgeMatcherResources.getBaseNameExt();
     String outputFilename = StorageTools.guessNewFilename(
-        outputContainer, DEFAULT_FILENAME, 1, 10);
+        outputContainer, filename, 1, 10);
 
     return new ResourceOutputPart(
         this, "Edge matcher location",
         outputContainer, outputFilename,
-        GraphEdgeMatcherDescriptor.EXTENSION);
+        GraphEdgeMatcherResources.EXTENSION);
   }
 
   @Override

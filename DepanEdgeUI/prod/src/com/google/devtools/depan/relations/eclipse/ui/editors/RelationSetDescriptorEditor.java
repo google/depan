@@ -27,6 +27,7 @@ import com.google.devtools.depan.relations.models.RelationSetDescrRepo;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 import com.google.devtools.depan.relations.models.RelationSetRepository;
 import com.google.devtools.depan.relations.persistence.RelationSetDescriptorXmlPersist;
+import com.google.devtools.depan.relations.persistence.RelationSetResources;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -99,7 +100,7 @@ public class RelationSetDescriptorEditor extends EditorPart {
 
     // get the file relatively to the workspace.
     IFile saveFile = WorkspaceTools.calcViewFile(
-        saveas.getResult(), RelationSetDescriptor.EXTENSION);
+        saveas.getResult(), RelationSetResources.EXTENSION);
     // TODO: set up a progress monitor
     file = saveFile;
     handleDocumentChange();
@@ -180,11 +181,7 @@ public class RelationSetDescriptorEditor extends EditorPart {
           RelationSetDescriptorXmlPersist.build(true);
       relSetInfo = persist.load(file.getRawLocationURI());
 
-      // No explicit universe for relation set.
-      // .. editor will implicitly use all registered relations
-      // .. maybe in the future, it should use only project relations?
-      // see RelationRegistry.getRegistryRelations()
-      relRepo = new RelationSetDescrRepo(null);
+      relRepo = new RelationSetDescrRepo(relSetInfo.getModel().getRelations());
       relRepo.setRelationSet(relSetInfo.getInfo());
 
       setPartName(buildPartName());
@@ -228,7 +225,7 @@ public class RelationSetDescriptorEditor extends EditorPart {
     props.setLayoutData(Widgets.buildHorzFillData());
 
     relationSetEditor = new RelationSetEditorControl(container);
-    relationSetEditor.setLayoutData(Widgets.buildHorzFillData());
+    relationSetEditor.setLayoutData(Widgets.buildGrabFillData());
 
     relRepo.addChangeListener(new RelationSetRepository.ChangeListener() {
       @Override

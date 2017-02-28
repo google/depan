@@ -34,18 +34,17 @@ import java.util.Collections;
  */
 public class RelationDisplayDocumentXStreamConfig implements XStreamConfig {
 
-  public static final String EDGE_DISPLAY_INFO_TAG = "edge-display-info";
+  public static final String RELATION_DISPLAY_INFO_TAG = "rel-display-info";
 
   @Override
   public void config(XStream xstream) {
     xstream.setMode(XStream.NO_REFERENCES);
-    xstream.alias(EDGE_DISPLAY_INFO_TAG, RelationDisplayDocument.class);
+    xstream.alias(RELATION_DISPLAY_INFO_TAG, RelationDisplayDocument.class);
   }
-
 
   @Override
   public Collection<? extends Bundle> getDocumentBundles() {
-    // EdgeDisplayDocument is an implicit types derived from ViewDocument.
+    // RelationDisplayDocument is an implicit types derived from ViewDocument.
     return Collections.singletonList(ViewDocResources.BUNDLE);
   }
 }

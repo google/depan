@@ -18,14 +18,15 @@ package com.google.devtools.depan.remap_doc.eclipse.ui.editors;
 
 import com.google.devtools.depan.platform.AlphabeticSorter;
 import com.google.devtools.depan.platform.CollectionContentProvider;
+import com.google.devtools.depan.platform.eclipse.ui.widgets.Selections;
 import com.google.devtools.depan.remap_doc.model.MigrationGroup;
 import com.google.devtools.depan.remap_doc.model.MigrationTask;
 
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -276,12 +277,8 @@ public class MigrationGroupEditor extends MigrationTaskAdapter {
    * @return the currently selected {@link MigrationGroup}.
    */
   private MigrationGroup getSelectedGroup() {
-    IStructuredSelection selection =
-      (IStructuredSelection) groupSelect.getSelection();
-    if (!(selection.getFirstElement() instanceof MigrationGroup)) {
-      return null;
-    }
-    return (MigrationGroup) selection.getFirstElement();
+    ISelection selection = groupSelect.getSelection();
+    return Selections.getFirstElement(selection, MigrationGroup.class);
   }
 
   /**
