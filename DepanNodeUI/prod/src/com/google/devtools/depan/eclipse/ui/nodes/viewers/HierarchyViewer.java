@@ -17,12 +17,15 @@ package com.google.devtools.depan.eclipse.ui.nodes.viewers;
 
 import com.google.devtools.depan.eclipse.ui.nodes.cache.HierarchyCache;
 import com.google.devtools.depan.eclipse.ui.nodes.trees.GraphData;
-import com.google.devtools.depan.matchers.eclipse.ui.widgets.GraphEdgeMatcherSelectorControl;
+import com.google.devtools.depan.graph.api.EdgeMatcher;
+import com.google.devtools.depan.matchers.eclipse.ui.widgets.EdgeMatcherSelectorControl;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.nodes.trees.TreeModel;
 import com.google.devtools.depan.platform.ListenerManager;
+import com.google.devtools.depan.resources.PropertyDocumentReference;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -33,7 +36,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -52,7 +54,7 @@ public class HierarchyViewer<T> extends Composite {
 
   private boolean isInvertSelect;
 
-  private GraphEdgeMatcherSelectorControl edgeMatcherSelector;
+  private EdgeMatcherSelectorControl edgeMatcherSelector;
 
   /** Listener when the selection change. */
   // private List<HierarchyChangeListener> listeners = Lists.newArrayList();
@@ -81,16 +83,16 @@ public class HierarchyViewer<T> extends Composite {
     selectorLabel.setLayoutData(
         new GridData(SWT.LEFT, SWT.CENTER, false, false));
 
-    edgeMatcherSelector = new GraphEdgeMatcherSelectorControl(this);
+    edgeMatcherSelector = new EdgeMatcherSelectorControl(this);
     edgeMatcherSelector.setLayoutData(
         new GridData(SWT.FILL, SWT.CENTER, true, false));
 
     edgeMatcherSelector.addChangeListener(
-        new GraphEdgeMatcherSelectorControl.SelectorListener() {
+        new EdgeMatcherSelectorControl.SelectorListener() {
 
           @Override
           public void selectedEdgeMatcherChanged(
-              GraphEdgeMatcherDescriptor edgeMatcher) {
+              PropertyDocumentReference<GraphEdgeMatcherDescriptor> edgeMatcher) {
             fireSelectionChange();
           }
         }
@@ -112,9 +114,9 @@ public class HierarchyViewer<T> extends Composite {
 
   public void setInput(
       HierarchyCache<T> hierarchies,
-      GraphEdgeMatcherDescriptor selectedEdgeMatcher,
-      List<GraphEdgeMatcherDescriptor> choices) {
-    edgeMatcherSelector.setInput(selectedEdgeMatcher, choices);
+      PropertyDocumentReference<GraphEdgeMatcherDescriptor> matcherRef,
+      IProject project) {
+    edgeMatcherSelector.setInput(matcherRef, project);
     this.hierarchies = hierarchies;
   }
 
@@ -173,13 +175,13 @@ public class HierarchyViewer<T> extends Composite {
       return new GraphData<T>(null, TreeModel.EMPTY);
     }
 
-    GraphEdgeMatcherDescriptor selectedEdgeMatcher =
+    PropertyDocumentReference<GraphEdgeMatcherDescriptor> matcherRef =
         edgeMatcherSelector.getSelection();
-    if (null == selectedEdgeMatcher) {
+    if (null == matcherRef) {
       return new GraphData<T>(null, TreeModel.EMPTY);
     }
-    GraphData<T> baseData =
-        hierarchies.getHierarchy(selectedEdgeMatcher.getInfo());
+    EdgeMatcher<String> matcher = matcherRef.getDocument().getInfo();
+    GraphData<T> baseData = hierarchies.getHierarchy(matcher);
 
     // Synthesize a inverse tree if requested.
     // These are not cached.  The inverted hierarchies are often small,

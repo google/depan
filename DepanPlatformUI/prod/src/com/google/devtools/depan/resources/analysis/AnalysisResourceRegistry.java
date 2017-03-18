@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 The Depan Project Authors
+ * Copyright 2017 The Depan Project Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,13 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.graph_doc.eclipse.ui.plugins;
+package com.google.devtools.depan.resources.analysis;
 
-import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptors;
-import com.google.devtools.depan.matchers.persistence.GraphEdgeMatcherResources;
 import com.google.devtools.depan.platform.PlatformLogger;
 import com.google.devtools.depan.platform.plugin.ContributionEntry;
 import com.google.devtools.depan.platform.plugin.ContributionRegistry;
-import com.google.devtools.depan.relations.models.RelationSetDescriptors;
-import com.google.devtools.depan.relations.persistence.RelationSetResources;
-import com.google.devtools.depan.resources.PropertyDocument;
+import com.google.devtools.depan.platform.plugin.ConfigurationDependOrder;
 import com.google.devtools.depan.resources.ResourceContainer;
-import com.google.devtools.depan.resources.analysis.AnalysisResources;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -36,11 +31,15 @@ import org.eclipse.core.runtime.IConfigurationElement;
 public class AnalysisResourceRegistry
     extends ContributionRegistry<AnalysisResourceInstaller> {
 
+  private static final String INSTALL_AFTER_TAG = "install_after";
+
+  private static final String INSTALL_AFTER_ATTR = "installer_ref";
+
   /**
    * Extension point name for persistence configuration
    */
   public final static String EXTENTION_POINT =
-      "com.google.devtools.depan.graph_doc.eclipse.ui.registry.analysis_resource";
+      "com.google.devtools.depan.resources.analysis.installer";
 
   /**
    * Static instance. This class is a singleton.
@@ -77,29 +76,15 @@ public class AnalysisResourceRegistry
   }
 
   private void installResources() {
-    // Start with build-in resources 
     ResourceContainer root = AnalysisResources.getRoot();
-    installBuiltInResources(root);
 
-    // Add in contributed resources
-    for (ContributionEntry<AnalysisResourceInstaller> contrib
-        : getContributions()) {
-      contrib.getInstance().installResource(root);
+    ConfigurationDependOrder<AnalysisResourceInstaller> sequencer =
+        new ConfigurationDependOrder<AnalysisResourceInstaller>(
+            INSTALL_AFTER_TAG, INSTALL_AFTER_ATTR);
+    sequencer.addContributions(getContributions());
+    for (AnalysisResourceInstaller installer : sequencer.getDependOrder()) {
+      installer.installResource(root);
     }
-  }
-
-  private static void installBuiltInResources(ResourceContainer root) {
-    ResourceContainer matchers = GraphEdgeMatcherResources.getContainer();
-    addResource(matchers, GraphEdgeMatcherDescriptors.FORWARD);
-    addResource(matchers, GraphEdgeMatcherDescriptors.EMPTY);
-
-    ResourceContainer relSets = RelationSetResources.getContainer();
-    addResource(relSets, RelationSetDescriptors.EMPTY);
-  }
-
-  private static void addResource(
-      ResourceContainer container, PropertyDocument<?> resource) {
-    container.addResource(resource.getName(), resource);
   }
 
   /////////////////////////////////////

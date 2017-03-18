@@ -49,5 +49,27 @@
             id="com.google.devtools.depan.relations.persistence.RelationSetDescriptorXStreamConfig">
       </xstream_config>
    </extension>
+   <extension
+         point="com.google.devtools.depan.persistence.resources.config">
+      <rsrc_doc_config
+            class="com.google.devtools.depan.matchers.persistence.EdgeMatcherDocConfig"
+            id="com.google.devtools.depan.matchers.persistence.EdgeMatcherDocConfig">
+      </rsrc_doc_config>
+      <rsrc_doc_config
+            class="com.google.devtools.depan.relations.persistence.RelationSetDescriptorConfig"
+            id="com.google.devtools.depan.relations.persistence.RelationSetDescriptorConfig">
+      </rsrc_doc_config>
+   </extension>
+   <extension
+         point="com.google.devtools.depan.resources.analysis.installer">
+      <installer
+            class="com.google.devtools.depan.matchers.persistence.GraphEdgeMatcherResourcesInstaller"
+            id="com.google.devtools.depan.matchers.persistence.GraphEdgeMatcherResourcesInstaller">
+      </installer>
+      <installer
+            class="com.google.devtools.depan.relations.persistence.RelationSetResourcesInstaller"
+            id="com.google.devtools.depan.relations.persistence.RelationSetResourcesInstaller">
+      </installer>
+   </extension>
 
 </plugin>

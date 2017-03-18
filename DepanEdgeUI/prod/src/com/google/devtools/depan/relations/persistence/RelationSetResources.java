@@ -17,9 +17,12 @@
 package com.google.devtools.depan.relations.persistence;
 
 import com.google.devtools.depan.graph_doc.model.DependencyModel;
-import com.google.devtools.depan.persistence.StorageTools;
+import com.google.devtools.depan.platform.PlatformTools;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
+import com.google.devtools.depan.relations.models.RelationSetDescriptors;
+import com.google.devtools.depan.resources.PropertyDocumentReference;
 import com.google.devtools.depan.resources.ResourceContainer;
+import com.google.devtools.depan.resources.ResourceDocumentReference;
 import com.google.devtools.depan.resources.analysis.AnalysisResources;
 
 import com.google.common.collect.Lists;
@@ -40,34 +43,58 @@ public class RelationSetResources {
   /** Expected extensions for a RelSet resource. */
   public static final String EXTENSION = "relxml";
 
-  static {
-    AnalysisResources.getRoot().addChild(RELATIONS);
-  }
+  /**
+   * Kludgy bit of Singleton mis-use to simplify access to a very
+   * commonly referenced resource.  Other solutions are welcome.
+   */
+  public static PropertyDocumentReference<RelationSetDescriptor> EMPTY_REF;
 
   private RelationSetResources() {
     // Prevent instantiation.
   }
 
+  public static void installResources(ResourceContainer root) {
+    ResourceContainer relSets = root.addChild(RELATIONS);
+    EMPTY_REF = installRelSet(relSets, RelationSetDescriptors.EMPTY);
+  }
+
+  private static PropertyDocumentReference<RelationSetDescriptor>
+      installRelSet(
+      ResourceContainer container, RelationSetDescriptor relSet) {
+    container.addResource(relSet);
+    return ResourceDocumentReference
+        .buildResourceReference(container, relSet);
+  }
+
+  /**
+   * Kludgy bit of Singleton mis-use to simplify access to a very
+   * commonly referenced resource.  Other solutions are welcome.
+   */
   public static ResourceContainer getContainer() {
     return AnalysisResources.getRoot().getChild(RELATIONS);
   }
 
   public static String getBaseNameExt() {
-    return StorageTools.getBaseNameExt(BASE_NAME, EXTENSION);
+    return PlatformTools.getBaseNameExt(BASE_NAME, EXTENSION);
   }
 
-  public static List<RelationSetDescriptor> getRelationSets(
-      DependencyModel model) {
+  public static List<PropertyDocumentReference<RelationSetDescriptor>>
+      getRelationSets(DependencyModel model) {
 
-    List<RelationSetDescriptor> result = Lists.newArrayList();
+    List<PropertyDocumentReference<RelationSetDescriptor>> result =
+        Lists.newArrayList();
 
     // Filter for GEMs with the supplied model.
-    for (Object resource : getContainer().getResources()) {
+    ResourceContainer container = getContainer();
+    for (Object resource : container.getResources()) {
         if (resource instanceof RelationSetDescriptor) {
           RelationSetDescriptor checkRes = (RelationSetDescriptor) resource;
 
           if (checkRes.forModel(model)) {
-            result.add(checkRes);
+            PropertyDocumentReference<RelationSetDescriptor> ref =
+                ResourceDocumentReference.buildResourceReference(
+                    container, checkRes);
+            result.add(ref);
           }
         }
       }

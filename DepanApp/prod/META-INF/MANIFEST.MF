@@ -11,11 +11,10 @@ Require-Bundle: org.eclipse.equinox.app,
  org.eclipse.jface,
  org.eclipse.ui,
  org.eclipse.ui.ide,
- com.google.devtools.depan.core,
  com.google.devtools.depan.persistence,
  com.google.devtools.depan.edges.ui,
  com.google.devtools.depan.nodes.ui,
- com.google.guava,
- com.google.devtools.depan.view_doc
+ com.google.devtools.depan.view_doc,
+ com.google.guava
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .

@@ -23,6 +23,7 @@ import com.google.devtools.depan.view_doc.model.ViewDocument;
 
 import com.google.common.base.Strings;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.wizard.Wizard;
 
 import java.text.MessageFormat;
@@ -42,6 +43,10 @@ public abstract class FromViewDocWizard extends Wizard {
     this.editor = editor;
     this.nodes = nodes;
     this.detail = detail;
+  }
+
+  protected IProject getResourceProject() {
+    return editor.getResourceProject();
   }
 
   protected GraphResources getGraphResources() {

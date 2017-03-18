@@ -1,9 +1,10 @@
 package com.google.devtools.depan.stats.eclipse.ui.views;
 
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeViewerProvider;
-import com.google.devtools.depan.matchers.eclipse.ui.widgets.GraphEdgeMatcherSelectorControl;
+import com.google.devtools.depan.matchers.eclipse.ui.widgets.EdgeMatcherSelectorControl;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
+import com.google.devtools.depan.resources.PropertyDocumentReference;
 import com.google.devtools.depan.stats.eclipse.StatsResources;
 import com.google.devtools.depan.stats.eclipse.ui.StatsExtensionData;
 import com.google.devtools.depan.stats.eclipse.ui.widgets.NodeStatsTableControl;
@@ -25,7 +26,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import java.text.DecimalFormat;
-import java.util.List;
 
 /**
  * Control and display node statistics.
@@ -37,7 +37,7 @@ public class NodeStatsViewPart extends AbstractViewDocViewPart {
   /////////////////////////////////////
   // UX Elements
 
-  private GraphEdgeMatcherSelectorControl matcherChoice;
+  private EdgeMatcherSelectorControl matcherChoice;
 
   private NodeStatsTableControl statsTable;
 
@@ -87,16 +87,8 @@ public class NodeStatsViewPart extends AbstractViewDocViewPart {
     Group result = Widgets.buildGridGroup(parent, "Statistics Options", 2);
 
     Label relSetLabel = Widgets.buildCompactLabel(result, "Edges: ");
-    matcherChoice = new GraphEdgeMatcherSelectorControl(result);
+    matcherChoice = new EdgeMatcherSelectorControl(result);
     matcherChoice.setLayoutData(Widgets.buildHorzFillData());
-
-    ViewEditor editor = getEditor();
-    StatsExtensionData data = StatsExtensionData.getStatsData(editor);
-    GraphEdgeMatcherDescriptor matcher =
-        (null == data) ? null : data.getStatsMatcherDescr();
-    List<GraphEdgeMatcherDescriptor> choices =
-        editor.getGraphResources().getEdgeMatcherChoices();
-    matcherChoice.setInput(matcher, choices);
 
     Button updateBtn = Widgets.buildCompactPushButton(
         result, "Update Statistics");
@@ -104,7 +96,7 @@ public class NodeStatsViewPart extends AbstractViewDocViewPart {
     updateLayout.horizontalSpan = 2;
     updateLayout.horizontalAlignment = SWT.TRAIL;
     updateBtn.addSelectionListener(new SelectionAdapter() {
-      
+
       @Override
       public void widgetSelected(SelectionEvent e) {
         updateStats();
@@ -112,17 +104,6 @@ public class NodeStatsViewPart extends AbstractViewDocViewPart {
     });
 
     return result;
-  }
-
-  protected void updateStats() {
-    GraphEdgeMatcherDescriptor matcher = matcherChoice.getSelection();
-    ViewEditor editor = getEditor();
-    StatsExtensionData data = StatsExtensionData.getStatsData(editor);
-
-    data.setStatsMatcherDescr(matcher);
-    data.calcJungStatistics(editor.getViewGraph());
-
-    StatsExtensionData.setStatsData(editor, data);
   }
 
   @SuppressWarnings("unused")
@@ -152,6 +133,39 @@ public class NodeStatsViewPart extends AbstractViewDocViewPart {
     return result;
   }
 
+  protected void updateStats() {
+    PropertyDocumentReference<GraphEdgeMatcherDescriptor> matcherRef =
+        matcherChoice.getSelection();
+    if (null == matcherRef) {
+      return;
+    }
+    ViewEditor editor = getEditor();
+    StatsExtensionData data = StatsExtensionData.getStatsData(editor);
+
+    data.setStatsMatcherRef(matcherRef);
+    data.calcJungStatistics(editor.getViewGraph());
+
+    StatsExtensionData.setStatsData(editor, data);
+  }
+
+  private void updateControls(ViewEditor editor) {
+    if (null == editor) {
+      return;
+    }
+    NodeViewerProvider provider = editor.getNodeViewProvider();
+    statsTable.setInput(provider);
+
+    StatsExtensionData data = StatsExtensionData.getStatsData(editor);
+    if (null == data) {
+      return;
+    }
+    PropertyDocumentReference<GraphEdgeMatcherDescriptor> matcherRef =
+        data.getStatsMatcherRef();
+
+    matcherChoice.setInput(matcherRef, editor.getResourceProject());
+    displayStats(data);
+  }
+
   private void displayStats(StatsExtensionData data) {
 
     JungStatistics stats = data.getJungStatistics();
@@ -168,7 +182,7 @@ public class NodeStatsViewPart extends AbstractViewDocViewPart {
   @Override
   protected void acquireResources() {
     ViewEditor editor = getEditor();
-    ExtensionDataListener dataListener = new ExtensionDataListener() {
+    dataListener = new ExtensionDataListener() {
       @Override
       public void extensionDataChanged(
           ViewExtension ext, Object instance,
@@ -177,11 +191,7 @@ public class NodeStatsViewPart extends AbstractViewDocViewPart {
       }
     };
     editor.addExtensionDataListener(dataListener);
-    NodeViewerProvider provider = editor.getNodeViewProvider();
-    statsTable.setInput(provider);
-
-    StatsExtensionData data = StatsExtensionData.getStatsData(editor);
-    displayStats(data);
+    updateControls(editor);
   }
 
   @Override

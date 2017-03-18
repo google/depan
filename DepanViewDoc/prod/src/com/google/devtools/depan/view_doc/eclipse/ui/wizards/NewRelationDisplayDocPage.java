@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.view_doc.eclipse.ui.wizards;
 
-import com.google.devtools.depan.persistence.StorageTools;
+import com.google.devtools.depan.platform.PlatformTools;
 import com.google.devtools.depan.resource_doc.eclipse.ui.wizards.AbstractResouceWizardPage;
 import com.google.devtools.depan.resource_doc.eclipse.ui.wizards.ResourceOptionWizard;
 import com.google.devtools.depan.resource_doc.eclipse.ui.wizards.ResourceOutputPart;
@@ -68,7 +68,7 @@ public class NewRelationDisplayDocPage extends AbstractResouceWizardPage {
     IContainer outputContainer = getResourceContainer(
         RelationDisplayResources.getContainer());
     String filename = RelationDisplayResources.getBaseNameExt();
-    String outputFilename = StorageTools.guessNewFilename(
+    String outputFilename = PlatformTools.guessNewFilename(
         outputContainer, filename, 1, 10);
 
     return new ResourceOutputPart(

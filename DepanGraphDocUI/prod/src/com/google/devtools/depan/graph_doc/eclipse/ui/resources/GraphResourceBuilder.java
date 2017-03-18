@@ -19,12 +19,11 @@ package com.google.devtools.depan.graph_doc.eclipse.ui.resources;
 import com.google.devtools.depan.analysis_doc.model.AnalysisProperties;
 import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
-import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptors;
 import com.google.devtools.depan.matchers.persistence.GraphEdgeMatcherResources;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
-import com.google.devtools.depan.relations.models.RelationSetDescriptors;
 import com.google.devtools.depan.relations.persistence.RelationSetResources;
 import com.google.devtools.depan.resources.PropertyDocument;
+import com.google.devtools.depan.resources.PropertyDocumentReference;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Lists;
@@ -42,17 +41,19 @@ public class GraphResourceBuilder {
 
   private final DependencyModel model;
 
-  private List<GraphEdgeMatcherDescriptor> knownMatchers =
-      Lists.newArrayList();
+  private List<PropertyDocumentReference<GraphEdgeMatcherDescriptor>>
+      knownMatchers = Lists.newArrayList();
 
-  private List<RelationSetDescriptor> knownRelSets =
-      Lists.newArrayList();
+  private List<PropertyDocumentReference<RelationSetDescriptor>>
+      knownRelSets = Lists.newArrayList();
 
-  private LinkedHashMultimap<String, GraphEdgeMatcherDescriptor> defMatchers =
-      LinkedHashMultimap.create();
+  private LinkedHashMultimap<
+          String, PropertyDocumentReference<GraphEdgeMatcherDescriptor>>
+      defMatchers = LinkedHashMultimap.create();
 
-  private LinkedHashMultimap<String, RelationSetDescriptor> defRelSets =
-      LinkedHashMultimap.create();
+  private LinkedHashMultimap<
+          String, PropertyDocumentReference<RelationSetDescriptor>>
+      defRelSets = LinkedHashMultimap.create();
 
   public GraphResourceBuilder(DependencyModel model) {
     this.model = model;
@@ -68,31 +69,36 @@ public class GraphResourceBuilder {
     buildMatcherSets(GraphEdgeMatcherResources.getMatchers(model));
     buildRelationSets(RelationSetResources.getRelationSets(model));
 
-    GraphEdgeMatcherDescriptor defMatcher = calcDefMatcher();
-    RelationSetDescriptor defRelSet = calcDefRelSet();
+    PropertyDocumentReference<GraphEdgeMatcherDescriptor> defMatcher =
+        calcDefMatcherRef();
+    PropertyDocumentReference<RelationSetDescriptor> defRelSet = calcDefRelSet();
 
     return new GraphResources(
         model, knownRelSets, knownMatchers, defRelSet , defMatcher);
   }
 
-  private GraphEdgeMatcherDescriptor calcDefMatcher() {
-    GraphEdgeMatcherDescriptor bestMatcher = getBestMatcher();
+  private PropertyDocumentReference<GraphEdgeMatcherDescriptor>
+  calcDefMatcherRef() {
+    PropertyDocumentReference<GraphEdgeMatcherDescriptor> bestMatcher =
+        getBestMatcher();
     if (null != bestMatcher) {
       return bestMatcher;
     }
     if (!knownMatchers.isEmpty()) {
       return knownMatchers.get(0);
     }
-    return GraphEdgeMatcherDescriptors.FORWARD;
+    return GraphEdgeMatcherResources.FORWARD_REF;
   }
 
-  private GraphEdgeMatcherDescriptor getBestMatcher() {
+  private PropertyDocumentReference<GraphEdgeMatcherDescriptor>
+  getBestMatcher() {
     if (defMatchers.isEmpty()) {
       return null;
     }
     // Check the contributions in priority order the default matcher.
     for (String contribs : model.getRelationContribs()) {
-      Set<GraphEdgeMatcherDescriptor> matchers = defMatchers.get(contribs);
+      Set<PropertyDocumentReference<GraphEdgeMatcherDescriptor>> matchers =
+          defMatchers.get(contribs);
       if (null == matchers) {
         continue;
       }
@@ -104,24 +110,26 @@ public class GraphResourceBuilder {
     return null;
   }
 
-  private RelationSetDescriptor calcDefRelSet() {
-    RelationSetDescriptor bestRelSet = getBestRelSet();
+  private PropertyDocumentReference<RelationSetDescriptor> calcDefRelSet() {
+    PropertyDocumentReference<RelationSetDescriptor> bestRelSet =
+        getBestRelSet();
     if (null != bestRelSet) {
       return bestRelSet;
     }
     if (!knownRelSets.isEmpty()) {
       return knownRelSets.get(0);
     }
-    return RelationSetDescriptors.EMPTY;
+    return RelationSetResources.EMPTY_REF;
   }
 
-  private RelationSetDescriptor getBestRelSet() {
+  private PropertyDocumentReference<RelationSetDescriptor> getBestRelSet() {
     if (defRelSets.isEmpty()) {
       return null;
     }
     // Check the contributions in priority order the default relset.
     for (String contribs : model.getRelationContribs()) {
-      Set<RelationSetDescriptor> relSets = defRelSets.get(contribs);
+      Set<PropertyDocumentReference<RelationSetDescriptor>> relSets =
+          defRelSets.get(contribs);
       if (null == relSets) {
         continue;
       }
@@ -133,11 +141,12 @@ public class GraphResourceBuilder {
     return null;
   }
 
-  private void buildRelationSets(List<RelationSetDescriptor> relSets) {
+  private void buildRelationSets(
+      List<PropertyDocumentReference<RelationSetDescriptor>> relSets) {
 
     knownRelSets.addAll(relSets);
 
-    for (RelationSetDescriptor matcher : relSets) {
+    for (PropertyDocumentReference<RelationSetDescriptor> matcher : relSets) {
       String defModel = getDefault(matcher);
       if (null != defModel) {
         defRelSets.put(defModel, matcher);
@@ -145,11 +154,12 @@ public class GraphResourceBuilder {
     }
   }
 
-  private void buildMatcherSets(List<GraphEdgeMatcherDescriptor> matchers) {
+  private void buildMatcherSets(
+      List<PropertyDocumentReference<GraphEdgeMatcherDescriptor>> matchers) {
 
     knownMatchers.addAll(matchers);
 
-    for (GraphEdgeMatcherDescriptor matcher : matchers) {
+    for (PropertyDocumentReference<GraphEdgeMatcherDescriptor> matcher : matchers) {
       String defModel = getDefault(matcher);
       if (null != defModel) {
         defMatchers.put(defModel, matcher);
@@ -158,10 +168,11 @@ public class GraphResourceBuilder {
   }
 
   private String getDefault(Object resource) {
-    if (!(resource instanceof PropertyDocument)) {
+    if (!(resource instanceof PropertyDocumentReference)) {
       return null;
     }
-    PropertyDocument<?> propRes = (PropertyDocument<?>) resource;
+    PropertyDocument<?> propRes =
+        ((PropertyDocumentReference<?>) resource).getDocument();
     String propVal = propRes.getProperty(AnalysisProperties.DEFAULT_PROP);
     if (model.getRelationContribs().contains(propVal)) {
       return propVal;

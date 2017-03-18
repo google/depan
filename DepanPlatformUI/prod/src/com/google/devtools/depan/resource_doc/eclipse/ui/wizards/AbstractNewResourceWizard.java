@@ -17,7 +17,6 @@
 package com.google.devtools.depan.resource_doc.eclipse.ui.wizards;
 
 import com.google.devtools.depan.persistence.AbstractDocXmlPersist;
-import com.google.devtools.depan.persistence.StorageTools;
 import com.google.devtools.depan.platform.eclipse.ui.wizards.AbstractNewDocumentWizard;
 
 import org.eclipse.core.resources.IFile;
@@ -63,7 +62,7 @@ public abstract class AbstractNewResourceWizard<T>
 
     monitor.setTaskName("Saving document...");
     AbstractDocXmlPersist<T> persist = getDocXmlPersist();
-    StorageTools.saveDocument(file, doc, persist, monitor);
+    persist.saveDocument(file, doc, monitor);
     monitor.worked(1);
 
     monitor.setTaskName("Refreshing resources ...");

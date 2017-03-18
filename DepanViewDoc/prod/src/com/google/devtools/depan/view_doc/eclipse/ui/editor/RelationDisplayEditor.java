@@ -19,7 +19,6 @@ package com.google.devtools.depan.view_doc.eclipse.ui.editor;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.registry.RelationRegistry;
 import com.google.devtools.depan.graph_doc.model.DependencyModel;
-import com.google.devtools.depan.persistence.StorageTools;
 import com.google.devtools.depan.platform.WorkspaceTools;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 import com.google.devtools.depan.relations.persistence.RelationSetResources;
@@ -27,7 +26,7 @@ import com.google.devtools.depan.view_doc.eclipse.ui.widgets.RelationDisplayTabl
 import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty;
 import com.google.devtools.depan.view_doc.model.RelationDisplayDocument;
 import com.google.devtools.depan.view_doc.model.RelationDisplayRepository;
-import com.google.devtools.depan.view_doc.persistence.RelationDisplayDocumentXmlPersist;
+import com.google.devtools.depan.view_doc.persistence.RelationDisplayDocXmlPersist;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -120,9 +119,9 @@ public class RelationDisplayEditor extends EditorPart {
    * location.
    */
   private void persistDocument(IProgressMonitor monitor) {
-    RelationDisplayDocumentXmlPersist persist =
-        RelationDisplayDocumentXmlPersist.build(false);
-    StorageTools.saveDocument(file, propInfo, persist, monitor);
+    RelationDisplayDocXmlPersist persist =
+        RelationDisplayDocXmlPersist.build(false);
+    persist.saveDocument(file, propInfo, monitor);
 
     setDirtyState(false);
   }
@@ -169,8 +168,8 @@ public class RelationDisplayEditor extends EditorPart {
       IFileEditorInput fileInput = (IFileEditorInput) input;
       file = fileInput.getFile();
 
-      RelationDisplayDocumentXmlPersist persist =
-          RelationDisplayDocumentXmlPersist.build(true);
+      RelationDisplayDocXmlPersist persist =
+          RelationDisplayDocXmlPersist.build(true);
       propInfo = persist.load(file.getRawLocationURI());
 
       propRepo = new RelationDisplayDocumentRepo(

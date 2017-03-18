@@ -24,22 +24,27 @@ import com.google.devtools.depan.resources.analysis.AnalysisResources;
  */
 public class NodeKindResources {
 
-  public static final String FILTERS = "nodes";
+  /** Name of resource tree container for node-kind resources. */
+  public static final String NODES = "nodes";
 
   public static final String BASE_NAME = null;
 
-  /** Preferred file extension for documents. */
+  /** Expected extensions for node-kind resources. */
   public static final String EXTENSION = "nkxml";
-
-  static {
-    AnalysisResources.getRoot().addChild(FILTERS);
-  }
 
   private NodeKindResources() {
     // Prevent instantiation.
   }
 
+  public static void installResources(ResourceContainer root) {
+    root.addChild(NODES);
+  }
+
+  /**
+   * Kludgy bit of Singleton mis-use to simplify access to a very
+   * commonly referenced resource.  Other solutions are welcome.
+   */
   public static ResourceContainer getContainer() {
-    return AnalysisResources.getRoot().getChild(FILTERS);
+    return AnalysisResources.getRoot().getChild(NODES);
   }
 }

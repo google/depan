@@ -2,7 +2,6 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension-point id="com.google.devtools.depan.graph_doc.eclipse.ui.registry.from_graph_doc" name="New From Graph" schema="schema/com.google.devtools.depan.graph_doc.eclipse.ui.registry.from_graph_doc.exsd"/>
-   <extension-point id="com.google.devtools.depan.graph_doc.eclipse.ui.registry.analysis_resource" name="Analysis Resources Installer" schema="schema/com.google.devtools.depan.graph_doc.eclipse.ui.registry.analysis_resource.exsd"/>
    <extension
          point="org.eclipse.ui.editors">
       <editor

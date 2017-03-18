@@ -18,7 +18,7 @@ package com.google.devtools.depan.nodes.filters.persistence;
 
 import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.nodes.filters.model.ContextualFilterDocument;
-import com.google.devtools.depan.persistence.StorageTools;
+import com.google.devtools.depan.platform.PlatformTools;
 import com.google.devtools.depan.resources.ResourceContainer;
 import com.google.devtools.depan.resources.analysis.AnalysisResources;
 
@@ -40,20 +40,24 @@ public class ContextualFilterResources {
   /** Expected extensions for a filter resource. */
   public static final String EXTENSION = "cfxml";
 
-  static {
-    AnalysisResources.getRoot().addChild(FILTERS);
-  }
-
   private ContextualFilterResources() {
     // Prevent instantiation.
   }
 
+  public static void installResources(ResourceContainer root) {
+    root.addChild(FILTERS);
+  }
+
+  /**
+   * Kludgy bit of Singleton mis-use to simplify access to a very
+   * commonly referenced resource.  Other solutions are welcome.
+   */
   public static ResourceContainer getContainer() {
     return AnalysisResources.getRoot().getChild(FILTERS);
   }
 
   public static String getBaseNameExt() {
-    return StorageTools.getBaseNameExt(BASE_NAME, EXTENSION);
+    return PlatformTools.getBaseNameExt(BASE_NAME, EXTENSION);
   }
 
   public static List<ContextualFilterDocument> getMatchers(

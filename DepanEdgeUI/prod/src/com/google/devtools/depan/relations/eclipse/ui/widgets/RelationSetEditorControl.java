@@ -22,9 +22,11 @@ import com.google.devtools.depan.graph.registry.RelationRegistry;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 import com.google.devtools.depan.relations.models.RelationSetRepository;
+import com.google.devtools.depan.resources.PropertyDocumentReference;
 
 import com.google.common.collect.Lists;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
@@ -149,10 +151,10 @@ public class RelationSetEditorControl extends Composite {
   }
 
   public void setRelationSetSelectorInput(
-      RelationSetDescriptor selectedRelSet,
-      Collection<RelationSetDescriptor> choices) {
+      PropertyDocumentReference<RelationSetDescriptor> selectedRelSet,
+      IProject project) {
 
-    relationSetSelector.setInput(selectedRelSet, choices);
+    relationSetSelector.setInput(selectedRelSet, project);
     handleRelSetPickerChange(selectedRelSet);
   }
 
@@ -217,8 +219,10 @@ public class RelationSetEditorControl extends Composite {
     relationSetSelector.setLayoutData(Widgets.buildHorzFillData());
     relationSetSelector.addChangeListener(
         new RelationSetSelectorControl.SelectorListener() {
+
       @Override
-      public void selectedRelationSetChanged(RelationSetDescriptor relationSet) {
+      public void selectedRelationSetChanged(
+          PropertyDocumentReference<RelationSetDescriptor> relationSet) {
         handleRelSetPickerChange(relationSet);
       }
     });
@@ -305,9 +309,10 @@ public class RelationSetEditorControl extends Composite {
   /**
    * Change listener for RelationSetPickerControl.
    */
-  private void handleRelSetPickerChange(RelationSetDescriptor relationSet) {
+  private void handleRelSetPickerChange(
+      PropertyDocumentReference<RelationSetDescriptor> relationSet) {
     if (null != relationSet) {
-      relSetChange = buildRelations(relationSet.getInfo());
+      relSetChange = buildRelations(relationSet.getDocument().getInfo());
       selectRelations(relSetChange);
     }
   }

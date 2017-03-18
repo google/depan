@@ -32,7 +32,7 @@ public class ViewFromViewDocWizard extends FromViewDocWizard {
 
   @Override
   public void addPages() {
-    page = new ViewFromGraphDocPage(getGraphResources());
+    page = new ViewFromGraphDocPage(getResourceProject(), getGraphResources());
     addPage(page);
   }
 

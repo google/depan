@@ -15,7 +15,7 @@
  */
 package com.google.devtools.depan.view_doc.persistence;
 
-import com.google.devtools.depan.persistence.StorageTools;
+import com.google.devtools.depan.platform.PlatformTools;
 import com.google.devtools.depan.relations.persistence.RelationSetResources;
 import com.google.devtools.depan.resources.ResourceContainer;
 
@@ -41,6 +41,6 @@ public class RelationDisplayResources {
   }
 
   public static String getBaseNameExt() {
-    return StorageTools.getBaseNameExt(BASE_NAME, EXTENSION);
+    return PlatformTools.getBaseNameExt(BASE_NAME, EXTENSION);
   }
 }

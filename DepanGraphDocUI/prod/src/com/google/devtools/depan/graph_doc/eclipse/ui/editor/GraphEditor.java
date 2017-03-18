@@ -34,6 +34,7 @@ import com.google.devtools.depan.graph_doc.persistence.ResourceCache;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
+import com.google.devtools.depan.resources.PropertyDocumentReference;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -214,9 +215,9 @@ public class GraphEditor extends MultiPageEditorPart {
     HierarchyViewer<GraphNode> result = 
         new HierarchyViewer<GraphNode>(parent, false);
 
-    GraphEdgeMatcherDescriptor selectedRelSet = getDefaultEdgeMatcher();
-    java.util.List<GraphEdgeMatcherDescriptor> choices = getEdgeMatcherChoices();
-    result.setInput(hierarchies, selectedRelSet, choices);
+    PropertyDocumentReference<GraphEdgeMatcherDescriptor> selectedRelSet =
+        getDefaultEdgeMatcher();
+    result.setInput(hierarchies, selectedRelSet, file.getProject());
 
     result.addChangeListener(new HierarchyChangeListener() {
 
@@ -307,12 +308,9 @@ public class GraphEditor extends MultiPageEditorPart {
    * 
    * TODO: Separate hierarchy edge matcher from display relation set.
    */
-  private GraphEdgeMatcherDescriptor getDefaultEdgeMatcher() {
+  private PropertyDocumentReference<GraphEdgeMatcherDescriptor>
+      getDefaultEdgeMatcher() {
     return graphResources.getDefaultEdgeMatcher();
-  }
-
-  private java.util.List<GraphEdgeMatcherDescriptor> getEdgeMatcherChoices() {
-    return graphResources.getEdgeMatcherChoices();
   }
 
   protected void selectView() {

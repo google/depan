@@ -19,6 +19,7 @@ package com.google.devtools.depan.view_doc.eclipse.ui.views;
 import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
+import com.google.devtools.depan.resources.PropertyDocumentReference;
 import com.google.devtools.depan.view_doc.eclipse.ViewDocResources;
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
 import com.google.devtools.depan.view_doc.eclipse.ui.widgets.EdgeDisplaySaveLoadControl;
@@ -154,8 +155,12 @@ public class EdgeDisplayViewPart extends AbstractViewDocViewPart {
           }
 
           @Override
-          protected void installLoadResource(EdgeDisplayDocument doc) {
-            EdgeDisplayViewPart.this.installLoadResource(doc);
+          protected void installLoadResource(
+              PropertyDocumentReference<EdgeDisplayDocument> ref) {
+            if (null != ref) {
+              EdgeDisplayDocument doc = ref.getDocument();
+              EdgeDisplayViewPart.this.installLoadResource(doc);
+            }
           }
       
     };

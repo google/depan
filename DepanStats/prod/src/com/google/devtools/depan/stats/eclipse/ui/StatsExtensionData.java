@@ -17,8 +17,8 @@
 package com.google.devtools.depan.stats.eclipse.ui;
 
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
-import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptors;
 import com.google.devtools.depan.model.GraphModel;
+import com.google.devtools.depan.resources.PropertyDocumentReference;
 import com.google.devtools.depan.stats.jung.JungStatistics;
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
 import com.google.devtools.depan.view_doc.eclipse.ui.plugins.ViewExtension;
@@ -33,8 +33,8 @@ import com.google.devtools.depan.view_doc.model.ExtensionData;
  */
 public class StatsExtensionData extends AbstractExtensionData {
 
-  private GraphEdgeMatcherDescriptor statsMatcher =
-      GraphEdgeMatcherDescriptors.FORWARD;
+  // The data selectors to save as part of the view.
+  private PropertyDocumentReference<GraphEdgeMatcherDescriptor> statsMatcher;
 
   private transient JungStatistics stats;
 
@@ -59,31 +59,37 @@ public class StatsExtensionData extends AbstractExtensionData {
       ViewEditor editor, ViewExtension extension) {
     ExtensionData result = editor.getExtensionData(extension);
     if (null == result) {
-      result = buildExtensionData(extension);
+      result = buildExtensionData(editor, extension);
       editor.setExtensionData(extension, null, result);
     }
     return (StatsExtensionData) result;
   }
 
   private static StatsExtensionData buildExtensionData(
-      ViewExtension extension) {
+      ViewEditor editor, ViewExtension extension) {
     StatsExtensionData result = new StatsExtensionData(extension, null);
+    PropertyDocumentReference<GraphEdgeMatcherDescriptor> matcherRef =
+        editor.getLayoutEdgeMatcherRef();
+    result.setStatsMatcherRef(matcherRef);
     return result;
   }
 
   /////////////////////////////////////
   // Public API
 
-  public GraphEdgeMatcherDescriptor getStatsMatcherDescr() {
+  public PropertyDocumentReference<GraphEdgeMatcherDescriptor>
+  getStatsMatcherRef() {
     return statsMatcher;
   }
 
-  public void setStatsMatcherDescr(GraphEdgeMatcherDescriptor statsMatcher) {
+  public void setStatsMatcherRef(
+      PropertyDocumentReference<GraphEdgeMatcherDescriptor> statsMatcher) {
     this.statsMatcher = statsMatcher;
   }
 
   public void calcJungStatistics(GraphModel model) {
-    stats = JungStatistics.build(model, statsMatcher);
+    GraphEdgeMatcherDescriptor doc = statsMatcher.getDocument();
+    stats = JungStatistics.build(model, doc);
   }
 
   public JungStatistics getJungStatistics() {

@@ -18,6 +18,7 @@ package com.google.devtools.depan.matchers.eclipse.ui.widgets;
 
 import com.google.devtools.depan.platform.ListenerManager;
 import com.google.devtools.depan.platform.ListenerManager.Dispatcher;
+import com.google.devtools.depan.resources.PropertyDocumentReference;
 import com.google.devtools.depan.edge_ui.EdgeUILogger;
 import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
@@ -119,12 +120,14 @@ public class EdgeMatcherMenuCreator implements IMenuCreator {
 
     menu = newMenu;
 
-    List<GraphEdgeMatcherDescriptor> matchers = GraphEdgeMatcherResources.getMatchers(model);
-    if (matchers.isEmpty()) {
+    List<PropertyDocumentReference<GraphEdgeMatcherDescriptor>> refs =
+        GraphEdgeMatcherResources.getMatchers(model);
+    if (refs.isEmpty()) {
       return null;
     }
 
-    for (GraphEdgeMatcherDescriptor matcher : matchers) {
+    for (PropertyDocumentReference<GraphEdgeMatcherDescriptor> ref : refs) {
+      GraphEdgeMatcherDescriptor matcher = ref.getDocument();
       MenuItem item = new MenuItem(menu, SWT.PUSH);
       item.setText(matcher.getName());
       item.setData(matcher);

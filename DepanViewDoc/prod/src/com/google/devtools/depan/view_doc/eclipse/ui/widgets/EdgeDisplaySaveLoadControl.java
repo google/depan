@@ -21,7 +21,7 @@ import com.google.devtools.depan.platform.eclipse.ui.widgets.GenericSaveLoadCont
 import com.google.devtools.depan.platform.eclipse.ui.widgets.SaveLoadConfig;
 import com.google.devtools.depan.resources.ResourceContainer;
 import com.google.devtools.depan.view_doc.model.EdgeDisplayDocument;
-import com.google.devtools.depan.view_doc.persistence.EdgeDisplayDocumentXmlPersist;
+import com.google.devtools.depan.view_doc.persistence.EdgeDisplayDocXmlPersist;
 import com.google.devtools.depan.view_doc.persistence.EdgeDisplayResources;
 
 import org.eclipse.swt.widgets.Composite;
@@ -54,7 +54,7 @@ public abstract class EdgeDisplaySaveLoadControl
     @Override
     public AbstractDocXmlPersist<EdgeDisplayDocument> getDocXmlPersist(
         boolean readable) {
-      return EdgeDisplayDocumentXmlPersist.build(readable);
+      return EdgeDisplayDocXmlPersist.build(readable);
     }
 
     @Override

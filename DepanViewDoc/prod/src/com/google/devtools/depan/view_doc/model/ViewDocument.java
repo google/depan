@@ -31,6 +31,7 @@ import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.builder.api.GraphBuilders;
 import com.google.devtools.depan.nodes.trees.TreeModel;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
+import com.google.devtools.depan.resources.PropertyDocumentReference;
 import com.google.devtools.depan.view_doc.eclipse.ui.plugins.ViewExtension;
 
 import com.google.common.collect.ImmutableList;
@@ -214,12 +215,14 @@ public class ViewDocument {
     userPrefs.editSelectedNodes(removeNodes, addNodes, author);
   }
 
-  public GraphEdgeMatcherDescriptor getLayoutFinder() {
-    return userPrefs.getLayoutFinder();
+  public PropertyDocumentReference<GraphEdgeMatcherDescriptor>
+      getLayoutMatcherRef() {
+    return userPrefs.getLayoutMatcherRef();
   }
 
-  public void setLayoutEdgeMatcher(GraphEdgeMatcherDescriptor layoutEdgeMatcher) {
-    userPrefs.setLayoutFinder(layoutEdgeMatcher);
+  public void setLayoutEdgeMatcher(
+      PropertyDocumentReference<GraphEdgeMatcherDescriptor> matcherRef) {
+    userPrefs.setLayoutMatcherRef(matcherRef);
   }
 
   public NodeTreeProvider<NodeDisplayProperty>

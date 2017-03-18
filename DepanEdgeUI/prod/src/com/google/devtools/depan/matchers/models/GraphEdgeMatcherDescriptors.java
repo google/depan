@@ -7,7 +7,7 @@ import com.google.devtools.depan.analysis_doc.model.ModelMatcher;
 import com.google.devtools.depan.edges.matchers.GraphEdgeMatchers;
 
 /**
- * @author Standard Lee
+ * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
 public class GraphEdgeMatcherDescriptors {
 

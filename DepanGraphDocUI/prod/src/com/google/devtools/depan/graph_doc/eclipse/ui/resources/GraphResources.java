@@ -22,6 +22,7 @@ import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
+import com.google.devtools.depan.resources.PropertyDocumentReference;
 
 import java.util.Collection;
 import java.util.List;
@@ -36,11 +37,15 @@ public class GraphResources {
   
   private final DependencyModel depsModel;
 
-  private final RelationSetDescriptor defRelSet;
-  private final List<RelationSetDescriptor> relSets;
+  private final PropertyDocumentReference<RelationSetDescriptor>
+      defRelSet;
+  private final List<PropertyDocumentReference<RelationSetDescriptor>>
+      relSets;
 
-  private final GraphEdgeMatcherDescriptor defMatcher;
-  private final List<GraphEdgeMatcherDescriptor> matchers;
+  private final PropertyDocumentReference<GraphEdgeMatcherDescriptor>
+      defMatcherRef;
+  private final List<PropertyDocumentReference<GraphEdgeMatcherDescriptor>>
+      matchers;
 
   /**
    * @param relSets
@@ -50,30 +55,34 @@ public class GraphResources {
    */
   public GraphResources(
       DependencyModel depsModel,
-      List<RelationSetDescriptor> relSets,
-      List<GraphEdgeMatcherDescriptor> matchers,
-      RelationSetDescriptor defRelSet,
-      GraphEdgeMatcherDescriptor defMatcher) {
+      List<PropertyDocumentReference<RelationSetDescriptor>> relSets,
+      List<PropertyDocumentReference<GraphEdgeMatcherDescriptor>> matchers,
+      PropertyDocumentReference<RelationSetDescriptor> defRelSet,
+      PropertyDocumentReference<GraphEdgeMatcherDescriptor> defMatcherRef) {
     this.depsModel = depsModel;
     this.relSets = relSets;
     this.matchers = matchers;
     this.defRelSet = defRelSet;
-    this.defMatcher = defMatcher;
+    this.defMatcherRef = defMatcherRef;
   }
 
-  public RelationSetDescriptor getDefaultRelationSet() {
+  public PropertyDocumentReference<RelationSetDescriptor>
+      getDefaultRelationSet() {
     return defRelSet;
   }
 
-  public List<RelationSetDescriptor> getRelationSetsChoices() {
+  public List<PropertyDocumentReference<RelationSetDescriptor>>
+      getRelationSetsChoices() {
     return relSets;
   }
 
-  public GraphEdgeMatcherDescriptor getDefaultEdgeMatcher() {
-    return defMatcher;
+  public PropertyDocumentReference<GraphEdgeMatcherDescriptor>
+      getDefaultEdgeMatcher() {
+    return defMatcherRef;
   }
 
-  public List<GraphEdgeMatcherDescriptor> getEdgeMatcherChoices() {
+  public List<PropertyDocumentReference<GraphEdgeMatcherDescriptor>>
+      getEdgeMatcherChoices() {
     return matchers;
   }
 

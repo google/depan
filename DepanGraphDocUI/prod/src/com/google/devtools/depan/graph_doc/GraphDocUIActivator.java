@@ -16,8 +16,6 @@
 
 package com.google.devtools.depan.graph_doc;
 
-import com.google.devtools.depan.graph_doc.eclipse.ui.plugins.AnalysisResourceRegistry;
-
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
@@ -28,7 +26,6 @@ public class GraphDocUIActivator implements BundleActivator {
 
   @Override
   public void start(BundleContext context) throws Exception {
-    AnalysisResourceRegistry.installRegistryResources();
   }
 
   @Override

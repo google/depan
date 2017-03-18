@@ -16,10 +16,14 @@
 
 package com.google.devtools.depan.resource_doc.eclipse.ui.widgets;
 
+import com.google.devtools.depan.persistence.AbstractDocXmlPersist;
 import com.google.devtools.depan.platform.PlatformTools;
-import com.google.devtools.depan.platform.WorkspaceTools;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
+import com.google.devtools.depan.resources.FileDocumentReference;
+import com.google.devtools.depan.resources.PropertyDocument;
+import com.google.devtools.depan.resources.PropertyDocumentReference;
 import com.google.devtools.depan.resources.ResourceContainer;
+import com.google.devtools.depan.resources.ResourceDocumentReference;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -36,7 +40,10 @@ import java.text.MessageFormat;
  * 
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public class ProjectResourceLoadControl extends ProjectResourceControl {
+public class ProjectResourceLoadControl<T extends PropertyDocument<?>>
+    extends ProjectResourceControl<T> {
+
+  private AbstractDocXmlPersist<T> persist;
 
   /////////////////////////////////////
   // UX elements
@@ -51,39 +58,51 @@ public class ProjectResourceLoadControl extends ProjectResourceControl {
    */
   public ProjectResourceLoadControl(
       Composite parent, UpdateListener client,
-      ResourceContainer container, IContainer rsrcContainer,
-      String fileName, String requiredExt) {
-    super(parent, client, container, rsrcContainer, fileName, requiredExt);
+      ResourceContainer container, IContainer folder,
+      String fileName, String requiredExt, AbstractDocXmlPersist<T> persist) {
+    super(parent, client, container, folder, fileName, requiredExt);
+    this.persist = persist;
     setLayout(Widgets.buildContainerLayout(1));
  
     Composite contents = setupContents(this);
     contents.setLayoutData(Widgets.buildGrabFillData());
   }
 
-  public IFile getResourceLocation() throws CoreException {
-    IFile result = getSelectedDocument();
-    if (result == null) {
-      PlatformTools.throwCoreException(
-          "Document resource must be selected",
-          "com.google.devtools.depan.platform.ui");
-      
-    }
-    if (!result.exists()) {
-      String msg = MessageFormat.format(
-          "Resource \'{0}\' does not exist.",
-          WorkspaceTools.fromPath(result.getFullPath()));
-      PlatformTools.throwCoreException(
-          msg, "com.google.devtools.depan.platform.ui");
+
+  @Override
+  public PropertyDocumentReference<T> getDocumentReference()
+      throws CoreException {
+    T resource = getSelectedResource();
+    if (null != resource) {
+      return ResourceDocumentReference.buildResourceReference(
+          getContainer(), resource);
     }
 
-    return result;
+    IFile location = getSelectedDocument();
+    if (null != location) {
+      if (!location.exists()) {
+        String msg = MessageFormat.format(
+            "Resource \'{0}\' does not exist.",
+            PlatformTools.fromPath(location.getFullPath()));
+        PlatformTools.throwCoreException(
+            msg, "com.google.devtools.depan.platform.ui");
+      }
+      T document = persist.load(location.getRawLocationURI());
+
+      return FileDocumentReference.buildFileReference(location, document);
+    }
+
+    PlatformTools.throwCoreException(
+        "Document resource must be selected",
+        "com.google.devtools.depan.platform.ui");
+    return null;
   }
 
   @Override
   public String validateInputs() {
     IFile input = getSelectedDocument();
     String result = validateInputs(
-        WorkspaceTools.fromPath(input.getFullPath()), input.getName());
+        PlatformTools.fromPath(input.getFullPath()), input.getName());
     if (null != result) {
       return result;
     }

@@ -22,7 +22,7 @@ import com.google.devtools.depan.persistence.AbstractDocXmlPersist;
 import com.google.devtools.depan.resource_doc.eclipse.ui.wizards.AbstractNewResourceWizard;
 import com.google.devtools.depan.view_doc.model.RelationDisplayDocument;
 import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty;
-import com.google.devtools.depan.view_doc.persistence.RelationDisplayDocumentXmlPersist;
+import com.google.devtools.depan.view_doc.persistence.RelationDisplayDocXmlPersist;
 import com.google.devtools.depan.view_doc.persistence.RelationDisplayResources;
 
 import org.eclipse.core.resources.IFile;
@@ -132,6 +132,6 @@ public class NewRelationDisplayDocWizard
   @Override
   protected AbstractDocXmlPersist<RelationDisplayDocument>
       getDocXmlPersist() {
-    return RelationDisplayDocumentXmlPersist.build(false);
+    return RelationDisplayDocXmlPersist.build(false);
   }
 }

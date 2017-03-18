@@ -43,7 +43,9 @@
     <module>../DepanCollapser/test</module>
     <module>../DepanEdgeUI/prod</module>
     <module>../DepanGraphDocUI/prod</module>
+<!-- missing dependency on AnalysisResources
     <module>../DepanGraphDocUI/test</module>
+   -->
     <module>../DepanLayouts/prod</module>
     <module>../DepanNodeUI/prod</module>
     <module>../DepanPlatformUI/prod</module>

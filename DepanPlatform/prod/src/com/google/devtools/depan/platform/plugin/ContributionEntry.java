@@ -16,8 +16,14 @@
 
 package com.google.devtools.depan.platform.plugin;
 
+import com.google.common.collect.Lists;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Basic contribution with a unique identifier bound to a contributed class.
@@ -128,5 +134,18 @@ public abstract class ContributionEntry<T> {
    */
   public T getInstance() {
     return instance;
+  }
+
+  public Collection<String> getDependIds(
+      String dependTag, String dependAttr) {
+    IConfigurationElement[] depends = element.getChildren(dependTag);
+    if (0 == depends.length) {
+      return Collections.emptyList();
+    }
+    List<String> result = Lists.newArrayListWithExpectedSize(depends.length);
+    for (IConfigurationElement depend : depends) {
+      result.add(depend.getAttribute(dependAttr));
+    }
+    return result;
   }
 }

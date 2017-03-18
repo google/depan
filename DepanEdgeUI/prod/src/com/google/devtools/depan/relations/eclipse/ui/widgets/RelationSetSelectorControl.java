@@ -17,25 +17,16 @@
 package com.google.devtools.depan.relations.eclipse.ui.widgets;
 
 import com.google.devtools.depan.edge_ui.EdgeUILogger;
-import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
-import com.google.devtools.depan.platform.AlphabeticSorter;
 import com.google.devtools.depan.platform.ListenerManager;
-import com.google.devtools.depan.platform.ViewerObjectToString;
-import com.google.devtools.depan.platform.eclipse.ui.widgets.Selections;
+import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
+import com.google.devtools.depan.resources.PropertyDocumentReference;
 
-import org.eclipse.jface.viewers.ArrayContentProvider;
-import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
-
-import java.util.Collection;
-import java.util.List;
+import org.eclipse.swt.widgets.Label;
 
 /**
  * A drop-dowp widget showing a list of named relation sets
@@ -47,15 +38,26 @@ import java.util.List;
  */
 public class RelationSetSelectorControl extends Composite {
 
-  /** The drop-down list itself. */
-  private ComboViewer setsViewer;
+  @SuppressWarnings("unused")
+  // The sole current application (RelationSetEditorControl) uses a
+  // listener to pickup the current selection.
+  private PropertyDocumentReference<RelationSetDescriptor> curr;
+
+  private IProject project;
+
+  /////////////////////////////////////
+  // UX Elements
+
+  private Label nameViewer;
+
+  private RelationSetLoadControl chooser;
 
   /////////////////////////////////////
   // Listener interface for interested parties
 
   public static interface SelectorListener {
     public void selectedRelationSetChanged(
-        RelationSetDescriptor relationSet);
+        PropertyDocumentReference<RelationSetDescriptor> relationSet);
   }
 
   /** Listener when the selection change. */
@@ -68,7 +70,8 @@ public class RelationSetSelectorControl extends Composite {
     @Override
     public void captureException(RuntimeException errAny) {
       EdgeUILogger.logException(
-          "Exception in selection handler for edge selector control", errAny);
+          "Exception in selection handler for relation set selector control",
+          errAny);
     }
   }
 
@@ -77,98 +80,43 @@ public class RelationSetSelectorControl extends Composite {
 
   public RelationSetSelectorControl(Composite parent) {
     super(parent, SWT.NONE);
-    setLayout(new FillLayout());
+    setLayout(Widgets.buildContainerLayout(2));
 
-    setsViewer = new ComboViewer(this, SWT.READ_ONLY | SWT.FLAT);
-    setsViewer.setContentProvider(new ArrayContentProvider());
-    setsViewer.setLabelProvider(RelationSetLabelProvider.PROVIDER);
+    nameViewer = Widgets.buildGridLabel(this, "");
+    nameViewer.setLayoutData(Widgets.buildGrabFillData());
 
-    setsViewer.setComparator(new AlphabeticSorter(new ViewerObjectToString() {
-
-        @Override
-        public String getString(Object object) {
-          return RelationSetLabelProvider.PROVIDER.getText(object);
-        }
-      }));
-
-    setsViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+    chooser = new RelationSetLoadControl(this) {
+      @Override
+      protected IProject getProject() {
+        return project;
+      }
 
       @Override
-      public void selectionChanged(SelectionChangedEvent event) {
-        RelationSetDescriptor relationSet =
-            extractFromSelection(event.getSelection());
-        if (null == relationSet) {
-          return;
-        }
-
-        // Notify interested parties about the change
-        fireSelectionChange(relationSet);
+      protected void installLoadResource(
+          PropertyDocumentReference<RelationSetDescriptor> ref) {
+        RelationSetSelectorControl.this.curr = ref;
+        nameViewer.setText(ref.getDocument().getName());
+        fireSelectionChange(ref);
       }
-    });
+    };
+    chooser.setLayoutData(Widgets.buildTrailFillData());
   }
 
   /**
-   * Update the picker to show only the provided choices, with the indicated
-   * {@code GraphEdgeMatcherDescriptor} as the selected element.  The selected
-   * {@code GraphEdgeMatcherDescriptor} must be included in the {@code choices}
-   * list, or no item will selected.
-   * 
-   * @param selectedRelSet {GraphEdgeMatcherDescriptor RelationSet} to select
-   *  in control
-   * @param choices selectable alternatives.  Since the viewer controls the
-   *   presentation order, no ordering is expected.
+   * Update the selector control to show the supplied relation set as the
+   * selected item from the project's choices.
    */
   public void setInput(
-      RelationSetDescriptor relationSet,
-      Collection<RelationSetDescriptor> choices) {
-    setsViewer.setInput(choices);
-    setSelection(relationSet);
-  }
-
-  @SuppressWarnings("unchecked")
-  private List<RelationSetDescriptor> getInput() {
-    return (List<RelationSetDescriptor>) setsViewer.getInput();
-  }
-
-  /**
-   * Select the given {@link RelationSetDescriptor} on the list if it is present.
-   * @param instanceSet the {@link RelationSetDescriptor} to select.
-   */
-  public void setSelection(RelationSetDescriptor relationSet) {
-    for (RelationSetDescriptor choice : getInput()) {
-      if (choice == relationSet) {
-        setsViewer.setSelection(new StructuredSelection(choice));
-        fireSelectionChange(relationSet);
-        return;
-      }
-    }
+      PropertyDocumentReference<RelationSetDescriptor> ref,
+      IProject project) {
+    this.curr = ref;
+    this.project = project;
+    nameViewer.setText(ref.getDocument().getName());
   }
 
   public void clearSelection() {
-    setsViewer.setSelection(StructuredSelection.EMPTY);
-    fireSelectionChange(null);
-  }
-
-  /**
-   * @return the currently selected GraphEdgeMatcherDescriptor,
-   *    or {@code null} if nothing is selected.
-   */
-  public RelationSetDescriptor getSelection() {
-    return extractFromSelection(setsViewer.getSelection());
-  }
-
-  /**
-   * return the {@link GraphEdgeMatcherDescriptor} for the given selection,
-   * or {@code null} if an error happens.
-   * 
-   * @param selection selection object containing a
-   *   {@link GraphEdgeMatcherDescriptor}
-   * @return the extracted {@link GraphEdgeMatcherDescriptor} or
-   *   {@code null} in case of error.
-   */
-  private RelationSetDescriptor extractFromSelection(ISelection selection) {
-    return Selections.getFirstElement(
-        selection, RelationSetDescriptor.class);
+    this.curr = null;
+    nameViewer.setText("");
   }
 
   /////////////////////////////////////
@@ -193,13 +141,13 @@ public class RelationSetSelectorControl extends Composite {
    * @param selection the new selection
    */
   protected void fireSelectionChange(
-      final RelationSetDescriptor relationSet) {
+      final PropertyDocumentReference<RelationSetDescriptor> ref) {
 
     selectionListeners.fireEvent(new LoggingDispatcher() {
 
       @Override
       public void dispatch(SelectorListener listener) {
-        listener.selectedRelationSetChanged(relationSet);
+        listener.selectedRelationSetChanged(ref);
       }
     });
   }

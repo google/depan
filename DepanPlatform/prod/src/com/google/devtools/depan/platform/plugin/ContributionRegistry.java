@@ -18,8 +18,6 @@ package com.google.devtools.depan.platform.plugin;
 
 import static com.google.devtools.depan.platform.PlatformLogger.LOG;
 
-import com.google.devtools.depan.model.Element;
-
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -36,6 +34,7 @@ import org.osgi.framework.Bundle;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Registry of known NodeElement definitions.  NodeElement contributions are
@@ -50,6 +49,7 @@ import java.util.Map;
  * to that plugin.
  *
  * @author Yohann Coppel
+ * @author <a href='mailto:leeca@pnambic.com'>Lee Carver</a>
  */
 public abstract class ContributionRegistry<T> {
 
@@ -105,7 +105,7 @@ public abstract class ContributionRegistry<T> {
         }
         entries.put(entryId, entry);
 
-        // try to instantiate the contribution and install it
+        // Try to instantiate the contribution and install it.
         try {
           T plugin = entry.prepareInstance();
           installContribution(entryId, plugin);
@@ -135,7 +135,23 @@ public abstract class ContributionRegistry<T> {
     return result;
   }
 
-  // Keep this private for now.
+  /**
+   * Rare, and during serialization, so linear search lookup should not
+   * be a performance bottleneck.
+   */
+  protected String getContributionId(T contrib) {
+    for (Entry<String, ContributionEntry<T>> entry : entries.entrySet()) {
+      if (entry.getValue().getInstance() == contrib) {
+        return entry.getKey();
+      }
+    }
+    // Unregistered contribution entry instance.
+    return null;
+  }
+
+  /**
+   * For {@code XStreamConfigRegistry}.
+   */
   public Collection<Bundle> getPluginBundles() {
     Collection<Bundle> result = Sets.newHashSet();
     for (ContributionEntry<T> entry: getContributions()) {

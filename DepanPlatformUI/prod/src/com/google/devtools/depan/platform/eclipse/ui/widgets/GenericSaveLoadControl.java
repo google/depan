@@ -17,6 +17,7 @@
 package com.google.devtools.depan.platform.eclipse.ui.widgets;
 
 import com.google.devtools.depan.resources.PropertyDocument;
+import com.google.devtools.depan.resources.PropertyDocumentReference;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.swt.SWT;
@@ -80,8 +81,9 @@ public abstract class GenericSaveLoadControl<T extends PropertyDocument<?>>
    * Open a dialog to load a resource.
    */
   private void handleLoad() {
-    T rsrc = config.loadResource(getShell(), getProject());
-    installLoadResource(rsrc);
+    PropertyDocumentReference<T> ref =
+        config.loadResource(getShell(), getProject());
+    installLoadResource(ref);
   }
 
   /////////////////////////////////////
@@ -98,5 +100,6 @@ public abstract class GenericSaveLoadControl<T extends PropertyDocument<?>>
   /**
    * Configure the editor's controls, based on the supplied document.
    */
-  protected abstract void installLoadResource(T doc);
+  protected abstract void installLoadResource(
+      PropertyDocumentReference<T> ref);
 }

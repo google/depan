@@ -25,7 +25,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.viewers.ISelection;
@@ -35,8 +34,6 @@ import org.eclipse.ui.dialogs.ContainerSelectionDialog;
 import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
 import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
-
-import java.text.MessageFormat;
 
 /**
  * A utility class that provides static methods for manipulating Eclipse
@@ -51,22 +48,6 @@ public final class WorkspaceTools {
     // Prevent instantiation.
   }
 
-  /**
-   * Do all string to path conversions here, to ensure consistency throughout
-   * DepAn.
-   */
-  public static IPath buildPath(String pathText) {
-    return Path.fromOSString(pathText);
-  }
-
-  /**
-   * Do all path to string conversions here, to ensure consistency throughout
-   * DepAn.
-   */
-  public static String fromPath(IPath path) {
-    return path.toOSString();
-  }
-
   public static IFile buildResourceFile(IPath path) {
     return ResourcesPlugin.getWorkspace().getRoot().getFile(path);
   }
@@ -78,11 +59,6 @@ public final class WorkspaceTools {
   public static IFile buildResourceFile(String saveFilename) {
     IPath savePath = Path.fromOSString(saveFilename);
     return buildResourceFile(savePath);
-  }
-
-  public static IFile buildResourceFile(IContainer container, String fileName) {
-    IFile result = container.getFile(buildPath(fileName));
-    return result;
   }
 
   /**

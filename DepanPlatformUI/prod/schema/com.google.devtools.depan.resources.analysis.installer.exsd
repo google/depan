@@ -49,13 +49,9 @@
 
    <element name="installer">
       <complexType>
-         <attribute name="id" type="string" use="required">
-            <annotation>
-               <documentation>
-                  
-               </documentation>
-            </annotation>
-         </attribute>
+         <sequence minOccurs="0" maxOccurs="unbounded">
+            <element ref="install_after"/>
+         </sequence>
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
@@ -64,6 +60,25 @@
                <appinfo>
                   <meta.attribute kind="java" basedOn=":com.google.devtools.depan.graph_doc.eclipse.ui.plugins.AnalysisResourceInstaller"/>
                </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="install_after">
+      <complexType>
+         <attribute name="installer_ref" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
             </annotation>
          </attribute>
       </complexType>

@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.nodes.filters.eclipse.ui.widgets;
 
+import com.google.devtools.depan.graph.api.EdgeMatcher;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.registry.RelationRegistry;
 import com.google.devtools.depan.matchers.eclipse.ui.widgets.EdgeMatcherEditorControl;
@@ -24,6 +25,7 @@ import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphEdgeMatcher;
 import com.google.devtools.depan.nodes.filters.sequence.EdgeMatcherFilter;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
+import com.google.devtools.depan.resources.PropertyDocumentReference;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.swt.widgets.Composite;
@@ -120,11 +122,12 @@ public class EdgeMatcherFilterEditorControl
     }
 
     @Override
-    protected void installLoadResource(GraphEdgeMatcherDescriptor doc) {
-      if (null == doc) {
-        return;
+    protected void installLoadResource(
+        PropertyDocumentReference<GraphEdgeMatcherDescriptor> ref) {
+      if (null != ref) {
+        EdgeMatcher<String> matcher =  ref.getDocument().getInfo();
+        edgeMatcherEditor.updateEdgeMatcher(matcher);
       }
-      edgeMatcherEditor.updateEdgeMatcher(doc.getInfo());
     }
   }
 }

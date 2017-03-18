@@ -19,6 +19,8 @@ package com.google.devtools.depan.resource_doc.eclipse.ui.persistence;
 import com.google.devtools.depan.platform.PlatformLogger;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 import com.google.devtools.depan.resource_doc.eclipse.ui.widgets.ProjectResourceControl;
+import com.google.devtools.depan.resources.PropertyDocument;
+import com.google.devtools.depan.resources.PropertyDocumentReference;
 import com.google.devtools.depan.resources.ResourceContainer;
 
 import org.eclipse.core.resources.IContainer;
@@ -36,19 +38,20 @@ import org.eclipse.swt.widgets.Shell;
  *
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public abstract class AbstractResourceDialog extends TitleAreaDialog {
+public abstract class AbstractResourceDialog<T extends PropertyDocument<?>>
+    extends TitleAreaDialog {
 
   private ResourceContainer container;
   private IContainer rsrcRoot;
   private String fileName;
   private String fileExt;
 
-  private IFile result;
+  private PropertyDocumentReference<T> result;
 
   /////////////////////////////////////
   // UX Elements
 
-  private ProjectResourceControl rsrcLoc;
+  private ProjectResourceControl<T> rsrcLoc;
 
   public AbstractResourceDialog(Shell parentShell) {
     super(parentShell);
@@ -68,7 +71,7 @@ public abstract class AbstractResourceDialog extends TitleAreaDialog {
   /**
    * Hook method to {@link #createContents(Composite)}.
    */
-  protected abstract ProjectResourceControl buildResourceControl(
+  protected abstract ProjectResourceControl<T> buildResourceControl(
       Composite parent);
 
   @Override
@@ -103,7 +106,7 @@ public abstract class AbstractResourceDialog extends TitleAreaDialog {
   @Override
   protected void okPressed() {
     try {
-      result = rsrcLoc.getResourceLocation();
+      result = rsrcLoc.getDocumentReference();
     } catch (CoreException errCore) {
       PlatformLogger.logException("Resource load error", errCore);
       result = null;
@@ -119,7 +122,7 @@ public abstract class AbstractResourceDialog extends TitleAreaDialog {
     getButton(IDialogConstants.OK_ID).setEnabled(null == msg);
   }
 
-  public IFile getResult() {
+  public PropertyDocumentReference<T> getResult() {
     return result;
   }
 

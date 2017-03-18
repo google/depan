@@ -17,7 +17,7 @@
 package com.google.devtools.depan.nodelist_doc.eclipse.ui.wizards;
 
 import com.google.devtools.depan.nodelist_doc.model.NodeListDocument;
-import com.google.devtools.depan.persistence.StorageTools;
+import com.google.devtools.depan.platform.PlatformTools;
 import com.google.devtools.depan.platform.eclipse.ui.wizards.AbstractNewDocumentOutputPart;
 import com.google.devtools.depan.platform.eclipse.ui.wizards.AbstractNewDocumentPage;
 import com.google.devtools.depan.platform.eclipse.ui.wizards.NewDocumentOutputPart;
@@ -50,7 +50,7 @@ public class NewSubtractNodesPage extends AbstractNewDocumentPage {
   @Override
   protected NewDocumentOutputPart createOutputPart() {
     IContainer outputContainer = guessContainer();
-    String outputFilename = StorageTools.guessNewFilename(
+    String outputFilename = PlatformTools.guessNewFilename(
         outputContainer, DEFAULT_FILENAME, 1, 10);
 
     return new AbstractNewDocumentOutputPart(

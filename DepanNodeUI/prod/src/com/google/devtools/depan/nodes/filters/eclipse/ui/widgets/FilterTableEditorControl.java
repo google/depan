@@ -23,6 +23,7 @@ import com.google.devtools.depan.nodes.filters.model.ContextualFilter;
 import com.google.devtools.depan.nodes.filters.model.ContextualFilterDocument;
 import com.google.devtools.depan.nodes.filters.sequence.SteppingFilter;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
+import com.google.devtools.depan.resources.PropertyDocumentReference;
 
 import com.google.common.collect.Lists;
 
@@ -194,15 +195,15 @@ public class FilterTableEditorControl
     if (null == getFilter()) {
       return;
     }
-    ContextualFilterDocument filterDoc =
+    PropertyDocumentReference<ContextualFilterDocument> ref =
         ContextualFilterSaveLoadConfig.CONFIG.loadResource(
             getShell(), getProject());
-    if (null == filterDoc) {
+    if (null == ref) {
       return;
     }
-
+    ContextualFilter filter = ref.getDocument().getInfo();
     List<ContextualFilter> result = getUpdatableSteps();
-    result.add(filterDoc.getInfo());
+    result.add(filter);
 
     updateSteps(result);
   }

@@ -35,6 +35,7 @@ import com.google.devtools.depan.nodes.filters.model.FilterContext;
 import com.google.devtools.depan.nodes.filters.sequence.SteppingFilter;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Sasher;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
+import com.google.devtools.depan.resources.PropertyDocumentReference;
 import com.google.devtools.depan.view_doc.eclipse.ViewDocLogger;
 import com.google.devtools.depan.view_doc.eclipse.ViewDocResources;
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
@@ -423,14 +424,13 @@ public class NodeFilterViewPart extends AbstractViewDocViewPart {
     Shell shell = editor.getSite().getShell();
     IProject project = getEditor().getResourceProject();
 
-    ContextualFilterDocument loadFilter =
+    PropertyDocumentReference<ContextualFilterDocument> ref =
         ContextualFilterSaveLoadConfig.CONFIG.loadResource(shell, project);
-    // Bail out on aborted load
-    if (null == loadFilter) {
+    if (null == ref) {
       return;
     }
 
-    ContextualFilter filter = loadFilter.getInfo();
+    ContextualFilter filter = ref.getDocument().getInfo();
     DependencyModel model = editor.getDependencyModel();
     if (filter instanceof SteppingFilter) {
       filterControl.setInput((SteppingFilter) filter, model, project);

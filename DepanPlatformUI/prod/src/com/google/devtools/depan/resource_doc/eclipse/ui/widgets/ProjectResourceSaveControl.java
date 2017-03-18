@@ -20,6 +20,9 @@ import com.google.devtools.depan.platform.PlatformTools;
 import com.google.devtools.depan.platform.WorkspaceTools;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Selections;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
+import com.google.devtools.depan.resources.FileDocumentReference;
+import com.google.devtools.depan.resources.PropertyDocument;
+import com.google.devtools.depan.resources.PropertyDocumentReference;
 import com.google.devtools.depan.resources.ResourceContainer;
 
 import org.eclipse.core.resources.IContainer;
@@ -50,7 +53,8 @@ import java.text.MessageFormat;
  *
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public class ProjectResourceSaveControl extends ProjectResourceControl {
+public class ProjectResourceSaveControl<T extends PropertyDocument<?>>
+    extends ProjectResourceControl<T> {
 
   /////////////////////////////////////
   // UX elements
@@ -87,8 +91,16 @@ public class ProjectResourceSaveControl extends ProjectResourceControl {
       PlatformTools.throwCoreException(
           msg, "com.google.devtools.depan.platform.ui");
     }
-    return WorkspaceTools.buildResourceFile(
+    return PlatformTools.buildResourceFile(
         (IContainer) resource, inputName);
+  }
+
+  @Override
+  public PropertyDocumentReference<T> getDocumentReference()
+      throws CoreException {
+    IFile location = getResourceLocation();
+    return FileDocumentReference.buildFileReference(
+        location, null);
   }
 
   @Override
@@ -100,7 +112,7 @@ public class ProjectResourceSaveControl extends ProjectResourceControl {
       return result;
     }
 
-    IPath filePath = WorkspaceTools.buildPath(inputName);
+    IPath filePath = PlatformTools.buildPath(inputName);
     result = validateExtension(filePath.getFileExtension());
     if (null != result) {
       return result;

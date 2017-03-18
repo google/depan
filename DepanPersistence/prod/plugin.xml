@@ -2,5 +2,13 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension-point id="com.google.devtools.depan.persistence.xstream.config" name="XStream Configuration" schema="schema/com.google.devtools.depan.persistence.xstream.config.exsd"/>
+   <extension-point id="com.google.devtools.depan.persistence.resources.config" name="Resource Document Configuration" schema="schema/com.google.devtools.depan.persistence.resources.config.exsd"/>
+   <extension
+         point="com.google.devtools.depan.persistence.xstream.config">
+      <xstream_config
+            class="com.google.devtools.depan.persistence.PersistenceXStreamConfig"
+            id="com.google.devtools.depan.persistence.PersistenceXStreamConfig">
+      </xstream_config>
+   </extension>
 
 </plugin>

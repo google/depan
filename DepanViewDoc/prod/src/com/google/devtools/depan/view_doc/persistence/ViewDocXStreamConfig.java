@@ -20,12 +20,14 @@ import com.google.devtools.depan.graph_doc.persistence.EdgeReferenceConverter;
 import com.google.devtools.depan.graph_doc.persistence.GraphModelReferenceConverter;
 import com.google.devtools.depan.graph_doc.persistence.NodeReferenceConverter;
 import com.google.devtools.depan.persistence.XStreamConfig;
+import com.google.devtools.depan.resources.ResourceContainer;
 import com.google.devtools.depan.view_doc.eclipse.ViewDocResources;
 import com.google.devtools.depan.view_doc.model.ViewDocument;
 import com.google.devtools.depan.view_doc.model.ViewPreferences;
 
 import com.thoughtworks.xstream.XStream;
 
+import org.eclipse.core.resources.IProject;
 import org.osgi.framework.Bundle;
 
 import java.util.Collection;
@@ -40,13 +42,15 @@ public class ViewDocXStreamConfig implements XStreamConfig {
 
   private static final String VIEW_PREFS = "view-prefs";
 
+  private ViewDocumentConverter converter;
+
   @Override
   public void config(XStream xstream) {
     xstream.setMode(XStream.NO_REFERENCES);
 
     xstream.alias(VIEW_PREFS, ViewPreferences.class);
 
-    ViewDocumentConverter converter = ViewDocumentConverter.configXStream(xstream);
+    converter = ViewDocumentConverter.configXStream(xstream);
     EdgeReferenceConverter.configXStream(xstream, converter);
     NodeReferenceConverter.configXStream(xstream, converter);
 
@@ -54,10 +58,19 @@ public class ViewDocXStreamConfig implements XStreamConfig {
     CameraDirConverter.configXStream(xstream);
     GraphModelReferenceConverter.configXStream(xstream);
     Point2DConverter.configXStream(xstream);
+    ViewExtensionConverter.configXStream(xstream);
   }
 
   @Override
   public Collection<? extends Bundle> getDocumentBundles() {
     return Collections.singletonList(ViewDocResources.BUNDLE);
+  }
+
+  public void setProjectSource(IProject project) {
+    converter.setProjectSource(project);
+  }
+
+  public void setResourceRoot(ResourceContainer root) {
+    converter.setResourceRoot(root);
   }
 }

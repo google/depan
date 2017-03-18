@@ -30,6 +30,7 @@ import com.google.common.collect.Lists;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 
+import java.text.MessageFormat;
 import java.util.Collection;
 
 /**
@@ -97,7 +98,14 @@ public class ViewExtensionRegistry
 
   private void prepareView(ViewEditor editor) {
     for (ContributionEntry<ViewExtension> entry : getContributions()) {
-      entry.getInstance().prepareView(editor);
+      try {
+        entry.getInstance().prepareView(editor);
+      } catch (Exception err) {
+        String msg = MessageFormat.format(
+            "Unable to prepare extension {0} for editor {1}",
+            entry.getId(), editor.getBaseName());
+        ViewDocLogger.logException(msg , err);
+      }
     }
   }
 
@@ -224,9 +232,12 @@ public class ViewExtensionRegistry
     return INSTANCE;
   }
 
-
   public static ViewExtension getRegistryExtension(String extensionId) {
     return getInstance().getExtension(extensionId);
+  }
+
+  public static String getRegistryId(ViewExtension ext) {
+    return getInstance().getContributionId(ext);
   }
 
   public static void deriveRegistryDetails(ViewEditor editor) {

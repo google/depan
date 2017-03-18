@@ -24,7 +24,6 @@ import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.matchers.persistence.EdgeMatcherDocXmlPersist;
 import com.google.devtools.depan.matchers.persistence.GraphEdgeMatcherResources;
 import com.google.devtools.depan.model.GraphEdgeMatcher;
-import com.google.devtools.depan.persistence.StorageTools;
 import com.google.devtools.depan.platform.WorkspaceTools;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 
@@ -124,7 +123,7 @@ public class EdgeMatcherEditor extends EditorPart {
    */
   private void persistDocument(IProgressMonitor monitor) {
     EdgeMatcherDocXmlPersist persist = EdgeMatcherDocXmlPersist.build(false);
-    StorageTools.saveDocument(file, matcherInfo, persist, monitor);
+    persist.saveDocument(file, matcherInfo, monitor);
 
     setDirtyState(false);
   }

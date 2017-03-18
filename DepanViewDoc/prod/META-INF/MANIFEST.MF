@@ -41,4 +41,3 @@ Export-Package: com.google.devtools.depan.eclipse.cm,
  com.google.devtools.depan.view_doc.persistence
 Bundle-Activator: com.google.devtools.depan.view_doc.eclipse.ViewDocActivator
 Bundle-ActivationPolicy: lazy
-Import-Package: com.google.devtools.depan.platform.plugin

@@ -25,6 +25,7 @@ import com.google.devtools.depan.relations.eclipse.ui.widgets.RelationSetEditorC
 import com.google.devtools.depan.relations.eclipse.ui.widgets.RelationSetSaveLoadControl;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 import com.google.devtools.depan.relations.models.RelationSetRepository;
+import com.google.devtools.depan.resources.PropertyDocumentReference;
 import com.google.devtools.depan.view_doc.eclipse.ViewDocResources;
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
 import com.google.devtools.depan.view_doc.model.ViewPrefsListener;
@@ -159,8 +160,12 @@ public class VisibleRelationsViewPart extends AbstractViewDocViewPart {
           }
 
           @Override
-          protected void installLoadResource(RelationSetDescriptor doc) {
-            VisibleRelationsViewPart.this.installLoadResource(doc);
+          protected void installLoadResource(
+              PropertyDocumentReference<RelationSetDescriptor> ref) {
+            if (null != ref) {
+              RelationSetDescriptor doc = ref.getDocument();
+              VisibleRelationsViewPart.this.installLoadResource(doc);
+            }
           }
       
     };
@@ -179,7 +184,7 @@ public class VisibleRelationsViewPart extends AbstractViewDocViewPart {
     relationSetEditor.setRelationSetRepository(vizRepo);
 
     relationSetEditor.setRelationSetSelectorInput(
-        editor.getDefaultRelationSet(), editor.getRelationSetsChoices());
+        editor.getDefaultRelationSet(), editor.getResourceProject());
   }
 
   @Override

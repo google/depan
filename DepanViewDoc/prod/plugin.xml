@@ -12,6 +12,35 @@
       </contribution>
    </extension>
    <extension
+         point="com.google.devtools.depan.persistence.resources.config">
+      <rsrc_doc_config
+            class="com.google.devtools.depan.view_doc.persistence.EdgeDisplayDocConfig"
+            id="com.google.devtools.depan.view_doc.persistence.EdgeDisplayDocConfig">
+      </rsrc_doc_config>
+      <rsrc_doc_config
+            class="com.google.devtools.depan.view_doc.persistence.RelationDisplayDocConfig"
+            id="com.google.devtools.depan.view_doc.persistence.RelationDisplayDocConfig">
+      </rsrc_doc_config>
+   </extension>
+   <extension
+         point="com.google.devtools.depan.nodes.filters.eclipse.ui.plugins.filters">
+      <filter
+            class="com.google.devtools.depan.view_doc.eclipse.ui.filters.IncludeViewNodesFilterContribution"
+            id="com.google.devtools.depan.view_doc.eclipse.ui.filters.IncludeViewNodesFilterContribution">
+      </filter>
+      <filter
+            class="com.google.devtools.depan.view_doc.eclipse.ui.filters.ExcludeViewNodesFilterContribution"
+            id="com.google.devtools.depan.view_doc.eclipse.ui.filters.ExcludeViewNodesFilterContribution">
+      </filter>
+   </extension>
+   <extension
+         point="com.google.devtools.depan.resources.analysis.installer">
+      <installer
+            class="com.google.devtools.depan.view_doc.persistence.EdgeDisplayResourcesInstaller"
+            id="com.google.devtools.depan.view_doc.persistence.EdgeDisplayResourcesInstaller">
+      </installer>
+   </extension>
+   <extension
          point="com.google.devtools.depan.view_doc.layout.registry.Generators">
       <layout
             class="com.google.devtools.depan.view_doc.layout.grid.GridLayoutContribution"
@@ -21,6 +50,25 @@
             class="com.google.devtools.depan.view_doc.layout.keep.KeepLocationsGenerator$Contribution"
             id="com.google.devtools.depan.view_doc.layout.keep.KeepLocationsContribution">
       </layout>
+   </extension>
+   <extension
+         point="com.google.devtools.depan.view_doc.eclipse.ui.registry.from_view_doc">
+      <contribution
+            class="com.google.devtools.depan.view_doc.eclipse.ui.wizards.ViewFromViewDocContributor"
+            id="com.google.devtools.depan.view_doc.eclipse.ui.wizards.ViewFromViewDocContributor">
+      </contribution>
+   </extension>
+   <extension
+         point="org.eclipse.core.expressions.definitions">
+      <definition
+            id="com.google.devtools.depan.view_doc.eclipse.ui.editor.isViewEditorActive">
+         <with
+               variable="activeEditorId">
+            <equals
+                  value="com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor">
+            </equals>
+         </with>
+      </definition>
    </extension>
    <extension
          point="org.eclipse.ui.editors">
@@ -131,18 +179,6 @@
       </handler>
    </extension>
    <extension
-         point="org.eclipse.core.expressions.definitions">
-      <definition
-            id="com.google.devtools.depan.view_doc.eclipse.ui.editor.isViewEditorActive">
-         <with
-               variable="activeEditorId">
-            <equals
-                  value="com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor">
-            </equals>
-         </with>
-      </definition>
-   </extension>
-   <extension
          point="org.eclipse.ui.menus">
       <menuContribution
             allPopups="false"
@@ -211,24 +247,6 @@
             id="com.google.devtools.depan.eclipse.preferences.nodeoptions"
             name="Node Rendering options">
       </page>
-   </extension>
-   <extension
-         point="com.google.devtools.depan.nodes.filters.eclipse.ui.plugins.filters">
-      <filter
-            class="com.google.devtools.depan.view_doc.eclipse.ui.filters.IncludeViewNodesFilterContribution"
-            id="com.google.devtools.depan.view_doc.eclipse.ui.filters.IncludeViewNodesFilterContribution">
-      </filter>
-      <filter
-            class="com.google.devtools.depan.view_doc.eclipse.ui.filters.ExcludeViewNodesFilterContribution"
-            id="com.google.devtools.depan.view_doc.eclipse.ui.filters.ExcludeViewNodesFilterContribution">
-      </filter>
-   </extension>
-   <extension
-         point="com.google.devtools.depan.view_doc.eclipse.ui.registry.from_view_doc">
-      <contribution
-            class="com.google.devtools.depan.view_doc.eclipse.ui.wizards.ViewFromViewDocContributor"
-            id="com.google.devtools.depan.view_doc.eclipse.ui.wizards.ViewFromViewDocContributor">
-      </contribution>
    </extension>
 
 </plugin>

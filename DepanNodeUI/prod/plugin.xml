@@ -57,5 +57,27 @@
          </adapter>
       </factory>
    </extension>
+   <extension
+         point="com.google.devtools.depan.persistence.resources.config">
+      <rsrc_doc_config
+            class="com.google.devtools.depan.nodes.filters.persistence.ContextualFilterDocConfig"
+            id="com.google.devtools.depan.nodes.filters.persistence.ContextualFilterDocumentConfig">
+      </rsrc_doc_config>
+      <rsrc_doc_config
+            class="com.google.devtools.depan.nodes.filters.persistence.NodeKindDocConfig"
+            id="com.google.devtools.depan.nodes.filters.persistence.NodeKindDocConfig">
+      </rsrc_doc_config>
+   </extension>
+   <extension
+         point="com.google.devtools.depan.resources.analysis.installer">
+      <installer
+            class="com.google.devtools.depan.nodes.filters.persistence.ContextualFilterResourcesInstaller"
+            id="com.google.devtools.depan.nodes.filters.persistence.ContextualFilterResourcesInstaller">
+      </installer>
+      <installer
+            class="com.google.devtools.depan.nodes.filters.persistence.NodeKindResourcesInstaller"
+            id="com.google.devtools.depan.nodes.filters.persistence.NodeKindResourcesInstaller">
+      </installer>
+   </extension>
 
 </plugin>

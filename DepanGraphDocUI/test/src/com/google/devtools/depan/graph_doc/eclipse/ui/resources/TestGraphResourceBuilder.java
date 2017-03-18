@@ -16,7 +16,9 @@
 
 package com.google.devtools.depan.graph_doc.eclipse.ui.resources;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import com.google.devtools.depan.graph_doc.model.DependencyModel;
 
@@ -25,7 +27,7 @@ import org.junit.Test;
 import java.util.Collections;
 
 /**
- * More an integration test, since it assume several static data services
+ * More an integration test, since it assumes several static data services
  * are available.
  * 
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
@@ -41,7 +43,8 @@ public class TestGraphResourceBuilder {
   }
 
   /**
-   * More an integration test, since it assume some
+   * More an integration test, since it assume some several static data
+   * services are available.
    */
   @Test
   public void testEmptyModel() {
@@ -56,7 +59,8 @@ public class TestGraphResourceBuilder {
     assertFalse(rcrs.getEdgeMatcherChoices().isEmpty());
     assertTrue(rcrs.getEdgeMatcherChoices().contains(rcrs.getDefaultEdgeMatcher()));
 
-    assertNotNull(rcrs.getDefaultRelationSet());
+    assertNotNull("No default relation set",
+        rcrs.getDefaultRelationSet());
     assertFalse(rcrs.getRelationSetsChoices().isEmpty());
     assertTrue(rcrs.getRelationSetsChoices().contains(rcrs.getDefaultRelationSet()));
   }

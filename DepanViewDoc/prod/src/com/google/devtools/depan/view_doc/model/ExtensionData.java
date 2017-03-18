@@ -21,11 +21,11 @@ import com.google.devtools.depan.view_doc.eclipse.ui.plugins.ViewExtension;
 /**
  * Base type for data added to the root ViewDocument.
  * 
- * @author Lee Carver
+ * @author <a href="mailto:leeca@pnambic.com">Lee Carver</a>
  */
 public interface ExtensionData {
 
   ViewExtension getExtension();
-  
+
   Object getInstance();
 }

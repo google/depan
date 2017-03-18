@@ -79,6 +79,11 @@ public class ViewEditorInput implements IEditorInput {
   }
 
   @Override
+  public int hashCode() {
+    return super.hashCode();
+  }
+
+  @Override
   public boolean exists() {
     return false;
   }

@@ -51,11 +51,12 @@ import com.google.devtools.depan.nodes.filters.sequence.SteppingFilter;
 import com.google.devtools.depan.nodes.trees.HierarchicalTreeModel;
 import com.google.devtools.depan.nodes.trees.SuccessorEdges;
 import com.google.devtools.depan.nodes.trees.TreeModel;
-import com.google.devtools.depan.persistence.StorageTools;
 import com.google.devtools.depan.platform.ListenerManager;
+import com.google.devtools.depan.platform.PlatformTools;
 import com.google.devtools.depan.platform.WorkspaceTools;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
+import com.google.devtools.depan.resources.PropertyDocumentReference;
 import com.google.devtools.depan.view_doc.eclipse.ViewDocLogger;
 import com.google.devtools.depan.view_doc.eclipse.ui.plugins.ViewExtension;
 import com.google.devtools.depan.view_doc.eclipse.ui.plugins.ViewExtensionRegistry;
@@ -181,6 +182,9 @@ public class ViewEditor extends MultiPageEditorPart {
 
   /** Handle changes to the user preferences, such a node locations. */
   private ViewPrefsListener viewPrefsListener;
+
+  /** Notice changes to extension data, mostly to mark dirty. */
+  private ExtensionDataListener extDataListener;
 
   /** Results from defining hierarchies over the nodes. */
   private HierarchyCache<NodeDisplayProperty> hierarchies;
@@ -429,16 +433,19 @@ public class ViewEditor extends MultiPageEditorPart {
     return viewResources.getDisplayRelations();
   }
 
-  public Collection<RelationSetDescriptor> getRelationSetsChoices() {
+  public List<PropertyDocumentReference<RelationSetDescriptor>> getRelationSetsChoices() {
     return viewResources.getRelationSetsChoices();
   }
 
-  public RelationSetDescriptor getDefaultRelationSet() {
+  public PropertyDocumentReference<RelationSetDescriptor>
+      getDefaultRelationSet() {
     return viewResources.getDefaultRelationSet();
   }
 
-  public GraphEdgeMatcherDescriptor getLayoutEdgeMatcher() {
-    GraphEdgeMatcherDescriptor result = viewInfo.getLayoutFinder();
+  public PropertyDocumentReference<GraphEdgeMatcherDescriptor>
+      getLayoutEdgeMatcherRef() {
+    PropertyDocumentReference<GraphEdgeMatcherDescriptor> result =
+        viewInfo.getLayoutMatcherRef();
     if (null != result) {
       return result;
     }
@@ -641,7 +648,9 @@ public class ViewEditor extends MultiPageEditorPart {
 
     // Listen to changes in the underlying ViewModel
     viewPrefsListener = new Listener();
-    viewInfo.addPrefsListener(viewPrefsListener);
+    addViewPrefsListener(viewPrefsListener);
+    extDataListener = new PartExtDataListener();
+    addExtensionDataListener(extDataListener);
 
     // Force a layout if there are no locations.
     if (viewInfo.getNodeLocations().isEmpty()) {
@@ -682,7 +691,9 @@ public class ViewEditor extends MultiPageEditorPart {
 
       viewInfo = editorInput.getViewDocument();
       markDirty();
-    } else if (input instanceof IFileEditorInput) {
+      return;
+    }
+    if (input instanceof IFileEditorInput) {
       IFile viewFile = ((IFileEditorInput) input).getFile();
       baseName = buildFileInputBaseName(viewFile);
       initialLayout = null;
@@ -693,15 +704,18 @@ public class ViewEditor extends MultiPageEditorPart {
             ViewDocXmlPersist.buildForLoad(viewFile, "load");
         viewInfo = loader.load(viewFile.getLocationURI());
         setDirtyState(false);
-      } catch (RuntimeException e) {
+      } catch (RuntimeException err) {
         viewInfo = null;
-        throw new PartInitException(
-            "Unable to load view from " + viewFile.getFullPath().toString());
+        String msg = MessageFormat.format(
+            "Unable to load view from {0}",
+            viewFile.getFullPath().toString());
+        ViewDocLogger.logException(msg, err);
+        throw new PartInitException(msg);
       }
-    } else {
-      throw new PartInitException(
-          "Input for editor is not suitable for the ViewEditor");
+      return;
     }
+    throw new PartInitException(
+        "Input for editor is not suitable for the ViewEditor");
   }
 
   private String buildFileInputBaseName(IFile file) {
@@ -735,8 +749,13 @@ public class ViewEditor extends MultiPageEditorPart {
   @Override
   public void dispose() {
     if (null != viewPrefsListener) {
-      viewInfo.removePrefsListener(viewPrefsListener);
-      viewPrefsListener = new Listener();
+      removeViewPrefsListener(viewPrefsListener);
+      viewPrefsListener = null;
+    }
+
+    if (null != extDataListener) {
+      removeExtensionDataListener(extDataListener);
+      extDataListener = null;
     }
 
     if (null != hierarchies) {
@@ -858,7 +877,7 @@ public class ViewEditor extends MultiPageEditorPart {
 
     IContainer parent = viewInfo.getGraphModelLocation().getParent();
     String filebase = baseName + '.' + ViewDocument.EXTENSION;
-    String filename = StorageTools.guessNewFilename(
+    String filename = PlatformTools.guessNewFilename(
         parent, filebase, 1, 10);
 
     IPath filePath = Path.fromOSString(filename);
@@ -900,7 +919,7 @@ public class ViewEditor extends MultiPageEditorPart {
    */
   private void saveFile(IFile file, IProgressMonitor monitor, String opLabel) {
     ViewDocXmlPersist persist = ViewDocXmlPersist.buildForSave(opLabel);
-    StorageTools.saveDocument(file, viewInfo, persist, monitor);
+    persist.saveDocument(file, viewInfo, monitor);
 
     setDirtyState(false);
   }
@@ -1100,7 +1119,7 @@ public class ViewEditor extends MultiPageEditorPart {
   }
 
   public void applyLayout(LayoutGenerator layout) {
-    applyLayout(layout, getLayoutEdgeMatcher());
+    applyLayout(layout, getLayoutEdgeMatcherRef().getDocument());
   }
 
   public void applyLayout(
@@ -1700,6 +1719,19 @@ public class ViewEditor extends MultiPageEditorPart {
     @Override
     public void nodeTreeChanged() {
       // Open views should register their own listener.
+      markDirty();
+    }
+  }
+
+  /////////////////////////////////////
+  // Notice changes to extension data
+
+  private class PartExtDataListener implements ExtensionDataListener {
+
+    @Override
+    public void extensionDataChanged(
+        ViewExtension ext, Object instance,
+        Object propertyId, Object updates) {
       markDirty();
     }
   }

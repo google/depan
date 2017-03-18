@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 The Depan Project Authors
+ * Copyright 2017 The Depan Project Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.graph_doc.eclipse.ui.plugins;
+package com.google.devtools.depan.resources;
 
-import com.google.devtools.depan.resources.ResourceContainer;
+import com.google.devtools.depan.persistence.AbstractDocXmlPersist;
 
 /**
- * @author <a href="leeca@pnambic.com">Lee Carver</a>
+ * Define references to property documents.
+ * 
+ * @author <a href='mailto:leeca@pnambic.com'>Lee Carver</a>
  */
-public interface AnalysisResourceInstaller {
-  
-  void installResource(ResourceContainer installRoot);
+public interface PropertyDocumentReference<T extends PropertyDocument<?>> {
+
+  void saveResource(T rsrc, AbstractDocXmlPersist<T> persist);
+
+  T getDocument();
 }

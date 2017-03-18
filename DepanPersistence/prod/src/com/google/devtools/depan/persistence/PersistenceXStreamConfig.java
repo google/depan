@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 The Depan Project Authors
+ * Copyright 2017 The Depan Project Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.view_doc.persistence;
+package com.google.devtools.depan.persistence;
 
-import com.google.devtools.depan.persistence.XStreamConfig;
-import com.google.devtools.depan.view_doc.eclipse.ViewDocResources;
-import com.google.devtools.depan.view_doc.model.EdgeDisplayDocument;
+import com.google.devtools.depan.resources.PropertyDocumentReference;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -28,23 +26,21 @@ import java.util.Collection;
 import java.util.Collections;
 
 /**
- * Prepare an {@link XStream} for serializing an {@link EdgeDisplayDocument}.
+ * Register widely used system converters, such as the
+ * {@link PropertyDocumentReference} types, which may be embedded anywhere.
  * 
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public class EdgeDisplayDocumentXStreamConfig implements XStreamConfig {
-
-  public static final String EDGE_DISPLAY_INFO_TAG = "edge-display-info";
+public class PersistenceXStreamConfig implements XStreamConfig {
 
   @Override
   public void config(XStream xstream) {
-    xstream.setMode(XStream.NO_REFERENCES);
-    xstream.alias(EDGE_DISPLAY_INFO_TAG, EdgeDisplayDocument.class);
+    FileDocumentReferenceConverter.configXStream(xstream);
+    ResourceDocumentReferenceConverter.configXStream(xstream);
   }
 
   @Override
   public Collection<? extends Bundle> getDocumentBundles() {
-    // EdgeDisplayDocument is an implicit types derived from ViewDocument.
-    return Collections.singletonList(ViewDocResources.BUNDLE);
+    return Collections.emptyList();
   }
 }

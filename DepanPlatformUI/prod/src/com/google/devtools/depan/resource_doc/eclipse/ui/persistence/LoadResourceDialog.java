@@ -16,8 +16,10 @@
 
 package com.google.devtools.depan.resource_doc.eclipse.ui.persistence;
 
+import com.google.devtools.depan.persistence.AbstractDocXmlPersist;
 import com.google.devtools.depan.resource_doc.eclipse.ui.widgets.ProjectResourceControl;
 import com.google.devtools.depan.resource_doc.eclipse.ui.widgets.ProjectResourceControl.UpdateListener;
+import com.google.devtools.depan.resources.PropertyDocument;
 import com.google.devtools.depan.resource_doc.eclipse.ui.widgets.ProjectResourceLoadControl;
 
 import org.eclipse.swt.widgets.Composite;
@@ -28,19 +30,25 @@ import org.eclipse.swt.widgets.Shell;
  *
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public class LoadResourceDialog extends AbstractResourceDialog {
+public class LoadResourceDialog<T extends PropertyDocument<?>>
+    extends AbstractResourceDialog<T> {
 
   private static final String LOAD_RESOURCE_TITLE = "Load resource";
 
   private static final String LOAD_RESOURCE_MSG =
       "Load resource from another location.";
 
-  public LoadResourceDialog(Shell parentShell) {
+  private final AbstractDocXmlPersist<T> persist;
+
+  public LoadResourceDialog(
+      Shell parentShell, AbstractDocXmlPersist<T> persist) {
     super(parentShell);
+    this.persist = persist;
   }
 
   @Override
-  protected ProjectResourceControl buildResourceControl(Composite parent) {
+  protected ProjectResourceControl<T> buildResourceControl(
+      Composite parent) {
     UpdateListener relay = new UpdateListener() {
 
       @Override
@@ -49,9 +57,9 @@ public class LoadResourceDialog extends AbstractResourceDialog {
       }
     };
 
-    return new ProjectResourceLoadControl(
+    return new ProjectResourceLoadControl<T>(
         parent, relay, getContainer(), getResourceRoot(),
-        getFileName(), getFileExt());
+        getFileName(), getFileExt(), persist);
   }
 
 

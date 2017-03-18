@@ -3,6 +3,7 @@ package com.google.devtools.depan.view_doc.persistence;
 import com.google.devtools.depan.persistence.AbstractDocXmlPersist;
 import com.google.devtools.depan.persistence.ObjectXmlPersist;
 import com.google.devtools.depan.persistence.XStreamFactory;
+import com.google.devtools.depan.resources.analysis.AnalysisResources;
 import com.google.devtools.depan.view_doc.model.ViewDocument;
 
 import org.eclipse.core.resources.IFile;
@@ -35,7 +36,10 @@ public class ViewDocXmlPersist extends AbstractDocXmlPersist<ViewDocument> {
 
   public static ViewDocXmlPersist buildForLoad(
       IFile wkspFile, String opLabel) {
-    ObjectXmlPersist persist = XStreamFactory.build(true, VIEW_DOC_CONFIG);
+    ViewDocXStreamConfig docConfig = new ViewDocXStreamConfig();
+    ObjectXmlPersist persist = XStreamFactory.build(true, docConfig);
+    docConfig.setProjectSource(wkspFile.getProject());
+    docConfig.setResourceRoot(AnalysisResources.getRoot());
     return new ViewDocXmlPersist(persist, opLabel);
   }
 

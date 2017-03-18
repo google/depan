@@ -16,8 +16,11 @@
 
 package com.google.devtools.depan.resource_doc.eclipse.ui.widgets;
 
+import com.google.devtools.depan.platform.PlatformTools;
 import com.google.devtools.depan.platform.WorkspaceTools;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
+import com.google.devtools.depan.resources.PropertyDocument;
+import com.google.devtools.depan.resources.PropertyDocumentReference;
 import com.google.devtools.depan.resources.ResourceContainer;
 
 import org.eclipse.core.resources.IContainer;
@@ -46,7 +49,8 @@ import java.text.MessageFormat;
  *
  * @author <a href="leeca@google.com">Lee Carver</a>
  */
-public abstract class ProjectResourceControl extends Composite {
+public abstract class ProjectResourceControl<T extends PropertyDocument<?>>
+    extends Composite {
 
   public static interface UpdateListener {
     void onUpdate();
@@ -57,7 +61,7 @@ public abstract class ProjectResourceControl extends Composite {
 
   private final ResourceContainer container;
 
-  private IContainer rsrcContainer;
+  private IContainer folder;
 
   private String fileName;
 
@@ -78,14 +82,14 @@ public abstract class ProjectResourceControl extends Composite {
    */
   public ProjectResourceControl(
       Composite parent, UpdateListener client,
-      ResourceContainer container, IContainer rsrcContainer,
+      ResourceContainer container, IContainer folder,
       String fileName, String requiredExt) {
     super(parent, SWT.NONE);
     setLayout(Widgets.buildContainerLayout(1));
 
     this.client = client;
     this.container = container;
-    this.rsrcContainer = rsrcContainer;
+    this.folder = folder;
     this.fileName = fileName;
     this.requiredExt = requiredExt;
   }
@@ -94,11 +98,25 @@ public abstract class ProjectResourceControl extends Composite {
     return fileName;
   }
 
+  protected ResourceContainer getContainer() {
+    return container;
+  }
+
   public IContainer getSelectedContainer() {
     ITreeSelection blix = containerViewer.getStructuredSelection();
     Object item = blix.getFirstElement();
     if (item instanceof IContainer) {
       return (IContainer) item;
+    }
+    return null;
+  }
+
+  @SuppressWarnings("unchecked")
+  public T getSelectedResource() {
+    ITreeSelection blix = containerViewer.getStructuredSelection();
+    Object item = blix.getFirstElement();
+    if (item instanceof PropertyDocument<?>) {
+      return (T) item;
     }
     return null;
   }
@@ -112,7 +130,8 @@ public abstract class ProjectResourceControl extends Composite {
     return null;
   }
 
-  public abstract IFile getResourceLocation() throws CoreException;
+  public abstract PropertyDocumentReference<T> getDocumentReference()
+      throws CoreException;
 
   public abstract String validateInputs();
 
@@ -130,7 +149,7 @@ public abstract class ProjectResourceControl extends Composite {
       return "File container must be specified";
     }
 
-    IPath containerPath = WorkspaceTools.buildPath(containerName);
+    IPath containerPath = PlatformTools.buildPath(containerName);
     IResource container = WorkspaceTools.buildWorkspaceResource(containerPath);
     if (container == null
         || (container.getType()
@@ -143,7 +162,7 @@ public abstract class ProjectResourceControl extends Composite {
     if (fileName.length() == 0) {
       return "File name must be specified";
     }
-    IPath filePath = WorkspaceTools.buildPath(fileName);
+    IPath filePath = PlatformTools.buildPath(fileName);
     if ((1 != filePath.segmentCount()) || (filePath.hasTrailingSeparator())) {
       return "File name cannot be a path";
     }
@@ -182,7 +201,7 @@ public abstract class ProjectResourceControl extends Composite {
 
   protected Text buildContainerText(Composite parent) {
     Text result = Widgets.buildGridBoxedText(parent);
-    result.setText(rsrcContainer.getFullPath().toString());
+    result.setText(folder.getFullPath().toString());
     return result;
   }
 
@@ -211,6 +230,6 @@ public abstract class ProjectResourceControl extends Composite {
 
   private ResourceRoot prepareInput() {
     return new ResourceRoot(
-        ResourceRoot.DEFAULT_LABEL, container, rsrcContainer);
+        ResourceRoot.DEFAULT_LABEL, container, folder);
   }
 }

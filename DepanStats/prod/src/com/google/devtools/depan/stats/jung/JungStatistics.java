@@ -109,7 +109,7 @@ public class JungStatistics {
   }
 
   public int getDegree(GraphNode node) {
-    return getPredecessorCount(node) + jungInfo.getSuccessorCount(node);
+    return getPredecessorCount(node) + getSuccessorCount(node);
   }
 
   public int getPredecessorCount(GraphNode node) {

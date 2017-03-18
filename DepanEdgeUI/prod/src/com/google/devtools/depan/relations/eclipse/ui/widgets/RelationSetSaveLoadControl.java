@@ -16,13 +16,9 @@
 
 package com.google.devtools.depan.relations.eclipse.ui.widgets;
 
-import com.google.devtools.depan.persistence.AbstractDocXmlPersist;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.GenericSaveLoadControl;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.SaveLoadConfig;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
-import com.google.devtools.depan.relations.persistence.RelationSetDescriptorXmlPersist;
-import com.google.devtools.depan.relations.persistence.RelationSetResources;
-import com.google.devtools.depan.resources.ResourceContainer;
 
 import org.eclipse.swt.widgets.Composite;
 
@@ -42,40 +38,5 @@ public abstract class RelationSetSaveLoadControl
   }
 
   private static SaveLoadConfig<RelationSetDescriptor> CONFIG =
-      new ControlSaveLoadConfig();
-
-  private static class ControlSaveLoadConfig
-      extends SaveLoadConfig<RelationSetDescriptor> {
-
-    @Override
-    public ResourceContainer getContainer() {
-      return RelationSetResources.getContainer();
-    }
-
-    @Override
-    public AbstractDocXmlPersist<RelationSetDescriptor> getDocXmlPersist(
-        boolean readable) {
-      return RelationSetDescriptorXmlPersist.build(readable);
-    }
-
-    @Override
-    public String getSaveLabel() {
-      return "Save as RelationSet...";
-    }
-
-    @Override
-    public String getLoadLabel() {
-      return "Load from RelationSet...";
-    }
-
-    @Override
-    public String getBaseName() {
-      return RelationSetResources.BASE_NAME;
-    }
-
-    @Override
-    public String getExension() {
-      return RelationSetResources.EXTENSION;
-    }
-  }
+      new RelationSetSaveLoadConfig();
 }

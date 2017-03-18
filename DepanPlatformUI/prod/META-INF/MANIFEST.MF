@@ -12,7 +12,6 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui.workbench,
  com.google.devtools.depan.core,
  com.google.devtools.depan.platform,
- com.google.devtools.depan.graph_doc,
  com.google.devtools.depan.persistence,
  com.google.guava
 Bundle-ClassPath: .
@@ -25,3 +24,5 @@ Export-Package: com.google.devtools.depan.platform,
  com.google.devtools.depan.resource_doc.eclipse.ui.persistence,
  com.google.devtools.depan.resource_doc.eclipse.ui.wizards,
  com.google.devtools.depan.resources.analysis
+Bundle-ActivationPolicy: lazy
+Bundle-Activator: com.google.devtools.depan.platform.eclipse.PlatformUIActivator

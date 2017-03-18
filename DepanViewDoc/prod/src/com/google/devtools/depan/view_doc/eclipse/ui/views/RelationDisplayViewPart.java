@@ -19,6 +19,7 @@ package com.google.devtools.depan.view_doc.eclipse.ui.views;
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
+import com.google.devtools.depan.resources.PropertyDocumentReference;
 import com.google.devtools.depan.view_doc.eclipse.ViewDocResources;
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
 import com.google.devtools.depan.view_doc.eclipse.ui.widgets.RelationDisplaySaveLoadControl;
@@ -175,10 +176,13 @@ public class RelationDisplayViewPart extends AbstractViewDocViewPart {
           }
 
           @Override
-          protected void installLoadResource(RelationDisplayDocument doc) {
-            RelationDisplayViewPart.this.installLoadResource(doc);
+          protected void installLoadResource(
+              PropertyDocumentReference<RelationDisplayDocument> ref) {
+            if (null != ref) {
+              RelationDisplayDocument doc = ref.getDocument();
+              RelationDisplayViewPart.this.installLoadResource(doc);
+            }
           }
-      
     };
     return result;
   }

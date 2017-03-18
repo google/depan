@@ -19,48 +19,48 @@ package com.google.devtools.depan.view_doc.persistence;
 import com.google.devtools.depan.persistence.AbstractDocXmlPersist;
 import com.google.devtools.depan.persistence.ObjectXmlPersist;
 import com.google.devtools.depan.persistence.XStreamFactory;
-import com.google.devtools.depan.view_doc.model.EdgeDisplayDocument;
+import com.google.devtools.depan.view_doc.model.RelationDisplayDocument;
 
 import java.net.URI;
 
 /**
  * Provide easy to use load and save methods for
- * {@link EdgeDisplayDocument}s.
+ * {@link RelationDisplayDocument}s.
  * 
  * @author <a href="mailto:leeca@google.com">Lee Carver</a>
  */
-public class EdgeDisplayDocumentXmlPersist
-    extends AbstractDocXmlPersist<EdgeDisplayDocument> {
+public class RelationDisplayDocXmlPersist
+    extends AbstractDocXmlPersist<RelationDisplayDocument> {
 
-  private final static EdgeDisplayDocumentXStreamConfig DOC_CONFIG =
-      new EdgeDisplayDocumentXStreamConfig();
+  private final static RelationDisplayDocXStreamConfig DOC_CONFIG =
+      new RelationDisplayDocXStreamConfig();
 
-  public EdgeDisplayDocumentXmlPersist(ObjectXmlPersist xmlPersist) {
+  public RelationDisplayDocXmlPersist(ObjectXmlPersist xmlPersist) {
     super(xmlPersist);
   }
 
-  public static EdgeDisplayDocumentXmlPersist build(boolean readable) {
+  public static RelationDisplayDocXmlPersist build(boolean readable) {
     ObjectXmlPersist persist = XStreamFactory.build(readable, DOC_CONFIG);
-    return new EdgeDisplayDocumentXmlPersist(persist);
+    return new RelationDisplayDocXmlPersist(persist);
   }
 
   /////////////////////////////////////
   // Hook method implementations for AbstractDocXmlPersist
 
   @Override
-  protected EdgeDisplayDocument coerceLoad(Object load) {
-      return (EdgeDisplayDocument) load;
+  protected RelationDisplayDocument coerceLoad(Object load) {
+      return (RelationDisplayDocument) load;
   }
 
   @Override
   protected String logLoadException(URI uri, Exception err) {
     return logException(
-        "Unable to load edge display properties from {0}", uri, err);
+        "Unable to load relation display properties from {0}", uri, err);
   }
 
   @Override
   public String logSaveException(URI uri, Exception err) {
     return logException(
-        "Unable to load edge display properties to {0}", uri, err);
+        "Unable to load relation display properties to {0}", uri, err);
   }
 }

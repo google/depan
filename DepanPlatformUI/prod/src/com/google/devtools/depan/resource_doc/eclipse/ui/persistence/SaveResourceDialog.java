@@ -18,6 +18,7 @@ package com.google.devtools.depan.resource_doc.eclipse.ui.persistence;
 
 import com.google.devtools.depan.resource_doc.eclipse.ui.widgets.ProjectResourceControl;
 import com.google.devtools.depan.resource_doc.eclipse.ui.widgets.ProjectResourceControl.UpdateListener;
+import com.google.devtools.depan.resources.PropertyDocument;
 import com.google.devtools.depan.resource_doc.eclipse.ui.widgets.ProjectResourceSaveControl;
 
 import org.eclipse.swt.widgets.Composite;
@@ -28,7 +29,8 @@ import org.eclipse.swt.widgets.Shell;
  *
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public class SaveResourceDialog extends AbstractResourceDialog {
+public class SaveResourceDialog<T extends PropertyDocument<?>>
+    extends AbstractResourceDialog<T> {
 
   private static final String SAVE_RESOURCE_TITLE = "Save resource";
 
@@ -43,7 +45,7 @@ public class SaveResourceDialog extends AbstractResourceDialog {
   }
 
   @Override
-  protected ProjectResourceControl buildResourceControl(Composite parent) {
+  protected ProjectResourceControl<T> buildResourceControl(Composite parent) {
     UpdateListener relay = new UpdateListener() {
 
       @Override
@@ -52,7 +54,7 @@ public class SaveResourceDialog extends AbstractResourceDialog {
       }
     };
 
-    return new ProjectResourceSaveControl(
+    return new ProjectResourceSaveControl<T>(
         parent, relay, getContainer(), getResourceRoot(),
         getFileName(), getFileExt());
   }

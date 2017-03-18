@@ -26,8 +26,8 @@ import com.google.devtools.depan.relations.eclipse.ui.widgets.RelationSetEditorC
 import com.google.devtools.depan.relations.eclipse.ui.widgets.RelationSetSaveLoadControl;
 import com.google.devtools.depan.relations.models.RelationSetDescrRepo;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
-import com.google.devtools.depan.relations.models.RelationSetDescriptors;
 import com.google.devtools.depan.relations.persistence.RelationSetResources;
+import com.google.devtools.depan.resources.PropertyDocumentReference;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.swt.SWT;
@@ -126,13 +126,9 @@ public class RelationCountFilterEditorControl
     }
 
     relationSetEditor.setRelationSetRepository(filterRepo);
-
     relationSetEditor.selectRelations(projectRelations);
-
-    RelationSetDescriptor relationSet = RelationSetDescriptors.EMPTY;
-    List<RelationSetDescriptor> choices =
-        RelationSetResources.getRelationSets(getModel());
-    relationSetEditor.setRelationSetSelectorInput(relationSet, choices);
+    relationSetEditor.setRelationSetSelectorInput(
+        RelationSetResources.EMPTY_REF, getProject());
 
     // TODO: Configure ranges, too.
   }
@@ -379,8 +375,12 @@ public class RelationCountFilterEditorControl
     }
 
     @Override
-    protected void installLoadResource(RelationSetDescriptor doc) {
-      filterRepo.setRelationSet(doc.getInfo());
+    protected void installLoadResource(
+        PropertyDocumentReference<RelationSetDescriptor> ref) {
+      if (null != ref) {
+        RelationSet relSet = ref.getDocument().getInfo();
+        filterRepo.setRelationSet(relSet);
+      }
     }
   }
 }

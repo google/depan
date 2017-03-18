@@ -22,7 +22,9 @@ import com.google.common.collect.Maps;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -96,6 +98,10 @@ public class ResourceContainer {
     return null;
   }
 
+  public Object addResource(PropertyDocument<?> resource) {
+    return addResource(resource.getName(), resource);
+  }
+
   public ResourceContainer getChild(String label) {
     return children.get(label);
   }
@@ -130,6 +136,33 @@ public class ResourceContainer {
       IPath front = Path.fromOSString(pathRsrc.getLabel());
       pathRsrc = pathRsrc.getParent();
       result = front.append(result);
+    }
+
+    return result;
+  }
+
+  /**
+   * Provide {@link ResourceContainer} from supplied {@code refPath}.
+   * The {@code refPath} must name a child container, not a resource.
+   * 
+   * @return {@code null} if {@code refPath} is not a valid descendant.
+   */
+  public ResourceContainer getFromPath(IPath refPath) {
+    ResourceContainer result = this;
+    String[] segments = refPath.segments();
+    if (segments.length < 1) {
+      return null;
+    }
+    if (!(result.getLabel().equals(segments[0]))) {
+      return null;
+    }
+    List<String> children =
+        Arrays.asList(segments).subList(1, segments.length);
+    for (String segment : children) {
+      result = result.getChild(segment);
+      if (null == result) {
+        return null;
+      }
     }
 
     return result;

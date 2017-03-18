@@ -24,6 +24,8 @@ import com.google.devtools.depan.graph_doc.persistence.ReferencedGraphDocumentCo
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.persistence.PersistenceLogger;
+import com.google.devtools.depan.persistence.PropertyDocumentReferenceContext;
+import com.google.devtools.depan.resources.ResourceContainer;
 import com.google.devtools.depan.view_doc.model.ViewDocument;
 import com.google.devtools.depan.view_doc.model.ViewDocument.Components;
 import com.google.devtools.depan.view_doc.model.ViewPreferences;
@@ -34,6 +36,8 @@ import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import com.thoughtworks.xstream.mapper.Mapper;
+
+import org.eclipse.core.resources.IProject;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -52,6 +56,10 @@ public class ViewDocumentConverter
 
   /** Legacy tag for the view-nodes section. */
   private static final Object SET_LEGACY = "set";
+
+  private IProject project;
+
+  private ResourceContainer root;
 
   public ViewDocumentConverter(Mapper mapper) {
     super(mapper);
@@ -104,6 +112,7 @@ public class ViewDocumentConverter
     // There should not be two graphs in the same serialization,
     // but just in case ....
     GraphDocument prior = getGraphDocument(context);
+    setupReferenceDocuments(context);
 
     try {
       GraphModelReference viewInfo =
@@ -120,6 +129,15 @@ public class ViewDocumentConverter
       return new ViewDocument(viewInfo, viewNodes, viewPrefs);
     } finally {
       putGraphDocument(context, prior);
+    }
+  }
+
+  private void setupReferenceDocuments(UnmarshallingContext context) {
+    if (null != project) {
+      PropertyDocumentReferenceContext.setProjectSource(context, project);
+    }
+    if (null != root) {
+      PropertyDocumentReferenceContext.setResourceRoot(context, root);
     }
   }
 
@@ -150,5 +168,13 @@ public class ViewDocumentConverter
       return true;
     }
     return false;
+  }
+
+  public void setProjectSource(IProject project) {
+    this.project = project;
+  }
+
+  public void setResourceRoot(ResourceContainer root) {
+    this.root = root;
   }
 }

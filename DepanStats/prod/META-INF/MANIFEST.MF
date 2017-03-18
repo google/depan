@@ -17,6 +17,9 @@ Require-Bundle: org.eclipse.core.runtime,
  com.google.guava,
  depan-jung-library,
  com.google.devtools.depan.nodes.ui,
- com.google.devtools.depan.collapser
+ com.google.devtools.depan.collapser,
+ com.google.devtools.depan.persistence,
+ org.eclipse.core.resources,
+ depan-xstream-library
 Bundle-ClassPath: .
 Bundle-ActivationPolicy: lazy

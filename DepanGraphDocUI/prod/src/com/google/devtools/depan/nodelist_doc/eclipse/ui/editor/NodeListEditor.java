@@ -20,8 +20,8 @@ import com.google.devtools.depan.eclipse.ui.nodes.cache.HierarchyCache;
 import com.google.devtools.depan.eclipse.ui.nodes.trees.GraphData;
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.CheckNodeTreeView;
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.HierarchyViewer;
-import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeTreeProviders;
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.HierarchyViewer.HierarchyChangeListener;
+import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeTreeProviders;
 import com.google.devtools.depan.graph_doc.GraphDocLogger;
 import com.google.devtools.depan.graph_doc.eclipse.ui.editor.GraphEditorNodeViewProvider;
 import com.google.devtools.depan.graph_doc.eclipse.ui.plugins.FromGraphDocContributor;
@@ -33,9 +33,10 @@ import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.nodelist_doc.model.NodeListDocument;
 import com.google.devtools.depan.nodelist_doc.persistence.NodeListDocXmlPersist;
-import com.google.devtools.depan.persistence.StorageTools;
+import com.google.devtools.depan.platform.PlatformTools;
 import com.google.devtools.depan.platform.WorkspaceTools;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
+import com.google.devtools.depan.resources.PropertyDocumentReference;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -230,7 +231,7 @@ public class NodeListEditor extends EditorPart {
 
     IContainer parent = nodeListInfo.getReferenceLocation().getParent();
     String filebase = baseName + '.' + NodeListDocument.EXTENSION;
-    String filename = StorageTools.guessNewFilename(
+    String filename = PlatformTools.guessNewFilename(
         parent, filebase, 1, 10);
 
     IPath filePath = Path.fromOSString(filename);
@@ -274,7 +275,7 @@ public class NodeListEditor extends EditorPart {
    */
   private void persistDocument(IProgressMonitor monitor) {
     NodeListDocXmlPersist persist = NodeListDocXmlPersist.buildForSave();
-    StorageTools.saveDocument(file, nodeListInfo, persist, monitor);
+    persist.saveDocument(file, nodeListInfo, monitor);
 
     setDirtyState(false);
   }
@@ -352,9 +353,9 @@ public class NodeListEditor extends EditorPart {
     HierarchyViewer<GraphNode> result = 
         new HierarchyViewer<GraphNode>(parent, false);
 
-    GraphEdgeMatcherDescriptor selectedRelSet = getDefaultEdgeMatcher();
-    java.util.List<GraphEdgeMatcherDescriptor> choices = getEdgeMatcherChoices();
-    result.setInput(hierarchies, selectedRelSet, choices);
+    PropertyDocumentReference<GraphEdgeMatcherDescriptor> relSetRef =
+        getDefaultEdgeMatcher();
+    result.setInput(hierarchies, relSetRef, file.getProject());
 
     result.addChangeListener(new HierarchyChangeListener() {
 
@@ -401,12 +402,9 @@ public class NodeListEditor extends EditorPart {
    * 
    * TODO: Separate hierarchy edge matcher from display relation set.
    */
-  private GraphEdgeMatcherDescriptor getDefaultEdgeMatcher() {
+  private PropertyDocumentReference<GraphEdgeMatcherDescriptor>
+      getDefaultEdgeMatcher() {
     return graphResources.getDefaultEdgeMatcher();
-  }
-
-  private java.util.List<GraphEdgeMatcherDescriptor> getEdgeMatcherChoices() {
-    return graphResources.getEdgeMatcherChoices();
   }
 
   /////////////////////////////////////

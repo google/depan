@@ -18,8 +18,11 @@ package com.google.devtools.depan.matchers.persistence;
 
 import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
-import com.google.devtools.depan.persistence.StorageTools;
+import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptors;
+import com.google.devtools.depan.platform.PlatformTools;
+import com.google.devtools.depan.resources.PropertyDocumentReference;
 import com.google.devtools.depan.resources.ResourceContainer;
+import com.google.devtools.depan.resources.ResourceDocumentReference;
 import com.google.devtools.depan.resources.analysis.AnalysisResources;
 
 import com.google.common.collect.Lists;
@@ -40,35 +43,61 @@ public class GraphEdgeMatcherResources {
   /** Expected extensions for a matcher resource. */
   public static final String EXTENSION = "gemxml";
 
-  static {
-    AnalysisResources.getRoot().addChild(MATCHERS);
-  }
+  /**
+   * Kludgy bit of Singleton mis-use to simplify access to a very
+   * commonly referenced resource.  Other solutions are welcome.
+   */
+  public static PropertyDocumentReference<GraphEdgeMatcherDescriptor>
+      FORWARD_REF;
 
   private GraphEdgeMatcherResources() {
     // Prevent instantiation.
   }
 
+  public static void installResources(ResourceContainer root) {
+    ResourceContainer matchers = root.addChild(MATCHERS);
+    matchers.addResource(GraphEdgeMatcherDescriptors.EMPTY);
+    FORWARD_REF = installMatcher(matchers, GraphEdgeMatcherDescriptors.FORWARD);
+  }
+
+  private static PropertyDocumentReference<GraphEdgeMatcherDescriptor>
+      installMatcher(
+          ResourceContainer container, GraphEdgeMatcherDescriptor matcher) {
+    container.addResource(matcher);
+    return ResourceDocumentReference
+        .buildResourceReference(container, matcher);
+  }
+
+  /**
+   * Kludgy bit of Singleton mis-use to simplify access to a very
+   * commonly referenced resource.  Other solutions are welcome.
+   */
   public static ResourceContainer getContainer() {
     return AnalysisResources.getRoot().getChild(MATCHERS);
   }
 
   public static String getBaseNameExt() {
-    return StorageTools.getBaseNameExt(BASE_NAME, EXTENSION);
+    return PlatformTools.getBaseNameExt(BASE_NAME, EXTENSION);
   }
 
-  public static List<GraphEdgeMatcherDescriptor> getMatchers(
-      DependencyModel model) {
+  public static List<PropertyDocumentReference<GraphEdgeMatcherDescriptor>>
+      getMatchers(DependencyModel model) {
 
-    List<GraphEdgeMatcherDescriptor> result = Lists.newArrayList();
+    List<PropertyDocumentReference<GraphEdgeMatcherDescriptor>> result =
+        Lists.newArrayList();
 
     // Filter for GEMs with the supplied model.
-    for (Object resource : getContainer().getResources()) {
+    ResourceContainer container = getContainer();
+    for (Object resource : container.getResources()) {
         if (resource instanceof GraphEdgeMatcherDescriptor) {
           GraphEdgeMatcherDescriptor checkRes =
               (GraphEdgeMatcherDescriptor) resource;
 
           if (checkRes.forModel(model)) {
-            result.add(checkRes);
+            PropertyDocumentReference<GraphEdgeMatcherDescriptor> ref =
+                ResourceDocumentReference.buildResourceReference(
+                    container, checkRes);
+            result.add(ref);
           }
         }
       }

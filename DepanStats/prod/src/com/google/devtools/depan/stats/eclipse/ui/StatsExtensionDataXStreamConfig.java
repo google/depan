@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.view_doc.persistence;
+package com.google.devtools.depan.stats.eclipse.ui;
 
 import com.google.devtools.depan.persistence.XStreamConfig;
-import com.google.devtools.depan.view_doc.eclipse.ViewDocResources;
-import com.google.devtools.depan.view_doc.model.RelationDisplayDocument;
+import com.google.devtools.depan.stats.eclipse.StatsResources;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -28,23 +27,20 @@ import java.util.Collection;
 import java.util.Collections;
 
 /**
- * Prepare an {@link XStream} for serializing an {@link RelationDisplayDocument}.
+ * Prepare an {@link XStream} for serializing with embedded 
+ * {@link StatsViewExtensionsData}.  Need to make sure the bundle is
+ * available to {@code XStream} for class lookups/
  * 
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public class RelationDisplayDocumentXStreamConfig implements XStreamConfig {
-
-  public static final String RELATION_DISPLAY_INFO_TAG = "rel-display-info";
+public class StatsExtensionDataXStreamConfig implements XStreamConfig {
 
   @Override
   public void config(XStream xstream) {
-    xstream.setMode(XStream.NO_REFERENCES);
-    xstream.alias(RELATION_DISPLAY_INFO_TAG, RelationDisplayDocument.class);
   }
 
   @Override
   public Collection<? extends Bundle> getDocumentBundles() {
-    // RelationDisplayDocument is an implicit types derived from ViewDocument.
-    return Collections.singletonList(ViewDocResources.BUNDLE);
+    return Collections.singletonList(StatsResources.BUNDLE);
   }
 }

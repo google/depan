@@ -19,13 +19,13 @@ package com.google.devtools.depan.javascript;
 import com.google.devtools.depan.analysis_doc.model.AnalysisProperties;
 import com.google.devtools.depan.edges.matchers.GraphEdgeMatchers;
 import com.google.devtools.depan.graph.api.RelationSet;
-import com.google.devtools.depan.graph_doc.eclipse.ui.plugins.AnalysisResourceInstaller;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.matchers.persistence.GraphEdgeMatcherResources;
 import com.google.devtools.depan.model.GraphEdgeMatcher;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 import com.google.devtools.depan.relations.persistence.RelationSetResources;
 import com.google.devtools.depan.resources.ResourceContainer;
+import com.google.devtools.depan.resources.analysis.AnalysisResourceInstaller;
 
 /**
  * Captures many of the capabilities provided by the legacy

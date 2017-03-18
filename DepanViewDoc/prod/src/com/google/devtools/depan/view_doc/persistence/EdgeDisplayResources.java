@@ -15,7 +15,7 @@
  */
 package com.google.devtools.depan.view_doc.persistence;
 
-import com.google.devtools.depan.persistence.StorageTools;
+import com.google.devtools.depan.platform.PlatformTools;
 import com.google.devtools.depan.resources.ResourceContainer;
 import com.google.devtools.depan.resources.analysis.AnalysisResources;
 
@@ -27,7 +27,7 @@ import com.google.devtools.depan.resources.analysis.AnalysisResources;
 public class EdgeDisplayResources {
 
   /** Name of resource tree container. */
-  public static final String RESOURCES = "edges";
+  public static final String EDGES = "edges";
 
   /** Base file name for a new edge display resource. */
   public static final String BASE_NAME = "Edge Display";
@@ -35,19 +35,19 @@ public class EdgeDisplayResources {
   /** Expected extensions for a edge display resource. */
   public static final String EXTENSION = "edspxml";
 
-  static {
-    AnalysisResources.getRoot().addChild(RESOURCES);
-  }
-
   private EdgeDisplayResources() {
     // Prevent instantiation.
   }
 
+  public static void installResources(ResourceContainer root) {
+    root.addChild(EDGES);
+  }
+
   public static ResourceContainer getContainer() {
-    return AnalysisResources.getRoot().getChild(RESOURCES);
+    return AnalysisResources.getRoot().getChild(EDGES);
   }
 
   public static String getBaseNameExt() {
-    return StorageTools.getBaseNameExt(BASE_NAME, EXTENSION);
+    return PlatformTools.getBaseNameExt(BASE_NAME, EXTENSION);
   }
 }

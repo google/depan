@@ -30,6 +30,7 @@ import com.google.devtools.depan.model.RelationSets;
 import com.google.devtools.depan.nodes.trees.TreeModel;
 import com.google.devtools.depan.platform.ListenerManager;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
+import com.google.devtools.depan.resources.PropertyDocumentReference;
 import com.google.devtools.depan.view_doc.eclipse.ViewDocLogger;
 import com.google.devtools.depan.view_doc.eclipse.ui.plugins.ViewExtension;
 
@@ -106,7 +107,7 @@ public class ViewPreferences {
    * Edge matcher used by layout algorithms by default if it wasn't
    * specified.
    */
-  private GraphEdgeMatcherDescriptor layoutEdgeMatcher;
+  private PropertyDocumentReference<GraphEdgeMatcherDescriptor> layoutEdgeMatcher;
 
   private List<GraphEdgeMatcherDescriptor> treeDescriptors;
 
@@ -198,7 +199,8 @@ public class ViewPreferences {
         ImmutableList.<GraphNode>of(),
         OptionPreferences.getDefaultOptions(),
         new Collapser(),
-        Lists.<GraphEdgeMatcherDescriptor>newArrayList());
+        Lists.<GraphEdgeMatcherDescriptor>newArrayList(),
+        Lists.<ExtensionData>newArrayList());
   }
 
   public ViewPreferences(
@@ -211,11 +213,8 @@ public class ViewPreferences {
       Collection<GraphNode> newSelectedNodes,
       OptionPreference options,
       Collapser collapser,
-      List<GraphEdgeMatcherDescriptor> treeDescriptors) {
-    initTransients();
-    this.collapser = collapser;
-    this.treeDescriptors = treeDescriptors;
-
+      List<GraphEdgeMatcherDescriptor> treeDescriptors,
+      List<ExtensionData> extensionData) {
     this.scenePrefs = gripPrefs;
     this.nodeLocations = newNodeLocations;
     this.nodeProperties = newNodeProperties;
@@ -224,6 +223,12 @@ public class ViewPreferences {
     this.relationProperties = newRelationProperties;
     this.selectedNodes = newSelectedNodes;
     this.options = options;
+    this.collapser = collapser;
+    this.treeDescriptors = treeDescriptors;
+    this.extensionData = extensionData;
+
+    // Initialize transients after normal values are configured.
+    initTransients();
   }
 
   /**
@@ -338,7 +343,7 @@ public class ViewPreferences {
         newNodeLocations, newNodeProperties,
         source.visibleRelationSet, newEdgeProperties, newRelationProps,
         newSelectedNodes, newOptions, new Collapser(),
-        source.getTreeDescriptors());
+        source.getTreeDescriptors(), Lists.<ExtensionData>newArrayList());
 
     return result;
   }
@@ -405,12 +410,14 @@ public class ViewPreferences {
     });
   }
 
-  public GraphEdgeMatcherDescriptor getLayoutFinder() {
+  public PropertyDocumentReference<GraphEdgeMatcherDescriptor>
+      getLayoutMatcherRef() {
     return layoutEdgeMatcher;
   }
 
-  public void setLayoutFinder(GraphEdgeMatcherDescriptor layoutEdgeMatcher) {
-    this.layoutEdgeMatcher = layoutEdgeMatcher;
+  public void setLayoutMatcherRef(
+      PropertyDocumentReference<GraphEdgeMatcherDescriptor> matcherRef) {
+    this.layoutEdgeMatcher = matcherRef;
   }
 
   public String getSelectedLayout() {
@@ -750,8 +757,11 @@ public class ViewPreferences {
   }
 
   public void setExtensionData(
-      ViewExtension ext, Object instance, ExtensionData data,
-      Object propId, Object updates) {
+      final ViewExtension ext,
+      final Object instance,
+      ExtensionData data,
+      final Object propId,
+      final Object updates) {
     Map<Object, ExtensionData> insts = extDataByView.get(ext);
     if (null == insts) {
       insts = Maps.newHashMap();
@@ -781,7 +791,9 @@ public class ViewPreferences {
   }
 
   private void fireExtensionDataChange(
-      ViewExtension ext, Object instance, ExtensionData data) {
+      final ViewExtension ext,
+      final Object instance,
+      final ExtensionData data) {
     extListeners.fireEvent(new SimpleDataDispatcher() {
       @Override
       public void dispatch(ExtensionDataListener listener) {
@@ -812,17 +824,18 @@ public class ViewPreferences {
   private void updateData(
       ViewExtension ext, Object instance, ExtensionData data) {
     if (null != data) {
-      insertData(ext, instance, data);
+      saveData(ext, instance, data);
       return;
     }
     removeData(ext, instance);
   }
 
-  private void insertData(
+  private void saveData(
       ViewExtension ext, Object instance, ExtensionData data) {
     int item = findData(ext, instance);
     if (item >= 0) {
       extensionData.set(item, data);
+      return;
     }
     extensionData.add(data);
   }
@@ -837,11 +850,11 @@ public class ViewPreferences {
   private int findData(ViewExtension ext, Object instance) {
     for (int index = 0; index < extensionData.size(); index++) {
       ExtensionData test = extensionData.get(index);
-      if (!ext.equals(test.getExtension())) {
+      if (ext != test.getExtension()) {
         return -1;
       }
       if (null == instance) {
-        return (null == test.getInstance() ? -1 : index);
+        return (null == test.getInstance() ? index : -1);
       }
       if (instance.equals(test.getInstance())) {
         return index;

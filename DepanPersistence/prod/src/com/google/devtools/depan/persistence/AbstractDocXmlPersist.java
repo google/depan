@@ -16,6 +16,10 @@
 
 package com.google.devtools.depan.persistence;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IProgressMonitor;
+
 import java.io.IOException;
 import java.net.URI;
 import java.text.MessageFormat;
@@ -76,6 +80,45 @@ public abstract class AbstractDocXmlPersist<T> {
     } catch (IOException errIo) {
       String msg = logSaveException(uri, errIo);
       throw new RuntimeException(msg, errIo);
+    }
+  }
+
+  /**
+   * Cancels the {@code monitor} if there is an exception,
+   * but reports no worked steps on the supplied  {@code monitor}.
+   */
+  public void saveDocument(
+      IFile file, T docInfo,
+      IProgressMonitor monitor) {
+    URI location = file.getLocationURI();
+    try {
+      this.save(location, docInfo);
+      file.refreshLocal(IResource.DEPTH_ZERO, monitor);
+    } catch (Exception err) {
+      if (null != monitor) {
+        monitor.setCanceled(true);
+      }
+      this.logSaveException(location, err);
+    }
+  }
+
+  /**
+   * Cancels the {@code monitor} if there is an exception,
+   * but reports no worked steps on the supplied  {@code monitor}.
+   */
+  public static <T> void saveDocument(
+      IFile file, T docInfo,
+      AbstractDocXmlPersist<T> persist,
+      IProgressMonitor monitor) {
+    URI location = file.getLocationURI();
+    try {
+      persist.save(location, docInfo);
+      file.refreshLocal(IResource.DEPTH_ZERO, monitor);
+    } catch (Exception err) {
+      if (null != monitor) {
+        monitor.setCanceled(true);
+      }
+      persist.logSaveException(location, err);
     }
   }
 }

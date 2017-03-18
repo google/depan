@@ -22,6 +22,7 @@ import com.google.devtools.depan.nodes.filters.model.ContextualFilter;
 import com.google.devtools.depan.nodes.filters.model.ContextualFilterDocument;
 import com.google.devtools.depan.nodes.filters.sequence.BasicFilter;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.GenericSaveLoadControl;
+import com.google.devtools.depan.resources.PropertyDocumentReference;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.swt.widgets.Composite;
@@ -64,7 +65,11 @@ public abstract class ContextualFilterSaveLoadControl<T extends BasicFilter>
 
   @Override
   @SuppressWarnings("unchecked")
-  protected void installLoadResource(ContextualFilterDocument doc) {
-    getEditor().setInput((T) doc.getInfo(), getModel(), getProject());
+  protected void installLoadResource(
+      PropertyDocumentReference<ContextualFilterDocument> ref) {
+    if (null != ref) {
+      ContextualFilter filter = ref.getDocument().getInfo();
+      getEditor().setInput((T) filter, getModel(), getProject());
+    }
   }
 }

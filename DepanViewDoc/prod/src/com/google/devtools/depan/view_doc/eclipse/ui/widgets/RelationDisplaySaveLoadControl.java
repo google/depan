@@ -22,7 +22,7 @@ import com.google.devtools.depan.platform.eclipse.ui.widgets.SaveLoadConfig;
 import com.google.devtools.depan.relations.persistence.RelationSetResources;
 import com.google.devtools.depan.resources.ResourceContainer;
 import com.google.devtools.depan.view_doc.model.RelationDisplayDocument;
-import com.google.devtools.depan.view_doc.persistence.RelationDisplayDocumentXmlPersist;
+import com.google.devtools.depan.view_doc.persistence.RelationDisplayDocXmlPersist;
 import com.google.devtools.depan.view_doc.persistence.RelationDisplayResources;
 
 import org.eclipse.swt.widgets.Composite;
@@ -55,7 +55,7 @@ public abstract class RelationDisplaySaveLoadControl
     @Override
     public AbstractDocXmlPersist<RelationDisplayDocument> getDocXmlPersist(
         boolean readable) {
-      return RelationDisplayDocumentXmlPersist.build(readable);
+      return RelationDisplayDocXmlPersist.build(readable);
     }
 
     @Override

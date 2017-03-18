@@ -1,13 +1,15 @@
 package com.google.devtools.depan.view_doc.eclipse.ui.wizards;
 
 import com.google.devtools.depan.graph_doc.eclipse.ui.resources.GraphResources;
-import com.google.devtools.depan.matchers.eclipse.ui.widgets.GraphEdgeMatcherSelectorControl;
+import com.google.devtools.depan.matchers.eclipse.ui.widgets.EdgeMatcherSelectorControl;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
+import com.google.devtools.depan.resources.PropertyDocumentReference;
 import com.google.devtools.depan.view_doc.layout.LayoutGenerator;
 import com.google.devtools.depan.view_doc.layout.eclipse.ui.widgets.LayoutGeneratorsControl;
 import com.google.devtools.depan.view_doc.layout.plugins.LayoutGeneratorContributor;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -16,8 +18,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 
-import java.util.List;
-
 public class ViewFromGraphDocPage extends WizardPage {
 
   public static final String PAGE_NAME = "Create View Editor document";
@@ -25,14 +25,20 @@ public class ViewFromGraphDocPage extends WizardPage {
   public static final String PAGE_DESCRIPTION =
       "Setup initial View Editor state";
 
+  private final IProject project;
+
+  private final GraphResources graphInfo;
+
+  /////////////////////////////////////
+  // UX Elements
+
   private LayoutGeneratorsControl layoutChoice;
 
-  private GraphEdgeMatcherSelectorControl matcherChoice;
+  private EdgeMatcherSelectorControl matcherChoice;
 
-  private GraphResources graphInfo;
-
-  protected ViewFromGraphDocPage(GraphResources graphInfo) {
+  protected ViewFromGraphDocPage(IProject project, GraphResources graphInfo) {
     super(PAGE_NAME);
+    this.project = project;
     this.graphInfo = graphInfo;
 
     setTitle(PAGE_NAME);
@@ -57,24 +63,19 @@ public class ViewFromGraphDocPage extends WizardPage {
 
   @SuppressWarnings("unused")
   private Group setupOptions(Composite parent) {
-    Group result = new Group(parent, SWT.NONE);
-
-    GridLayout layout = new GridLayout(2, false);
-    result.setLayout(layout);
-    result.setText("Diagram options");
+    Group result = Widgets.buildGridGroup(parent, "Diagram options", 2);
 
     Label layoutLabel = Widgets.buildCompactLabel(result, "Layout: ");
     layoutChoice = new LayoutGeneratorsControl(result);
     layoutChoice.setLayoutData(Widgets.buildHorzFillData());
 
     Label relSetLabel = Widgets.buildCompactLabel(result, "Edges: ");
-    matcherChoice = new GraphEdgeMatcherSelectorControl(result);
+    matcherChoice = new EdgeMatcherSelectorControl(result);
     matcherChoice.setLayoutData(Widgets.buildHorzFillData());
 
-    GraphEdgeMatcherDescriptor matcher = graphInfo.getDefaultEdgeMatcher();
-    List<GraphEdgeMatcherDescriptor> choices =
-        graphInfo.getEdgeMatcherChoices();
-    matcherChoice.setInput(matcher, choices);
+    PropertyDocumentReference<GraphEdgeMatcherDescriptor> matcher =
+        graphInfo.getDefaultEdgeMatcher();
+    matcherChoice.setInput(matcher, project);
 
     return result;
   }
@@ -104,7 +105,8 @@ public class ViewFromGraphDocPage extends WizardPage {
     return layoutChoice.getChoice().getLayoutGenerator();
   }
 
-  public GraphEdgeMatcherDescriptor getLayoutMatcher() {
+  public PropertyDocumentReference<GraphEdgeMatcherDescriptor>
+      getLayoutMatcher() {
     return matcherChoice.getSelection();
   }
 }

@@ -24,7 +24,6 @@ import com.google.devtools.depan.nodelist_doc.model.NodeListDocument;
 import com.google.devtools.depan.nodelist_doc.persistence.NodeListDocXmlPersist;
 import com.google.devtools.depan.persistence.AbstractDocXmlPersist;
 import com.google.devtools.depan.persistence.PersistenceLogger;
-import com.google.devtools.depan.persistence.StorageTools;
 import com.google.devtools.depan.platform.WorkspaceTools;
 import com.google.devtools.depan.platform.eclipse.ui.wizards.AbstractNewDocumentWizard;
 
@@ -133,7 +132,7 @@ public class NewSubtractNodesWizard
     monitor.setTaskName("Saving document...");
     AbstractDocXmlPersist<NodeListDocument> persist =
         NodeListDocXmlPersist.buildForSave();
-    StorageTools.saveDocument(file, doc, persist, monitor);
+    persist.saveDocument(file, doc, monitor);
     monitor.worked(1);
 
     monitor.setTaskName("Refreshing resources ...");
