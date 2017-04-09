@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.persistence;
+package com.google.devtools.depan.persistence.plugins;
 
 import com.thoughtworks.xstream.XStream;
 

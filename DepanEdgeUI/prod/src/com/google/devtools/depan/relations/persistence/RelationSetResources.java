@@ -47,6 +47,8 @@ public class RelationSetResources {
    * Kludgy bit of Singleton mis-use to simplify access to a very
    * commonly referenced resource.  Other solutions are welcome.
    */
+  public static PropertyDocumentReference<RelationSetDescriptor> ALL_REF;
+
   public static PropertyDocumentReference<RelationSetDescriptor> EMPTY_REF;
 
   private RelationSetResources() {
@@ -55,6 +57,7 @@ public class RelationSetResources {
 
   public static void installResources(ResourceContainer root) {
     ResourceContainer relSets = root.addChild(RELATIONS);
+    ALL_REF = installRelSet(relSets, RelationSetDescriptors.ALL);
     EMPTY_REF = installRelSet(relSets, RelationSetDescriptors.EMPTY);
   }
 

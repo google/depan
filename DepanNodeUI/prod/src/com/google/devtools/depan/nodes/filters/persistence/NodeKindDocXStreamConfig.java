@@ -17,7 +17,7 @@
 package com.google.devtools.depan.nodes.filters.persistence;
 
 import com.google.devtools.depan.nodes.filters.model.NodeKindDocument;
-import com.google.devtools.depan.persistence.XStreamConfig;
+import com.google.devtools.depan.persistence.plugins.XStreamConfig;
 
 import com.thoughtworks.xstream.XStream;
 

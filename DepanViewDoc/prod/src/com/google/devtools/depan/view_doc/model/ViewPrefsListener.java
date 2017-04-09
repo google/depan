@@ -18,9 +18,10 @@ package com.google.devtools.depan.view_doc.model;
 
 import com.google.devtools.depan.collapse.model.CollapseData;
 import com.google.devtools.depan.graph.api.Relation;
-import com.google.devtools.depan.graph.api.RelationSet;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphNode;
+import com.google.devtools.depan.relations.models.RelationSetDescriptor;
+import com.google.devtools.depan.resources.PropertyDocumentReference;
 
 import java.awt.geom.Point2D;
 import java.util.Collection;
@@ -39,11 +40,8 @@ public interface ViewPrefsListener {
   public class Simple implements ViewPrefsListener {
 
     @Override
-    public void relationSetVisibleChanged(RelationSet visibleSet) {
-    }
-
-    @Override
-    public void relationVisibleChanged(Relation relation, boolean visible) {
+    public void relationSetVisibleChanged(
+        PropertyDocumentReference<RelationSetDescriptor> visibleRelationSet) {
     }
 
     @Override
@@ -92,9 +90,8 @@ public interface ViewPrefsListener {
   /////////////////////////////////////
   // Relation visibility callbacks
 
-  void relationSetVisibleChanged(RelationSet visibleSet);
-
-  void relationVisibleChanged(Relation relation, boolean visible);
+  void relationSetVisibleChanged(
+      PropertyDocumentReference<RelationSetDescriptor> visibleRelationSet);
 
   /////////////////////////////////////
   // Edge related callbacks

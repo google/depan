@@ -18,7 +18,7 @@ package com.google.devtools.depan.maven;
 
 import com.google.devtools.depan.maven.graph.ArtifactElement;
 import com.google.devtools.depan.maven.graph.PropertyElement;
-import com.google.devtools.depan.persistence.XStreamConfig;
+import com.google.devtools.depan.persistence.plugins.XStreamConfig;
 
 import com.thoughtworks.xstream.XStream;
 

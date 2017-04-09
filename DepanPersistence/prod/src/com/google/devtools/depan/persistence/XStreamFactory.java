@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.persistence;
 
+import com.google.devtools.depan.persistence.plugins.XStreamConfig;
 import com.google.devtools.depan.persistence.plugins.XStreamConfigRegistry;
 import com.google.devtools.depan.platform.plugin.PluginClassLoader;
 

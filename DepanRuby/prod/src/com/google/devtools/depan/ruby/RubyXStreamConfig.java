@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.ruby;
 
-import com.google.devtools.depan.persistence.XStreamConfig;
+import com.google.devtools.depan.persistence.plugins.XStreamConfig;
 import com.google.devtools.depan.ruby.graph.ClassElement;
 import com.google.devtools.depan.ruby.graph.ClassMethodElement;
 import com.google.devtools.depan.ruby.graph.InstanceMethodElement;

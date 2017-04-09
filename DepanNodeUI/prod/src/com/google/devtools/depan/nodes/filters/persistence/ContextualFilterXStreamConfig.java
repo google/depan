@@ -18,7 +18,7 @@ package com.google.devtools.depan.nodes.filters.persistence;
 
 import com.google.devtools.depan.eclipse.ui.nodes.NodesUIResources;
 import com.google.devtools.depan.nodes.filters.model.ContextualFilterDocument;
-import com.google.devtools.depan.persistence.XStreamConfig;
+import com.google.devtools.depan.persistence.plugins.XStreamConfig;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 
 import com.thoughtworks.xstream.XStream;

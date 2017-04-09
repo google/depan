@@ -4,6 +4,9 @@ import com.google.devtools.depan.graph_doc.eclipse.ui.resources.GraphResources;
 import com.google.devtools.depan.matchers.eclipse.ui.widgets.EdgeMatcherSelectorControl;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
+import com.google.devtools.depan.relations.eclipse.ui.widgets.RelationSetSelectorControl;
+import com.google.devtools.depan.relations.eclipse.ui.widgets.RelationSetSelectorControl.SelectorListener;
+import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 import com.google.devtools.depan.resources.PropertyDocumentReference;
 import com.google.devtools.depan.view_doc.layout.LayoutGenerator;
 import com.google.devtools.depan.view_doc.layout.eclipse.ui.widgets.LayoutGeneratorsControl;
@@ -36,10 +39,18 @@ public class ViewFromGraphDocPage extends WizardPage {
 
   private EdgeMatcherSelectorControl matcherChoice;
 
-  protected ViewFromGraphDocPage(IProject project, GraphResources graphInfo) {
+  private RelationSetSelectorControl visibleChoice;
+
+  private PropertyDocumentReference<RelationSetDescriptor> visibleRelatioSet;
+
+  protected ViewFromGraphDocPage(
+      IProject project,
+      GraphResources graphInfo,
+      PropertyDocumentReference<RelationSetDescriptor> visibleRelatioSet) {
     super(PAGE_NAME);
     this.project = project;
     this.graphInfo = graphInfo;
+    this.visibleRelatioSet = visibleRelatioSet;
 
     setTitle(PAGE_NAME);
     setDescription(PAGE_DESCRIPTION);
@@ -65,6 +76,19 @@ public class ViewFromGraphDocPage extends WizardPage {
   private Group setupOptions(Composite parent) {
     Group result = Widgets.buildGridGroup(parent, "Diagram options", 2);
 
+    Label visibleLabel = Widgets.buildCompactLabel(result, "Visible Relations: ");
+    visibleChoice = new RelationSetSelectorControl(result);
+    visibleChoice.setLayoutData(Widgets.buildHorzFillData());
+    visibleChoice.setInput(visibleRelatioSet, project);
+    visibleChoice.addChangeListener(new SelectorListener() {
+
+      @Override
+      public void selectedRelationSetChanged(
+          PropertyDocumentReference<RelationSetDescriptor> relationSet) {
+        ViewFromGraphDocPage.this.handleRelationSetChanged(relationSet);
+      }
+    });
+
     Label layoutLabel = Widgets.buildCompactLabel(result, "Layout: ");
     layoutChoice = new LayoutGeneratorsControl(result);
     layoutChoice.setLayoutData(Widgets.buildHorzFillData());
@@ -78,6 +102,11 @@ public class ViewFromGraphDocPage extends WizardPage {
     matcherChoice.setInput(matcher, project);
 
     return result;
+  }
+
+  protected void handleRelationSetChanged(
+      PropertyDocumentReference<RelationSetDescriptor> visibleRelatioSet) {
+    this.visibleRelatioSet = visibleRelatioSet;
   }
 
   /**
@@ -108,5 +137,10 @@ public class ViewFromGraphDocPage extends WizardPage {
   public PropertyDocumentReference<GraphEdgeMatcherDescriptor>
       getLayoutMatcher() {
     return matcherChoice.getSelection();
+  }
+
+  public PropertyDocumentReference<RelationSetDescriptor>
+      getVisibleRelationSet() {
+    return visibleRelatioSet;
   }
 }

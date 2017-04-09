@@ -19,7 +19,7 @@ package com.google.devtools.depan.view_doc.persistence;
 import com.google.devtools.depan.graph_doc.persistence.EdgeReferenceConverter;
 import com.google.devtools.depan.graph_doc.persistence.GraphModelReferenceConverter;
 import com.google.devtools.depan.graph_doc.persistence.NodeReferenceConverter;
-import com.google.devtools.depan.persistence.XStreamConfig;
+import com.google.devtools.depan.persistence.plugins.XStreamConfig;
 import com.google.devtools.depan.resources.ResourceContainer;
 import com.google.devtools.depan.view_doc.eclipse.ViewDocResources;
 import com.google.devtools.depan.view_doc.model.ViewDocument;

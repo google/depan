@@ -40,6 +40,7 @@ import com.google.devtools.depan.resources.PropertyDocumentReference;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
@@ -355,7 +356,7 @@ public class NodeListEditor extends EditorPart {
 
     PropertyDocumentReference<GraphEdgeMatcherDescriptor> relSetRef =
         getDefaultEdgeMatcher();
-    result.setInput(hierarchies, relSetRef, file.getProject());
+    result.setInput(hierarchies, relSetRef, getProject());
 
     result.addChangeListener(new HierarchyChangeListener() {
 
@@ -365,6 +366,13 @@ public class NodeListEditor extends EditorPart {
         }
       });
     return result;
+  }
+
+  private IProject getProject() {
+    if (null != file) {
+      return file.getProject();
+    }
+    return nodeListInfo.getReferenceLocation().getProject();
   }
 
   /////////////////////////////////////

@@ -5,6 +5,8 @@ import com.google.devtools.depan.graph_doc.model.GraphModelReference;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.platform.PlatformTools;
+import com.google.devtools.depan.relations.models.RelationSetDescriptor;
+import com.google.devtools.depan.relations.persistence.RelationSetResources;
 import com.google.devtools.depan.resources.PropertyDocumentReference;
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditorInput;
@@ -22,8 +24,10 @@ public class ViewFromGraphDocWizard extends FromGraphDocWizard {
 
   @Override
   public void addPages() {
+    PropertyDocumentReference<RelationSetDescriptor> visRelations =
+        RelationSetResources.ALL_REF;
     page = new ViewFromGraphDocPage(
-        getGraphFile().getProject(), getGraphResources());
+        getGraphFile().getProject(), getGraphResources(), visRelations);
     addPage(page);
   }
 
@@ -48,6 +52,7 @@ public class ViewFromGraphDocWizard extends FromGraphDocWizard {
     PropertyDocumentReference<GraphEdgeMatcherDescriptor> matcher =
         page.getLayoutMatcher();
     userPrefs.setLayoutMatcherRef(matcher);
+    userPrefs.setVisibleRelationSet(page.getVisibleRelationSet());
 
     ViewDocument viewInfo = new ViewDocument(graphRef, getNodes(), userPrefs);
 

@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.remap_doc.persistence;
 
-import com.google.devtools.depan.persistence.XStreamConfig;
+import com.google.devtools.depan.persistence.plugins.XStreamConfig;
 import com.google.devtools.depan.remap_doc.model.MigrationTask;
 
 import com.thoughtworks.xstream.XStream;

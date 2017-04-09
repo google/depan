@@ -22,7 +22,7 @@ import com.google.devtools.depan.java.graph.JavaRelation;
 import com.google.devtools.depan.java.graph.MethodElement;
 import com.google.devtools.depan.java.graph.PackageElement;
 import com.google.devtools.depan.java.graph.TypeElement;
-import com.google.devtools.depan.persistence.XStreamConfig;
+import com.google.devtools.depan.persistence.plugins.XStreamConfig;
 
 import com.thoughtworks.xstream.XStream;
 

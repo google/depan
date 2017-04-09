@@ -18,4 +18,7 @@ public class RelationSetDescriptors {
 
   public static RelationSetDescriptor EMPTY = new RelationSetDescriptor(
       "Empty", ModelMatcher.ALL_MODELS, RelationSets.EMPTY);
+
+  public static RelationSetDescriptor ALL = new RelationSetDescriptor(
+      "All", ModelMatcher.ALL_MODELS, RelationSets.ALL);
 }

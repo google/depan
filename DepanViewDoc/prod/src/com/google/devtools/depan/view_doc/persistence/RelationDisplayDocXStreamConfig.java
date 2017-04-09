@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.view_doc.persistence;
 
-import com.google.devtools.depan.persistence.XStreamConfig;
+import com.google.devtools.depan.persistence.plugins.XStreamConfig;
 import com.google.devtools.depan.view_doc.eclipse.ViewDocResources;
 import com.google.devtools.depan.view_doc.model.RelationDisplayDocument;
 

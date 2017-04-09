@@ -56,6 +56,8 @@ import com.google.devtools.depan.platform.PlatformTools;
 import com.google.devtools.depan.platform.WorkspaceTools;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
+import com.google.devtools.depan.relations.models.RelationSetDescriptor.Builder;
+import com.google.devtools.depan.resources.DirectDocumentReference;
 import com.google.devtools.depan.resources.PropertyDocumentReference;
 import com.google.devtools.depan.view_doc.eclipse.ViewDocLogger;
 import com.google.devtools.depan.view_doc.eclipse.ui.plugins.ViewExtension;
@@ -451,14 +453,6 @@ public class ViewEditor extends MultiPageEditorPart {
     }
 
     return viewResources.getDefaultEdgeMatcher();
-  }
-
-  public RelationSetDescriptor getDisplayRelationSet() {
-    return viewInfo.getDisplayRelationSetDescriptor();
-  }
-
-  public void setDisplayRelationSet(RelationSetDescriptor newDisplay) {
-    viewInfo.setDisplayRelationSetDescriptor(newDisplay);
   }
 
   public ScenePreferences getScenePrefs() {
@@ -963,8 +957,13 @@ public class ViewEditor extends MultiPageEditorPart {
   // Provide standardized access to this view's
   // relation visibility
 
-  public RelationSet getVisibleRelationSet() {
+  public PropertyDocumentReference<RelationSetDescriptor> getVisibleRelationSet() {
     return viewInfo.getVisibleRelationSet();
+  }
+
+  public void setVisibleRelationSet(
+      PropertyDocumentReference<RelationSetDescriptor> visRelSet) {
+    viewInfo.setVisibleRelationSet(visRelSet);
   }
 
   public boolean isVisibleRelation(Relation relation) {
@@ -972,8 +971,40 @@ public class ViewEditor extends MultiPageEditorPart {
   }
 
   public void setVisibleRelation(Relation relation, boolean isVisible) {
-    viewInfo.setVisibleRelation(relation, isVisible);
+    boolean nowVisible = isVisibleRelation(relation);
+    if (nowVisible == isVisible) {
+      return;
+    }
+
+    Collection<Relation> visibleRelations = getVisibleRelations();
+    if (isVisible) {
+      visibleRelations.add(relation);
+    } else {
+      visibleRelations.remove(relation);
+    }
+    PropertyDocumentReference<RelationSetDescriptor> visibleRelationSet =
+        buildAdHocRelationSet(visibleRelations);
+    viewInfo.setVisibleRelationSet(visibleRelationSet);
   }
+
+  private Collection<Relation> getVisibleRelations() {
+    RelationSet visibleRelationSet =
+        getVisibleRelationSet().getDocument().getInfo();
+    return RelationSets.filterRelations(
+        visibleRelationSet, getDisplayRelations());
+  }
+
+  private PropertyDocumentReference<RelationSetDescriptor>
+      buildAdHocRelationSet(Collection<Relation> visibleRelations) {
+    Builder builder = RelationSetDescriptor.createBuilder("custom", null);
+    for(Relation relation : visibleRelations) {
+      builder.addRelation(relation);
+    }
+    RelationSetDescriptor relSetDesc = builder.build();
+    PropertyDocumentReference<RelationSetDescriptor> result =
+        DirectDocumentReference.buildDirectReference(relSetDesc);
+    return result;
+ }
 
   /////////////////////////////////////
   // Provide standardized access to this view's
@@ -1629,24 +1660,14 @@ public class ViewEditor extends MultiPageEditorPart {
    */
   private class Listener implements ViewPrefsListener {
     @Override
-    public void relationSetVisibleChanged(RelationSet visibleSet) {
+    public void relationSetVisibleChanged(
+        PropertyDocumentReference<RelationSetDescriptor> visibleSet) {
       if (null == renderer) {
         return;
       }
       // The visible relations in view preferences has already
       // changed to the supplied visibleSet.
       updateEdgesToVisible(RelationSets.ALL);
-      markDirty();
-    }
-
-    @Override
-    public void relationVisibleChanged(Relation relation, boolean visible) {
-      if (null == renderer) {
-        return;
-      }
-      // The relation's visibility in view preferences has already
-      // changed to the supplied value.
-      updateEdgesToVisible(RelationSets.createSingle(relation));
       markDirty();
     }
 

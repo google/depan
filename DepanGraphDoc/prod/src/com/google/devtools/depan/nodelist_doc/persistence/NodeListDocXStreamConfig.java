@@ -20,7 +20,7 @@ import com.google.devtools.depan.graph_doc.GraphDocResources;
 import com.google.devtools.depan.graph_doc.persistence.GraphModelReferenceConverter;
 import com.google.devtools.depan.graph_doc.persistence.NodeReferenceConverter;
 import com.google.devtools.depan.nodelist_doc.model.NodeListDocument;
-import com.google.devtools.depan.persistence.XStreamConfig;
+import com.google.devtools.depan.persistence.plugins.XStreamConfig;
 
 import com.thoughtworks.xstream.XStream;
 

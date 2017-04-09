@@ -23,7 +23,7 @@ import com.google.devtools.depan.javascript.graph.JavaScriptFieldElement;
 import com.google.devtools.depan.javascript.graph.JavaScriptFunctionElement;
 import com.google.devtools.depan.javascript.graph.JavaScriptRelation;
 import com.google.devtools.depan.javascript.graph.JavaScriptVariableElement;
-import com.google.devtools.depan.persistence.XStreamConfig;
+import com.google.devtools.depan.persistence.plugins.XStreamConfig;
 
 import com.thoughtworks.xstream.XStream;
 

@@ -17,7 +17,6 @@
 package com.google.devtools.depan.persistence.plugins;
 
 import com.google.devtools.depan.persistence.PersistenceLogger;
-import com.google.devtools.depan.persistence.XStreamConfig;
 import com.google.devtools.depan.platform.plugin.ContributionEntry;
 import com.google.devtools.depan.platform.plugin.ContributionRegistry;
 

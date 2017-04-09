@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.stats.eclipse.ui;
 
-import com.google.devtools.depan.persistence.XStreamConfig;
+import com.google.devtools.depan.persistence.plugins.XStreamConfig;
 import com.google.devtools.depan.stats.eclipse.StatsResources;
 
 import com.thoughtworks.xstream.XStream;

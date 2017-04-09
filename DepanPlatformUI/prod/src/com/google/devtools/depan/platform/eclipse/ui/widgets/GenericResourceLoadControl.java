@@ -62,10 +62,13 @@ public abstract class GenericResourceLoadControl<T extends PropertyDocument<?>>
    */
   private void handleLoad() {
     IProject project = getProject();
-    if (null != project) {
-      PropertyDocumentReference<T> rsrc =
-          config.loadResource(getShell(), project);
-      installLoadResource(rsrc);
+    if (null == project) {
+      return;
+    }
+    PropertyDocumentReference<T> rsrc =
+       config.loadResource(getShell(), project);
+    if (null != rsrc) {
+        installLoadResource(rsrc);
     }
   }
 

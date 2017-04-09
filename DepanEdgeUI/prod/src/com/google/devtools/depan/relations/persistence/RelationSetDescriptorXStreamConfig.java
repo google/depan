@@ -16,7 +16,7 @@
 
 package com.google.devtools.depan.relations.persistence;
 
-import com.google.devtools.depan.persistence.XStreamConfig;
+import com.google.devtools.depan.persistence.plugins.XStreamConfig;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 
 import com.thoughtworks.xstream.XStream;

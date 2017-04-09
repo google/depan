@@ -20,16 +20,14 @@ import com.google.devtools.depan.collapse.model.CollapseData;
 import com.google.devtools.depan.collapse.model.Collapser;
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeTreeProvider;
 import com.google.devtools.depan.graph.api.Relation;
-import com.google.devtools.depan.graph.api.RelationSet;
-import com.google.devtools.depan.graph.registry.RelationRegistry;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.model.RelationSets;
 import com.google.devtools.depan.nodes.trees.TreeModel;
 import com.google.devtools.depan.platform.ListenerManager;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
+import com.google.devtools.depan.relations.persistence.RelationSetResources;
 import com.google.devtools.depan.resources.PropertyDocumentReference;
 import com.google.devtools.depan.view_doc.eclipse.ViewDocLogger;
 import com.google.devtools.depan.view_doc.eclipse.ui.plugins.ViewExtension;
@@ -80,20 +78,13 @@ public class ViewPreferences {
   /**
    * The set of edges that are currently visible in the diagram.
    */
-  private RelationSet visibleRelationSet;
+  private PropertyDocumentReference<RelationSetDescriptor> visibleRelationSet;
 
   /**
    * Hash map that contains a list of edge display property objects
    * for known relations.
    */
   private Map<Relation, EdgeDisplayProperty> relationProperties;
-
-  /**
-   * Preferred relation set of displaying edges.
-   * A value of {@code null} indicates that the {@link #relationProperties}
-   * should be used as an anonymous relation set.
-   */
-  private RelationSetDescriptor edgeDisplayRelationSet;
 
   private Collection<GraphNode> selectedNodes = ImmutableList.of();
 
@@ -193,7 +184,7 @@ public class ViewPreferences {
         ScenePreferences.getDefaultScenePrefs(),
         Maps.<GraphNode, Point2D>newHashMap(),
         Maps.<GraphNode, NodeDisplayProperty>newHashMap(),
-        RelationSets.ALL,
+        RelationSetResources.ALL_REF,
         Maps.<GraphEdge, EdgeDisplayProperty>newHashMap(),
         Maps.<Relation, EdgeDisplayProperty>newHashMap(),
         ImmutableList.<GraphNode>of(),
@@ -207,7 +198,7 @@ public class ViewPreferences {
       ScenePreferences gripPrefs,
       Map<GraphNode, Point2D> newNodeLocations,
       Map<GraphNode, NodeDisplayProperty> newNodeProperties,
-      RelationSet visibleRelationSet,
+      PropertyDocumentReference<RelationSetDescriptor> visibleRelationSet,
       Map<GraphEdge, EdgeDisplayProperty> newEdgeProperties,
       Map<Relation, EdgeDisplayProperty> newRelationProperties,
       Collection<GraphNode> newSelectedNodes,
@@ -248,7 +239,7 @@ public class ViewPreferences {
       nodeProperties = Maps.newHashMap();
     }
     if (null == visibleRelationSet) {
-      visibleRelationSet = RelationSets.ALL;
+      visibleRelationSet = RelationSetResources.ALL_REF;
     }
     if (null == edgeProperties) {
       edgeProperties = Maps.newHashMap();
@@ -526,12 +517,14 @@ public class ViewPreferences {
     });
   }
 
-  public RelationSet getVisibleRelationSet() {
+  public PropertyDocumentReference<RelationSetDescriptor>
+      getVisibleRelationSet() {
     return visibleRelationSet;
   }
 
-  public void setVisibleRelationSet(RelationSet relationSet) {
-    visibleRelationSet = relationSet;
+  public void setVisibleRelationSet(
+      final PropertyDocumentReference<RelationSetDescriptor> visibleRelationSet) {
+    this.visibleRelationSet = visibleRelationSet;
 
     listeners.fireEvent(new SimpleDispatcher() {
       @Override
@@ -542,49 +535,7 @@ public class ViewPreferences {
   }
 
   public boolean isVisibleRelation(Relation relation) {
-    return visibleRelationSet.contains(relation);
-  }
-
-  public void setVisibleRelation(
-      final Relation relation, final boolean isVisible) {
-    boolean nowVisible = isVisibleRelation(relation);
-    if (nowVisible == isVisible) {
-      return;
-    }
-
-    Collection<Relation> visibleRelations = getVisibleRelations();
-    if (isVisible) {
-      visibleRelations.add(relation);
-      visibleRelationSet = RelationSets.createSimple(visibleRelations);
-
-      listeners.fireEvent(new SimpleDispatcher() {
-        @Override
-        public void dispatch(ViewPrefsListener listener) {
-          listener.relationVisibleChanged(relation, isVisible);
-        }
-      });
-    } else {
-      visibleRelations.remove(relation);
-      visibleRelationSet = RelationSets.createSimple(visibleRelations);
-
-      listeners.fireEvent(new SimpleDispatcher() {
-        @Override
-        public void dispatch(ViewPrefsListener listener) {
-          listener.relationVisibleChanged(relation, isVisible);
-        }
-      });
-    }
-  }
-
-  private Collection<Relation> getVisibleRelations() {
-    return RelationSets.filterRelations(
-        visibleRelationSet, getDisplayRelations());
-  }
-
-  public Collection<Relation> getDisplayRelations() {
-    // TODO: Should be based on included Relation plugins from
-    // GraphDoc reference
-    return RelationRegistry.getRegistryRelations();
+    return visibleRelationSet.getDocument().getInfo().contains(relation);
   }
 
   public EdgeDisplayProperty getRelationProperty(Relation relation) {
@@ -601,15 +552,6 @@ public class ViewPreferences {
         listener.relationPropertyChanged(relation, newProperty);
       }
     });
-  }
-
-  public RelationSetDescriptor getDisplayRelationSet() {
-    return edgeDisplayRelationSet;
-  }
-
-  public void setDisplayRelationSet(
-      RelationSetDescriptor edgeDisplayRelationSetDescriptor) {
-    this.edgeDisplayRelationSet = edgeDisplayRelationSetDescriptor;
   }
 
   /////////////////////////////////////

@@ -178,7 +178,6 @@ public class RelationSetTableControl extends Composite {
   public void removeRelSetRepository(RelationSetRepository visRepo) {
     if (null != relSetListener) {
       this.relSetRepo.removeChangeListener(relSetListener);
-      relSetListener = null;
     }
     relSetListener = null;
     this.relSetRepo = null;

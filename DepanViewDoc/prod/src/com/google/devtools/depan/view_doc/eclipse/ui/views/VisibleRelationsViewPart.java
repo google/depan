@@ -18,13 +18,13 @@ package com.google.devtools.depan.view_doc.eclipse.ui.views;
 
 import com.google.devtools.depan.graph.api.Relation;
 import com.google.devtools.depan.graph.api.RelationSet;
-import com.google.devtools.depan.graph.registry.RelationRegistry;
 import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 import com.google.devtools.depan.relations.eclipse.ui.widgets.RelationSetEditorControl;
 import com.google.devtools.depan.relations.eclipse.ui.widgets.RelationSetSaveLoadControl;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 import com.google.devtools.depan.relations.models.RelationSetRepository;
+import com.google.devtools.depan.resources.DirectDocumentReference;
 import com.google.devtools.depan.resources.PropertyDocumentReference;
 import com.google.devtools.depan.view_doc.eclipse.ViewDocResources;
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
@@ -83,7 +83,8 @@ public class VisibleRelationsViewPart extends AbstractViewDocViewPart {
     @Override
     public void addChangeListener(
         RelationSetRepository.ChangeListener listener) {
-      prefsListener = new PartPrefsListener(listener);
+      prefsListener = new PartPrefsListener(
+          listener, editor.getDisplayRelations());
       editor.addViewPrefsListener(prefsListener);
     }
 
@@ -101,15 +102,23 @@ public class VisibleRelationsViewPart extends AbstractViewDocViewPart {
 
   private static class PartPrefsListener extends ViewPrefsListener.Simple {
 
+    private final Collection<Relation> displayRelations;
     private RelationSetRepository.ChangeListener listener;
 
-    public PartPrefsListener(RelationSetRepository.ChangeListener listener) {
+    public PartPrefsListener(
+        RelationSetRepository.ChangeListener listener,
+        Collection<Relation> displayRelations) {
       this.listener = listener;
+      this.displayRelations = displayRelations;
     }
 
-    @Override
-    public void relationVisibleChanged(Relation relation, boolean visible) {
-      listener.includedRelationChanged(relation, visible);
+    public void relationSetVisibleChanged(
+        PropertyDocumentReference<RelationSetDescriptor> visRelSet) {
+      RelationSet doc = visRelSet.getDocument().getInfo();
+      for(Relation relation : displayRelations) {
+        boolean visible = doc.contains(relation);
+        listener.includedRelationChanged(relation, visible);
+      }
     }
   }
 
@@ -184,7 +193,7 @@ public class VisibleRelationsViewPart extends AbstractViewDocViewPart {
     relationSetEditor.setRelationSetRepository(vizRepo);
 
     relationSetEditor.setRelationSetSelectorInput(
-        editor.getDefaultRelationSet(), editor.getResourceProject());
+        editor.getVisibleRelationSet(), editor.getResourceProject());
   }
 
   @Override
@@ -199,11 +208,13 @@ public class VisibleRelationsViewPart extends AbstractViewDocViewPart {
 
   private RelationSetDescriptor buildSaveResource() {
     ViewEditor editor = getEditor();
-    RelationSet vizRelSet = editor.getVisibleRelationSet();
+    PropertyDocumentReference<RelationSetDescriptor> vizRelSet =
+        editor.getVisibleRelationSet();
 
     String name = editor.getBaseName();
     DependencyModel model = editor.getDependencyModel();
-    return new RelationSetDescriptor(name, model, vizRelSet);
+    return new RelationSetDescriptor(
+        name, model, vizRelSet.getDocument().getInfo());
   }
 
   private void installLoadResource(RelationSetDescriptor doc) {
@@ -212,8 +223,8 @@ public class VisibleRelationsViewPart extends AbstractViewDocViewPart {
     }
 
     ViewEditor ed = getEditor();
-    for (Relation relation : RelationRegistry.getRegistryRelations()) {
-      ed.setVisibleRelation(relation, doc.getInfo().contains(relation));
-    }
+    DirectDocumentReference<RelationSetDescriptor> rsrcRef =
+        DirectDocumentReference.buildDirectReference(doc);
+    ed.setVisibleRelationSet(rsrcRef);
   }
 }

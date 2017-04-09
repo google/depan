@@ -18,7 +18,7 @@ package com.google.devtools.depan.graph_doc.persistence;
 
 import com.google.devtools.depan.graph_doc.GraphDocResources;
 import com.google.devtools.depan.graph_doc.model.GraphDocument;
-import com.google.devtools.depan.persistence.XStreamConfig;
+import com.google.devtools.depan.persistence.plugins.XStreamConfig;
 
 import com.thoughtworks.xstream.XStream;
 

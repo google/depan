@@ -94,12 +94,20 @@ public class RelationSetSelectorControl extends Composite {
       @Override
       protected void installLoadResource(
           PropertyDocumentReference<RelationSetDescriptor> ref) {
-        RelationSetSelectorControl.this.curr = ref;
-        nameViewer.setText(ref.getDocument().getName());
-        fireSelectionChange(ref);
+        if (null == ref) {
+          return;
+        }
+        RelationSetSelectorControl.this.handleInstallLoadResource(ref);
       }
     };
     chooser.setLayoutData(Widgets.buildTrailFillData());
+  }
+
+  private void handleInstallLoadResource(
+      PropertyDocumentReference<RelationSetDescriptor> ref) {
+    curr = ref;
+    nameViewer.setText(ref.getDocument().getName());
+    fireSelectionChange(ref);
   }
 
   /**

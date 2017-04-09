@@ -19,7 +19,6 @@ package com.google.devtools.depan.view_doc.model;
 import com.google.devtools.depan.collapse.model.Collapser;
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeTreeProvider;
 import com.google.devtools.depan.graph.api.Relation;
-import com.google.devtools.depan.graph.api.RelationSet;
 import com.google.devtools.depan.graph_doc.eclipse.ui.resources.GraphResourceBuilder;
 import com.google.devtools.depan.graph_doc.eclipse.ui.resources.GraphResources;
 import com.google.devtools.depan.graph_doc.model.DependencyModel;
@@ -146,20 +145,18 @@ public class ViewDocument {
     userPrefs.setNodeProperty(node, newProperty);
   }
 
-  public RelationSet getVisibleRelationSet() {
+  public PropertyDocumentReference<RelationSetDescriptor>
+      getVisibleRelationSet() {
     return userPrefs.getVisibleRelationSet();
   }
 
-  public void setVisibleRelationSet(RelationSet relationSet) {
-    userPrefs.setVisibleRelationSet(relationSet);
+  public void setVisibleRelationSet(
+      PropertyDocumentReference<RelationSetDescriptor> visRelSet) {
+    userPrefs.setVisibleRelationSet(visRelSet);
   }
 
   public boolean isVisibleRelation(Relation relation) {
     return userPrefs.isVisibleRelation(relation);
-  }
-
-  public void setVisibleRelation(Relation relation, boolean isVisible) {
-    userPrefs.setVisibleRelation(relation, isVisible);
   }
 
   public EdgeDisplayProperty getEdgeProperty(GraphEdge edge) {
@@ -171,10 +168,6 @@ public class ViewDocument {
     userPrefs.setEdgeProperty(edge, newProperty);
   }
 
-  public Collection<Relation> getDisplayRelations() {
-    return userPrefs.getDisplayRelations();
-  }
-
   public EdgeDisplayProperty getRelationProperty(Relation relation) {
     return userPrefs.getRelationProperty(relation);
   }
@@ -182,14 +175,6 @@ public class ViewDocument {
   public void setRelationProperty(
       Relation relation, EdgeDisplayProperty edgeProp) {
     userPrefs.setRelationProperty(relation, edgeProp);
-  }
-
-  public RelationSetDescriptor getDisplayRelationSetDescriptor() {
-    return userPrefs.getDisplayRelationSet();
-  }
-
-  public void setDisplayRelationSetDescriptor(RelationSetDescriptor newDisplay) {
-    userPrefs.setDisplayRelationSet(newDisplay);
   }
 
   public void setSelectedLayout(String layoutName) {

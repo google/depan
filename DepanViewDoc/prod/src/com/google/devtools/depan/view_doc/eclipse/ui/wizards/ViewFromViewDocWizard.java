@@ -16,6 +16,9 @@
 
 package com.google.devtools.depan.view_doc.eclipse.ui.wizards;
 
+import com.google.devtools.depan.relations.models.RelationSetDescriptor;
+import com.google.devtools.depan.relations.persistence.RelationSetResources;
+import com.google.devtools.depan.resources.PropertyDocumentReference;
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditorInput;
 import com.google.devtools.depan.view_doc.eclipse.ui.plugins.FromViewDocWizard;
@@ -32,7 +35,11 @@ public class ViewFromViewDocWizard extends FromViewDocWizard {
 
   @Override
   public void addPages() {
-    page = new ViewFromGraphDocPage(getResourceProject(), getGraphResources());
+    
+    PropertyDocumentReference<RelationSetDescriptor> visRelations =
+        RelationSetResources.ALL_REF;
+    page = new ViewFromGraphDocPage(
+        getResourceProject(), getGraphResources(), visRelations);
     addPage(page);
   }
 
