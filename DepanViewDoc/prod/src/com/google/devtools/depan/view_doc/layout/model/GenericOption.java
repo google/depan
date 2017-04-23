@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 The Depan Project Authors
+ * Copyright 2017 The Depan Project Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,22 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.view_doc.layout.plugins;
+package com.google.devtools.depan.view_doc.layout.model;
 
-import com.google.devtools.depan.view_doc.layout.LayoutGenerator;
+public class GenericOption<T> implements ValueOption {
 
-/**
- * @author <a href="leeca@pnambic.com">Lee Carver</a>
- */
-public interface LayoutGeneratorContributor {
+  private final T value;
 
-  String getLabel();
+  public GenericOption(T value) {
+    this.value = value;
+  }
 
-  LayoutGenerator getLayoutGenerator();
+  @Override
+  public boolean isSet() {
+    return null != value;
+  }
+
+  public T getValue() {
+    return value;
+  }
 }

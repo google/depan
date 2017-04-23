@@ -8,9 +8,9 @@ import com.google.devtools.depan.relations.eclipse.ui.widgets.RelationSetSelecto
 import com.google.devtools.depan.relations.eclipse.ui.widgets.RelationSetSelectorControl.SelectorListener;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 import com.google.devtools.depan.resources.PropertyDocumentReference;
-import com.google.devtools.depan.view_doc.layout.LayoutGenerator;
 import com.google.devtools.depan.view_doc.layout.eclipse.ui.widgets.LayoutGeneratorsControl;
-import com.google.devtools.depan.view_doc.layout.plugins.LayoutGeneratorContributor;
+import com.google.devtools.depan.view_doc.layout.model.LayoutPlan;
+import com.google.devtools.depan.view_doc.layout.model.LayoutPlanDocument;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.wizard.WizardPage;
@@ -21,6 +21,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 
+/**
+ * @author <a href="leeca@pnambic.com">Lee Carver</a>
+ */
 public class ViewFromGraphDocPage extends WizardPage {
 
   public static final String PAGE_NAME = "Create View Editor document";
@@ -118,8 +121,8 @@ public class ViewFromGraphDocPage extends WizardPage {
   }
 
   protected String getPageErrorMsg() {
-    LayoutGeneratorContributor layout = layoutChoice.getChoice();
-    if (null == layout) {
+    LayoutPlanDocument<?> layoutDoc = layoutChoice.getChoice();
+    if (null == layoutDoc) {
       return "Initial layout must be specified";
     }
     return null;
@@ -130,8 +133,8 @@ public class ViewFromGraphDocPage extends WizardPage {
     setPageComplete((null == message) && isPageComplete());
   }
 
-  public LayoutGenerator getLayoutGenerator() {
-    return layoutChoice.getChoice().getLayoutGenerator();
+  public LayoutPlan getLayoutPlan() {
+    return layoutChoice.getChoice().getInfo();
   }
 
   public PropertyDocumentReference<GraphEdgeMatcherDescriptor>

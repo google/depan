@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 The Depan Project Authors
+ * Copyright 2017 The Depan Project Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,49 +14,56 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.analysis_doc.model;
+package com.google.devtools.depan.view_doc.layout.model;
 
-import com.google.devtools.depan.graph_doc.model.DependencyModel;
-import com.google.devtools.depan.resources.InfoDocument;
+import com.google.devtools.depan.resources.PropertyDocument;
 
 /**
- * Document type for analysis objects that are tied to a set of relation and
- * node contributions.
- *
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public class AnalysisDocument<T> extends InfoDocument<T> {
+public class LayoutPlanDocument<T extends LayoutPlan>
+    extends PropertyDocument<T> {
 
-  public static final String MATCHER_KEY = "matcher";
+  public static final String INFO_KEY = "info";
 
-  private ModelMatcher matcher;
+  public static final String SUMMARY_KEY = "summary";
 
-  public AnalysisDocument(String name, ModelMatcher matcher, T info) {
-    super(name, info);
-    this.matcher = matcher;
+  private final T info;
+
+  public LayoutPlanDocument(String name, T info) {
+    super(name);
+    this.info = info;
   }
 
-  public ModelMatcher getMatcher() {
-    return matcher;
+  public T getInfo() {
+    return info;
   }
 
-  public boolean forModel(DependencyModel model) {
-    return matcher.forModel(model);
+  public void setSummary(String summary) {
+    setProperty(SUMMARY_KEY, summary);
+  }
+
+  public String getSummary() {
+    return getProperty(SUMMARY_KEY);
   }
 
   @Override
   public Object getObject(String key) {
-    if (MATCHER_KEY.equals(key)) {
-      return getMatcher();
+    if (INFO_KEY.equals(key)) {
+      return getInfo();
     }
     return super.getObject(key);
   }
 
   @Override
   protected boolean isWritable(String key) {
-    if (MATCHER_KEY.equals(key)) {
+    if (INFO_KEY.equals(key)) {
       return false;
     }
     return super.isWritable(key);
+  }
+
+  public String buildSummary() {
+    return info.buildSummary();
   }
 }

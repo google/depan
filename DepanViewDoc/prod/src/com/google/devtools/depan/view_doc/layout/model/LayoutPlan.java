@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 The Depan Project Authors
+ * Copyright 2017 The Depan Project Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,17 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.view_doc.layout.hierarchy;
+package com.google.devtools.depan.view_doc.layout.model;
 
-import com.google.devtools.depan.view_doc.layout.LayoutGenerator;
-import com.google.devtools.depan.view_doc.layout.plugins.LayoutGeneratorContributor;
+import com.google.devtools.depan.view_doc.layout.LayoutContext;
+import com.google.devtools.depan.view_doc.layout.LayoutRunner;
 
 /**
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public class TreeLayoutContribution implements LayoutGeneratorContributor {
+public interface LayoutPlan {
 
-  @Override
-  public String getLabel() {
-    return "Tree";
-  }
+  String buildSummary();
 
-  @Override
-  public LayoutGenerator getLayoutGenerator() {
-    return TreeLayoutGenerator.NewTreeLayoutBuilder;
-  }
+  LayoutRunner buildLayout(LayoutContext context);
 }

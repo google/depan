@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.devtools.depan.view_doc.layout.hierarchy;
 
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.view_doc.layout.LayoutContext;
-import com.google.devtools.depan.view_doc.layout.LayoutGenerator;
 import com.google.devtools.depan.view_doc.layout.LayoutRunner;
+import com.google.devtools.depan.view_doc.layout.model.LayoutPlan;
 
 import com.google.common.collect.Maps;
 
@@ -27,32 +28,32 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
- * An adapter from @c{@code TreeLayout} classes to the {@link LayoutGenerator}
+ * An adapter from @c{@code TreeLayout} classes to the {@link LayoutPlan}
  * class.
  * 
  * @author <a href='mailto:lee.carver@servicenow.com'>Lee Carver</a>
  */
-public abstract class TreeLayoutGenerator implements LayoutGenerator {
+public abstract class TreeLayoutPlan implements LayoutPlan {
 
   /**
    * Hook method for layout construction.
    * from {@link #buildRunner(LayoutContext)}.
    */
-  protected abstract NewTreeLayout buildTreeLayout(LayoutContext context);
+  protected abstract HierarchicalTreeLayout buildTreeLayout(LayoutContext context);
 
   @Override
-  public LayoutRunner buildRunner(LayoutContext context) {
-    NewTreeLayout layout = buildTreeLayout(context);
+  public LayoutRunner buildLayout(LayoutContext context) {
+    HierarchicalTreeLayout layout = buildTreeLayout(context);
     LayoutRunnerAdapter runner = new LayoutRunnerAdapter(layout);
     return runner;
   }
 
   private static class LayoutRunnerAdapter implements LayoutRunner {
 
-    private final NewTreeLayout layout;
+    private final HierarchicalTreeLayout layout;
     private boolean done;
 
-    public LayoutRunnerAdapter(NewTreeLayout layout) {
+    public LayoutRunnerAdapter(HierarchicalTreeLayout layout) {
       this.layout = layout;
     }
 
@@ -87,31 +88,4 @@ public abstract class TreeLayoutGenerator implements LayoutGenerator {
       return result;
     }
   }
-
-  /////////////////////////////////////
-  // Canonical instances
-
-  public static TreeLayoutGenerator NewTreeLayoutBuilder =
-      new TreeLayoutGenerator() {
-
-    @Override
-    protected NewTreeLayout buildTreeLayout(LayoutContext context) {
-      return new NewTreeLayout(
-          context.getGraphModel(),
-          context.getEdgeMatcher().getInfo(),
-          context.getViewport());
-    }
-  };
-
-  public static TreeLayoutGenerator NewRadialLayoutBuilder =
-      new TreeLayoutGenerator() {
-
-    @Override
-    protected NewTreeLayout buildTreeLayout(LayoutContext context) {
-      return new NewRadialLayout(
-          context.getGraphModel(),
-          context.getEdgeMatcher().getInfo(),
-          context.getViewport());
-    }
-  };
 }

@@ -19,10 +19,8 @@ package com.google.devtools.depan.view_doc.layout.hierarchy;
 import com.google.devtools.depan.graph.api.EdgeMatcher;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.view_doc.model.Point2dUtils;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import java.awt.geom.Point2D;
@@ -43,44 +41,34 @@ import java.util.Set;
  * 
  * @author <a href='mailto:leeca@google.com'>Lee Carver </a>
  */
-public class NewRadialLayout extends NewTreeLayout {
+public class RadialTreeLayout extends HierarchicalTreeLayout {
 
   /**
    * @param viewModel source of nodes (exposed graph) to layout
    * @param edgeMatcher edge matcher that defines the hierarchy
    * @param size available rendering space (ignored)
    */
-  protected NewRadialLayout(
+  protected RadialTreeLayout(
       GraphModel graphModel, EdgeMatcher<String> edgeMatcher,
       Rectangle2D region) {
     super(graphModel, edgeMatcher, region);
   }
 
-  /**
-   * Does the complete radial layout.
-   */
   @Override
-  public void initialize() {
-
+  protected HierarchicalLayoutTool buildLayoutTool() {
     // Determine number of leafs ("circumference" of the circles).
     DryRunTool dryRun = new DryRunTool(graphModel, edgeMatcher);
     dryRun.layoutTree();
 
     // Now assign locations
-    HierarchicalLayoutTool layoutTool =
-        new RadialLayoutTool(graphModel, edgeMatcher, dryRun.getLeafCount());
-
-    Collection<GraphNode> layoutNodes = graphModel.getNodes();
-    positions = Maps.newHashMapWithExpectedSize(layoutNodes.size());
-    layoutTool.layoutTree();
-    Point2dUtils.translatePos(region, layoutNodes, positions);
+    return new RadialLayoutTool(graphModel, edgeMatcher, dryRun.getLeafCount());
   }
 
   /**
    * Define how x and y locations are assigned to nodes (but don't
    * actually set those locations).
    */
-  private class DryRunTool extends HierarchicalLayoutTool.Planar {
+  private static class DryRunTool extends HierarchicalLayoutTool.Planar {
 
     protected Set<GraphNode> orphans = Sets.newHashSet();
 

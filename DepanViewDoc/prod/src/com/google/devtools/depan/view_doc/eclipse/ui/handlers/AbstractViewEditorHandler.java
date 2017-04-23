@@ -36,11 +36,10 @@ public abstract class AbstractViewEditorHandler extends AbstractHandler {
 
   protected ViewEditor getViewEditor(ExecutionEvent event) {
     IEditorPart editor = HandlerUtil.getActiveEditor(event);
-    if (!(editor instanceof ViewEditor)) {
-      return null;
+    if (editor instanceof ViewEditor) {
+      return (ViewEditor) editor;
     }
-    ViewEditor viewer = (ViewEditor) editor;
-    return viewer;
+    return null;
   }
 
   @Override

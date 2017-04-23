@@ -66,10 +66,10 @@ import com.google.devtools.depan.view_doc.eclipse.ui.trees.NodeCompactor;
 import com.google.devtools.depan.view_doc.eclipse.ui.trees.ViewEditorNodeViewerProvider;
 import com.google.devtools.depan.view_doc.eclipse.ui.views.NodeFilterViewPart;
 import com.google.devtools.depan.view_doc.layout.LayoutContext;
-import com.google.devtools.depan.view_doc.layout.LayoutGenerator;
-import com.google.devtools.depan.view_doc.layout.LayoutGenerators;
 import com.google.devtools.depan.view_doc.layout.LayoutUtil;
-import com.google.devtools.depan.view_doc.layout.grid.GridLayoutGenerator;
+import com.google.devtools.depan.view_doc.layout.grid.GridLayoutPlan;
+import com.google.devtools.depan.view_doc.layout.model.LayoutPlan;
+import com.google.devtools.depan.view_doc.layout.model.LayoutPlanDocument;
 import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty;
 import com.google.devtools.depan.view_doc.model.ExtensionData;
 import com.google.devtools.depan.view_doc.model.ExtensionDataListener;
@@ -140,8 +140,8 @@ public class ViewEditor extends MultiPageEditorPart {
       "com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor";
 
   // TODO: Expected to evolve ..
-  private static final LayoutGenerator[] OGL_LAYOUTS =
-      new LayoutGenerator[] { new GridLayoutGenerator() };
+  private static final LayoutPlan[] OGL_LAYOUTS =
+      new LayoutPlan[] { GridLayoutPlan.GRID_LAYOUT_PLAN };
 
   // TODO: Could be user option
   public static final double ZOOM_IN_FACTOR = 1.1;
@@ -169,12 +169,12 @@ public class ViewEditor extends MultiPageEditorPart {
   private String baseName;
 
   /**
-   * {@link LayoutGenerator} to use if the nodes arrive in the editor with
+   * {@link LayoutPlan} to use if the nodes arrive in the editor with
    * no locations.  This is typical for new {@link ViewDocument}s coming
    * from a {@link GraphDocument}. Typically set through the
    * {@link ViewEditorInput} supplied at editor startup.
    */
-  private LayoutGenerator initialLayout;
+  private LayoutPlan initialLayout;
 
   /** Dirty state. */
   private boolean isDirty = true;
@@ -455,6 +455,11 @@ public class ViewEditor extends MultiPageEditorPart {
     return viewResources.getDefaultEdgeMatcher();
   }
 
+  public void setLayoutEdgeMatcherRef(
+      PropertyDocumentReference<GraphEdgeMatcherDescriptor> matcherRef) {
+    viewInfo.setLayoutEdgeMatcher(matcherRef);
+  }
+
   public ScenePreferences getScenePrefs() {
     return viewInfo.getScenePrefs();
   }
@@ -649,7 +654,7 @@ public class ViewEditor extends MultiPageEditorPart {
     // Force a layout if there are no locations.
     if (viewInfo.getNodeLocations().isEmpty()) {
       markDirty();
-      final LayoutGenerator initLayout = getInitialLayout();
+      final LayoutPlan initLayout = getInitialLayout();
       addDrawingListener(new DrawingListener() {
 
         @Override
@@ -665,15 +670,15 @@ public class ViewEditor extends MultiPageEditorPart {
     }
   }
 
-  private LayoutGenerator getInitialLayout() {
-    LayoutGenerator selectedLayout = getSelectedLayout();
+  private LayoutPlan getInitialLayout() {
+    LayoutPlan selectedLayout = getSelectedLayout();
     if (null != selectedLayout ) {
       return selectedLayout;
     }
     if (null != initialLayout) {
       return initialLayout;
     }
-    return new GridLayoutGenerator();
+    return GridLayoutPlan.GRID_LAYOUT_PLAN;
   }
 
   private void initFromInput(IEditorInput input) throws PartInitException {
@@ -1043,12 +1048,13 @@ public class ViewEditor extends MultiPageEditorPart {
   /////////////////////////////////////
   // Update Graph Layouts
 
-  public String getLayoutName() {
-    return viewInfo.getSelectedLayout();
-  }
-
-  public LayoutGenerator getSelectedLayout() {
-    return LayoutGenerators.getByName(getLayoutName());
+  public LayoutPlan getSelectedLayout() {
+    PropertyDocumentReference<LayoutPlanDocument<? extends LayoutPlan>> planRef =
+        viewInfo.getSelectedLayout();
+    if (null != planRef) {
+      return planRef.getDocument().getInfo();
+    }
+    return null;
   }
 
   public Map<GraphNode, Point2D> getNodeLocations() {
@@ -1149,19 +1155,19 @@ public class ViewEditor extends MultiPageEditorPart {
     return position.getY();
   }
 
-  public void applyLayout(LayoutGenerator layout) {
-    applyLayout(layout, getLayoutEdgeMatcherRef().getDocument());
+  public void applyLayout(LayoutPlan layoutPlan) {
+    applyLayout(layoutPlan, getLayoutEdgeMatcherRef().getDocument());
   }
 
   public void applyLayout(
-          LayoutGenerator layout, GraphEdgeMatcherDescriptor edgeMatcher) {
+      LayoutPlan layoutPlan, GraphEdgeMatcherDescriptor edgeMatcher) {
 
     Collection<GraphNode> layoutNodes = getLayoutNodes();
     if (layoutNodes.size() < 2) {
       // TODO: Notify user that a single node cannot be positioned.
       return;
     }
-    applyLayout(layout, edgeMatcher, layoutNodes);
+    applyLayout(layoutPlan, edgeMatcher, layoutNodes);
   }
 
   private Collection<GraphNode> getLayoutNodes() {
@@ -1183,7 +1189,7 @@ public class ViewEditor extends MultiPageEditorPart {
    * @param layoutNodes nodes that participate in the layout
    */
   private void applyLayout(
-      LayoutGenerator layout, GraphEdgeMatcherDescriptor edgeMatcher,
+      LayoutPlan layoutPlan, GraphEdgeMatcherDescriptor edgeMatcher,
       Collection<GraphNode> layoutNodes) {
 
     LayoutContext context = new LayoutContext();
@@ -1196,8 +1202,8 @@ public class ViewEditor extends MultiPageEditorPart {
     Rectangle2D layoutViewport = Point2dUtils.scaleRectangle(viewport, 0.7);
     context.setViewport(layoutViewport);
 
-    Map<GraphNode, Point2D> changes = LayoutUtil.calcPositions(
-            layout, context, layoutNodes);
+    Map<GraphNode, Point2D> changes =
+        LayoutUtil.calcPositions(layoutPlan, context, layoutNodes);
 
     // Change the node locations.
     editNodeLocations(changes);

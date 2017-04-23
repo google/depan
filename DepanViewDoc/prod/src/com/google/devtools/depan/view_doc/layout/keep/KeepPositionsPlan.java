@@ -18,9 +18,8 @@ package com.google.devtools.depan.view_doc.layout.keep;
 
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.view_doc.layout.LayoutContext;
-import com.google.devtools.depan.view_doc.layout.LayoutGenerator;
 import com.google.devtools.depan.view_doc.layout.LayoutRunner;
-import com.google.devtools.depan.view_doc.layout.plugins.LayoutGeneratorContributor;
+import com.google.devtools.depan.view_doc.layout.model.LayoutPlan;
 
 import com.google.common.collect.Maps;
 
@@ -33,21 +32,21 @@ import java.util.Map;
  * original locations.  Nodes missing from the {@link LayoutContext} will
  * get a null location.
  * 
- * @author SERVICE-NOW\lee.carver
+ * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public class KeepLocationsGenerator implements LayoutGenerator {
+public class KeepPositionsPlan implements LayoutPlan {
 
-  public static class Contribution implements LayoutGeneratorContributor {
+  /** Only need one. */
+  public static KeepPositionsPlan INSTANCE = new KeepPositionsPlan();
 
-    @Override
-    public String getLabel() {
-      return "Keep position";
-    }
+  @Override
+  public String buildSummary() {
+    return "Keep positions";
+  }
 
-    @Override
-    public LayoutGenerator getLayoutGenerator() {
-      return new KeepLocationsGenerator();
-    }
+  @Override
+  public LayoutRunner buildLayout(LayoutContext context) {
+    return new KeepPositionsRunner(context.getNodeLocations());
   }
 
   /**
@@ -55,11 +54,11 @@ public class KeepLocationsGenerator implements LayoutGenerator {
    * positions.  Nodes missing from the {@link LayoutContext} will
    * get a null location.
    */
-  private static class KeepLocationsRunner implements LayoutRunner {
+  private static class KeepPositionsRunner implements LayoutRunner {
 
     private final Map<GraphNode, Point2D> nodeLocations;
 
-    public KeepLocationsRunner(Map<GraphNode, Point2D> nodeLocations) {
+    public KeepPositionsRunner(Map<GraphNode, Point2D> nodeLocations) {
       this.nodeLocations = nodeLocations;
     }
 
@@ -95,12 +94,4 @@ public class KeepLocationsGenerator implements LayoutGenerator {
       return result;
     }
   }
-
-  @Override
-  public LayoutRunner buildRunner(LayoutContext context) {
-    return new KeepLocationsRunner(context.getNodeLocations());
-  }
-
-  /** Only need one, and parallels other {@code XxxGenerator} classes. */
-  public static KeepLocationsGenerator INSTANCE = new KeepLocationsGenerator();
 }

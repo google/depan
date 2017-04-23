@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 The Depan Project Authors
+ * Copyright 2017 The Depan Project Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,12 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.view_doc.layout.grid;
-
-import com.google.devtools.depan.view_doc.layout.LayoutGenerator;
-import com.google.devtools.depan.view_doc.layout.plugins.LayoutGeneratorContributor;
+package com.google.devtools.depan.view_doc.layout.model;
 
 /**
- * @author <a href="leeca@pnambic.com">Lee Carver</a>
+ * @author <a href="mailto:leeca@pnambic.com">Lee Carver</a>
  */
-public class GridLayoutContribution implements LayoutGeneratorContributor {
+public interface ValueOption {
 
-  @Override
-  public String getLabel() {
-    return "Grid";
-  }
-
-  @Override
-  public LayoutGenerator getLayoutGenerator() {
-    return new GridLayoutGenerator();
-  }
+  boolean isSet();
 }

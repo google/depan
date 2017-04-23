@@ -33,13 +33,35 @@ import java.util.Map;
  */
 public class GridLayoutRunner implements LayoutRunner {
 
-  private static final double UNIT = 30.0;
+  public static final double UNIT = 30.0;
 
-  private Map<GraphNode, Point2D> result;
+  private Map<GraphNode, Point2D> positions;
+
   private final LayoutContext context;
+
+  private double columns;
+
+  private double rows;
+
+  private double horizontalSpace = UNIT;
+
+  private double verticalSpace = UNIT;
 
   public GridLayoutRunner(LayoutContext context) {
     this.context = context;
+  }
+
+  public void setColumnRows(int columns, int rows) {
+    this.columns = columns;
+    this.rows = rows;
+  }
+
+  public void setHorizontalSpace(double horizontalSpace) {
+    this.horizontalSpace = horizontalSpace;
+  }
+
+  public void setVerticalSpace(double verticalSpace) {
+    this.verticalSpace = verticalSpace;
   }
 
   @Override
@@ -50,35 +72,63 @@ public class GridLayoutRunner implements LayoutRunner {
   @Override
   public void layoutStep() {
     Collection<GraphNode> layoutNodes = context.getMovableNodes();
-    result = Maps.newHashMapWithExpectedSize(layoutNodes.size());
-    double columns = Math.ceil(Math.sqrt(layoutNodes.size()));
-    double rows = Math.ceil(layoutNodes.size() / columns);
-    double leftPos = - UNIT * ((columns / 2.0) - 0.5);
-    double topPos = UNIT * ((rows / 2.0) - 0.5);
+    positions = Maps.newHashMapWithExpectedSize(layoutNodes.size());
+    double leftPos = - horizontalSpace * ((columns / 2.0) - 0.5);
+    double topPos = verticalSpace * ((rows / 2.0) - 0.5);
 
     double xCurr = leftPos;
     double yCurr = topPos;
     int item = (int) columns;
     for (GraphNode node : layoutNodes) {
-      result.put(node, new Point2D.Double(xCurr, yCurr));
+      positions.put(node, new Point2D.Double(xCurr, yCurr));
       item--;
       if (item > 0) {
-        xCurr += UNIT;
+        xCurr += horizontalSpace;
       } else {
         item = (int) columns;
         xCurr = leftPos;
-        yCurr -= UNIT;
+        yCurr -= verticalSpace;
       }
     }
   }
 
   @Override
   public boolean layoutDone() {
-    return (result != null);
+    return (positions != null);
   }
 
   @Override
   public Map<GraphNode, Point2D> getPositions(Collection<GraphNode> nodes) {
+    return positions;
+  }
+
+  public static GridLayoutRunner buildByRows(
+      LayoutContext context, int buildRows) {
+    Collection<GraphNode> layoutNodes = context.getMovableNodes();
+    int buildColumns = layoutNodes.size() / buildRows;
+    GridLayoutRunner result = new GridLayoutRunner(context);
+    result.setColumnRows(buildColumns, buildRows);
     return result;
+  }
+
+  public static GridLayoutRunner buildByColumns(
+      LayoutContext context, int buildColumns) {
+    Collection<GraphNode> layoutNodes = context.getMovableNodes();
+    int buildRows = layoutNodes.size() / buildColumns;
+    GridLayoutRunner result = new GridLayoutRunner(context);
+    result.setColumnRows(buildColumns, buildRows);
+    return result;
+  }
+
+  public static GridLayoutRunner buildPortrait(LayoutContext context) {
+    Collection<GraphNode> layoutNodes = context.getMovableNodes();
+    double split = Math.sqrt(layoutNodes.size());
+    return buildByRows(context, (int) Math.ceil(split));
+  }
+
+  public static GridLayoutRunner buildLandscape(LayoutContext context) {
+    Collection<GraphNode> layoutNodes = context.getMovableNodes();
+    double split = Math.sqrt(layoutNodes.size());
+    return buildByRows(context, (int) Math.floor(split));
   }
 }

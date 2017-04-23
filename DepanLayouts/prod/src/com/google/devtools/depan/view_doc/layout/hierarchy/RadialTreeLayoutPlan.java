@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 The Depan Project Authors
+ * Copyright 2017 The Depan Project Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,23 @@
 
 package com.google.devtools.depan.view_doc.layout.hierarchy;
 
-import com.google.devtools.depan.view_doc.layout.LayoutGenerator;
-import com.google.devtools.depan.view_doc.layout.plugins.LayoutGeneratorContributor;
+import com.google.devtools.depan.view_doc.layout.LayoutContext;
 
 /**
- * @author <a href="leeca@pnambic.com">Lee Carver</a>
+ * @author <a href="mailto:leeca@pnambic.com">Lee Carver</a>
  */
-public class RadialLayoutContribution implements LayoutGeneratorContributor {
+public final class RadialTreeLayoutPlan extends TreeLayoutPlan {
 
   @Override
-  public String getLabel() {
-    return "Radial";
+  protected HierarchicalTreeLayout buildTreeLayout(LayoutContext context) {
+    return new RadialTreeLayout(
+        context.getGraphModel(),
+        context.getEdgeMatcher().getInfo(),
+        context.getViewport());
   }
 
   @Override
-  public LayoutGenerator getLayoutGenerator() {
-    return TreeLayoutGenerator.NewRadialLayoutBuilder;
+  public String buildSummary() {
+    return "Radial";
   }
 }

@@ -1,5 +1,5 @@
-/*
- * Copyright 2016 The Depan Project Authors
+/**
+ * Copyright 2017 The Depan Project Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,19 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.view_doc.layout;
+ package com.google.devtools.depan.view_doc.layout.persistence;
+
+import com.google.devtools.depan.resources.ResourceContainer;
+import com.google.devtools.depan.resources.analysis.AnalysisResourceInstaller;
 
 /**
- * @author Lee Carver
- *
+ * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public interface LayoutGenerator {
+public class LayoutResourcesInstaller
+    implements AnalysisResourceInstaller {
 
-  LayoutRunner buildRunner(LayoutContext context);
-
+  @Override
+  public void installResource(ResourceContainer root) {
+    LayoutResources.installResources(root);
+  }
 }

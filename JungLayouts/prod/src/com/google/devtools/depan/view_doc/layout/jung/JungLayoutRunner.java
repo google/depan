@@ -34,12 +34,13 @@ import java.util.Map;
  * Define a few standard variations of the {@link LayoutRunner} that are
  * useful for JUNG-based layout algorithms.
  * 
- * @author <a href='mailto:lee.carver@servicenow.com'>Lee Carver</a>
+ * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
 public abstract class JungLayoutRunner implements LayoutRunner {
 
   private final Layout<GraphNode, GraphEdge> jungLayout;
 
+  /** Scales the layout positions into their overall graph position. */
   private final Rectangle2D region;
 
   protected JungLayoutRunner(

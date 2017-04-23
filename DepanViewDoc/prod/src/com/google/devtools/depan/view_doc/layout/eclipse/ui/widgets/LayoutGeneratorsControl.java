@@ -17,11 +17,14 @@
 package com.google.devtools.depan.view_doc.layout.eclipse.ui.widgets;
 
 import com.google.devtools.depan.platform.eclipse.ui.widgets.MapChoiceControl;
-import com.google.devtools.depan.view_doc.layout.plugins.LayoutGeneratorContributor;
-import com.google.devtools.depan.view_doc.layout.plugins.LayoutGeneratorRegistry;
+import com.google.devtools.depan.view_doc.layout.model.LayoutPlanDocument;
+import com.google.devtools.depan.view_doc.layout.persistence.LayoutResources;
+
+import com.google.common.collect.Maps;
 
 import org.eclipse.swt.widgets.Composite;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -29,27 +32,32 @@ import java.util.Map;
  * @author Lee Carver
  */
 public class LayoutGeneratorsControl
-    extends MapChoiceControl<LayoutGeneratorContributor> {
+    extends MapChoiceControl<LayoutPlanDocument<?>> {
 
   public LayoutGeneratorsControl(Composite parent) {
     super(parent);
 
-    Map<String, LayoutGeneratorContributor> layouts =
-        LayoutGeneratorRegistry.getRegistryContributionMap();
+    List<LayoutPlanDocument<?>> topLayouts = LayoutResources.getTopLayouts();
 
-    setInput(getBestLayout(layouts), layouts);
+    Map<String, LayoutPlanDocument<?>> layoutMap =
+        Maps.newHashMapWithExpectedSize(topLayouts.size());
+    for (LayoutPlanDocument<?> layoutDoc : topLayouts) {
+      layoutMap.put(layoutDoc.getName(), layoutDoc);
+    }
+
+    setInput(getBestLayout(topLayouts), layoutMap);
   }
 
-  private static LayoutGeneratorContributor getBestLayout(
-      Map<String, LayoutGeneratorContributor> contribs) {
-    if (contribs.isEmpty()) {
+  private static LayoutPlanDocument<?> getBestLayout(
+      List<LayoutPlanDocument<?>> layouts) {
+    if (layouts.isEmpty()) {
       return null;
     }
-    return contribs.values().iterator().next();
+    return layouts.get(0);
   }
 
   @Override
-  protected LayoutGeneratorContributor coerceResult(Object obj) {
-    return (LayoutGeneratorContributor) obj;
+  protected LayoutPlanDocument<?> coerceResult(Object obj) {
+    return (LayoutPlanDocument<?>) obj;
   }
 }

@@ -31,8 +31,12 @@ import com.google.devtools.depan.resources.ResourceContainer;
  * 
  * @author <a href="mailto:leeca@google.com">Lee Carver</a>
  */
-class EdgeMatcherSaveLoadConfig
+public class EdgeMatcherSaveLoadConfig
     extends SaveLoadConfig<GraphEdgeMatcherDescriptor> {
+
+  // Only need one.
+  public static SaveLoadConfig<GraphEdgeMatcherDescriptor> CONFIG =
+      new EdgeMatcherSaveLoadConfig();
 
   @Override
   public ResourceContainer getContainer() {

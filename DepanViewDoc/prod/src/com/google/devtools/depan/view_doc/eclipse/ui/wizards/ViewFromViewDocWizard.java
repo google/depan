@@ -22,8 +22,8 @@ import com.google.devtools.depan.resources.PropertyDocumentReference;
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditorInput;
 import com.google.devtools.depan.view_doc.eclipse.ui.plugins.FromViewDocWizard;
-import com.google.devtools.depan.view_doc.layout.LayoutGenerator;
-import com.google.devtools.depan.view_doc.layout.grid.GridLayoutGenerator;
+import com.google.devtools.depan.view_doc.layout.grid.GridLayoutPlan;
+import com.google.devtools.depan.view_doc.layout.model.LayoutPlan;
 import com.google.devtools.depan.view_doc.model.ViewDocument;
 
 /**
@@ -64,11 +64,11 @@ public class ViewFromViewDocWizard extends FromViewDocWizard {
     return result;
   }
 
-  private LayoutGenerator calcInitialLayout() {
-    LayoutGenerator layout = page.getLayoutGenerator();
+  private LayoutPlan calcInitialLayout() {
+    LayoutPlan layout = page.getLayoutPlan();
     if (null != layout) {
       return layout;
     }
-    return new GridLayoutGenerator();
+    return GridLayoutPlan.GRID_LAYOUT_PLAN;
   }
 }

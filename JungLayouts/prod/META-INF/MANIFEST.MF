@@ -9,8 +9,10 @@ Require-Bundle: com.google.guava,
  com.google.devtools.depan.core,
  com.google.devtools.depan.edges,
  com.google.devtools.depan.nodes,
- com.google.devtools.depan.graph_doc;bundle-version="2.1.0",
+ com.google.devtools.depan.persistence,
+ com.google.devtools.depan.graph_doc,
  com.google.devtools.depan.edges.ui,
  com.google.devtools.depan.view_doc,
- depan-jung-library
+ depan-jung-library,
+ com.google.devtools.depan.platform.ui
 Bundle-ClassPath: .

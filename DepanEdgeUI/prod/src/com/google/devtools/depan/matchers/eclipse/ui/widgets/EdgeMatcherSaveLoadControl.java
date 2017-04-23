@@ -18,7 +18,6 @@ package com.google.devtools.depan.matchers.eclipse.ui.widgets;
 
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.GenericSaveLoadControl;
-import com.google.devtools.depan.platform.eclipse.ui.widgets.SaveLoadConfig;
 
 import org.eclipse.swt.widgets.Composite;
 
@@ -34,10 +33,6 @@ public abstract class EdgeMatcherSaveLoadControl
     extends GenericSaveLoadControl<GraphEdgeMatcherDescriptor> {
 
   public EdgeMatcherSaveLoadControl(Composite parent) {
-    super(parent, CONFIG);
+    super(parent, EdgeMatcherSaveLoadConfig.CONFIG);
   }
-
-  // Only need one.
-  private static SaveLoadConfig<GraphEdgeMatcherDescriptor> CONFIG =
-      new EdgeMatcherSaveLoadConfig();
 }

@@ -34,7 +34,7 @@ import java.util.Map;
  * 
  * @author <a href='mailto:leeca@google.com'>Lee Carver </a>
  */
-public class NewTreeLayout {
+public abstract class HierarchicalTreeLayout {
 
   /** The source of nodes for layout. */
   protected final GraphModel graphModel;
@@ -52,26 +52,26 @@ public class NewTreeLayout {
   protected Map<GraphNode, Point2D> positions;
 
   /**
-   * Create a JUNG Layout object from the available data.
-   * 
-   * @param graph JUNG graph for layout (ignored)
-   * @param viewModel source of nodes (exposed graph) to layout
+   * @param graphModel nodes and edges to layout
    * @param edgeMatcher edge matcher that defines the hierarchy
    * @param size available rendering space (ignored)
    */
-  protected NewTreeLayout(
-      GraphModel graphModel, EdgeMatcher<String> edgeMatcher,
+  protected HierarchicalTreeLayout(
+      GraphModel graphModel,
+      EdgeMatcher<String> edgeMatcher,
       Rectangle2D region) {
     this.graphModel = graphModel;
     this.edgeMatcher = edgeMatcher;
     this.region = region;
   }
 
+  protected abstract HierarchicalLayoutTool buildLayoutTool();
+
   /**
    * Does the complete left-to-right planar layout.
    */
   public void initialize() {
-    LayoutTool layoutTool = new LayoutTool(graphModel, edgeMatcher);
+    HierarchicalLayoutTool layoutTool = buildLayoutTool();
 
     positions = Maps.newHashMapWithExpectedSize(graphModel.getNodes().size());
     layoutTool.layoutTree();
@@ -80,40 +80,5 @@ public class NewTreeLayout {
 
   public Point2D getPosition(GraphNode node) {
     return positions.get(node);
-  }
-
-  /**
-   * Define how x and y locations are assigned to nodes.
-   */
-  private class LayoutTool extends HierarchicalLayoutTool.Planar {
-
-    /**
-     * Scaling factor for X dimension.  Ideally, this should be parameter
-     * that is discovered from the geometry of the layout space and the
-     * overall properties of the nodes that are being placed.
-     * <p>
-     * BUT, x12 seems to work well in practice to keep the levels far
-     * enough apart that the text label mostly do not overlap.
-     */
-    static final int EXPAND_X = 12;
-
-    /**
-     * Create a LayoutTool for left-to-right planar hierarchies.
-     * 
-     * @param layoutGraph source of nodes (exposed graph) to layout
-     * @param edgeMatcher edge matcher that defines the hierarchy
-     */
-    public LayoutTool(
-        GraphModel layoutGraph, EdgeMatcher<String> edgeMatcher) {
-      super(layoutGraph, edgeMatcher);
-    }
-
-    @Override
-    protected void assignNode(GraphNode node, int level, int offset) {
-      // TODO(): Come up with a better heuristic for non-overlapping placement
-      // of the nodes.
-      Point2D point = makePoint2D(level * EXPAND_X, offset);
-      positions.put(node, point);
-    }
   }
 }

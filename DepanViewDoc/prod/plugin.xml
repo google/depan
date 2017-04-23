@@ -39,6 +39,10 @@
             class="com.google.devtools.depan.view_doc.persistence.EdgeDisplayResourcesInstaller"
             id="com.google.devtools.depan.view_doc.persistence.EdgeDisplayResourcesInstaller">
       </installer>
+      <installer
+            class="com.google.devtools.depan.view_doc.layout.persistence.LayoutResourcesInstaller"
+            id="com.google.devtools.depan.view_doc.layout.persistence.LayoutResourcesInstaller">
+      </installer>
    </extension>
    <extension
          point="com.google.devtools.depan.view_doc.layout.registry.Generators">
@@ -47,7 +51,7 @@
             id="com.google.devtools.depan.view_doc.layout.grid.GridLayoutContribution">
       </layout>
       <layout
-            class="com.google.devtools.depan.view_doc.layout.keep.KeepLocationsGenerator$Contribution"
+            class="com.google.devtools.depan.view_doc.layout.keep.KeepPositionsPlan$Contribution"
             id="com.google.devtools.depan.view_doc.layout.keep.KeepLocationsContribution">
       </layout>
    </extension>
@@ -156,6 +160,26 @@
             id="com.google.devtools.depan.view_doc.eclipse.ui.command.TakeScreenshot"
             name="Take screenshot...">
       </command>
+      <command
+            description="Layout nodes with the supplied plan"
+            id="com.google.devtools.depan.view_doc.eclipse.ui.command.LayoutNodes"
+            name="Layout Nodes...">
+         <commandParameter
+               id="com.google.devtools.depan.view_doc.eclipse.ui.command.LayoutNodes.Contributor"
+               name="Plan Contributor"
+               optional="false">
+         </commandParameter>
+      </command>
+      <command
+            description="Select Layout"
+            id="com.google.devtools.depan.view_doc.layout.eclipse.ui.command.SelectLayoutNodes"
+            name="Layout nodes from selection">
+      </command>
+      <command
+            description="Layout Edges"
+            id="com.google.devtools.depan.view_doc.layout.eclipse.ui.command.SelectLayoutEdges"
+            name="Layout Edges">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -177,6 +201,33 @@
             </reference>
          </activeWhen>
       </handler>
+      <handler
+            class="com.google.devtools.depan.view_doc.layout.eclipse.ui.handlers.LayoutNodesHandler"
+            commandId="com.google.devtools.depan.view_doc.eclipse.ui.command.LayoutNodes">
+         <activeWhen>
+            <reference
+                  definitionId="com.google.devtools.depan.view_doc.eclipse.ui.editor.isViewEditorActive">
+            </reference>
+         </activeWhen>
+      </handler>
+      <handler
+            class="com.google.devtools.depan.view_doc.layout.eclipse.ui.handlers.SelectLayoutNodes"
+            commandId="com.google.devtools.depan.view_doc.layout.eclipse.ui.command.SelectLayoutNodes">
+         <activeWhen>
+            <reference
+                  definitionId="com.google.devtools.depan.view_doc.eclipse.ui.editor.isViewEditorActive">
+            </reference>
+         </activeWhen>
+      </handler>
+      <handler
+            class="com.google.devtools.depan.view_doc.layout.eclipse.ui.handlers.SelectLayoutEdges"
+            commandId="com.google.devtools.depan.view_doc.layout.eclipse.ui.command.SelectLayoutEdges">
+         <activeWhen>
+            <reference
+                  definitionId="com.google.devtools.depan.view_doc.eclipse.ui.editor.isViewEditorActive">
+            </reference>
+         </activeWhen>
+      </handler>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -186,6 +237,30 @@
          <menu
                id="eclipse.ui.main.menu.Edit"
                label="Edit">
+            <menu
+                  id="eclipse.ui.main.menu.Edit.Layout"
+                  label="Layout">
+               <command
+                     commandId="com.google.devtools.depan.view_doc.layout.eclipse.ui.command.SelectLayoutEdges"
+                     label="Layout Edges..."
+                     style="push">
+                  <visibleWhen>
+                     <reference
+                           definitionId="com.google.devtools.depan.view_doc.eclipse.ui.editor.isViewEditorActive">
+                     </reference>
+                  </visibleWhen>
+               </command>
+               <command
+                     commandId="com.google.devtools.depan.view_doc.layout.eclipse.ui.command.SelectLayoutNodes"
+                     label="Select Layout..."
+                     style="push">
+                  <visibleWhen>
+                     <reference
+                           definitionId="com.google.devtools.depan.view_doc.eclipse.ui.editor.isViewEditorActive">
+                     </reference>
+                  </visibleWhen>
+               </command>
+            </menu>
             <command
                   commandId="com.google.devtools.depan.view_doc.eclipse.ui.command.TakeScreenshot"
                   icon="icons/screenshot_16x16.png"

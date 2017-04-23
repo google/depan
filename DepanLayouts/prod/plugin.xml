@@ -2,15 +2,14 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension
-         point="com.google.devtools.depan.view_doc.layout.registry.Generators">
-      <layout
-            class="com.google.devtools.depan.view_doc.layout.hierarchy.RadialLayoutContribution"
-            id="com.google.devtools.depan.view_doc.layout.hierarchy.RadialLayoutContribution">
-      </layout>
-      <layout
-            class="com.google.devtools.depan.view_doc.layout.hierarchy.TreeLayoutContribution"
-            id="com.google.devtools.depan.view_doc.layout.hierarchy.TreeLayoutContribution">
-      </layout>
+         point="com.google.devtools.depan.resources.analysis.installer">
+      <installer
+            class="com.google.devtools.depan.view_doc.layout.hierarchy.HierarchicalLayoutResourceInstaller"
+            id="com.google.devtools.depan.view_doc.layout.hierarchy.HierarchicalLayoutResourceInstaller">
+         <install_after
+               installer_ref="com.google.devtools.depan.view_doc.layout.persistence.LayoutResourcesInstaller">
+         </install_after>
+      </installer>
    </extension>
 
 </plugin>

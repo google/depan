@@ -32,6 +32,8 @@ import com.google.devtools.depan.nodes.trees.TreeModel;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 import com.google.devtools.depan.resources.PropertyDocumentReference;
 import com.google.devtools.depan.view_doc.eclipse.ui.plugins.ViewExtension;
+import com.google.devtools.depan.view_doc.layout.model.LayoutPlan;
+import com.google.devtools.depan.view_doc.layout.model.LayoutPlanDocument;
 
 import com.google.common.collect.ImmutableList;
 
@@ -177,11 +179,14 @@ public class ViewDocument {
     userPrefs.setRelationProperty(relation, edgeProp);
   }
 
-  public void setSelectedLayout(String layoutName) {
+  public void setSelectedLayout(
+      PropertyDocumentReference<LayoutPlanDocument<? extends LayoutPlan>>
+          layoutName) {
     userPrefs.setSelectedLayout(layoutName);
   }
 
-  public String getSelectedLayout() {
+  public PropertyDocumentReference<LayoutPlanDocument<? extends LayoutPlan>>
+      getSelectedLayout() {
     return userPrefs.getSelectedLayout();
   }
 

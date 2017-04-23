@@ -17,7 +17,6 @@
 package com.google.devtools.depan.relations.eclipse.ui.widgets;
 
 import com.google.devtools.depan.platform.eclipse.ui.widgets.GenericSaveLoadControl;
-import com.google.devtools.depan.platform.eclipse.ui.widgets.SaveLoadConfig;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 
 import org.eclipse.swt.widgets.Composite;
@@ -34,9 +33,6 @@ public abstract class RelationSetSaveLoadControl
     extends GenericSaveLoadControl<RelationSetDescriptor> {
 
   public RelationSetSaveLoadControl(Composite parent) {
-    super(parent, CONFIG);
+    super(parent, RelationSetSaveLoadConfig.CONFIG);
   }
-
-  private static SaveLoadConfig<RelationSetDescriptor> CONFIG =
-      new RelationSetSaveLoadConfig();
 }

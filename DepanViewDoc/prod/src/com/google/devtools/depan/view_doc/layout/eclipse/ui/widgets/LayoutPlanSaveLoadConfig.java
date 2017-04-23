@@ -14,52 +14,55 @@
  * limitations under the License.
  */
 
-package com.google.devtools.depan.relations.eclipse.ui.widgets;
+package com.google.devtools.depan.view_doc.layout.eclipse.ui.widgets;
 
 import com.google.devtools.depan.persistence.AbstractDocXmlPersist;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.SaveLoadConfig;
-import com.google.devtools.depan.relations.models.RelationSetDescriptor;
-import com.google.devtools.depan.relations.persistence.RelationSetDescriptorXmlPersist;
-import com.google.devtools.depan.relations.persistence.RelationSetResources;
 import com.google.devtools.depan.resources.ResourceContainer;
+import com.google.devtools.depan.view_doc.layout.model.LayoutPlan;
+import com.google.devtools.depan.view_doc.layout.model.LayoutPlanDocument;
+import com.google.devtools.depan.view_doc.layout.persistence.LayoutPlanDocXmlPersist;
+import com.google.devtools.depan.view_doc.layout.persistence.LayoutResources;
 
 /**
- * @author <a href='mailto:leeca@pnambic.com'>Lee Carver</a>
+ * Describe the standard Save/Load parameters for {@link LayoutPlanDocument}s.
+ * 
+ * @author <a href="mailto:leeca@google.com">Lee Carver</a>
  */
-class RelationSetSaveLoadConfig
-    extends SaveLoadConfig<RelationSetDescriptor> {
+public class LayoutPlanSaveLoadConfig
+    extends SaveLoadConfig<LayoutPlanDocument<LayoutPlan>> {
 
-  public static SaveLoadConfig<RelationSetDescriptor> CONFIG =
-      new RelationSetSaveLoadConfig();
+  public static SaveLoadConfig<LayoutPlanDocument<LayoutPlan>> CONFIG =
+      new LayoutPlanSaveLoadConfig();
 
   @Override
   public ResourceContainer getContainer() {
-    return RelationSetResources.getContainer();
+    return LayoutResources.getContainer();
   }
 
   @Override
-  public AbstractDocXmlPersist<RelationSetDescriptor> getDocXmlPersist(
+  public AbstractDocXmlPersist<LayoutPlanDocument<LayoutPlan>> getDocXmlPersist(
       boolean readable) {
-    return RelationSetDescriptorXmlPersist.build(readable);
+    return LayoutPlanDocXmlPersist.build(readable);
   }
 
   @Override
   public String getSaveLabel() {
-    return "Save as RelationSet...";
+    return "Save layout plan resource...";
   }
 
   @Override
   public String getLoadLabel() {
-    return "Load from RelationSet...";
+    return "Load layout plan resource...";
   }
 
   @Override
   public String getBaseName() {
-    return RelationSetResources.BASE_NAME;
+    return LayoutResources.BASE_NAME;
   }
 
   @Override
   public String getExension() {
-    return RelationSetResources.EXTENSION;
+    return LayoutResources.EXTENSION;
   }
 }

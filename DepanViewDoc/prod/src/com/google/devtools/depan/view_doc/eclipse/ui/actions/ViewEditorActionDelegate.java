@@ -16,7 +16,6 @@
 package com.google.devtools.depan.view_doc.eclipse.ui.actions;
 
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
-import com.google.devtools.depan.view_doc.layout.LayoutGenerator;
 import com.google.devtools.depan.view_doc.model.OptionPreferences;
 
 import org.eclipse.jface.action.IAction;
@@ -29,19 +28,7 @@ import org.eclipse.ui.IEditorPart;
  */
 public class ViewEditorActionDelegate implements IEditorActionDelegate {
 
-  // layouts
-  public static final String FRLAYOUT_ID =
-      "com.google.devtools.depan.eclipse.actions.view.SetFRLayout";
-  public static final String SPRINGLAYOUT_ID =
-      "com.google.devtools.depan.eclipse.actions.view.SetSpringLayout";
-  public static final String TREELAYOUT_ID =
-      "com.google.devtools.depan.eclipse.actions.view.SetTreeLayout";
-  public static final String RADIALLAYOUT_ID =
-      "com.google.devtools.depan.eclipse.actions.view.SetRadialLayout";
-
   // selections
-  public static final String SUBLAYOUT_ID =
-      "com.google.devtools.depan.eclipse.actions.view.SubLayout";
   public static final String COLLAPSE_ID =
       "com.google.devtools.depan.eclipse.actions.view.Collapse";
   public static final String SELECT_ALL =
@@ -76,18 +63,8 @@ public class ViewEditorActionDelegate implements IEditorActionDelegate {
     }
     String id = action.getId();
 
-    // layouts
-    if (id.equals(FRLAYOUT_ID)) {
-      applyLayout(null); // JungLayoutGenerator.FRLayoutBuilder);
-    } else if (id.equals(SPRINGLAYOUT_ID)) {
-      applyLayout(null); // JungLayoutGenerator.SpringLayoutBuilder);
-    } else if (id.equals(TREELAYOUT_ID))  {
-      applyLayout(null); // TreeLayoutGenerator.NewTreeLayoutBuilder);
-    } else if (id.equals(RADIALLAYOUT_ID)) {
-      applyLayout(null); // TreeLayoutGenerator.NewRadialLayoutBuilder);
-
     // visualization options
-    } else if (id.equals(OptionPreferences.STROKEHIGHLIGHT_ID)) {
+    if (id.equals(OptionPreferences.STROKEHIGHLIGHT_ID)) {
       toggleOptions(action, OptionPreferences.STROKEHIGHLIGHT_ID);
     } else if (id.equals(OptionPreferences.SHAPE_ID)) {
       toggleOptions(action, OptionPreferences.SHAPE_ID);
@@ -116,9 +93,5 @@ public class ViewEditorActionDelegate implements IEditorActionDelegate {
     boolean checked = targetEditor.isOptionChecked(optionId);
     targetEditor.setOption(optionId, OptionPreferences.notValue(checked));
     action.setChecked(!checked);
-  }
-
-  private void applyLayout(LayoutGenerator layout) {
-    targetEditor.applyLayout(layout);
   }
 }

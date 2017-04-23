@@ -31,6 +31,8 @@ import com.google.devtools.depan.relations.persistence.RelationSetResources;
 import com.google.devtools.depan.resources.PropertyDocumentReference;
 import com.google.devtools.depan.view_doc.eclipse.ViewDocLogger;
 import com.google.devtools.depan.view_doc.eclipse.ui.plugins.ViewExtension;
+import com.google.devtools.depan.view_doc.layout.model.LayoutPlan;
+import com.google.devtools.depan.view_doc.layout.model.LayoutPlanDocument;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -88,7 +90,10 @@ public class ViewPreferences {
 
   private Collection<GraphNode> selectedNodes = ImmutableList.of();
 
-  private String selectedLayout;
+  private PropertyDocumentReference<LayoutPlanDocument<? extends LayoutPlan>>
+      selectedLayout;
+
+  // private String selectedLayout;
 
   private ScenePreferences scenePrefs;
 
@@ -98,7 +103,8 @@ public class ViewPreferences {
    * Edge matcher used by layout algorithms by default if it wasn't
    * specified.
    */
-  private PropertyDocumentReference<GraphEdgeMatcherDescriptor> layoutEdgeMatcher;
+  private PropertyDocumentReference<GraphEdgeMatcherDescriptor>
+      layoutEdgeMatcher;
 
   private List<GraphEdgeMatcherDescriptor> treeDescriptors;
 
@@ -411,12 +417,15 @@ public class ViewPreferences {
     this.layoutEdgeMatcher = matcherRef;
   }
 
-  public String getSelectedLayout() {
+  public PropertyDocumentReference<LayoutPlanDocument<? extends LayoutPlan>>
+      getSelectedLayout() {
     return selectedLayout;
   }
 
-  public void setSelectedLayout(String layoutName) {
-    selectedLayout = layoutName;
+  public void setSelectedLayout(
+      PropertyDocumentReference<LayoutPlanDocument<? extends LayoutPlan>>
+          selectedLayout) {
+    this.selectedLayout = selectedLayout;
   }
 
   /////////////////////////////////////
