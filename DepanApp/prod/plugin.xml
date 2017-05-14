@@ -61,7 +61,7 @@
    <extension
          point="org.eclipse.ui.newWizards">
       <wizard
-            category="com.google.devtools.depan"
+            category="com.google.devtools.depan.eclipse.ui.wizards"
             class="com.google.devtools.depan.eclipse.natures.NewDepanProjectWizard"
             finalPerspective="com.google.devtools.depan.eclipse.perspective"
             icon="icons/branding/depan-icon-16x16.gif"

@@ -1061,7 +1061,9 @@ public abstract class GLScene {
     }
     context.makeCurrent();
     Point size = canvas.getSize();
-    BufferedImage image = Screenshots.grab(size.x, size.y);
+    int shotX = scaleDpiUp(size.x);
+    int shotY = scaleDpiUp(size.y);
+    BufferedImage image = Screenshots.grab(shotX, shotY);
     context.release();
     return image;
   }
