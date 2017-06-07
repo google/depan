@@ -2,7 +2,7 @@
 <feature
       id="com.pnambic.depan.platform"
       label="DepAn Application Platform"
-      version="2.0.0.qualifier"
+      version="2.1.0.qualifier"
       provider-name="Pnambic Computing">
 
    <description url="http://www.example.com/description">
@@ -47,13 +47,6 @@
    </requires>
 
    <plugin
-         id="com.google.devtools.depan"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="com.google.devtools.depan.core"
          download-size="0"
          install-size="0"
@@ -68,20 +61,6 @@
          unpack="false"/>
 
    <plugin
-         id="depan-jogl-library"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="depan-jung-library"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="depan-xstream-library"
          download-size="0"
          install-size="0"
@@ -90,6 +69,41 @@
 
    <plugin
          id="joda-time"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.google.devtools.depan.builder"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.google.devtools.depan.edges"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.google.devtools.depan.graph_doc"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.google.devtools.depan.nodes"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.google.devtools.depan.persistence"
          download-size="0"
          install-size="0"
          version="0.0.0"

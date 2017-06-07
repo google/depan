@@ -83,6 +83,7 @@
     <module>../depan-java-feature</module>
     <module>../depan-javascript-feature</module>
     <module>../depan-maven-feature</module>
+    <module>../depan-platform-feature</module>
     <module>../depan-ruby-feature</module>
 
     <!-- Win64 Release -->
