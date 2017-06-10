@@ -21,11 +21,13 @@ import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeViewerProvider;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 import com.google.devtools.depan.view_doc.eclipse.ViewDocResources;
+import com.google.devtools.depan.view_doc.eclipse.ui.editor.SelectionChangeListener;
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
 import com.google.devtools.depan.view_doc.eclipse.ui.widgets.NodeDisplayTableControl;
 import com.google.devtools.depan.view_doc.model.NodeDisplayProperty;
 import com.google.devtools.depan.view_doc.model.NodeDisplayRepository;
 import com.google.devtools.depan.view_doc.model.NodeLocationRepository;
+import com.google.devtools.depan.view_doc.model.NodeSelectedRepository;
 import com.google.devtools.depan.view_doc.model.ViewPrefsListener;
 
 import org.eclipse.swt.graphics.Image;
@@ -52,6 +54,46 @@ public class NodeDisplayViewPart extends AbstractViewDocViewPart {
   private NodeDisplayTableControl propEditor;
 
   private CompactPrefsListener compactListener;
+
+  /////////////////////////////////////
+  // Node selected integration
+
+  private NodeSelectedRepository selectedRepo;
+
+  private static class PartNodeSelectedRepo
+      implements NodeSelectedRepository {
+
+    private final ViewEditor editor;
+
+    public PartNodeSelectedRepo(ViewEditor editor) {
+      this.editor = editor;
+    }
+
+    @Override
+    public boolean isSelected(GraphNode node) {
+      return editor.getSelectedNodes().contains(node);
+    }
+
+    @Override
+    public void setSelected(GraphNode node, boolean selected) {
+      Collection<GraphNode> change = Collections.singletonList(node);
+      if (selected) {
+        editor.extendSelection(change, null);
+      } else {
+        editor.reduceSelection(change, null);
+      }
+    }
+
+    @Override
+    public void addChangeListener(SelectionChangeListener listener) {
+      editor.addSelectionChangeListener(listener);
+    }
+
+    @Override
+    public void removeChangeListener(SelectionChangeListener listener) {
+      editor.removeSelectionChangeListener(listener);
+    }
+  }
 
   /////////////////////////////////////
   // Display attribute integration
@@ -220,7 +262,8 @@ public class NodeDisplayViewPart extends AbstractViewDocViewPart {
 
     propRepo = new PartEdgeDisplayRepo(editor);
     posRepo = new PartNodeLocationRepo(editor);
-    propEditor.setNodeRepository(posRepo, propRepo);
+    selectedRepo = new PartNodeSelectedRepo(editor);
+    propEditor.setNodeRepository(posRepo, propRepo, selectedRepo);
 
     updateInput();
 
@@ -230,7 +273,7 @@ public class NodeDisplayViewPart extends AbstractViewDocViewPart {
 
   @Override
   protected void releaseResources() {
-    propEditor.removeNodeRepository(posRepo, propRepo);
+    propEditor.removeNodeRepository();
     propRepo = null;
 
     if (null != compactListener) {

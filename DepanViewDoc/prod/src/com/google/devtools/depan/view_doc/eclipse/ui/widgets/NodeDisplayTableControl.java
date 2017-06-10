@@ -31,11 +31,13 @@ import com.google.devtools.depan.platform.PlatformResources;
 import com.google.devtools.depan.platform.eclipse.ui.tables.EditColTableDef;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 import com.google.devtools.depan.view_doc.eclipse.ViewDocLogger;
+import com.google.devtools.depan.view_doc.eclipse.ui.editor.SelectionChangeListener;
 import com.google.devtools.depan.view_doc.eclipse.ui.plugins.ViewExtensionRegistry;
 import com.google.devtools.depan.view_doc.model.EdgeDisplayProperty;
 import com.google.devtools.depan.view_doc.model.NodeDisplayProperty;
 import com.google.devtools.depan.view_doc.model.NodeDisplayRepository;
 import com.google.devtools.depan.view_doc.model.NodeLocationRepository;
+import com.google.devtools.depan.view_doc.model.NodeSelectedRepository;
 import com.google.devtools.depan.view_doc.model.NodeSizeMode;
 import com.google.devtools.depan.view_doc.model.Point2dUtils;
 
@@ -76,22 +78,24 @@ import java.util.Collection;
 public class NodeDisplayTableControl extends Composite {
 
   public static final String COL_NAME = "Node";
+  protected static final String COL_SELECTED = "Selected";
   protected static final String COL_XPOS = "X";
   protected static final String COL_YPOS = "Y";
   protected static final String COL_VISIBLE = "Visible";
-  protected static final String COL_SELECTED = "Selected";
   protected static final String COL_SIZE = "Size";
   public static final String COL_COLOR = "Color";
 
   public static final int INDEX_NAME = 0;
-  public static final int INDEX_XPOS = 1;
-  public static final int INDEX_YPOS = 2;
-  public static final int INDEX_VISIBLE = 3;
-  public static final int INDEX_SIZE = 4;
-  public static final int INDEX_COLOR = 5;
+  public static final int INDEX_SELECTED = 1;
+  public static final int INDEX_XPOS = 2;
+  public static final int INDEX_YPOS = 3;
+  public static final int INDEX_VISIBLE = 4;
+  public static final int INDEX_SIZE = 5;
+  public static final int INDEX_COLOR = 6;
 
   private static final EditColTableDef[] TABLE_DEF = new EditColTableDef[] {
     new EditColTableDef(COL_NAME, false, COL_NAME, 600),
+    new EditColTableDef(COL_SELECTED, true, COL_SELECTED, 70),
     new EditColTableDef(COL_XPOS, true, COL_XPOS, 100),
     new EditColTableDef(COL_YPOS, true, COL_YPOS, 100),
     new EditColTableDef(COL_VISIBLE, true, COL_VISIBLE, 100),
@@ -121,6 +125,7 @@ public class NodeDisplayTableControl extends Composite {
       // Configure cell editing.
       CellEditor[] cellEditors = new CellEditor[TABLE_DEF.length];
       cellEditors[INDEX_NAME] = null;
+      cellEditors[INDEX_SELECTED] = new CheckboxCellEditor(tree);
       cellEditors[INDEX_XPOS] = new TextCellEditor(tree);
       cellEditors[INDEX_YPOS] = new TextCellEditor(tree);
       cellEditors[INDEX_VISIBLE] = new CheckboxCellEditor(tree);
@@ -157,6 +162,35 @@ public class NodeDisplayTableControl extends Composite {
   }
 
   /////////////////////////////////////
+  // Node selected integration
+
+  private NodeSelectedRepository selectedRepo;
+
+  private SelectionChangeListener selectedListener;
+
+  private static final String[] UPDATE_SELECTED_COLUMNS = new String [] {
+      COL_SELECTED
+  };
+
+  private class ControlSelectionChangeListener
+    implements SelectionChangeListener {
+
+    @Override
+    public void extendSelection(Collection<GraphNode> extension) {
+      for (GraphNode node : extension) {
+        updateNodeColumns(node, UPDATE_SELECTED_COLUMNS);
+      }
+    }
+
+    @Override
+    public void reduceSelection(Collection<GraphNode> reduction) {
+      for (GraphNode node : reduction) {
+        updateNodeColumns(node, UPDATE_SELECTED_COLUMNS);
+      }
+    }
+  }
+
+  /////////////////////////////////////
   // NodeDisplayProperty integration
 
   private NodeDisplayRepository displayRepo;
@@ -164,11 +198,11 @@ public class NodeDisplayTableControl extends Composite {
   private ControlDisplayChangeListener displayListener;
 
   private static final String[] UPDATE_DISPLAY_COLUMNS = new String [] {
-    COL_VISIBLE, COL_SIZE, COL_COLOR
+      COL_VISIBLE, COL_SIZE, COL_COLOR
   };
 
   private class ControlDisplayChangeListener
-  implements NodeDisplayRepository.ChangeListener {
+      implements NodeDisplayRepository.ChangeListener {
 
     @Override
     public void nodeDisplayChanged(GraphNode node, NodeDisplayProperty props) {
@@ -242,7 +276,12 @@ public class NodeDisplayTableControl extends Composite {
 
   public void setNodeRepository(
       NodeLocationRepository posRepo,
-      NodeDisplayRepository displayRepo) {
+      NodeDisplayRepository displayRepo,
+      NodeSelectedRepository selectedRepo) {
+    this.selectedRepo = selectedRepo;
+    selectedListener = new ControlSelectionChangeListener();
+    selectedRepo.addChangeListener(selectedListener);
+
     this.posRepo = posRepo;
     posListener = new ControlLocationChangeListener();
     posRepo.addChangeListener(posListener);
@@ -252,21 +291,26 @@ public class NodeDisplayTableControl extends Composite {
     displayRepo.addChangeListener(displayListener);
   }
 
-  public void removeNodeRepository(
-      NodeLocationRepository posRepo,
-      NodeDisplayRepository displayRepo) {
+  public void removeNodeRepository() {
     if (null != displayListener) {
-      this.displayRepo.removeChangeListener(displayListener);
+      displayRepo.removeChangeListener(displayListener);
       displayListener = null;
     }
     if (null != posListener) {
-      this.posRepo.removeChangeListener(posListener);
+      posRepo.removeChangeListener(posListener);
       posListener = null;
     }
   }
 
   private void updateNodeColumns(GraphNode node, String[] cols) {
     propViewer.updateNodeColumns(node, cols);
+  }
+
+  /////////////////////////////////////
+  // Selection repository methods
+
+  private boolean isNodeSelected(GraphNode node) {
+    return selectedRepo.isSelected(node);
   }
 
   /////////////////////////////////////
@@ -439,7 +483,7 @@ public class NodeDisplayTableControl extends Composite {
 
   private ViewerComparator buildColumnSorter(int colIndex) {
     if (INDEX_VISIBLE == colIndex) {
-      return new BooleanViewSorter();
+      return new BooleanVisibleSorter();
     }
     if (INDEX_XPOS == colIndex) {
       return new PositionSorter(true);
@@ -503,7 +547,7 @@ public class NodeDisplayTableControl extends Composite {
     }
   }
 
-  private class BooleanViewSorter extends ViewerComparator {
+  private class BooleanVisibleSorter extends ViewerComparator {
 
     @Override
     public int compare(Viewer viewer, Object e1, Object e2) {
@@ -560,6 +604,8 @@ public class NodeDisplayTableControl extends Composite {
       GraphNode node = getGraphNode(element);
       if (null != node) {
         switch (columnIndex) {
+        case INDEX_SELECTED:
+          return PlatformResources.getOnOff(isNodeSelected(node));
         case INDEX_VISIBLE:
           return PlatformResources.getOnOff(isVisible(node));
         }
@@ -594,6 +640,9 @@ public class NodeDisplayTableControl extends Composite {
         return null;
       }
 
+      if (COL_SELECTED.equals(property)) {
+        return isNodeSelected(node);
+      }
       if (COL_XPOS.equals(property)) {
         return getXPos(node);
       }
@@ -628,6 +677,10 @@ public class NodeDisplayTableControl extends Composite {
       GraphNode node = getGraphNode(modifiedObject);
       if (null == node) {
         return;
+      }
+      if (COL_SELECTED.equals(property)) {
+        boolean selected = ((Boolean) value).booleanValue();
+        selectedRepo.setSelected(node, selected);
       }
       if (COL_XPOS.equals(property)) {
         updateLocationX(node, value);
