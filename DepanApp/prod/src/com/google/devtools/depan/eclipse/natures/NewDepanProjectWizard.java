@@ -22,6 +22,7 @@ import com.google.devtools.depan.nodes.filters.persistence.ContextualFilterResou
 import com.google.devtools.depan.nodes.filters.persistence.NodeKindResources;
 import com.google.devtools.depan.relations.persistence.RelationSetResources;
 import com.google.devtools.depan.resources.ResourceContainer;
+import com.google.devtools.depan.view_doc.layout.persistence.LayoutResources;
 import com.google.devtools.depan.view_doc.persistence.EdgeDisplayResources;
 import com.google.devtools.depan.view_doc.persistence.RelationDisplayResources;
 
@@ -71,12 +72,13 @@ public class NewDepanProjectWizard extends BasicNewProjectResourceWizard {
 
   private void buildAnalysisResources() {
     // TODO: from registered resource containers.
-    buildContainerFolder(GraphEdgeMatcherResources.getContainer());
     buildContainerFolder(ContextualFilterResources.getContainer());
-    buildContainerFolder(RelationSetResources.getContainer());
-    buildContainerFolder(RelationDisplayResources.getContainer());
     buildContainerFolder(EdgeDisplayResources.getContainer());
+    buildContainerFolder(GraphEdgeMatcherResources.getContainer());
+    buildContainerFolder(LayoutResources.getContainer());
     buildContainerFolder(NodeKindResources.getContainer());
+    buildContainerFolder(RelationDisplayResources.getContainer());
+    buildContainerFolder(RelationSetResources.getContainer());
   }
 
   private void buildWorkResources() {

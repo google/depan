@@ -35,8 +35,7 @@
             class="com.google.devtools.depan.nodelist_doc.eclipse.ui.wizards.NewSubtractNodesWizard"
             icon="icons/not16.png"
             id="com.google.devtools.depan.nodelist_doc.eclipse.ui.wizards.NewSubtractNodesWizard"
-            name="Subtract Nodes"
-            project="true">
+            name="Subtract Nodes">
       </wizard>
    </extension>
 

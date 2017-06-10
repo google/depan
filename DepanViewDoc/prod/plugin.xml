@@ -194,8 +194,17 @@
    <extension
          point="org.eclipse.ui.handlers">
       <handler
-            class="com.google.devtools.depan.view_doc.eclipse.ui.handlers.TakeScreenshotHandler"
-            commandId="com.google.devtools.depan.view_doc.eclipse.ui.command.TakeScreenshot">
+            class="com.google.devtools.depan.view_doc.eclipse.ui.handlers.SelectNoneHandler"
+            commandId="com.google.devtools.depan.view_doc.eclipse.ui.command.SelectNone">
+         <activeWhen>
+            <reference
+                  definitionId="com.google.devtools.depan.view_doc.eclipse.ui.editor.isViewEditorActive">
+            </reference>
+         </activeWhen>
+      </handler>
+      <handler
+            class="com.google.devtools.depan.view_doc.eclipse.ui.handlers.SelectAllHandler"
+            commandId="com.google.devtools.depan.view_doc.eclipse.ui.command.SelectAll">
          <activeWhen>
             <reference
                   definitionId="com.google.devtools.depan.view_doc.eclipse.ui.editor.isViewEditorActive">
@@ -221,6 +230,15 @@
          </activeWhen>
       </handler>
       <handler
+            class="com.google.devtools.depan.view_doc.eclipse.ui.handlers.TakeScreenshotHandler"
+            commandId="com.google.devtools.depan.view_doc.eclipse.ui.command.TakeScreenshot">
+         <activeWhen>
+            <reference
+                  definitionId="com.google.devtools.depan.view_doc.eclipse.ui.editor.isViewEditorActive">
+            </reference>
+         </activeWhen>
+      </handler>
+      <handler
             class="com.google.devtools.depan.view_doc.layout.eclipse.ui.handlers.SelectLayoutNodes"
             commandId="com.google.devtools.depan.view_doc.layout.eclipse.ui.command.SelectLayoutNodes">
          <activeWhen>
@@ -232,24 +250,6 @@
       <handler
             class="com.google.devtools.depan.view_doc.layout.eclipse.ui.handlers.SelectLayoutEdges"
             commandId="com.google.devtools.depan.view_doc.layout.eclipse.ui.command.SelectLayoutEdges">
-         <activeWhen>
-            <reference
-                  definitionId="com.google.devtools.depan.view_doc.eclipse.ui.editor.isViewEditorActive">
-            </reference>
-         </activeWhen>
-      </handler>
-      <handler
-            class="com.google.devtools.depan.view_doc.eclipse.ui.handlers.SelectAllHandler"
-            commandId="com.google.devtools.depan.view_doc.eclipse.ui.command.SelectAll">
-         <activeWhen>
-            <reference
-                  definitionId="com.google.devtools.depan.view_doc.eclipse.ui.editor.isViewEditorActive">
-            </reference>
-         </activeWhen>
-      </handler>
-      <handler
-            class="com.google.devtools.depan.view_doc.eclipse.ui.handlers.SelectNoneHandler"
-            commandId="com.google.devtools.depan.view_doc.eclipse.ui.command.SelectNone">
          <activeWhen>
             <reference
                   definitionId="com.google.devtools.depan.view_doc.eclipse.ui.editor.isViewEditorActive">
@@ -354,8 +354,7 @@
             class="com.google.devtools.depan.view_doc.eclipse.ui.wizards.NewRelationDisplayDocWizard"
             icon="icons/relpicker.png"
             id="com.google.devtools.depan.view_doc.eclipse.ui.wizards.NewEdgeDisplayDocWizard"
-            name="Edge Properties"
-            project="true">
+            name="Edge Properties">
       </wizard>
    </extension>
    <extension

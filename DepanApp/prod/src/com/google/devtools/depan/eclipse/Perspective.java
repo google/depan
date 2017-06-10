@@ -16,13 +16,14 @@
 
 package com.google.devtools.depan.eclipse;
 
+import com.google.devtools.depan.eclipse.natures.NewDepanProjectWizard;
+
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
 
 /**
  * @author ycoppel@google.com (Yohann Coppel)
- *
  */
 public class Perspective implements IPerspectiveFactory {
 
@@ -33,7 +34,7 @@ public class Perspective implements IPerspectiveFactory {
   public void createInitialLayout(IPageLayout layout) {
     // Define shortcuts for DepAn perspective
     // TODO: layout.addShowViewShortcut(Tools.VIEW_ID);
-    // layout.addNewWizardShortcut(NewDepanProjectWizard.WIZARD_ID);
+    layout.addNewWizardShortcut(NewDepanProjectWizard.WIZARD_ID);
 
     // Define screen regions for DepAn perspective
     IFolderLayout folder = layout.createFolder("views",
