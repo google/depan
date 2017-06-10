@@ -16,10 +16,13 @@
 
 package com.google.devtools.depan.view_doc.eclipse.ui.handlers;
 
+import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+
+import java.util.Collections;
 
 /**
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
@@ -29,7 +32,7 @@ public class SelectNoneHandler extends AbstractViewEditorHandler {
   @Override
   public Object execute(ExecutionEvent event) throws ExecutionException {
     ViewEditor viewer = getViewEditor(event);
-    viewer.selectAllNodes();
+    viewer.selectNodes(Collections.<GraphNode>emptyList());
     return null;
   }
 }

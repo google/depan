@@ -21,8 +21,6 @@ import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 
-import java.util.Collections;
-
 /**
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
@@ -31,7 +29,7 @@ public class SelectAllHandler extends AbstractViewEditorHandler {
   @Override
   public Object execute(ExecutionEvent event) throws ExecutionException {
     ViewEditor viewer = getViewEditor(event);
-    viewer.selectNodes(Collections.emptyList());
+    viewer.selectAllNodes();
     return null;
   }
 }
