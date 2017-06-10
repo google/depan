@@ -14,7 +14,7 @@
   <description>ASM byte-code libraries packaged for DepAn</description>
 
   <properties>
-    <asm.version>5.0.4</asm.version>
+    <asm.version>5.2</asm.version>
   </properties>
 
   <dependencies>
