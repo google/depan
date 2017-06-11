@@ -80,6 +80,11 @@ public class NodeFilterViewPart extends AbstractViewDocViewPart {
   public static final String PART_NAME = "Node Filter";
 
   /////////////////////////////////////
+  // Internal state
+
+  private Collection<GraphNode> resultNodes;
+
+  /////////////////////////////////////
   // UX Elements
 
   private FromViewDocListControl fromViewDoc;
@@ -256,7 +261,8 @@ public class NodeFilterViewPart extends AbstractViewDocViewPart {
   private void updateResults() {
     SteppingFilter filter = filterControl.buildFilter();
     Collection<GraphNode> source = getEditor().getSelectedNodes();
-    refreshResults(computeResults(filter, source));
+    this.resultNodes = computeResults(filter, source);
+    refreshResults(resultNodes);
   }
 
   private void refreshResults(Collection<GraphNode> nodes) {
@@ -315,8 +321,13 @@ public class NodeFilterViewPart extends AbstractViewDocViewPart {
   }
 
   private void selectResultNodes() {
+    if (null == resultNodes) {
+      getEditor().selectNodes(Collections.<GraphNode>emptyList());
+      return;
+    }
+
     // TODO: Fill in with results from filter execution.
-    getEditor().selectNodes(Collections.<GraphNode>emptyList(), this);
+    getEditor().selectNodes(resultNodes, this);
   }
 
   private Composite setupNewView(Composite parent) {
@@ -356,23 +367,23 @@ public class NodeFilterViewPart extends AbstractViewDocViewPart {
       // control active, but no bound editor ..
       return;
     }
-    SteppingFilter filter = filterControl.buildFilter();
-    Collection<GraphNode> source = editor.getSelectedNodes();
 
-    Collection<GraphNode> nodes = computeResults(filter, source);
-    if (nodes.isEmpty()) {
+    // Refresh displayed nodes.
+    updateResults();
+    if ((null == resultNodes) || resultNodes.isEmpty()) {
       ViewDocLogger.LOG.info("empty nodes");
       return;
     }
 
-    IWizard wizard = prepareWizard(nodes, filter);
+    SteppingFilter filter = filterControl.buildFilter();
+    IWizard wizard = prepareWizard(resultNodes, filter.getName());
     Shell shell = getSite().getWorkbenchWindow().getShell();
     WizardDialog dialog = new WizardDialog(shell, wizard);
     dialog.open();
   }
 
   private IWizard prepareWizard(
-      Collection<GraphNode> nodes, ContextualFilter filter) {
+      Collection<GraphNode> nodes, String name) {
     ViewEditor editor = getEditor();
 
     Object choice = fromViewDoc.getChoice();
@@ -380,7 +391,6 @@ public class NodeFilterViewPart extends AbstractViewDocViewPart {
       return null;
     }
 
-    String name = filter.getName();
     if (choice instanceof FromViewDocContributor) {
       FromViewDocWizard wizard = ((FromViewDocContributor) choice).newWizard();
       wizard.init(editor, nodes, name);
