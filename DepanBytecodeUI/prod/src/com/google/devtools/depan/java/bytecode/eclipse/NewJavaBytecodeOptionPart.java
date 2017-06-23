@@ -20,6 +20,8 @@ import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 import com.google.devtools.depan.platform.eclipse.ui.wizards.AbstractNewDocumentPage;
 import com.google.devtools.depan.platform.eclipse.ui.wizards.NewWizardOptionPart;
 
+import com.google.common.base.Strings;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -297,8 +299,11 @@ public class NewJavaBytecodeOptionPart implements NewWizardOptionPart {
    * Open a directory and write the name in the given {@link Text} object.
    */
   private void handleBrowse(Text cell) {
-    cell.setText(new DirectoryDialog(containingPage.getShell()).open());
-    dialogChanged();
+    String dirname = new DirectoryDialog(containingPage.getShell()).open();
+    if (!Strings.isNullOrEmpty(dirname)) {
+      cell.setText(dirname);
+      dialogChanged();
+    }
   }
 
 
@@ -308,8 +313,11 @@ public class NewJavaBytecodeOptionPart implements NewWizardOptionPart {
   private void handleFileBrowse(Text cell) {
     FileDialog dialog = new FileDialog(containingPage.getShell());
     dialog.setFilterExtensions(new String[] {"*.jar", "*.zip", "*.*"});
-    cell.setText(dialog.open());
-    dialogChanged();
+    String filename = dialog.open();
+    if (!Strings.isNullOrEmpty(filename)) {
+      cell.setText(filename);
+      dialogChanged();
+    }
   }
 
   /////////////////////////////////////
