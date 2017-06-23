@@ -44,7 +44,7 @@ public class MethodDepLister extends MethodVisitor {
   private MethodElement thisElement;
 
   public MethodDepLister(DependenciesListener dl, MethodElement thisElem) {
-    super(Opcodes.ASM4);
+    super(Opcodes.ASM5);
     this.dl = dl;
     this.thisElement = thisElem;
   }

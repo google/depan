@@ -36,6 +36,6 @@ public class FieldDepLister extends FieldVisitor {
   public static FieldDepLister LISTER = new FieldDepLister();
 
   private FieldDepLister() {
-    super(Opcodes.ASM4);
+    super(Opcodes.ASM5);
   }
 }

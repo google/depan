@@ -69,7 +69,7 @@ public class ClassDepLister extends ClassVisitor {
    * @param fileNode node for the .class file containing this class
    */
   public ClassDepLister(DependenciesListener dl, FileElement fileNode) {
-    super(Opcodes.ASM4);
+    super(Opcodes.ASM5);
     this.dl = dl;
     this.fileNode = fileNode;
   }
