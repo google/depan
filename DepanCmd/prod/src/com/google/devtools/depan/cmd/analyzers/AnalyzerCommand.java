@@ -21,6 +21,7 @@ import com.google.devtools.depan.cmd.dispatch.AbstractCommandExec;
 import com.google.devtools.depan.graph_doc.model.GraphDocument;
 import com.google.devtools.depan.graph_doc.persistence.GraphModelXmlPersist;
 import com.google.devtools.depan.graphml.builder.GraphFactory;
+import com.google.devtools.depan.java.bytecode.eclipse.AsmFactory;
 import com.google.devtools.depan.java.bytecode.eclipse.DefaultElementFilter;
 import com.google.devtools.depan.maven.builder.PomProcessing;
 import com.google.devtools.depan.maven.graphml.MavenGraphFactory;
@@ -106,14 +107,26 @@ public class AnalyzerCommand extends AbstractCommandExec {
       URI location = buildLocation(getParm(1));
       String classPath = getParm(2);
       String filterText = getParm(3, "");
+      AsmFactory asmFactory = getAsmFactory(getParm(4));
 
       ElementFilter filter = DefaultElementFilter.build(filterText);
-      JavaAnalyst analyzer = new JavaAnalyst(classPath, filter);
+      JavaAnalyst analyzer = new JavaAnalyst(asmFactory, classPath, filter);
 
       performAnalysis(analyzer, location);
     } catch (IOException errIo) {
       CmdLogger.logException("Java dependency analysis failed", errIo);
     }
+  }
+
+  private AsmFactory getAsmFactory(String parm) {
+    if ("asm4".equals(parm)) {
+      return AsmFactory.ASM4_FACTORY;
+    }
+    if ("asm5".equals(parm)) {
+      return AsmFactory.ASM5_FACTORY;
+    }
+
+    return AsmFactory.ASM5_FACTORY;
   }
 
   private void analyzeMaven() {

@@ -22,6 +22,7 @@ import com.google.devtools.depan.filesystem.builder.TreeLoader;
 import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.graph_doc.model.GraphDocument;
 import com.google.devtools.depan.java.JavaRelationContributor;
+import com.google.devtools.depan.java.bytecode.eclipse.AsmFactory;
 import com.google.devtools.depan.java.bytecode.eclipse.ClassAnalysisStats;
 import com.google.devtools.depan.java.bytecode.eclipse.ClassFileReader;
 import com.google.devtools.depan.model.GraphModel;
@@ -40,13 +41,17 @@ import java.util.zip.ZipFile;
  */
 public class JavaAnalyst implements DependencyAnalyst {
 
+  private final AsmFactory asmFactory;
+
   private final String classPath;
 
   private final ElementFilter filter;
 
   private final ClassAnalysisStats analysisStats;
 
-  public JavaAnalyst(String classPath, ElementFilter filter) {
+  public JavaAnalyst(
+      AsmFactory asmFactory, String classPath, ElementFilter filter) {
+    this.asmFactory = asmFactory;
     this.filter = filter;
     this.classPath = classPath;
     analysisStats = new ClassAnalysisStats();
@@ -88,7 +93,8 @@ public class JavaAnalyst implements DependencyAnalyst {
   private void readZipFile(
       String classPath, DependenciesListener builder) throws IOException {
 
-    ClassFileReader reader = new ClassFileReader(analysisStats);
+    ClassFileReader reader =
+        new ClassFileReader(asmFactory, analysisStats);
     ZipFile zipFile = new ZipFile(classPath);
     JarFileLister jarReader =
         new JarFileLister(zipFile, builder, reader);
@@ -111,7 +117,7 @@ public class JavaAnalyst implements DependencyAnalyst {
     // to be cleaned up and refactored.
     String treePrefix = new File(classPath).getParent();
 
-    ClassFileReader reader = new ClassFileReader(analysisStats);
+    ClassFileReader reader = new ClassFileReader(asmFactory, analysisStats);
 
     TreeLoader loader =
         new ClassTreeLoader(treePrefix, builder, reader);
