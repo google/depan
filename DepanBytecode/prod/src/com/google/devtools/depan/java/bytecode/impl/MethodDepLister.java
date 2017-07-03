@@ -16,14 +16,14 @@
 
 package com.google.devtools.depan.java.bytecode.impl;
 
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
-
+import com.google.devtools.depan.java.bytecode.eclipse.AsmFactory;
 import com.google.devtools.depan.java.graph.FieldElement;
 import com.google.devtools.depan.java.graph.JavaRelation;
 import com.google.devtools.depan.java.graph.MethodElement;
 import com.google.devtools.depan.model.builder.chain.DependenciesListener;
+
+import org.objectweb.asm.Label;
+import org.objectweb.asm.MethodVisitor;
 
 /**
  * Implements a visitor of the ASM package, to find the dependencies in a method
@@ -40,11 +40,16 @@ import com.google.devtools.depan.model.builder.chain.DependenciesListener;
  */
 public class MethodDepLister extends MethodVisitor {
 
+  private final AsmFactory asmFactory;
+
   private DependenciesListener dl;
+
   private MethodElement thisElement;
 
-  public MethodDepLister(DependenciesListener dl, MethodElement thisElem) {
-    super(Opcodes.ASM5);
+  public MethodDepLister(
+      AsmFactory asmFactory, DependenciesListener dl, MethodElement thisElem) {
+    super(asmFactory.getApiLevel());
+    this.asmFactory = asmFactory;
     this.dl = dl;
     this.thisElement = thisElem;
   }
@@ -57,6 +62,13 @@ public class MethodDepLister extends MethodVisitor {
          new FieldElement(name, TypeNameUtil.fromDescriptor(desc),
            TypeNameUtil.fromInternalName(owner)),
          JavaRelation.READ);
+  }
+
+  @Override
+  public void visitMethodInsn(
+      int opcode, String owner, String name, String desc, boolean itf) {
+    dl.newDep(thisElement, new MethodElement(desc, name,
+      TypeNameUtil.fromInternalName(owner)), JavaRelation.CALL);
   }
 
   @Override

@@ -116,15 +116,16 @@ public class NewJavaBytecodeWizard extends AbstractAnalysisWizard {
 
     // Step 2) Read in the class files, depending on the source
     monitor.setTaskName("Load Classes...");
+    AsmFactory asmFactory = page.getAsmFactory();
 
     ProgressListener baseProgress = new ProgressListenerMonitor(monitor);
     ProgressListener quickProgress = new QuickProgressListener(
         baseProgress, 300);
 
     if (classPath.endsWith(".jar") || classPath.endsWith(".zip")) {
-      readZipFile(classPath, builder, quickProgress);
+      readZipFile(classPath, asmFactory, builder, quickProgress);
     } else {
-      readTree(classPath, builder, quickProgress);
+      readTree(classPath, asmFactory, builder, quickProgress);
     }
 
     logger.info(
@@ -151,10 +152,10 @@ public class NewJavaBytecodeWizard extends AbstractAnalysisWizard {
    * @throws IOException
    */
   private void readZipFile(
-      String classPath, DependenciesListener builder,
+      String classPath, AsmFactory asmFactory, DependenciesListener builder,
       ProgressListener progress) throws IOException {
 
-    ClassFileReader reader = new ClassFileReader(analysisStats);
+    ClassFileReader reader = new ClassFileReader(asmFactory, analysisStats);
     ZipFile zipFile = new ZipFile(classPath);
     JarFileLister jarReader =
         new JarFileLister(zipFile, builder, reader, progress);
@@ -170,7 +171,7 @@ public class NewJavaBytecodeWizard extends AbstractAnalysisWizard {
    * @throws IOException
    */
   private void readTree(
-      String classPath, DependenciesListener builder,
+      String classPath, AsmFactory asmFactory, DependenciesListener builder,
       ProgressListener progress) throws IOException {
 
     // TODO(leeca): Instead of just assuming one level of path retention,
@@ -178,7 +179,7 @@ public class NewJavaBytecodeWizard extends AbstractAnalysisWizard {
     // to be cleaned up and refactored.
     String treePrefix = new File(classPath).getParent();
 
-    ClassFileReader reader = new ClassFileReader(analysisStats);
+    ClassFileReader reader = new ClassFileReader(asmFactory, analysisStats);
 
     TreeLoader loader =
         new ClassTreeLoader(treePrefix, builder, reader, progress);

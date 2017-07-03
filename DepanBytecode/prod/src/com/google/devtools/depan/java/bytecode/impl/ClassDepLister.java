@@ -18,13 +18,17 @@ package com.google.devtools.depan.java.bytecode.impl;
 
 import java.io.File;
 
+import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.Attribute;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
+import org.objectweb.asm.TypePath;
 
 import com.google.devtools.depan.filesystem.graph.FileElement;
+import com.google.devtools.depan.java.bytecode.eclipse.AsmFactory;
 import com.google.devtools.depan.java.graph.FieldElement;
 import com.google.devtools.depan.java.graph.InterfaceElement;
 import com.google.devtools.depan.java.graph.JavaRelation;
@@ -45,10 +49,12 @@ import com.google.devtools.depan.model.builder.chain.DependenciesListener;
  */
 public class ClassDepLister extends ClassVisitor {
 
+  private final AsmFactory asmFactory;
+
   /**
    * {@link DependenciesListener} called when a dependency is found.
    */
-  private final DependenciesListener dl;
+  private final DependenciesListener builder;
 
   /**
    * File element for source code.
@@ -61,16 +67,17 @@ public class ClassDepLister extends ClassVisitor {
    */
   private TypeElement mainClass = null;
 
-
   /**
    * constructor for new {@link ClassDepLister}.
    *
-   * @param dl {@link DependenciesListener} implementing callbacks
+   * @param builder {@link DependenciesListener} implementing callbacks
    * @param fileNode node for the .class file containing this class
    */
-  public ClassDepLister(DependenciesListener dl, FileElement fileNode) {
-    super(Opcodes.ASM5);
-    this.dl = dl;
+  public ClassDepLister(
+      AsmFactory asmFactory, DependenciesListener builder, FileElement fileNode) {
+    super(asmFactory.getApiLevel());
+    this.asmFactory = asmFactory;
+    this.builder = builder;
     this.fileNode = fileNode;
   }
 
@@ -80,13 +87,13 @@ public class ClassDepLister extends ClassVisitor {
     mainClass = TypeNameUtil.fromInternalName(name);
 
     PackageElement packageNode = installPackageForTypeName(name);
-    dl.newDep(packageNode, mainClass, JavaRelation.CLASS);
+    builder.newDep(packageNode, mainClass, JavaRelation.CLASS);
 
-    dl.newDep(TypeNameUtil.fromInternalName(superName), mainClass,
+    builder.newDep(TypeNameUtil.fromInternalName(superName), mainClass,
         JavaRelation.EXTENDS);
     for (String s : interfaces) {
       InterfaceElement element = TypeNameUtil.fromInterfaceName(s);
-      dl.newDep(element, mainClass, JavaRelation.IMPLEMENTS);
+      builder.newDep(element, mainClass, JavaRelation.IMPLEMENTS);
     }
     checkAnonymousType(name);
   }
@@ -109,7 +116,7 @@ public class ClassDepLister extends ClassVisitor {
       // A digit must follow the $ in the name.
       if (Character.isDigit(name.charAt(name.lastIndexOf('$')+1))) {
         TypeElement superType = TypeNameUtil.fromInternalName(superClass);
-        dl.newDep(superType, mainClass, JavaRelation.ANONYMOUS_TYPE);
+        builder.newDep(superType, mainClass, JavaRelation.ANONYMOUS_TYPE);
       }
     }
   }
@@ -121,7 +128,7 @@ public class ClassDepLister extends ClassVisitor {
     FieldElement field = new FieldElement(name, type, mainClass);
 
     // simple className
-    dl.newDep(mainClass, type, JavaRelation.TYPE);
+    builder.newDep(mainClass, type, JavaRelation.TYPE);
 
     // field
     JavaRelation r = null;
@@ -130,17 +137,17 @@ public class ClassDepLister extends ClassVisitor {
     } else {
       r = JavaRelation.MEMBER_FIELD;
     }
-    dl.newDep(mainClass, field, r);
+    builder.newDep(mainClass, field, r);
 
     // generic types in signature
     // TODO(ycoppel): how to get types in generics ? (signature)
 
-    return FieldDepLister.LISTER;
+    return asmFactory.getGenericFieldVisitor();
   }
 
   @Override
-  public void visitInnerClass(String name, String outerName, String innerName,
-      int access) {
+  public void visitInnerClass(
+      String name, String outerName, String innerName, int access) {
     if ((null == outerName) || (null == innerName)) {
       //System.out.println("visitInnerClass()" + name + " - "
       //    + outerName + " - " + innerName + " - " + access + " @ "
@@ -156,7 +163,32 @@ public class ClassDepLister extends ClassVisitor {
       return;
     }
     TypeElement parent = TypeNameUtil.fromInternalName(outerName);
-    dl.newDep(parent, inner, JavaRelation.INNER_TYPE);
+    builder.newDep(parent, inner, JavaRelation.INNER_TYPE);
+  }
+
+  @Override
+  public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
+    // TODO Auto-generated method stub
+    return super.visitAnnotation(desc, visible);
+  }
+
+  @Override
+  public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath,
+      String desc, boolean visible) {
+    // TODO Auto-generated method stub
+    return super.visitTypeAnnotation(typeRef, typePath, desc, visible);
+  }
+
+  @Override
+  public void visitAttribute(Attribute attr) {
+    // TODO Auto-generated method stub
+    super.visitAttribute(attr);
+  }
+
+  @Override
+  public void visitEnd() {
+    // TODO Auto-generated method stub
+    super.visitEnd();
   }
 
   @Override
@@ -172,20 +204,20 @@ public class ClassDepLister extends ClassVisitor {
     } else {
       r = JavaRelation.MEMBER_METHOD;
     }
-    dl.newDep(mainClass, m, r);
+    builder.newDep(mainClass, m, r);
 
     // arguments dependencies
     for (Type t : Type.getArgumentTypes(desc)) {
-      dl.newDep(m, TypeNameUtil.fromDescriptor(t.getDescriptor()),
+      builder.newDep(m, TypeNameUtil.fromDescriptor(t.getDescriptor()),
           JavaRelation.TYPE);
     }
 
     // return-type dependency
     TypeElement type = TypeNameUtil.fromDescriptor(
         Type.getReturnType(desc).getDescriptor());
-    dl.newDep(m, type, JavaRelation.READ);
+    builder.newDep(m, type, JavaRelation.READ);
 
-    return new MethodDepLister(dl, m);
+    return asmFactory.buildMethodVisitor(builder, m);
   }
 
   @Override
@@ -206,7 +238,7 @@ public class ClassDepLister extends ClassVisitor {
     }
 
     // Link the main class to it's containing file
-    dl.newDep(fileNode, mainClass, JavaRelation.CLASSFILE);
+    builder.newDep(fileNode, mainClass, JavaRelation.CLASSFILE);
   }
 
   /**
@@ -224,7 +256,7 @@ public class ClassDepLister extends ClassVisitor {
       return new PackageElement("<unnamed>");
     }
     File treeFile = createTreeFile();
-    PackageTreeBuilder packageBuilder = new PackageTreeBuilder(dl);
+    PackageTreeBuilder packageBuilder = new PackageTreeBuilder(builder);
 
     return packageBuilder.installPackageTree(packageFile, treeFile);
   }

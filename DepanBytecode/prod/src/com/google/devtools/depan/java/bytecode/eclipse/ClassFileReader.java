@@ -17,10 +17,10 @@
 package com.google.devtools.depan.java.bytecode.eclipse;
 
 import com.google.devtools.depan.filesystem.graph.FileElement;
-import com.google.devtools.depan.java.bytecode.impl.ClassDepLister;
 import com.google.devtools.depan.model.builder.chain.DependenciesListener;
 
 import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,6 +36,8 @@ public class ClassFileReader {
   private static final Logger logger =
       Logger.getLogger(ClassFileReader.class.getName());
 
+  private final AsmFactory asmFactory;
+
   private final ClassAnalysisStats analysisStats;
 
   /**
@@ -43,7 +45,9 @@ public class ClassFileReader {
    * 
    * @param packageBuilder
    */
-  public ClassFileReader(ClassAnalysisStats analysisStats) {
+  public ClassFileReader(
+      AsmFactory asmFactory, ClassAnalysisStats analysisStats) {
+    this.asmFactory = asmFactory;
     this.analysisStats = analysisStats;
   }
 
@@ -59,7 +63,7 @@ public class ClassFileReader {
       FileElement fileNode,
       InputStream content) {
 
-    ClassDepLister cd = new ClassDepLister(builder, fileNode);
+    ClassVisitor cd = asmFactory.buildClassVisitor(builder, fileNode);
     try {
       ClassReader cr = new ClassReader(content);
       cr.accept(cd, 0);

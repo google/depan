@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.java.bytecode.eclipse;
 
+import com.google.devtools.depan.java.bytecode.eclipse.ui.widgets.AsmLevelControl;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 import com.google.devtools.depan.platform.eclipse.ui.wizards.AbstractNewDocumentPage;
 import com.google.devtools.depan.platform.eclipse.ui.wizards.NewWizardOptionPart;
@@ -58,6 +59,7 @@ public class NewJavaBytecodeOptionPart implements NewWizardOptionPart {
   private Text directoryFilter;
   private Button infer;
   private Button dirFilterButton;
+  private AsmLevelControl asmLevelOpt;
 
   /////////////////////////////////////
   // Public API
@@ -81,6 +83,10 @@ public class NewJavaBytecodeOptionPart implements NewWizardOptionPart {
 
   public String getPackageFilter() {
     return packageFilter.getText();
+  }
+
+  public AsmFactory getAsmFactory() {
+    return asmLevelOpt.getChoice();
   }
 
   @Override
@@ -159,6 +165,9 @@ public class NewJavaBytecodeOptionPart implements NewWizardOptionPart {
     dirPath = Widgets.buildGridBoxedText(result);
 
     dirBrowse = Widgets.buildCompactPushButton(result, "Browse...");
+
+    Widgets.buildCompactLabel(result, "Bytecode Level");
+    asmLevelOpt = new AsmLevelControl(result);
 
     return result;
   }

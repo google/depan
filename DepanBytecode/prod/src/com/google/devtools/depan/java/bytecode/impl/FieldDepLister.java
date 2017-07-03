@@ -16,8 +16,12 @@
 
 package com.google.devtools.depan.java.bytecode.impl;
 
+import com.google.devtools.depan.java.bytecode.eclipse.AsmFactory;
+
+import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.Attribute;
 import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.TypePath;
 
 /**
  * Implements a visitor of the ASM package, to find the dependencies in a Field
@@ -33,9 +37,32 @@ import org.objectweb.asm.Opcodes;
  */
 public class FieldDepLister extends FieldVisitor {
 
-  public static FieldDepLister LISTER = new FieldDepLister();
+  public FieldDepLister(int api) {
+    super(api);
+  }
 
-  private FieldDepLister() {
-    super(Opcodes.ASM5);
+  @Override
+  public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
+    // TODO Auto-generated method stub
+    return super.visitAnnotation(desc, visible);
+  }
+
+  @Override
+  public AnnotationVisitor visitTypeAnnotation(
+      int typeRef, TypePath typePath, String desc, boolean visible) {
+    // TODO Auto-generated method stub
+    return super.visitTypeAnnotation(typeRef, typePath, desc, visible);
+  }
+
+  @Override
+  public void visitAttribute(Attribute attr) {
+    // TODO Auto-generated method stub
+    super.visitAttribute(attr);
+  }
+
+  @Override
+  public void visitEnd() {
+    // TODO Auto-generated method stub
+    super.visitEnd();
   }
 }

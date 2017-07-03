@@ -59,4 +59,8 @@ public class NewJavaBytecodePage extends AbstractAnalysisPage {
   public String getPackageFilter() {
     return javaBytecodeOptions.getPackageFilter();
   }
+
+  public AsmFactory getAsmFactory() {
+    return javaBytecodeOptions.getAsmFactory();
+  }
 }
