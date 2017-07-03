@@ -12,6 +12,7 @@
          </run>
       </application>
    </extension>
+
    <extension
          id="com.google.devtools.depan.app"
          name="DepAn [Win64]"
@@ -58,6 +59,7 @@
          </property>
       </product>
    </extension>
+
    <extension
          point="org.eclipse.ui.newWizards">
       <wizard
@@ -80,9 +82,10 @@
             name="DepAn Perspective">
       </perspective>
    </extension>
+
    <extension
          id="DepAnNature"
-         name="DapAn"
+         name="DepAn"
          point="org.eclipse.core.resources.natures">
       <runtime>
          <run
