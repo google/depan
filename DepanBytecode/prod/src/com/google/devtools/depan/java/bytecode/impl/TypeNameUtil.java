@@ -16,7 +16,10 @@
 package com.google.devtools.depan.java.bytecode.impl;
 
 import com.google.devtools.depan.java.graph.InterfaceElement;
+import com.google.devtools.depan.java.graph.JavaElement;
+import com.google.devtools.depan.java.graph.JavaRelation;
 import com.google.devtools.depan.java.graph.TypeElement;
+import com.google.devtools.depan.model.builder.chain.DependenciesListener;
 
 import org.objectweb.asm.Type;
 
@@ -104,5 +107,19 @@ public class TypeNameUtil {
     Type type = Type.getObjectType(internalName);
     String fullyQualifiedName = getFullyQualifiedTypeName(type);
     return new TypeElement(fullyQualifiedName);
+  }
+
+  /**
+   * Create the dependency from a {@link JavaElement} to an annotation.
+   */
+  public static void buildAnnotationDep(
+      DependenciesListener builder, JavaElement target,
+      String desc, boolean visible) {
+    TypeElement type = TypeNameUtil.fromDescriptor(desc);
+    if (visible) {
+      builder.newDep(target, type, JavaRelation.RUNTIME_ANNOTATION);
+      return;
+    }
+    builder.newDep(target, type, JavaRelation.COMPILE_ANNOTATION);
   }
 }

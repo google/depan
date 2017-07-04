@@ -22,8 +22,10 @@ import com.google.devtools.depan.java.graph.JavaRelation;
 import com.google.devtools.depan.java.graph.MethodElement;
 import com.google.devtools.depan.model.builder.chain.DependenciesListener;
 
+import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.TypePath;
 
 /**
  * Implements a visitor of the ASM package, to find the dependencies in a method
@@ -42,45 +44,58 @@ public class MethodDepLister extends MethodVisitor {
 
   private final AsmFactory asmFactory;
 
-  private DependenciesListener dl;
+  private DependenciesListener builder;
 
   private MethodElement thisElement;
 
   public MethodDepLister(
-      AsmFactory asmFactory, DependenciesListener dl, MethodElement thisElem) {
+      AsmFactory asmFactory, DependenciesListener builder, MethodElement thisElem) {
     super(asmFactory.getApiLevel());
     this.asmFactory = asmFactory;
-    this.dl = dl;
+    this.builder = builder;
     this.thisElement = thisElem;
+  }
+
+  @Override
+  public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
+    TypeNameUtil.buildAnnotationDep(builder, thisElement, desc, visible);
+    return null;
+  }
+
+  @Override
+  public AnnotationVisitor visitTypeAnnotation(
+      int typeRef, TypePath typePath, String desc, boolean visible) {
+    TypeNameUtil.buildAnnotationDep(builder, thisElement, desc, visible);
+    return null;
   }
 
   @Override
   public void visitFieldInsn(
       int opcode, String owner, String name, String desc) {
      // FIXME: is it a read ?
-     dl.newDep(thisElement,
+     builder.newDep(thisElement,
          new FieldElement(name, TypeNameUtil.fromDescriptor(desc),
            TypeNameUtil.fromInternalName(owner)),
          JavaRelation.READ);
   }
 
-  @Override
+  @Override // ASM-5
   public void visitMethodInsn(
       int opcode, String owner, String name, String desc, boolean itf) {
-    dl.newDep(thisElement, new MethodElement(desc, name,
+    builder.newDep(thisElement, new MethodElement(desc, name,
       TypeNameUtil.fromInternalName(owner)), JavaRelation.CALL);
   }
 
-  @Override
+  @Override // ASM-4
   public void visitMethodInsn(
       int opcode, String owner, String name, String desc) {
-    dl.newDep(thisElement, new MethodElement(desc, name,
+    builder.newDep(thisElement, new MethodElement(desc, name,
       TypeNameUtil.fromInternalName(owner)), JavaRelation.CALL);
   }
 
   @Override
   public void visitTypeInsn(int opcode, String type) {
-    dl.newDep(
+    builder.newDep(
         thisElement, TypeNameUtil.fromInternalName(type), JavaRelation.TYPE);
   }
 
@@ -92,7 +107,7 @@ public class MethodDepLister extends MethodVisitor {
     if (null == type) {
       return;
     }
-    dl.newDep(thisElement, TypeNameUtil.fromInternalName(type),
+    builder.newDep(thisElement, TypeNameUtil.fromInternalName(type),
         JavaRelation.ERROR_HANDLING);
   }
 }

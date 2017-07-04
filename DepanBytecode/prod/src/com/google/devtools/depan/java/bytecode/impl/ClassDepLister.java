@@ -122,8 +122,8 @@ public class ClassDepLister extends ClassVisitor {
   }
 
   @Override
-  public FieldVisitor visitField(int access, String name, String desc,
-      String signature, Object value) {
+  public FieldVisitor visitField(
+      int access, String name, String desc, String signature, Object value) {
     TypeElement type = TypeNameUtil.fromDescriptor(desc);
     FieldElement field = new FieldElement(name, type, mainClass);
 
@@ -168,27 +168,15 @@ public class ClassDepLister extends ClassVisitor {
 
   @Override
   public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
-    // TODO Auto-generated method stub
-    return super.visitAnnotation(desc, visible);
+    TypeNameUtil.buildAnnotationDep(builder, mainClass, desc, visible);
+    return null;
   }
 
   @Override
-  public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath,
-      String desc, boolean visible) {
-    // TODO Auto-generated method stub
-    return super.visitTypeAnnotation(typeRef, typePath, desc, visible);
-  }
-
-  @Override
-  public void visitAttribute(Attribute attr) {
-    // TODO Auto-generated method stub
-    super.visitAttribute(attr);
-  }
-
-  @Override
-  public void visitEnd() {
-    // TODO Auto-generated method stub
-    super.visitEnd();
+  public AnnotationVisitor visitTypeAnnotation(
+      int typeRef, TypePath typePath, String desc, boolean visible) {
+    TypeNameUtil.buildAnnotationDep(builder, mainClass, desc, visible);
+    return null;
   }
 
   @Override

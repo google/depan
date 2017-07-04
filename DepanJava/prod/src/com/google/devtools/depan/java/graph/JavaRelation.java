@@ -57,10 +57,14 @@ public enum JavaRelation implements Relation {
   IMPLEMENTS("realize", "implements", "implements", "implemented by"),
 
   // "Extension" relationships
-  INTERFACE_EXTENDS("interfaceRealize", "interfaceImplements", "realizes", "implementes"),
+  INTERFACE_EXTENDS("interfaceRealize", "interfaceImplements", "realizes", "implements"),
   METHOD_OVERLOAD("overloader", "overloaded", "overloads", "overloaded by"),
   METHOD_OVERRIDE("overridder", "overriden", "overrides", "overriden by"),
   ERROR_HANDLING("try", "catch", "handles", "handled by"),
+
+  // Annotation relationships
+  RUNTIME_ANNOTATION("type", "annotation", "annotated (runtime)", "annotator (runtime)"),
+  COMPILE_ANNOTATION("type", "annotation", "annotated (class)", "annotator (class)")
   ;
 
   /**
