@@ -371,6 +371,9 @@ public class NodeDisplayTableControl extends Composite {
   // Location repository methods
 
   private void updateLocationX(GraphNode node, Object update) {
+    if (null == update) {
+      return;
+    }
     try {
       double newX = Double.parseDouble((String) update);
       double posY = getYPoint(node);
@@ -384,6 +387,9 @@ public class NodeDisplayTableControl extends Composite {
   }
 
   private void updateLocationY(GraphNode node, Object update) {
+    if (null == update) {
+      return;
+    }
     try {
       double posX = getXPoint(node);
       double newY = Double.parseDouble((String) update);
