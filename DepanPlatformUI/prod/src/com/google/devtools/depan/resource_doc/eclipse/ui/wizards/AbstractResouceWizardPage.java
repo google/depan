@@ -174,7 +174,10 @@ public abstract class AbstractResouceWizardPage extends WizardPage {
   protected IContainer getResourceContainer(
       ResourceContainer container) {
     IContainer resources = WorkspaceTools.guessContainer(selection);
-    return resources.getFolder(container.getPath());
+    if (resources != null) {
+      return resources.getFolder(container.getPath());
+    }
+    return null;
   }
 
   /////////////////////////////////////
