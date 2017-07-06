@@ -31,6 +31,7 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IWorkspaceRoot;
 
 /**
  * Custom {@link XStream} converter for {@link FileDocumentReferenceConverter}s.
@@ -66,8 +67,7 @@ public class FileDocumentReferenceConverter implements Converter {
   public void marshal(
       Object source, HierarchicalStreamWriter writer,
       MarshallingContext context) {
-    FileDocumentReference<?> docRef =
-        (FileDocumentReference<?>) source;
+    FileDocumentReference<?> docRef = (FileDocumentReference<?>) source;
     String location =
         PlatformTools.fromPath(docRef.getLocation().getFullPath());
 
@@ -88,10 +88,14 @@ public class FileDocumentReferenceConverter implements Converter {
   public Object unmarshal(
       HierarchicalStreamReader reader, UnmarshallingContext context) {
 
+    reader.moveDown();
     String docPath = reader.getAttribute(DOC_PATH_ATTR);
+    reader.moveUp();
+
     IContainer project =
         PropertyDocumentReferenceContext.getProjectSource(context);
-    IFile docFile = PlatformTools.buildResourceFile(project, docPath);
+    IWorkspaceRoot wkspRoot =  project.getWorkspace().getRoot();
+    IFile docFile = PlatformTools.buildResourceFile(wkspRoot, docPath);
     PropertyDocument<?> doc = 
         ResourceDocumentConfigRegistry.loadRegistryResourceDocument(docFile);
     return FileDocumentReference.buildFileReference(docFile, doc);
