@@ -21,9 +21,9 @@ import static com.google.devtools.depan.view_doc.layout.LayoutLogger.LOG;
 import com.google.devtools.depan.graph.api.EdgeMatcher;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.nodes.Graphs;
 import com.google.devtools.depan.nodes.trees.HierarchicalTreeModel;
 import com.google.devtools.depan.nodes.trees.TreeModel;
+import com.google.devtools.depan.nodes.trees.Trees;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -68,7 +68,7 @@ public abstract class HierarchicalLayoutTool {
   public static TreeModel createTreeModel(
       GraphModel layoutGraph, EdgeMatcher<String> edgeMatcher) {
     return new HierarchicalTreeModel(
-        Graphs.computeSuccessorHierarchy(layoutGraph, edgeMatcher));
+        Trees.computeSuccessorHierarchy(layoutGraph, edgeMatcher));
   }
 
   /**

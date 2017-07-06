@@ -24,9 +24,9 @@ import com.google.devtools.depan.graph.api.RelationSet;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.RelationSets;
-import com.google.devtools.depan.nodes.Graphs;
 import com.google.devtools.depan.nodes.trees.HierarchicalTreeModel;
 import com.google.devtools.depan.nodes.trees.TreeModel;
+import com.google.devtools.depan.nodes.trees.Trees;
 import com.google.devtools.depan.test.TestUtils;
 
 import com.google.common.collect.Lists;
@@ -178,7 +178,7 @@ public class CollapserTest {
     EdgeMatcher<String> matcher =
         GraphEdgeMatchers.createForwardEdgeMatcher(relSet);
     TreeModel treeData = new HierarchicalTreeModel(
-        Graphs.computeSuccessorHierarchy(testGraph, matcher));
+        Trees.computeSuccessorHierarchy(testGraph, matcher));
 
     @SuppressWarnings("unused")
     Collection<CollapseData> collapseChanges =

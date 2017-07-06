@@ -16,9 +16,9 @@
 
 package com.google.devtools.depan.edges.matchers;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-import com.google.devtools.depan.graph.api.RelationSet;
 import com.google.devtools.depan.model.GraphEdgeMatcher;
 import com.google.devtools.depan.model.RelationSets;
 import com.google.devtools.depan.test.TestUtils;
@@ -32,24 +32,21 @@ public class TestGraphEdgeMatchers {
 
   @Test
   public void testCreateForwardEdgeMatcher() {
-    RelationSet relSet = TestUtils.buildRelationSet();
     GraphEdgeMatcher matcher =
-        GraphEdgeMatchers.createForwardEdgeMatcher(relSet);
+        GraphEdgeMatchers.createForwardEdgeMatcher(TestUtils.RELATION_SET);
     assertTrue(matcher.relationForward(TestUtils.RELATION)); 
     assertFalse(matcher.relationReverse(TestUtils.RELATION)); 
   }
 
   @Test
   public void testCreateBinaryEdgeMatcher() {
-    RelationSet testSet = TestUtils.buildRelationSet();
-
     GraphEdgeMatcher forward = GraphEdgeMatchers.createBinaryEdgeMatcher(
-        testSet, RelationSets.EMPTY);
+        TestUtils.RELATION_SET, RelationSets.EMPTY);
     assertTrue(forward.relationForward(TestUtils.RELATION)); 
     assertFalse(forward.relationReverse(TestUtils.RELATION)); 
 
     GraphEdgeMatcher reverse = GraphEdgeMatchers.createBinaryEdgeMatcher(
-        RelationSets.EMPTY, testSet);
+        RelationSets.EMPTY, TestUtils.RELATION_SET);
     assertFalse(reverse.relationForward(TestUtils.RELATION)); 
     assertTrue(reverse.relationReverse(TestUtils.RELATION)); 
   }

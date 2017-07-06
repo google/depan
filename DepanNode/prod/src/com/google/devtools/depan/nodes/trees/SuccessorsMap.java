@@ -60,9 +60,14 @@ public class SuccessorsMap {
   /**
    * Add the Edge to the forward Collection for the head Node.
    * 
+   * Since this is a forward edge, the head is the start of the path.
+   * Therefore, the forward edge is a forward successor for the head.
+   * 
    * @param edge Edge to add
    */
   public void addForwardEdge(GraphEdge edge) {
+    // Since this is a forward edge, the head is the start of the path.
+    // Therefore, the forward edge is a forward successor for the head.
     SuccessorEdges.Mutable successors = getNodeSuccessors(edge.getHead());
     successors.addForwardEdge(edge);
   }
@@ -70,10 +75,13 @@ public class SuccessorsMap {
   /**
    * Add the Edge to the reverse Collection for the tail Node.
    * 
+   * Since this is a reverse edge, the tail is the start of the path.
+   * Therefore, the reverse edge is a reverse successor for the tail.
+   * 
    * @param edge Edge to add
    */
   public void addReverseEdge(GraphEdge edge) {
-    SuccessorEdges.Mutable successors = getNodeSuccessors(edge.getHead());
+    SuccessorEdges.Mutable successors = getNodeSuccessors(edge.getTail());
     successors.addReverseEdge(edge);
   }
 

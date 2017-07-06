@@ -16,18 +16,25 @@
 
 package com.google.devtools.depan.nodes;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import com.google.devtools.depan.graph.api.RelationSet;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.RelationSets;
+import com.google.devtools.depan.nodes.trees.SuccessorEdges;
+import com.google.devtools.depan.nodes.trees.Trees;
 import com.google.devtools.depan.test.TestUtils;
+
+import com.google.common.collect.Sets;
 
 import org.junit.Test;
 
 import java.util.Collection;
 import java.util.Map;
-
-import static org.junit.Assert.*;
+import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * @author <a href='mailto:leeca@google.com'>Lee Carver</a>
@@ -83,5 +90,35 @@ public class GraphsTest {
     assertEquals(2, reverseMap.get(nodeArray[2]).intValue());
     assertEquals(3, reverseMap.get(nodeArray[3]).intValue());
     assertEquals(4, reverseMap.get(nodeArray[4]).intValue());
+  }
+
+  @Test
+  public void testComputeSpanningHierarchyForward() {
+    GraphNode[] nodeArray = TestUtils.buildNodes(5);
+    GraphModel test = TestUtils.buildComplete(nodeArray, TestUtils.RELATION);
+
+    Map<GraphNode, ? extends SuccessorEdges> result =
+        Trees.computeSpanningHierarchy(test, TestUtils.FORWARD);
+    assertEquals(5, buildAllNodes(result).size());
+  }
+
+  @Test
+  public void testComputeSpanningHierarchyReverse() {
+    GraphNode[] nodeArray = TestUtils.buildNodes(5);
+    GraphModel test = TestUtils.buildComplete(nodeArray, TestUtils.RELATION);
+
+    Map<GraphNode, ? extends SuccessorEdges> result =
+        Trees.computeSpanningHierarchy(test, TestUtils.REVERSE);
+    assertEquals(5, buildAllNodes(result).size());
+  }
+
+  private Set<GraphNode> buildAllNodes(
+      Map<GraphNode, ? extends SuccessorEdges> map) {
+    Set<GraphNode> result  = Sets.newHashSet();
+    for (Entry<GraphNode, ? extends SuccessorEdges> entry : map.entrySet()) {
+      result.add(entry.getKey());
+      result.addAll(entry.getValue().computeSuccessorNodes());
+    }
+    return result;
   }
 }

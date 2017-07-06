@@ -20,9 +20,9 @@ import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeTreeProvider;
 import com.google.devtools.depan.graph.api.EdgeMatcher;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
-import com.google.devtools.depan.nodes.Graphs;
 import com.google.devtools.depan.nodes.trees.HierarchicalTreeModel;
 import com.google.devtools.depan.nodes.trees.TreeModel;
+import com.google.devtools.depan.nodes.trees.Trees;
 
 import com.google.common.collect.Maps;
 
@@ -77,7 +77,7 @@ public class GraphData<F> {
       NodeTreeProvider<F> provider,
       GraphModel graph, EdgeMatcher<String> edgeMatcher) {
     TreeModel hierarchy = new HierarchicalTreeModel(
-        Graphs.computeSpanningHierarchy(graph, edgeMatcher));
+        Trees.computeSpanningHierarchy(graph, edgeMatcher));
     return new GraphData<F>(provider, hierarchy);
   }
 

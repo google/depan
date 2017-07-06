@@ -45,12 +45,12 @@ import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.RelationSets;
 import com.google.devtools.depan.model.builder.api.GraphBuilders;
-import com.google.devtools.depan.nodes.Graphs;
 import com.google.devtools.depan.nodes.filters.model.ContextualFilter;
 import com.google.devtools.depan.nodes.filters.sequence.SteppingFilter;
 import com.google.devtools.depan.nodes.trees.HierarchicalTreeModel;
 import com.google.devtools.depan.nodes.trees.SuccessorEdges;
 import com.google.devtools.depan.nodes.trees.TreeModel;
+import com.google.devtools.depan.nodes.trees.Trees;
 import com.google.devtools.depan.platform.ListenerManager;
 import com.google.devtools.depan.platform.PlatformTools;
 import com.google.devtools.depan.platform.WorkspaceTools;
@@ -332,7 +332,7 @@ public class ViewEditor extends MultiPageEditorPart {
     GraphModel treeGraph = GraphBuilders.buildFromNodes(
         getViewGraph(), nodes);
     TreeModel treeModel = new HierarchicalTreeModel(
-        Graphs.computeSpanningHierarchy(treeGraph, matcher.getInfo()));
+        Trees.computeSpanningHierarchy(treeGraph, matcher.getInfo()));
 
     // OPEN: or, is 1st arg treeGraph??
     viewInfo.collapseTree(getViewGraph(), treeModel);
@@ -1462,7 +1462,7 @@ public class ViewEditor extends MultiPageEditorPart {
   private void initGraphRenderer() {
     GraphModel view = getViewGraph();
     Map<GraphNode, ? extends SuccessorEdges> edgeMap =
-        Graphs.computeSuccessorHierarchy(
+        Trees.computeSuccessorHierarchy(
             view, GraphEdgeMatcherDescriptors.FORWARD.getInfo());
 
     renderer.setGraphModel(view, edgeMap);

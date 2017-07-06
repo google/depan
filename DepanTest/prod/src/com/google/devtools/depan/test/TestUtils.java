@@ -24,6 +24,7 @@ import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.graph_doc.model.GraphDocument;
 import com.google.devtools.depan.model.ElementVisitor;
 import com.google.devtools.depan.model.GraphEdge;
+import com.google.devtools.depan.model.GraphEdgeMatcher;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.RelationSets;
@@ -54,13 +55,24 @@ public class TestUtils {
     }
   };
 
-  public static RelationSet buildRelationSet() {
-    return RelationSets.createSingle(RELATION);
-  }
+  public static RelationSet RELATION_SET =
+      RelationSets.createSingle(RELATION);
 
-  public static String getNodeId(int count) {
-    return nameGen("node ", count);
-  }
+  public static GraphEdgeMatcher FORWARD = new GraphEdgeMatcher() {
+
+    @Override
+    public boolean relationForward(Relation relation) {
+      return RELATION == relation;
+    }
+  }; 
+
+  public static GraphEdgeMatcher REVERSE = new GraphEdgeMatcher() {
+
+    @Override
+    public boolean relationReverse(Relation relation) {
+      return RELATION == relation;
+    }
+  };
 
   public static class TestNode extends GraphNode {
     private final String label;
@@ -82,6 +94,17 @@ public class TestUtils {
     public String getId() {
       return label;
     }
+  }
+
+  /////////////////////////////////////
+  // Methods
+
+  private TestUtils() {
+    // Prevent instantiation.
+  }
+
+  public static String getNodeId(int count) {
+    return nameGen("node ", count);
   }
 
   public static GraphNode[] buildNodes(int degree) {
@@ -110,7 +133,7 @@ public class TestUtils {
       GraphNode nodes[], Set<BasicEdge<? extends String>> edges) {
     Map<String, BasicNode<? extends String>> graphNodes =
         Maps.newHashMapWithExpectedSize(nodes.length);
-
+ 
     for (GraphNode node : nodes) {
       graphNodes.put(node.getId(), node);
     }
