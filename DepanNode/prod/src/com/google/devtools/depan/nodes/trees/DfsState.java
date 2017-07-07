@@ -147,6 +147,10 @@ public class DfsState {
   public void visitNode(GraphNode parent) {
     setDiscovered(parent);
     for(GraphNode child : treeData.getSuccessorNodes(parent)) {
+      // Ignore self loops, too.
+      if (child == parent) {
+        continue;
+      }
       // Even if we have previously visited this node,
       // set it's predecessor if it doesn't have one.
       // This appears to be a bug in the CLR version of DFS-visit(u)
@@ -162,10 +166,8 @@ public class DfsState {
   }
 
   public Collection<GraphNode> extractRoots() {
-    Collection<GraphNode> result =
-        Lists.newArrayList();
-    for (Entry<GraphNode, NodeState> entry
-        : infoMap.entrySet()) {
+    Collection<GraphNode> result = Lists.newArrayList();
+    for (Entry<GraphNode, NodeState> entry : infoMap.entrySet()) {
       if (null == entry.getValue().parent) {
         result.add(entry.getKey());
       }
