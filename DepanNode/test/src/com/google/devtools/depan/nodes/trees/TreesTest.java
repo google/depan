@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.nodes.trees;
 
+import com.google.devtools.depan.graph.basic.BasicEdge;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
@@ -62,8 +63,11 @@ public class TreesTest {
     GraphNode[] nodeArray = TestUtils.buildNodes(1);
     GraphNode node = nodeArray[0];
     GraphEdge edge = new GraphEdge(node, node, TestUtils.RELATION);
-    GraphModel test =
-        TestUtils.buildGraphModel(nodeArray, Collections.singleton(edge));
+    // Set<BasicEdge<? extends String>> edges = Sets.newHashSet((BasicEdge<? extends String>) edge);
+    // Set<BasicEdge<? extends String>> edges = Collections.singleton((BasicEdge<? extends String>) edge);
+    Set<BasicEdge<? extends String>> edges = Sets.newHashSet();
+    edges.add((BasicEdge<? extends String>) edge);
+    GraphModel test = TestUtils.buildGraphModel(nodeArray, edges);
 
     Map<GraphNode, ? extends SuccessorEdges> result =
         Trees.computeSpanningHierarchy(test, TestUtils.FORWARD);
