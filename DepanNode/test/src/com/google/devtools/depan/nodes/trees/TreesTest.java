@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.nodes.trees;
 
+import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.test.TestUtils;
@@ -25,6 +26,7 @@ import com.google.common.collect.Sets;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -52,6 +54,20 @@ public class TreesTest {
     Map<GraphNode, ? extends SuccessorEdges> result =
         Trees.computeSpanningHierarchy(test, TestUtils.REVERSE);
     Assert.assertEquals(5, buildAllNodes(result).size());
+  }
+
+  @Test
+  public void testComputeSuccessorHierarchy() {
+    // Build a one node self-referent graph to test
+    GraphNode[] nodeArray = TestUtils.buildNodes(1);
+    GraphNode node = nodeArray[0];
+    GraphEdge edge = new GraphEdge(node, node, TestUtils.RELATION);
+    GraphModel test =
+        TestUtils.buildGraphModel(nodeArray, Collections.singleton(edge));
+
+    Map<GraphNode, ? extends SuccessorEdges> result =
+        Trees.computeSpanningHierarchy(test, TestUtils.FORWARD);
+    Assert.assertEquals(0, result.size());
   }
 
   private Set<GraphNode> buildAllNodes(
