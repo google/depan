@@ -337,15 +337,7 @@ public class NodeFilterViewPart extends AbstractViewDocViewPart {
     create.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
-        try {
-          createViewEditor();
-        } catch (IllegalArgumentException ex) {
-          // bad layout. don't do anything for the layout, but still finish the
-          // creation of the view.
-          ViewDocLogger.LOG.warning("Bad layout selected.");
-        } catch (Exception errView) {
-          ViewDocLogger.logException("Unable to create view", errView);
-        }
+        createViewEditor();
       }
     });
 
@@ -375,11 +367,15 @@ public class NodeFilterViewPart extends AbstractViewDocViewPart {
       return;
     }
 
-    SteppingFilter filter = filterControl.buildFilter();
-    IWizard wizard = prepareWizard(resultNodes, filter.getName());
-    Shell shell = getSite().getWorkbenchWindow().getShell();
-    WizardDialog dialog = new WizardDialog(shell, wizard);
-    dialog.open();
+    try {
+      runCreateWizard();
+    } catch (IllegalArgumentException ex) {
+      // bad layout. don't do anything for the layout, but still finish the
+      // creation of the view.
+      ViewDocLogger.LOG.warning("Bad layout selected.");
+    } catch (Exception errView) {
+      ViewDocLogger.logException("Unable to create view", errView);
+    }
   }
 
   private IWizard prepareWizard(
@@ -408,6 +404,14 @@ public class NodeFilterViewPart extends AbstractViewDocViewPart {
     }
 
     return null;
+  }
+
+  private void runCreateWizard() {
+    SteppingFilter filter = filterControl.buildFilter();
+    IWizard wizard = prepareWizard(resultNodes, filter.getName());
+    Shell shell = getSite().getWorkbenchWindow().getShell();
+    WizardDialog dialog = new WizardDialog(shell, wizard);
+    dialog.open();
   }
 
   /////////////////////////////////////

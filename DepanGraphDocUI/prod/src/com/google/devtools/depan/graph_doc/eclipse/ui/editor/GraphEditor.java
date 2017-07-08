@@ -16,35 +16,25 @@
 
 package com.google.devtools.depan.graph_doc.eclipse.ui.editor;
 
-import com.google.devtools.depan.eclipse.ui.nodes.cache.HierarchyCache;
-import com.google.devtools.depan.eclipse.ui.nodes.trees.GraphData;
-import com.google.devtools.depan.eclipse.ui.nodes.viewers.CheckNodeTreeView;
-import com.google.devtools.depan.eclipse.ui.nodes.viewers.HierarchyViewer;
-import com.google.devtools.depan.eclipse.ui.nodes.viewers.HierarchyViewer.HierarchyChangeListener;
-import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeTreeProviders;
 import com.google.devtools.depan.graph_doc.GraphDocLogger;
-import com.google.devtools.depan.graph_doc.eclipse.ui.plugins.FromGraphDocContributor;
-import com.google.devtools.depan.graph_doc.eclipse.ui.plugins.FromGraphDocWizard;
 import com.google.devtools.depan.graph_doc.eclipse.ui.resources.GraphResourceBuilder;
 import com.google.devtools.depan.graph_doc.eclipse.ui.resources.GraphResources;
-import com.google.devtools.depan.graph_doc.eclipse.ui.widgets.FromGraphDocListControl;
+import com.google.devtools.depan.graph_doc.eclipse.ui.widgets.NodeListCommandInfo;
+import com.google.devtools.depan.graph_doc.eclipse.ui.widgets.NodeListCommandViewer;
 import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.graph_doc.model.GraphDocument;
 import com.google.devtools.depan.graph_doc.persistence.ResourceCache;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
-import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 import com.google.devtools.depan.resources.PropertyDocumentReference;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.List;
@@ -54,8 +44,6 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.MultiPageEditorPart;
-
-import java.util.Collection;
 
 /**
  * Show the entire set of nodes from an analysis tree.  Allow the user
@@ -74,23 +62,17 @@ public class GraphEditor extends MultiPageEditorPart {
 
   private GraphDocument graph = null;
 
+  private GraphResources graphResources;
+
   private List associatedViews = null;
 
   /////////////////////////////////////
   // UX Elements
 
-  private CheckNodeTreeView checkNodeTreeView = null;
-
-  private FromGraphDocListControl fromGraphDoc;
+  private NodeListCommandViewer checkNodeTreeView = null;
 
   // TODO(leeca): Figure out how to turn this back on
   // private Binop<GraphModel> binop = null;
-
-  private HierarchyViewer<GraphNode> hierarchyView = null;
-
-  private HierarchyCache<GraphNode> hierarchies;
-
-  private GraphResources graphResources;
 
   /////////////////////////////////////
   // Public methods
@@ -109,10 +91,6 @@ public class GraphEditor extends MultiPageEditorPart {
     GraphDocLogger.LOG.info("Reading " + file.getRawLocationURI());
     graph = ResourceCache.fetchGraphDocument(file);
     GraphDocLogger.LOG.info("  DONE");
-
-    hierarchies = new HierarchyCache<GraphNode>(
-        NodeTreeProviders.GRAPH_NODE_PROVIDER, graph.getGraph());
-    handleHierarchyChanged();
 
     DependencyModel model = graph.getDependencyModel();
     graphResources = GraphResourceBuilder.forModel(model);
@@ -146,91 +124,37 @@ public class GraphEditor extends MultiPageEditorPart {
 
   @Override
   protected void createPages() {
-    createPage0();
-    createPage1();
+    Composite parent = getContainer();
+    createPage0(parent);
+    createPage1(parent);
   }
 
-  private void createPage0() {
-    Composite composite = new Composite(getContainer(), SWT.NONE);
+  private void createPage0(Composite parent) {
+    Composite composite = Widgets.buildGridContainer(parent, 1);
 
-    GridLayout layout = new GridLayout();
-    layout.numColumns = 1;
-    composite.setLayout(layout);
-
-    // top panel ---------------
-    Composite top = new Composite(composite, SWT.NONE);
-    top.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-
-    RowLayout toplayout = new RowLayout();
-    toplayout.fill = true;
-    toplayout.pack = true;
-    toplayout.wrap = true;
-    toplayout.type = SWT.HORIZONTAL;
-    top.setLayout(toplayout);
-
-    hierarchyView = createHierarchyViewer(top);
-
-    // recursive select options
-    final Button recursiveSelect = new Button(top, SWT.CHECK);
-    recursiveSelect.setText("Recursive select in tree");
-    recursiveSelect.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        setRecursiveSelect(recursiveSelect.getSelection());
-      }
-    });
-
-    Button create = new Button(top, SWT.PUSH);
-    create.setText("Create");
-    create.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        try {
-          createViewEditor();
-        } catch (IllegalArgumentException ex) {
-          // bad layout. don't do anything for the layout, but still finish the
-          // creation of the view.
-          GraphDocLogger.LOG.warning("Bad layout selected.");
-        } catch (Exception errView) {
-          GraphDocLogger.logException("Unable to create view", errView);
-        }
-      }
-    });
-
-    fromGraphDoc = new FromGraphDocListControl(top);
-
-    // tree --------------------
-    checkNodeTreeView = new CheckNodeTreeView(composite);
+    checkNodeTreeView = setupTree(composite);
     checkNodeTreeView.setLayoutData(Widgets.buildGrabFillData());
-
-    recursiveSelect.setSelection(RECURSIVE_SELECT_DEFAULT);
-    checkNodeTreeView.setRecursive(recursiveSelect.getSelection());
-    handleHierarchyChanged();
 
     int index = addPage(composite);
     setPageText(index, "New View");
   }
 
-  private HierarchyViewer<GraphNode> createHierarchyViewer(Composite parent) {
-    HierarchyViewer<GraphNode> result = 
-        new HierarchyViewer<GraphNode>(parent, false);
+  private NodeListCommandViewer setupTree(Composite parent) {
+    PropertyDocumentReference<GraphEdgeMatcherDescriptor> defMatcher =
+        graphResources.getDefaultEdgeMatcher();
+    Shell shell = getSite().getWorkbenchWindow().getShell();
 
-    PropertyDocumentReference<GraphEdgeMatcherDescriptor> selectedRelSet =
-        getDefaultEdgeMatcher();
-    result.setInput(hierarchies, selectedRelSet, file.getProject());
+    NodeListCommandInfo runner = new NodeListCommandInfo(
+        file, graph, graphResources, shell);
 
-    result.addChangeListener(new HierarchyChangeListener() {
-
-        @Override
-        public void hierarchyChanged() {
-          handleHierarchyChanged(); 
-        }
-      });
+    NodeListCommandViewer result = new NodeListCommandViewer(parent, runner);
+    result.setHierachyInput(defMatcher, file.getProject());
+    result.setRecursive(RECURSIVE_SELECT_DEFAULT);
     return result;
   }
 
-  private void createPage1() {
-    Composite composite = new Composite(getContainer(), SWT.NONE);
+  private void createPage1(Composite parent) {
+    Composite composite = new Composite(parent, SWT.NONE);
     GridLayout layout = new GridLayout();
     composite.setLayout(layout);
     layout.numColumns = 2;
@@ -274,44 +198,7 @@ public class GraphEditor extends MultiPageEditorPart {
   }
 
   /////////////////////////////////////
-  // UX Actions
-
-  private void setRecursiveSelect(boolean state) {
-    checkNodeTreeView.setRecursive(state);
-  }
-
-  private void handleHierarchyChanged() {
-    if (null == checkNodeTreeView) {
-      return;
-    }
-    if (null == hierarchyView) {
-      return;
-    }
-
-    GraphDocLogger.LOG.info("Initialize graph...");
-    GraphData<GraphNode> graphData = hierarchyView.getGraphData();
-
-    GraphEditorNodeViewProvider<GraphNode> provider =
-        new GraphEditorNodeViewProvider<GraphNode>(graphData);
-    checkNodeTreeView.setNvProvider(provider);
-    checkNodeTreeView.refresh();
-
-    GraphDocLogger.LOG.info("  DONE");
-  }
-
-  /////////////////////////////////////
   // Support methods
-
-  /**
-   * Really should have separate edge matchers from default display
-   * relation.
-   * 
-   * TODO: Separate hierarchy edge matcher from display relation set.
-   */
-  private PropertyDocumentReference<GraphEdgeMatcherDescriptor>
-      getDefaultEdgeMatcher() {
-    return graphResources.getDefaultEdgeMatcher();
-  }
 
   protected void selectView() {
 /* TODO(leeca):  Need richer ReferencedGraphModel
@@ -345,46 +232,5 @@ public class GraphEditor extends MultiPageEditorPart {
     }
     associatedViews.redraw();
 */
-  }
-
-  /////////////////////////////////////
-  // Create Views
-
-  /**
-   * Create a new Graph Visualization editor from the selected tree elements
-   * and other {@code GraphEditor} settings.
-   */
-  private void createViewEditor() {
-    GraphNode topNode = checkNodeTreeView.getFirstNode();
-    if (null == topNode) {
-      GraphDocLogger.LOG.info("no topNode");
-      return;
-    }
-
-    Collection<GraphNode> nodes = checkNodeTreeView.getSelectedNodes();
-    if (nodes.isEmpty()) {
-      GraphDocLogger.LOG.info("empty nodes");
-      return;
-    }
-
-    runGraphFromDocWizard(topNode, nodes);
-  }
-
-  private void runGraphFromDocWizard(
-      GraphNode topNode, Collection<GraphNode> nodes) {
-
-    // Prepare the wizard.
-    FromGraphDocContributor choice = fromGraphDoc.getChoice();
-    if (null == choice) {
-      return;
-    }
-    FromGraphDocWizard wizard = choice.newWizard();
-    String name = FromGraphDocWizard.calcDetailName(topNode);
-    wizard.init(file, graph, graphResources, nodes, name);
-
-    // Run the wizard.
-    Shell shell = getSite().getWorkbenchWindow().getShell();
-    WizardDialog dialog = new WizardDialog(shell, wizard);
-    dialog.open();
   }
 }

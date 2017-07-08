@@ -16,11 +16,9 @@
 
 package com.google.devtools.depan.maven.eclipse;
 import com.google.devtools.depan.graph_doc.eclipse.ui.wizards.AbstractAnalysisWizard;
-import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.graph_doc.model.GraphDocument;
 import com.google.devtools.depan.maven.MavenLogger;
 import com.google.devtools.depan.maven.MavenPluginActivator;
-import com.google.devtools.depan.maven.MavenRelationContributor;
 import com.google.devtools.depan.maven.builder.MavenContext;
 import com.google.devtools.depan.maven.builder.MavenDocumentHandler;
 import com.google.devtools.depan.maven.builder.MavenGraphResolver;

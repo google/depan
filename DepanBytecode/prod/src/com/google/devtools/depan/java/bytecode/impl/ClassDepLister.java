@@ -16,17 +16,6 @@
 
 package com.google.devtools.depan.java.bytecode.impl;
 
-import java.io.File;
-
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.Attribute;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
-import org.objectweb.asm.TypePath;
-
 import com.google.devtools.depan.filesystem.graph.FileElement;
 import com.google.devtools.depan.java.bytecode.eclipse.AsmFactory;
 import com.google.devtools.depan.java.graph.FieldElement;
@@ -36,6 +25,16 @@ import com.google.devtools.depan.java.graph.MethodElement;
 import com.google.devtools.depan.java.graph.PackageElement;
 import com.google.devtools.depan.java.graph.TypeElement;
 import com.google.devtools.depan.model.builder.chain.DependenciesListener;
+
+import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.FieldVisitor;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
+import org.objectweb.asm.TypePath;
+
+import java.io.File;
 
 /**
  * Implements a visitor of the ASM package, to find the dependencies in a class

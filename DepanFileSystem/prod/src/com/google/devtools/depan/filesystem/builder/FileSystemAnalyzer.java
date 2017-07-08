@@ -17,8 +17,6 @@
 package com.google.devtools.depan.filesystem.builder;
 
 import com.google.devtools.depan.filesystem.FileSystemPluginActivator;
-import com.google.devtools.depan.filesystem.FileSystemRelationContributor;
-import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.graph_doc.model.GraphDocument;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.builder.api.GraphBuilder;

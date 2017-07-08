@@ -20,22 +20,15 @@ import com.google.devtools.depan.eclipse.ui.nodes.trees.GraphData;
 import com.google.devtools.depan.graph.api.EdgeMatcher;
 import com.google.devtools.depan.matchers.eclipse.ui.widgets.EdgeMatcherSelectorControl;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
-import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.nodes.trees.TreeModel;
 import com.google.devtools.depan.platform.ListenerManager;
+import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 import com.google.devtools.depan.resources.PropertyDocumentReference;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
 
-import java.util.Collection;
 import java.util.logging.Logger;
 
 /**
@@ -52,8 +45,6 @@ public class HierarchyViewer<T> extends Composite {
 
   private HierarchyCache<T> hierarchies;
 
-  private boolean isInvertSelect;
-
   private EdgeMatcherSelectorControl edgeMatcherSelector;
 
   /** Listener when the selection change. */
@@ -69,24 +60,12 @@ public class HierarchyViewer<T> extends Composite {
   /////////////////////////////////////
   // Relationship Set Selector itself
 
-  public HierarchyViewer(Composite parent, boolean isInvertSelect) {
+  public HierarchyViewer(Composite parent) {
     super(parent, SWT.NONE);
-    this.isInvertSelect = isInvertSelect;
-
-    GridLayout viewerLayout = new GridLayout(3, false);
-    viewerLayout.marginWidth = 0;
-    viewerLayout.marginHeight = 0;
-    this.setLayout(viewerLayout);
-
-    Label selectorLabel = new Label(this, SWT.NONE);
-    selectorLabel.setText("Hierarchy from");
-    selectorLabel.setLayoutData(
-        new GridData(SWT.LEFT, SWT.CENTER, false, false));
+    this.setLayout(Widgets.buildContainerLayout(2));
 
     edgeMatcherSelector = new EdgeMatcherSelectorControl(this);
-    edgeMatcherSelector.setLayoutData(
-        new GridData(SWT.FILL, SWT.CENTER, true, false));
-
+    edgeMatcherSelector.setLayoutData(Widgets.buildHorzFillData());
     edgeMatcherSelector.addChangeListener(
         new EdgeMatcherSelectorControl.SelectorListener() {
 
@@ -97,19 +76,6 @@ public class HierarchyViewer<T> extends Composite {
           }
         }
       );
-
-    final Button invertSelect = new Button(this, SWT.CHECK);
-    invertSelect.setText("Invert");
-    invertSelect.setSelection(isInvertSelect);
-    invertSelect.setLayoutData(
-        new GridData(SWT.RIGHT, SWT.CENTER, false, false));
-
-    invertSelect.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        setInvertSelect(invertSelect.getSelection());
-      }
-    });
   }
 
   public void setInput(
@@ -118,11 +84,6 @@ public class HierarchyViewer<T> extends Composite {
       IProject project) {
     edgeMatcherSelector.setInput(matcherRef, project);
     this.hierarchies = hierarchies;
-  }
-
-  public void setInvertSelect(boolean invertSelect) {
-    isInvertSelect = invertSelect;
-    fireSelectionChange();
   }
 
   /////////////////////////////////////
@@ -183,21 +144,6 @@ public class HierarchyViewer<T> extends Composite {
     EdgeMatcher<String> matcher = matcherRef.getDocument().getInfo();
     GraphData<T> baseData = hierarchies.getHierarchy(matcher);
 
-    // Synthesize a inverse tree if requested.
-    // These are not cached.  The inverted hierarchies are often small,
-    // and quick to computes, so it should not matter.  When the inverts
-    // are large, they are rarely useful and rarely have a long lifetime.
-    // Caching a such a model will only impede garbage collection.
-    if (isInvertSelect) {
-      return excludedNodes(baseData);
-    }
-
     return baseData;
-  }
-
-  private GraphData<T> excludedNodes(GraphData<T> baseData) {
-    TreeModel baseTree = baseData.getTreeModel();
-    Collection<GraphNode> included = baseTree.computeTreeNodes();
-    return hierarchies.excludedNodes(included);
   }
 }

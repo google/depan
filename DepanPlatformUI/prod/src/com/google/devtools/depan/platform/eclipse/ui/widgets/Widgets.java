@@ -105,6 +105,13 @@ public class Widgets {
     return result;
   }
 
+  public static Button buildCompactCheckButton(Composite parent, String label) {
+    Button result = new Button(parent, SWT.CHECK);
+    result.setLayoutData(new GridData());
+    result.setText(label);
+    return result;
+  }
+
   public static Button buildCompactPushButton(Composite parent, String label) {
     Button result = new Button(parent, SWT.PUSH);
     result.setLayoutData(new GridData());

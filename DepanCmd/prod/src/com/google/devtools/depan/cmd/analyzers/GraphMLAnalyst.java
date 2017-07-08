@@ -16,14 +16,12 @@
 
 package com.google.devtools.depan.cmd.analyzers;
 
-import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.graph_doc.model.GraphDocument;
 import com.google.devtools.depan.graphml.builder.GraphFactory;
 import com.google.devtools.depan.graphml.builder.GraphMLContext;
 import com.google.devtools.depan.graphml.builder.GraphMLDocumentHandler;
 import com.google.devtools.depan.maven.MavenLogger;
 import com.google.devtools.depan.maven.MavenPluginActivator;
-import com.google.devtools.depan.maven.MavenRelationContributor;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.builder.api.GraphBuilder;
 import com.google.devtools.depan.model.builder.api.GraphBuilders;
