@@ -16,10 +16,14 @@
 
 package com.google.devtools.depan.matchers.persistence;
 
+import com.google.devtools.depan.edges.matchers.GraphEdgeMatchers;
+import com.google.devtools.depan.graph.api.RelationSet;
 import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptors;
+import com.google.devtools.depan.model.GraphEdgeMatcher;
 import com.google.devtools.depan.platform.PlatformTools;
+import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 import com.google.devtools.depan.resources.PropertyDocumentReference;
 import com.google.devtools.depan.resources.ResourceContainer;
 import com.google.devtools.depan.resources.ResourceDocumentReference;
@@ -27,6 +31,7 @@ import com.google.devtools.depan.resources.analysis.AnalysisResources;
 
 import com.google.common.collect.Lists;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -58,6 +63,20 @@ public class GraphEdgeMatcherResources {
     ResourceContainer matchers = root.addChild(MATCHERS);
     matchers.addResource(GraphEdgeMatcherDescriptors.EMPTY);
     FORWARD_REF = installMatcher(matchers, GraphEdgeMatcherDescriptors.FORWARD);
+  }
+
+  public static void installMatchers(
+      ResourceContainer container, Collection<RelationSetDescriptor> relSets) {
+
+    for (RelationSetDescriptor descr : relSets) {
+      RelationSet relSet = descr.getInfo();
+      GraphEdgeMatcher matcher =
+          GraphEdgeMatchers.createForwardEdgeMatcher(relSet);
+      GraphEdgeMatcherDescriptor resource =
+          new GraphEdgeMatcherDescriptor(
+              descr.getName(), descr.getModel(), matcher);
+      container.addResource(descr.getName(), resource);
+    }
   }
 
   private static PropertyDocumentReference<GraphEdgeMatcherDescriptor>

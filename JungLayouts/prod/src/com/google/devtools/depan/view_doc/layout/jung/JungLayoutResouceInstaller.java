@@ -31,7 +31,7 @@ public class JungLayoutResouceInstaller implements
     installLayouts(LayoutResources.getContainer(installRoot));
   }
 
-  private void installLayouts(ResourceContainer layouts) {
+  private static void installLayouts(ResourceContainer layouts) {
     LayoutResources.addLayoutPlan(
         layouts, "FR Layout", JungLayoutPlan.BASE_FR_LAYOUT);
     LayoutResources.addLayoutPlan(

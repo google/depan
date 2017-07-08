@@ -27,6 +27,7 @@ import com.google.devtools.depan.resources.PropertyDocumentReference;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Lists;
+import com.google.common.base.Strings;
 
 import java.util.List;
 import java.util.Set;
@@ -176,6 +177,9 @@ public class GraphResourceBuilder {
     PropertyDocument<?> propRes =
         ((PropertyDocumentReference<?>) resource).getDocument();
     String propVal = propRes.getProperty(AnalysisProperties.DEFAULT_PROP);
+    if (Strings.isNullOrEmpty(propVal)) {
+      return null;
+    }
     if (model.getRelationContribs().contains(propVal)) {
       return propVal;
     }

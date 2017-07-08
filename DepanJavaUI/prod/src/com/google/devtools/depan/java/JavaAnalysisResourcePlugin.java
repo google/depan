@@ -17,19 +17,15 @@
 package com.google.devtools.depan.java;
 
 import com.google.devtools.depan.analysis_doc.model.AnalysisProperties;
-import com.google.devtools.depan.edges.matchers.GraphEdgeMatchers;
 import com.google.devtools.depan.filesystem.graph.FileSystemRelation;
-import com.google.devtools.depan.graph.api.Relation;
-import com.google.devtools.depan.graph.api.RelationSet;
 import com.google.devtools.depan.java.graph.JavaElements;
 import com.google.devtools.depan.java.graph.JavaRelation;
-import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.matchers.persistence.GraphEdgeMatcherResources;
-import com.google.devtools.depan.model.GraphEdgeMatcher;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor;
 import com.google.devtools.depan.relations.models.RelationSetDescriptor.Builder;
 import com.google.devtools.depan.relations.persistence.RelationSetResources;
 import com.google.devtools.depan.resources.ResourceContainer;
+import com.google.devtools.depan.resources.Resources;
 import com.google.devtools.depan.resources.analysis.AnalysisResourceInstaller;
 
 import com.google.common.collect.Lists;
@@ -44,11 +40,6 @@ import java.util.Collection;
  */
 public class JavaAnalysisResourcePlugin implements
     AnalysisResourceInstaller {
-
-  /**
-   * List of all built-in RelationshipSets. Make it easier to iterate.
-   */
-  private static final Collection<RelationSetDescriptor> BUILT_IN_SETS;
 
   private static final RelationSetDescriptor CLASS_MEMBER;
 
@@ -67,6 +58,13 @@ public class JavaAnalysisResourcePlugin implements
   private static final RelationSetDescriptor USES;
 
   private static final RelationSetDescriptor ALL;
+
+  private static final RelationSetDescriptor DEFAULT_REL_SET;
+
+  /**
+   * List of all built-in RelationshipSets. Make it easier to iterate.
+   */
+  private static final Collection<RelationSetDescriptor> BUILT_IN_SETS;
 
   static {
     // class member relationships only
@@ -137,9 +135,7 @@ public class JavaAnalysisResourcePlugin implements
 
     // check all relationships
     Builder allBuilder = createRelSetBuilder("All Java");
-    for (Relation relation : JavaElements.RELATIONS) {
-      allBuilder.addRelation(relation);
-    }
+    allBuilder.addRelations(JavaElements.RELATIONS);
     ALL = allBuilder.build();
 
     // add predefined sets to the built-in list
@@ -153,6 +149,8 @@ public class JavaAnalysisResourcePlugin implements
     BUILT_IN_SETS.add(USES);
     BUILT_IN_SETS.add(CONTAINER);
     BUILT_IN_SETS.add(ALL);
+
+    DEFAULT_REL_SET = PKG_MEMBER;
   }
 
   @Override
@@ -161,31 +159,15 @@ public class JavaAnalysisResourcePlugin implements
     installRelSets(RelationSetResources.getContainer());
   }
 
-  private void installMatchers(ResourceContainer matchers) {
-    for (RelationSetDescriptor descr : BUILT_IN_SETS) {
-      RelationSet relSet = descr.getInfo();
-      GraphEdgeMatcher matcher =
-          GraphEdgeMatchers.createForwardEdgeMatcher(relSet);
-      GraphEdgeMatcherDescriptor resource = 
-          new GraphEdgeMatcherDescriptor(
-              descr.getName(), descr.getModel(), matcher);
-      matchers.addResource(descr.getName(), resource);
-    }
-
-    GraphEdgeMatcherDescriptor defResource = (GraphEdgeMatcherDescriptor)
-        matchers.getResource(CONTAINER.getName());
-    defResource.setProperty(
+  private static void installMatchers(ResourceContainer matchers) {
+    GraphEdgeMatcherResources.installMatchers(matchers, BUILT_IN_SETS);
+    Resources.setProperty(matchers, DEFAULT_REL_SET.getName(),
         AnalysisProperties.DEFAULT_PROP, JavaRelationContributor.ID);
   }
 
-  private void installRelSets(ResourceContainer relSets) {
-    for (RelationSetDescriptor descr : BUILT_IN_SETS) {
-      relSets.addResource(descr.getName(), descr);
-    }
-
-    RelationSetDescriptor defResource =
-        (RelationSetDescriptor) relSets.getResource(CONTAINER.getName());
-    defResource.setProperty(
+  private static void installRelSets(ResourceContainer relSets) {
+    RelationSetResources.installRelSets(relSets, BUILT_IN_SETS);
+    Resources.setProperty(relSets, DEFAULT_REL_SET.getName(),
         AnalysisProperties.DEFAULT_PROP, JavaRelationContributor.ID);
   }
 

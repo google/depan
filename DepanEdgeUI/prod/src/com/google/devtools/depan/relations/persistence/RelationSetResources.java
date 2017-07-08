@@ -27,6 +27,7 @@ import com.google.devtools.depan.resources.analysis.AnalysisResources;
 
 import com.google.common.collect.Lists;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -59,6 +60,14 @@ public class RelationSetResources {
     ResourceContainer relSets = root.addChild(RELATIONS);
     ALL_REF = installRelSet(relSets, RelationSetDescriptors.ALL);
     EMPTY_REF = installRelSet(relSets, RelationSetDescriptors.EMPTY);
+  }
+
+  public static void installRelSets(
+      ResourceContainer container, Collection<RelationSetDescriptor> relSets) {
+
+    for (RelationSetDescriptor descr : relSets) {
+      container.addResource(descr.getName(), descr);
+    }
   }
 
   private static PropertyDocumentReference<RelationSetDescriptor>

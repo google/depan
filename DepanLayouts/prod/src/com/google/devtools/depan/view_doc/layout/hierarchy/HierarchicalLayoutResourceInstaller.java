@@ -32,7 +32,7 @@ public class HierarchicalLayoutResourceInstaller implements
     installLayouts(LayoutResources.getContainer(installRoot));
   }
 
-  private void installLayouts(ResourceContainer layouts) {
+  private static void installLayouts(ResourceContainer layouts) {
     LayoutResources.addLayoutPlan(
         layouts, "Tree Layout", NEW_LINEAR_TREE_LAYOUT_PLAN);
     LayoutResources.addLayoutPlan(

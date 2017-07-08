@@ -25,6 +25,7 @@ import com.google.devtools.depan.model.RelationSets;
 
 import com.google.common.collect.Sets;
 
+import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -85,6 +86,12 @@ public class RelationSetDescriptor
 
     public void addRelation(Relation relation) {
       relations.add(relation);
+    }
+
+    public void addRelations(Collection<? extends Relation> source) {
+      for (Relation relation : source) {
+        relations.add(relation);
+      }
     }
 
     /**
