@@ -17,11 +17,9 @@
 package com.google.devtools.depan.cmd.analyzers;
 
 import com.google.devtools.depan.cmd.CmdLogger;
-import com.google.devtools.depan.filesystem.FileSystemRelationContributor;
 import com.google.devtools.depan.filesystem.builder.TreeLoader;
-import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.graph_doc.model.GraphDocument;
-import com.google.devtools.depan.java.JavaRelationContributor;
+import com.google.devtools.depan.java.JavaPluginActivator;
 import com.google.devtools.depan.java.bytecode.eclipse.AsmFactory;
 import com.google.devtools.depan.java.bytecode.eclipse.ClassAnalysisStats;
 import com.google.devtools.depan.java.bytecode.eclipse.ClassFileReader;
@@ -75,11 +73,7 @@ public class JavaAnalyst implements DependencyAnalyst {
 
     GraphModel resultGraph = graphBuilder.createGraphModel();
 
-    DependencyModel.Builder modelBuilder = new DependencyModel.Builder();
-    modelBuilder.addRelationContrib(JavaRelationContributor.ID);
-    modelBuilder.addRelationContrib(FileSystemRelationContributor.ID);
-
-    return new GraphDocument(modelBuilder.build(), resultGraph);
+    return new GraphDocument(JavaPluginActivator.JAVA_MODEL, resultGraph);
   }
 
   /**

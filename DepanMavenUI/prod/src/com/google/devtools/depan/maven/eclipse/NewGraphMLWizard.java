@@ -17,13 +17,12 @@
 package com.google.devtools.depan.maven.eclipse;
 
 import com.google.devtools.depan.graph_doc.eclipse.ui.wizards.AbstractAnalysisWizard;
-import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.graph_doc.model.GraphDocument;
 import com.google.devtools.depan.graphml.builder.GraphFactory;
 import com.google.devtools.depan.graphml.builder.GraphMLContext;
 import com.google.devtools.depan.graphml.builder.GraphMLDocumentHandler;
 import com.google.devtools.depan.maven.MavenLogger;
-import com.google.devtools.depan.maven.MavenRelationContributor;
+import com.google.devtools.depan.maven.MavenPluginActivator;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.builder.api.GraphBuilder;
 import com.google.devtools.depan.model.builder.api.GraphBuilders;
@@ -112,14 +111,11 @@ public class NewGraphMLWizard extends AbstractAnalysisWizard {
           "Unable to analyze GraphML at " + page.getPathText(), err);
     }
 
+    GraphModel resultGraph = graphBuilder.createGraphModel();
     monitor.worked(1);
 
     // Done
-    GraphModel resultGraph = graphBuilder.createGraphModel();
-
-    DependencyModel.Builder modelBuilder = new DependencyModel.Builder();
-    modelBuilder.addRelationContrib(MavenRelationContributor.ID);
-    return new GraphDocument(modelBuilder.build(), resultGraph);
+    return new GraphDocument(MavenPluginActivator.MAVEN_MODEL, resultGraph);
   }
 
   private void processModule(GraphMLContext context, File graphMLFile)

@@ -16,12 +16,10 @@
 
 package com.google.devtools.depan.java.bytecode.eclipse;
 
-import com.google.devtools.depan.filesystem.FileSystemRelationContributor;
 import com.google.devtools.depan.filesystem.builder.TreeLoader;
 import com.google.devtools.depan.graph_doc.eclipse.ui.wizards.AbstractAnalysisWizard;
-import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.graph_doc.model.GraphDocument;
-import com.google.devtools.depan.java.JavaRelationContributor;
+import com.google.devtools.depan.java.JavaPluginActivator;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.builder.api.GraphBuilder;
 import com.google.devtools.depan.model.builder.api.GraphBuilders;
@@ -135,12 +133,7 @@ public class NewJavaBytecodeWizard extends AbstractAnalysisWizard {
     monitor.worked(1);
 
     GraphModel resultGraph = graphBuilder.createGraphModel();
-
-    DependencyModel.Builder modelBuilder = new DependencyModel.Builder();
-    modelBuilder.addRelationContrib(FileSystemRelationContributor.ID);
-    modelBuilder.addRelationContrib(JavaRelationContributor.ID);
-
-    return new GraphDocument(modelBuilder.build(), resultGraph);
+    return new GraphDocument(JavaPluginActivator.JAVA_MODEL, resultGraph);
   }
 
   /**

@@ -19,6 +19,7 @@ import com.google.devtools.depan.graph_doc.eclipse.ui.wizards.AbstractAnalysisWi
 import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.graph_doc.model.GraphDocument;
 import com.google.devtools.depan.maven.MavenLogger;
+import com.google.devtools.depan.maven.MavenPluginActivator;
 import com.google.devtools.depan.maven.MavenRelationContributor;
 import com.google.devtools.depan.maven.builder.MavenContext;
 import com.google.devtools.depan.maven.builder.MavenDocumentHandler;
@@ -127,9 +128,7 @@ public class NewMavenPomWizard extends AbstractAnalysisWizard {
     GraphModel resultGraph = resolver.resolveReferences(analysisGraph);
     monitor.worked(1);
 
-    DependencyModel.Builder modelBuilder = new DependencyModel.Builder();
-    modelBuilder.addRelationContrib(MavenRelationContributor.ID);
-    return new GraphDocument(modelBuilder.build(), resultGraph);
+    return new GraphDocument(MavenPluginActivator.MAVEN_MODEL, resultGraph);
   }
 
   private void processModule(DependenciesListener builder, File moduleFile)

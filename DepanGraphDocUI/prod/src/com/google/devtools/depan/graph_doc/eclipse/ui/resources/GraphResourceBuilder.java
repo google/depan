@@ -95,7 +95,9 @@ public class GraphResourceBuilder {
     if (defMatchers.isEmpty()) {
       return null;
     }
-    // Check the contributions in priority order the default matcher.
+    // Check the contributions in priority order for the default matcher.
+    // Since getRelationContribs() sequences elements highest priority first,
+    // return the first non-empty matcher candidate.
     for (String contribs : model.getRelationContribs()) {
       Set<PropertyDocumentReference<GraphEdgeMatcherDescriptor>> matchers =
           defMatchers.get(contribs);

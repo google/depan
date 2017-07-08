@@ -50,10 +50,12 @@ public class DependencyModel {
     return ImmutableList.copyOf(nodeContribIds);
   }
 
-
   /**
    * Order implies priority.
    * The {@code get(0)} element has the highest priority.
+   * 
+   * Future versions may use additional information,
+   * such as explicit dependencies, to build the ordered list dynamically.
    */
   public List<String> getRelationContribs() {
     return ImmutableList.copyOf(relationContribIds);

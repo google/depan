@@ -22,6 +22,7 @@ import com.google.devtools.depan.graphml.builder.GraphFactory;
 import com.google.devtools.depan.graphml.builder.GraphMLContext;
 import com.google.devtools.depan.graphml.builder.GraphMLDocumentHandler;
 import com.google.devtools.depan.maven.MavenLogger;
+import com.google.devtools.depan.maven.MavenPluginActivator;
 import com.google.devtools.depan.maven.MavenRelationContributor;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.builder.api.GraphBuilder;
@@ -64,13 +65,10 @@ public class GraphMLAnalyst implements DependencyAnalyst {
       MavenLogger.logException(
           "Unable to analyze GraphML at " + graphMLPath, err);
     }
-
-    // Done
     GraphModel resultGraph = graphBuilder.createGraphModel();
 
-    DependencyModel.Builder modelBuilder = new DependencyModel.Builder();
-    modelBuilder.addRelationContrib(MavenRelationContributor.ID);
-    return new GraphDocument(modelBuilder.build(), resultGraph);
+    // Done
+    return new GraphDocument(MavenPluginActivator.MAVEN_MODEL, resultGraph);
   }
 
   private void processModule(GraphMLContext context)

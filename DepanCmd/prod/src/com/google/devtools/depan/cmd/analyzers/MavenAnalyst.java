@@ -17,9 +17,8 @@
 package com.google.devtools.depan.cmd.analyzers;
 
 import com.google.devtools.depan.cmd.CmdLogger;
-import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.graph_doc.model.GraphDocument;
-import com.google.devtools.depan.maven.MavenRelationContributor;
+import com.google.devtools.depan.maven.MavenPluginActivator;
 import com.google.devtools.depan.maven.builder.MavenAnalysisProperties;
 import com.google.devtools.depan.maven.builder.MavenContext;
 import com.google.devtools.depan.maven.builder.MavenDocumentHandler;
@@ -72,9 +71,7 @@ public class MavenAnalyst implements DependencyAnalyst {
     MavenGraphResolver resolver = new MavenGraphResolver();
     GraphModel resultGraph = resolver.resolveReferences(analysisGraph);
 
-    DependencyModel.Builder modelBuilder = new DependencyModel.Builder();
-    modelBuilder.addRelationContrib(MavenRelationContributor.ID);
-    return new GraphDocument(modelBuilder.build(), resultGraph);
+    return new GraphDocument(MavenPluginActivator.MAVEN_MODEL, resultGraph);
   }
 
   private String getPathText() {

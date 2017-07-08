@@ -19,12 +19,8 @@ package com.google.devtools.depan.maven;
 import com.google.devtools.depan.filesystem.FileSystemRelationContributor;
 import com.google.devtools.depan.graph_doc.model.DependencyModel;
 
-import com.google.common.collect.ImmutableList;
-
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-
-import java.util.Collections;
 
 /**
  * The activator class controls the plug-in life cycle.
@@ -36,12 +32,7 @@ public class MavenPluginActivator implements BundleActivator {
   /** Plug-in ID used to identify this plug-in. */
   public static final String PLUGIN_ID = "com.google.devtools.depan.maven";
 
-  public static final DependencyModel MAVEN_MODEL =
-      new DependencyModel(
-          Collections.<String>emptyList(), 
-          ImmutableList.<String>of(
-              MavenRelationContributor.ID,
-              FileSystemRelationContributor.ID));
+  public static final DependencyModel MAVEN_MODEL = buildDependencyModel();
 
   public MavenPluginActivator() {
   }
@@ -52,5 +43,12 @@ public class MavenPluginActivator implements BundleActivator {
 
   @Override
   public void stop(BundleContext context) throws Exception {
+  }
+
+  private static DependencyModel buildDependencyModel() {
+    DependencyModel.Builder result = new DependencyModel.Builder();
+    result.addRelationContrib(MavenRelationContributor.ID);
+    result.addRelationContrib(FileSystemRelationContributor.ID);
+    return result.build();
   }
 }

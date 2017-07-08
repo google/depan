@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.filesystem.builder;
 
+import com.google.devtools.depan.filesystem.FileSystemPluginActivator;
 import com.google.devtools.depan.filesystem.FileSystemRelationContributor;
 import com.google.devtools.depan.graph_doc.model.DependencyModel;
 import com.google.devtools.depan.graph_doc.model.GraphDocument;
@@ -72,13 +73,10 @@ public class FileSystemAnalyzer {
     TreeLoader loader = new TreeLoader(builder, treePrefix);
     loader.analyzeTree(pathText);
 
+    GraphModel graph = graphBuilder.createGraphModel();
     monitor.worked(1);
 
     // Done
-    GraphModel graph = graphBuilder.createGraphModel();
-    DependencyModel.Builder modelBuilder = new DependencyModel.Builder();
-    modelBuilder.addRelationContrib(FileSystemRelationContributor.ID);
-
-    return new GraphDocument(modelBuilder.build(), graph);
+    return new GraphDocument(FileSystemPluginActivator.FILE_SYSTEM_MODEL, graph);
   }
 }
