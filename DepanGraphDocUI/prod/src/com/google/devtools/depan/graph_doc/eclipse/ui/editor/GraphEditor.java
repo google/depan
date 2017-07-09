@@ -58,6 +58,9 @@ public class GraphEditor extends MultiPageEditorPart {
 
   private static final boolean RECURSIVE_SELECT_DEFAULT = true;
 
+  /////////////////////////////////////
+  // Editor input data
+
   private IFile file = null;
 
   private GraphDocument graph = null;
@@ -81,24 +84,7 @@ public class GraphEditor extends MultiPageEditorPart {
   public void init(IEditorSite site, IEditorInput input)
       throws PartInitException {
     super.init(site, input);
-    if (!(input instanceof IFileEditorInput)) {
-      throw new PartInitException("Invalid Input: Must be IFileEditorInput");
-    }
-
-    // load the graph
-    file = ((IFileEditorInput) input).getFile();
-
-    GraphDocLogger.LOG.info("Reading " + file.getRawLocationURI());
-    graph = ResourceCache.fetchGraphDocument(file);
-    GraphDocLogger.LOG.info("  DONE");
-
-    DependencyModel model = graph.getDependencyModel();
-    graphResources = GraphResourceBuilder.forModel(model);
-
-    // set the title to the filename, excepted the file extension
-    String title = file.getName();
-    title = title.substring(0, title.lastIndexOf('.'));
-    this.setPartName(title);
+    initFromInput(input);
   }
 
   @Override
@@ -117,6 +103,31 @@ public class GraphEditor extends MultiPageEditorPart {
   @Override
   public void dispose() {
     super.dispose();
+  }
+
+  /////////////////////////////////////
+  // Editor setup
+
+  private void initFromInput(IEditorInput input) throws PartInitException {
+
+    if (!(input instanceof IFileEditorInput)) {
+      throw new PartInitException("Invalid Input: Must be IFileEditorInput");
+    }
+
+    // load the graph
+    file = ((IFileEditorInput) input).getFile();
+
+    GraphDocLogger.LOG.info("Reading " + file.getRawLocationURI());
+    graph = ResourceCache.fetchGraphDocument(file);
+    GraphDocLogger.LOG.info("  DONE");
+
+    DependencyModel model = graph.getDependencyModel();
+    graphResources = GraphResourceBuilder.forModel(model);
+
+    // set the title to the filename, excepted the file extension
+    String title = file.getName();
+    title = title.substring(0, title.lastIndexOf('.'));
+    this.setPartName(title);
   }
 
   /////////////////////////////////////
