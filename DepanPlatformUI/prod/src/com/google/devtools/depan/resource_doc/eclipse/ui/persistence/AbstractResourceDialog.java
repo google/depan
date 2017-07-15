@@ -17,6 +17,7 @@
 package com.google.devtools.depan.resource_doc.eclipse.ui.persistence;
 
 import com.google.devtools.depan.platform.PlatformLogger;
+import com.google.devtools.depan.platform.eclipse.PlatformUIActivator;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 import com.google.devtools.depan.resource_doc.eclipse.ui.widgets.ProjectResourceControl;
 import com.google.devtools.depan.resources.PropertyDocument;
@@ -27,6 +28,7 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -77,6 +79,11 @@ public abstract class AbstractResourceDialog<T extends PropertyDocument<?>>
   @Override
   protected boolean isResizable() {
     return true;
+  }
+
+  @Override
+  protected IDialogSettings getDialogBoundsSettings() {
+    return PlatformUIActivator.getPlatformDialogSettings();
   }
 
   @Override

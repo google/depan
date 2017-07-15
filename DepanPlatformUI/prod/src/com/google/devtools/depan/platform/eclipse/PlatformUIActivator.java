@@ -18,7 +18,8 @@ package com.google.devtools.depan.platform.eclipse;
 
 import com.google.devtools.depan.resources.analysis.AnalysisResourceRegistry;
 
-import org.osgi.framework.BundleActivator;
+import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -26,14 +27,23 @@ import org.osgi.framework.BundleContext;
  * 
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public class PlatformUIActivator implements BundleActivator {
+public class PlatformUIActivator extends AbstractUIPlugin {
+
+  // The shared instance
+  private static PlatformUIActivator plugin;
 
   @Override
   public void start(BundleContext context) throws Exception {
     AnalysisResourceRegistry.installRegistryResources();
+    plugin = this;
   }
 
   @Override
   public void stop(BundleContext context) throws Exception {
+    plugin = null;
+  }
+
+  public static IDialogSettings getPlatformDialogSettings() {
+    return plugin.getDialogSettings();
   }
 }

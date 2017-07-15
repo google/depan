@@ -92,9 +92,6 @@ public class ProjectResourceLoadControl<T extends PropertyDocument<?>>
       return FileDocumentReference.buildFileReference(location, document);
     }
 
-    PlatformTools.throwCoreException(
-        "Document resource must be selected",
-        "com.google.devtools.depan.platform.ui");
     return null;
   }
 
