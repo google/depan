@@ -651,10 +651,7 @@ public class ViewEditor extends MultiPageEditorPart {
     extDataListener = new PartExtDataListener();
     addExtensionDataListener(extDataListener);
 
-    // Force a layout if there are no locations.
-    if (viewInfo.getNodeLocations().isEmpty()) {
-      markDirty();
-      final LayoutPlan initLayout = getInitialLayout();
+    if (null != initialLayout) {
       addDrawingListener(new DrawingListener() {
 
         @Override
@@ -662,23 +659,14 @@ public class ViewEditor extends MultiPageEditorPart {
             Rectangle2D drawing, Rectangle2D viewport) {
 
           // TODO: Use edge matcher from ViewEditorInput, too.
-          applyLayout(initLayout);
+          GraphEdgeMatcherDescriptor matcher =
+              getLayoutEdgeMatcherRef().getDocument();
+          applyLayout(initialLayout, matcher, getExposedNodes());
 
           // Only need to do this once on startup
           removeDrawingListener(this);
         }});
     }
-  }
-
-  private LayoutPlan getInitialLayout() {
-    LayoutPlan selectedLayout = getSelectedLayout();
-    if (null != selectedLayout ) {
-      return selectedLayout;
-    }
-    if (null != initialLayout) {
-      return initialLayout;
-    }
-    return GridLayoutPlan.GRID_LAYOUT_PLAN;
   }
 
   private void initFromInput(IEditorInput input) throws PartInitException {

@@ -57,6 +57,8 @@ public class ViewFromViewDocWizard extends FromViewDocWizard {
     String basename = calcName();
 
     ViewDocument viewInfo = buildNewViewDocument();
+    viewInfo.setVisibleRelationSet(page.getVisibleRelationSet());
+    viewInfo.setLayoutEdgeMatcher(page.getLayoutMatcher());
 
     ViewEditorInput result = new ViewEditorInput(viewInfo, basename);
     result.setInitialLayout(calcInitialLayout());
