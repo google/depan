@@ -448,13 +448,14 @@ public class NodeFilterViewPart extends AbstractViewDocViewPart {
     DependencyModel model = editor.getDependencyModel();
     if (filter instanceof SteppingFilter) {
       filterControl.setInput((SteppingFilter) filter, model, project);
-    } else {
-      String name = MessageFormat.format("Wrapped {0}", filter.getName());
-      String summary = MessageFormat.format("From {0}", filter.getSummary());
-      SteppingFilter synth = new SteppingFilter(name, summary);
-      synth.setSteps(Collections.singletonList(filter));
-      filterControl.setInput(synth, model, project);
-    }
+      return;
+    } 
+
+    String name = MessageFormat.format("Wrapped {0}", filter.getName());
+    String summary = MessageFormat.format("From {0}", filter.getSummary());
+    SteppingFilter synth = new SteppingFilter(name, summary);
+    synth.setSteps(Collections.singletonList(filter));
+    filterControl.setInput(synth, model, project);
   }
 
   /////////////////////////////////////
@@ -470,26 +471,10 @@ public class NodeFilterViewPart extends AbstractViewDocViewPart {
         editor.getResourceProject());
 
     refreshSources();
+    refreshResults(Collections.emptyList());
 
     listener = new PartViewPrefsListener() ;
     editor.addViewPrefsListener(listener);
-  }
-
-  private void refreshSources() {
-
-    ViewEditor editor = getEditor();
-
-    Collection<GraphNode> nodes = editor.getSelectedNodes();
-    String name = editor.getPartName();
-    String label = MessageFormat.format(
-        "{0} [{1} selected nodes]", name, nodes.size());
-
-    NodeListViewProvider<GraphNode> provider =
-        new NodeListViewProvider<GraphNode>(label, nodes);
-    provider.setProvider(NodeTreeProviders.GRAPH_NODE_PROVIDER);
-
-    sources.setNvProvider(provider);
-    sources.refresh();
   }
 
   @Override
@@ -510,5 +495,22 @@ public class NodeFilterViewPart extends AbstractViewDocViewPart {
         refreshSources();
       }
     }
+  }
+
+  private void refreshSources() {
+
+    ViewEditor editor = getEditor();
+
+    Collection<GraphNode> nodes = editor.getSelectedNodes();
+    String name = editor.getPartName();
+    String label = MessageFormat.format(
+        "{0} [{1} selected nodes]", name, nodes.size());
+
+    NodeListViewProvider<GraphNode> provider =
+        new NodeListViewProvider<GraphNode>(label, nodes);
+    provider.setProvider(NodeTreeProviders.GRAPH_NODE_PROVIDER);
+
+    sources.setNvProvider(provider);
+    sources.refresh();
   }
 }
