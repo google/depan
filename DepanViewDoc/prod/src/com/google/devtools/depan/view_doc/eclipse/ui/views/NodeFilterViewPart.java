@@ -471,7 +471,7 @@ public class NodeFilterViewPart extends AbstractViewDocViewPart {
         editor.getResourceProject());
 
     refreshSources();
-    refreshResults(Collections.emptyList());
+    refreshResults(Collections.<GraphNode>emptyList());
 
     listener = new PartViewPrefsListener() ;
     editor.addViewPrefsListener(listener);
