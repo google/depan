@@ -221,9 +221,7 @@ public class Point2dUtils {
 
     for (GraphNode node : moveNodes) {
       Point2D location = positions.get(node);
-      if (null != location) {
-        result.put(node, translater.translate(location));
-      }
+      result.put(node, translater.translate(location));
     }
     return result;
   }
