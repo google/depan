@@ -67,6 +67,11 @@ public class Point2dUtils {
   // Translaters for repetitively doing the same thing to many Point2Ds.
 
   public static interface Translater {
+
+ /*
+     * Must be prepared to handle a null point, which should be treated
+     * as the origin (0.0, 0.0).
+     */
     Point2D translate(Point2D source);
   }
 
