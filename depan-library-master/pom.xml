@@ -28,6 +28,7 @@
     <module>../depan-asm-library</module>
     <module>../depan-jogl-library</module>
     <module>../depan-jung-library</module>
+    <module>../depan-json-library</module>
     <module>../depan-xstream-library</module>
 
     <!-- Features ##>

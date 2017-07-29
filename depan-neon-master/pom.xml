@@ -30,6 +30,8 @@
     <module>../DepanEdge/test</module>
     <module>../DepanGraphDoc/prod</module>
     <module>../DepanGraphDoc/test</module>
+    <module>../DepanJson/prod</module>
+    <module>../DepanJson/test</module>
     <module>../DepanNode/prod</module>
     <module>../DepanNode/test</module>
     <module>../DepanPersistence/prod</module>

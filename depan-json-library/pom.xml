@@ -1,0 +1,60 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.pnambic.depan</groupId>
+    <artifactId>depan-library-parent</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <relativePath>../depan-library-parent</relativePath>
+  </parent>
+
+  <artifactId>depan-json-library</artifactId>
+  <packaging>bundle</packaging>
+
+  <name>Depan JSON Library</name>
+  <description>JSON libraries (jackson) packaged for DepAn</description>
+
+  <properties>
+    <json.version>2.8.9</json.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+      <version>${json.version}</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <version>${bundle.version}</version>
+        <extensions>true</extensions>
+        <configuration>
+         <instructions>
+           <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+           <Bundle-Vendor>Squarespace</Bundle-Vendor>
+           <Embed-Dependency>*</Embed-Dependency>
+           <Export-Package>
+             com.fasterxml.jackson.core,
+             com.fasterxml.jackson.core.format,
+             com.fasterxml.jackson.core.io,
+             com.fasterxml.jackson.core.sym,
+             com.fasterxml.jackson.core.type,
+             com.fasterxml.jackson.core.util
+           </Export-Package>
+           <_nouses>true</_nouses>
+           <_removeheaders>
+             Embed-Dependency,
+             Embed-Artifacts,
+             Import-Package
+           </_removeheaders>
+         </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
+
