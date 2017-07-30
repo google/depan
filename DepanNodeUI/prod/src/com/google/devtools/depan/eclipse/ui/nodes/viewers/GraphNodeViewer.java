@@ -71,7 +71,6 @@ public class GraphNodeViewer extends Composite {
 
     treeViewer = createTreeViewer(this);
     treeViewer.getTree().setLayoutData(Widgets.buildGrabFillData());
-    // treeViewer.getControl().setLayoutData(Widgets.buildGrabFillData());
   }
 
   private Composite setupOptions(Composite parent) {
