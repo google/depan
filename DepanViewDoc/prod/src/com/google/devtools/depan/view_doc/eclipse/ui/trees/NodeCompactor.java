@@ -23,14 +23,14 @@ import com.google.devtools.depan.eclipse.ui.nodes.trees.GraphData;
 import com.google.devtools.depan.eclipse.ui.nodes.trees.NodeWrapper;
 import com.google.devtools.depan.eclipse.ui.nodes.trees.SolitaryRoot;
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeTreeProviders;
-import com.google.devtools.depan.matchers.eclipse.ui.widgets.EdgeMatcherMenuCreator;
-import com.google.devtools.depan.matchers.eclipse.ui.widgets.EdgeMatcherSelectionListener;
+import com.google.devtools.depan.matchers.eclipse.ui.widgets.EdgeMatcherSaveLoadConfig;
 import com.google.devtools.depan.matchers.models.GraphEdgeMatcherDescriptor;
 import com.google.devtools.depan.model.GraphEdge;
 import com.google.devtools.depan.model.GraphModel;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.builder.api.GraphBuilders;
 import com.google.devtools.depan.nodes.trees.TreeModel;
+import com.google.devtools.depan.resources.PropertyDocumentReference;
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
 import com.google.devtools.depan.view_doc.eclipse.ui.trees.ActionableViewerObject.ActionSolitaryRoot;
 
@@ -259,47 +259,41 @@ public class NodeCompactor {
     }
 
     private Action buildAddHierarchy(final ViewEditor editor) {
-      EdgeMatcherMenuCreator matcherMenu = new EdgeMatcherMenuCreator();
-      matcherMenu.setDependencyModel(editor.getDependencyModel());
-      matcherMenu.addSelectionListener(new EdgeMatcherSelectionListener() {
+      Action action = new Action("Add hierarchy..", IAction.AS_PUSH_BUTTON) {
 
-          @Override
-          public void selected(GraphEdgeMatcherDescriptor matcher) {
-            editor.addNodeTreeHierarchy(matcher);
-          }
-        });
-
-      Action action = new Action("Add hierarchy", IAction.AS_DROP_DOWN_MENU) {
         @Override
         public void run() {
-          // Only sub-menu takes actions ..
+          PropertyDocumentReference<GraphEdgeMatcherDescriptor> matcher =
+              EdgeMatcherSaveLoadConfig.CONFIG.loadResource(
+                  editor.getEditorSite().getShell(), editor.getResourceProject());
+
+          if (null != matcher) {
+            editor.addNodeTreeHierarchy(matcher.getDocument());
+           }
         }
       };
-      action.setMenuCreator(matcherMenu);
+
       return action;
     }
 
     private Action buildCollapseHierarchy(final ViewEditor editor) {
-      EdgeMatcherMenuCreator matcherMenu = new EdgeMatcherMenuCreator();
-      matcherMenu.setDependencyModel(editor.getDependencyModel());
-
       final Collection<GraphNode> nodes =
           getGraphData().getTreeModel().computeRoots();
-      matcherMenu.addSelectionListener(new EdgeMatcherSelectionListener() {
 
-          @Override
-          public void selected(GraphEdgeMatcherDescriptor matcher) {
-            editor.collapseNodesByHierarchy(nodes, matcher);
-          }
-        });
+      Action action = new Action("Collapse hierarchy..", IAction.AS_PUSH_BUTTON) {
 
-      Action action = new Action("Collapse hierarchy", IAction.AS_DROP_DOWN_MENU) {
         @Override
         public void run() {
-          // Only sub-menu takes actions ..
+          PropertyDocumentReference<GraphEdgeMatcherDescriptor> matcher =
+              EdgeMatcherSaveLoadConfig.CONFIG.loadResource(
+                  editor.getEditorSite().getShell(), editor.getResourceProject());
+
+          if (null != matcher) {
+             editor.collapseNodesByHierarchy(nodes, matcher.getDocument());
+           }
         }
       };
-      action.setMenuCreator(matcherMenu);
+
       return action;
     }
   }

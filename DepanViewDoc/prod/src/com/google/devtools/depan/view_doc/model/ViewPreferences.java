@@ -335,12 +335,15 @@ public class ViewPreferences {
     String newDescription = (descrp.isEmpty()) ? "" : "Derived from " + descrp;
     newOptions.setOption(OptionPreferences.OPTION_DESCRIPTION, newDescription);
 
+    List<GraphEdgeMatcherDescriptor> mutableTreeDescriptors =
+        Lists.newArrayList(source.getTreeDescriptors());
+
     ViewPreferences result = new ViewPreferences(
         ScenePreferences.getDefaultScenePrefs(),
         newNodeLocations, newNodeProperties,
         source.visibleRelationSet, newEdgeProperties, newRelationProps,
         newSelectedNodes, newOptions, new Collapser(),
-        source.getTreeDescriptors(), Lists.<ExtensionData>newArrayList());
+        mutableTreeDescriptors, Lists.<ExtensionData>newArrayList());
 
     return result;
   }
