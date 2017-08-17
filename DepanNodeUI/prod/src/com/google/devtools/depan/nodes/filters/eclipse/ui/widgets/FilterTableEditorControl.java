@@ -121,11 +121,11 @@ public class FilterTableEditorControl
       }
     });
 
-    Button wrapButton = Widgets.buildCompactPushButton(result, "Wrap");
-    wrapButton.addSelectionListener(new SelectionAdapter() {
+    Button selectionButton = Widgets.buildCompactPushButton(result, "Selection");
+    selectionButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
-        wrapFilter();
+        selectedFilter();
       }
     });
 
@@ -208,7 +208,7 @@ public class FilterTableEditorControl
     updateSteps(result);
   }
 
-  private void wrapFilter() {
+  private void selectedFilter() {
     List<ContextualFilter> target = filterControl.getSelectedFilters();
     if (target.isEmpty()) {
       return;
@@ -223,15 +223,44 @@ public class FilterTableEditorControl
       return;
     }
 
-    ContextualFilter filter = target.get(0);
-    List<ContextualFilter> result = getUpdatableSteps();
-    int index = result.indexOf(filter);
+    List<ContextualFilter> source = getUpdatableSteps();
+    List<ContextualFilter> result = buildFilter(contrib, target, source);
+    if (null != result) {
+      updateSteps(result);
+    }
+  }
 
-    ContextualFilter wrapper =
-        ContextualFilterContributors.createFilter(contrib, target);
-    result.set(index, wrapper);
+  private List<ContextualFilter> buildFilter(
+      ContextualFilterContributor<? extends ContextualFilter> contrib,
+      List<ContextualFilter> target, List<ContextualFilter> source) {
 
-    updateSteps(result);
+    switch (contrib.getForm()) {
+    case STEPS:
+      ContextualFilter steps =
+          ContextualFilterContributors.createFilter(contrib, target);
+
+      List<ContextualFilter> result = Lists.newArrayList();
+      for (ContextualFilter step : source) {
+        if (!target.contains(step)) {
+          result.add(step);
+        }
+      }
+      result.add(steps);
+      return result;
+    case GROUP:
+    case WRAPPER:
+      int index = source.indexOf(target.get(0));
+
+      ContextualFilter wrapper =
+          ContextualFilterContributors.createFilter(contrib, target);
+      source.set(index, wrapper);
+      return source;
+    case ELEMENT:
+      break;
+    default:
+      break;
+    }
+    return null;
   }
 
   private void editFilter() {

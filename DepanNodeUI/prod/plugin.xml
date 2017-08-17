@@ -25,6 +25,10 @@
             class="com.google.devtools.depan.nodes.filters.eclipse.ui.filters.RelationCountContribution"
             id="com.google.devtools.depan.nodes.filters.eclipse.ui.filters.RelationCountContribution">
       </filter>
+      <filter
+            class="com.google.devtools.depan.nodes.filters.eclipse.ui.filters.SteppingContribution"
+            id="com.google.devtools.depan.nodes.filters.eclipse.ui.filters.SteppingContribution">
+      </filter>
    </extension>
    <extension
          point="org.eclipse.core.runtime.adapters">

@@ -89,7 +89,8 @@ public class FilterTableControl extends Composite {
     super(parent, SWT.NONE);
     setLayout(Widgets.buildContainerLayout(1));
 
-    filterViewer = new TableViewer(this, SWT.BORDER | SWT.V_SCROLL);
+    filterViewer = 
+        new TableViewer(this, SWT.BORDER | SWT.V_SCROLL | SWT.MULTI );
 
     // Set up layout properties.
     Table filterTable = filterViewer.getTable();
