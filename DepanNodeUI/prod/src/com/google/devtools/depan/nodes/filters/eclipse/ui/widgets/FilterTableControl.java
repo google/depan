@@ -22,6 +22,7 @@ import com.google.devtools.depan.platform.eclipse.ui.tables.EditColTableDef;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Selections;
 import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ICellModifier;
@@ -34,6 +35,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 
@@ -129,6 +131,12 @@ public class FilterTableControl extends Composite {
   public List<ContextualFilter> getSelectedFilters() {
     ISelection selection = filterViewer.getSelection();
     return Selections.getSelectionList(selection, ContextualFilter.class);
+  }
+
+  public void createContextMenu(MenuManager mgr) {
+    Table filterTable = filterViewer.getTable();
+    Menu menu = mgr.createContextMenu(filterTable);
+    filterTable.setMenu(menu);
   }
 
   /////////////////////////////////////

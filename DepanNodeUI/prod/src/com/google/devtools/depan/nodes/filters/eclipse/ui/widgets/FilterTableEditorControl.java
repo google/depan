@@ -17,6 +17,7 @@
 package com.google.devtools.depan.nodes.filters.eclipse.ui.widgets;
 
 import com.google.devtools.depan.nodes.filters.eclipse.ui.plugins.ContextualFilterContributor;
+import com.google.devtools.depan.nodes.filters.eclipse.ui.plugins.ContextualFilterContributor.Form;
 import com.google.devtools.depan.nodes.filters.eclipse.ui.plugins.ContextualFilterContributors;
 import com.google.devtools.depan.nodes.filters.eclipse.ui.plugins.ContextualFilterRegistry;
 import com.google.devtools.depan.nodes.filters.model.ContextualFilter;
@@ -27,6 +28,12 @@ import com.google.devtools.depan.resources.PropertyDocumentReference;
 
 import com.google.common.collect.Lists;
 
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -34,7 +41,10 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
+import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Enhances {@link SteppingFilter} editing with a
@@ -76,9 +86,164 @@ public class FilterTableEditorControl
   protected void setupControls(Composite parent) {
     filterControl = new FilterTableControl(this);
     filterControl.setLayoutData(Widgets.buildGrabFillData());
+    addContextMenu();
 
     Composite commands = setupCommandButtons(this);
     commands.setLayoutData(Widgets.buildHorzFillData());
+  }
+
+  private void addContextMenu() {
+    final MenuManager mgr = new MenuManager();
+    mgr.setRemoveAllWhenShown(true);
+
+    mgr.addMenuListener(new IMenuListener() {
+
+      @Override
+      public void menuAboutToShow(IMenuManager mgr) {
+        List<ContextualFilter> selection = filterControl.getSelectedFilters();
+        buildMenu(mgr, selection);
+      }
+    });
+    filterControl.createContextMenu(mgr);
+  }
+
+  private void buildMenu(IMenuManager mgr, List<ContextualFilter> selection) {
+    if (selection.isEmpty()) {
+      addElementMenuActions(getNoneSelectedItems(), mgr);
+    }
+    if (selection.size() == 1) {
+      addItemMenuActions(mgr, selection);
+      addSelectionMenuActions(getSingleSelectItems(), mgr);
+    }
+    if (selection.size() > 1) {
+      addItemMenuActions(mgr, selection);
+      addSelectionMenuActions(getMulitSelectItems(), mgr);
+    }
+  }
+
+  private void addItemMenuActions(
+      IMenuManager mgr, List<ContextualFilter> selection) {
+    if (selection.size() == 1) {
+      mgr.add(new EditAction("Edit", selection.get(0)));
+    }
+    mgr.add(new RemoveAction("Delete", selection));
+    mgr.add(new Separator());
+  }
+
+  private void addElementMenuActions(
+      Collection<ContextualFilterContributor<? extends ContextualFilter>> filters,
+      IMenuManager mgr) {
+    for (ContextualFilterContributor<? extends ContextualFilter>
+        filter : filters) {
+      Action action = new ElementAction(filter.getLabel(), filter);
+      mgr.add(action);
+    }
+  }
+
+  private void addSelectionMenuActions(
+      Collection<ContextualFilterContributor<? extends ContextualFilter>> filters,
+      IMenuManager mgr) {
+    for (ContextualFilterContributor<? extends ContextualFilter>
+        filter : filters) {
+      Action action = new SelectionAction(filter.getLabel(), filter);
+      mgr.add(action);
+    }
+  }
+
+  private Collection<ContextualFilterContributor<? extends ContextualFilter>>
+      getNoneSelectedItems() {
+    return choiceItems(EnumSet.of(Form.ELEMENT) );
+  }
+
+  private Collection<ContextualFilterContributor<? extends ContextualFilter>>
+      getSingleSelectItems() {
+    return choiceItems(EnumSet.of(Form.WRAPPER, Form.GROUP, Form.STEPS) );
+  }
+
+  private Collection<ContextualFilterContributor<? extends ContextualFilter>>
+      getMulitSelectItems() {
+    return choiceItems(EnumSet.of(Form.GROUP, Form.STEPS) );
+  }
+
+  private Collection<ContextualFilterContributor<? extends ContextualFilter>>
+      choiceItems(EnumSet<ContextualFilterContributor.Form> formSet) {
+    Map<String, ContextualFilterContributor<? extends ContextualFilter>>
+        filters = ContextualFilterRegistry.getRegistryContributionMap();
+    Collection<ContextualFilterContributor<? extends ContextualFilter>>
+        result = Lists.newArrayList();
+
+    for (ContextualFilterContributor<? extends ContextualFilter>
+        filter : filters.values()) {
+      if (formSet.contains(filter.getForm())) {
+        result.add(filter);
+      }
+    }
+    return result;
+  }
+
+  private class EditAction extends Action {
+
+    private final ContextualFilter filter;
+
+    public EditAction(String label, ContextualFilter filter) {
+      super(label, IAction.AS_PUSH_BUTTON);
+      this.filter = filter;
+    }
+
+    public void run() {
+      changeFilter(filter);
+    }
+  }
+
+  private class RemoveAction extends Action {
+
+    private final Collection<ContextualFilter> filters;
+
+    public RemoveAction(String label, Collection<ContextualFilter> filters) {
+      super(label, IAction.AS_PUSH_BUTTON);
+      this.filters = filters;
+    }
+
+    public void run() {
+      removeFilter(filters);
+    }
+  }
+
+  private class ElementAction extends Action {
+
+    private final ContextualFilterContributor<? extends ContextualFilter>
+        contrib;
+
+    public ElementAction(String label,
+        ContextualFilterContributor<? extends ContextualFilter> contrib) {
+      super(label, IAction.AS_PUSH_BUTTON);
+      this.contrib = contrib;
+    }
+
+    public void run() {
+      addNewFilter(contrib);
+    }
+  }
+
+  private class SelectionAction extends Action {
+
+    private final ContextualFilterContributor<? extends ContextualFilter>
+        contrib;
+
+    public SelectionAction(String label,
+        ContextualFilterContributor<? extends ContextualFilter> contrib) {
+      super(label, IAction.AS_PUSH_BUTTON);
+      this.contrib = contrib;
+    }
+
+    public void run() {
+      List<ContextualFilter> target = filterControl.getSelectedFilters();
+      if (target.isEmpty()) {
+        return;
+      }
+
+      selectedFilter(contrib, target);
+    }
   }
 
   /////////////////////////////////////
@@ -102,7 +267,7 @@ public class FilterTableEditorControl
     editButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
-        editFilter();
+        changeFilter();
       }
     });
 
@@ -183,13 +348,17 @@ public class FilterTableEditorControl
       return;
     }
 
+    addNewFilter(contrib);
+  }
+
+  private void addNewFilter(
+      ContextualFilterContributor<? extends ContextualFilter> contrib) {
     ContextualFilter filter = contrib.createElementFilter();
     List<ContextualFilter> result = getUpdatableSteps();
     result.add(filter);
 
     updateSteps(result);
   }
-
 
   private void importFilter() {
     if (null == getFilter()) {
@@ -222,6 +391,13 @@ public class FilterTableEditorControl
     if (null == steps) {
       return;
     }
+
+    selectedFilter(contrib, target);
+  }
+
+  private void selectedFilter(
+      ContextualFilterContributor<? extends ContextualFilter> contrib,
+      List<ContextualFilter> target) {
 
     List<ContextualFilter> source = getUpdatableSteps();
     List<ContextualFilter> result = buildFilter(contrib, target, source);
@@ -263,7 +439,7 @@ public class FilterTableEditorControl
     return null;
   }
 
-  private void editFilter() {
+  private void changeFilter() {
     List<ContextualFilter> target = filterControl.getSelectedFilters();
     if (target.isEmpty()) {
       return;
@@ -273,8 +449,12 @@ public class FilterTableEditorControl
       return;
     }
 
-    List<ContextualFilter> result = getUpdatableSteps();
     ContextualFilter filter = target.get(0);
+    changeFilter(filter);
+  }
+
+  private void changeFilter(ContextualFilter filter) {
+    List<ContextualFilter> result = getUpdatableSteps();
     int index = result.indexOf(filter);
 
     ContextualFilter update = editFilter(filter);
@@ -292,8 +472,12 @@ public class FilterTableEditorControl
       return;
     }
 
-    List<ContextualFilter> result = getUpdatableSteps();
     List<ContextualFilter> target = filterControl.getSelectedFilters();
+    removeFilter(target);
+  }
+
+  private void removeFilter(Collection<ContextualFilter> target) {
+    List<ContextualFilter> result = getUpdatableSteps();
     result.removeAll(target);
 
     updateSteps(result);
