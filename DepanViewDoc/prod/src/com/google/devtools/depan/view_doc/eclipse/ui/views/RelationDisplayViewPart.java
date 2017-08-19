@@ -60,6 +60,31 @@ public class RelationDisplayViewPart extends AbstractViewDocViewPart {
 
   private RelationDisplayRepository propRepo;
 
+  private class ControlSaveLoadControl extends RelationDisplaySaveLoadControl {
+    private ControlSaveLoadControl(Composite parent) {
+      super(parent);
+    }
+
+    @Override
+    protected IProject getProject() {
+      return RelationDisplayViewPart.this.getProject();
+    }
+
+    @Override
+    protected RelationDisplayDocument buildSaveResource() {
+      return RelationDisplayViewPart.this.buildSaveResource();
+    }
+
+    @Override
+    protected void installLoadResource(
+        PropertyDocumentReference<RelationDisplayDocument> ref) {
+      if (null != ref) {
+        RelationDisplayDocument doc = ref.getDocument();
+        RelationDisplayViewPart.this.installLoadResource(doc);
+      }
+    }
+  }
+
   private static class PartRelationDisplayRepo
       implements RelationDisplayRepository {
 
@@ -152,39 +177,13 @@ public class RelationDisplayViewPart extends AbstractViewDocViewPart {
     propEditor = new RelationDisplayTableControl(result);
     propEditor.setLayoutData(Widgets.buildGrabFillData());
 
-    Composite saves = setupSaveButtons(result);
+    RelationDisplaySaveLoadControl saves = new ControlSaveLoadControl(result);
     saves.setLayoutData(Widgets.buildHorzFillData());
   }
 
   @Override
   protected void disposeGui() {
     releaseResources();
-  }
-
-  private Composite setupSaveButtons(Composite parent) {
-    RelationDisplaySaveLoadControl result =
-        new RelationDisplaySaveLoadControl(parent) {
-
-          @Override
-          protected IProject getProject() {
-            return RelationDisplayViewPart.this.getProject();
-          }
-
-          @Override
-          protected RelationDisplayDocument buildSaveResource() {
-            return RelationDisplayViewPart.this.buildSaveResource();
-          }
-
-          @Override
-          protected void installLoadResource(
-              PropertyDocumentReference<RelationDisplayDocument> ref) {
-            if (null != ref) {
-              RelationDisplayDocument doc = ref.getDocument();
-              RelationDisplayViewPart.this.installLoadResource(doc);
-            }
-          }
-    };
-    return result;
   }
 
   /////////////////////////////////////

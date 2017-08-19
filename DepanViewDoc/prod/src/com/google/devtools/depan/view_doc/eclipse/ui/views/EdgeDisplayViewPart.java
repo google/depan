@@ -58,6 +58,31 @@ public class EdgeDisplayViewPart extends AbstractViewDocViewPart {
 
   private EdgeDisplayRepository propRepo;
 
+  private class ControlSaveLoadControl extends EdgeDisplaySaveLoadControl {
+    private ControlSaveLoadControl(Composite parent) {
+      super(parent);
+    }
+
+    @Override
+    protected IProject getProject() {
+      return EdgeDisplayViewPart.this.getProject();
+    }
+
+    @Override
+    protected EdgeDisplayDocument buildSaveResource() {
+      return EdgeDisplayViewPart.this.buildSaveResource();
+    }
+
+    @Override
+    protected void installLoadResource(
+        PropertyDocumentReference<EdgeDisplayDocument> ref) {
+      if (null != ref) {
+        EdgeDisplayDocument doc = ref.getDocument();
+        EdgeDisplayViewPart.this.installLoadResource(doc);
+      }
+    }
+  }
+
   private static class PartEdgeDisplayRepo
       implements EdgeDisplayRepository {
 
@@ -131,40 +156,13 @@ public class EdgeDisplayViewPart extends AbstractViewDocViewPart {
     propEditor = new EdgeDisplayTableControl(result);
     propEditor.setLayoutData(Widgets.buildGrabFillData());
 
-    Composite saves = setupSaveButtons(result);
+    EdgeDisplaySaveLoadControl saves = new ControlSaveLoadControl(result);
     saves.setLayoutData(Widgets.buildHorzFillData());
   }
 
   @Override
   protected void disposeGui() {
     releaseResources();
-  }
-
-  private Composite setupSaveButtons(Composite parent) {
-    EdgeDisplaySaveLoadControl result =
-        new EdgeDisplaySaveLoadControl(parent) {
-
-          @Override
-          protected IProject getProject() {
-            return EdgeDisplayViewPart.this.getProject();
-          }
-
-          @Override
-          protected EdgeDisplayDocument buildSaveResource() {
-            return EdgeDisplayViewPart.this.buildSaveResource();
-          }
-
-          @Override
-          protected void installLoadResource(
-              PropertyDocumentReference<EdgeDisplayDocument> ref) {
-            if (null != ref) {
-              EdgeDisplayDocument doc = ref.getDocument();
-              EdgeDisplayViewPart.this.installLoadResource(doc);
-            }
-          }
-      
-    };
-    return result;
   }
 
   /////////////////////////////////////

@@ -58,6 +58,31 @@ public class VisibleRelationsViewPart extends AbstractViewDocViewPart {
 
   private PartRelationRepo vizRepo;
 
+  private class ControlSaveLoadControl extends RelationSetSaveLoadControl {
+    private ControlSaveLoadControl(Composite parent) {
+      super(parent);
+    }
+
+    @Override
+    protected IProject getProject() {
+      return VisibleRelationsViewPart.this.getProject();
+    }
+
+    @Override
+    protected RelationSetDescriptor buildSaveResource() {
+      return VisibleRelationsViewPart.this.buildSaveResource();
+    }
+
+    @Override
+    protected void installLoadResource(
+        PropertyDocumentReference<RelationSetDescriptor> ref) {
+      if (null != ref) {
+        RelationSetDescriptor doc = ref.getDocument();
+        VisibleRelationsViewPart.this.installLoadResource(doc);
+      }
+    }
+  }
+
   private static class PartRelationRepo
       implements RelationSetRepository,
           RelationSetRepository.ProvidesUniverse {
@@ -145,40 +170,13 @@ public class VisibleRelationsViewPart extends AbstractViewDocViewPart {
     relationSetEditor = new RelationSetEditorControl(result);
     relationSetEditor.setLayoutData(Widgets.buildGrabFillData());
 
-    Composite saves = setupSaveButtons(result);
+    RelationSetSaveLoadControl saves = new ControlSaveLoadControl(result);
     saves.setLayoutData(Widgets.buildHorzFillData());
   }
 
   @Override
   protected void disposeGui() {
     releaseResources();
-  }
-
-  private Composite setupSaveButtons(Composite parent) {
-    RelationSetSaveLoadControl result =
-        new RelationSetSaveLoadControl(parent) {
-
-          @Override
-          protected IProject getProject() {
-            return VisibleRelationsViewPart.this.getProject();
-          }
-
-          @Override
-          protected RelationSetDescriptor buildSaveResource() {
-            return VisibleRelationsViewPart.this.buildSaveResource();
-          }
-
-          @Override
-          protected void installLoadResource(
-              PropertyDocumentReference<RelationSetDescriptor> ref) {
-            if (null != ref) {
-              RelationSetDescriptor doc = ref.getDocument();
-              VisibleRelationsViewPart.this.installLoadResource(doc);
-            }
-          }
-      
-    };
-    return result;
   }
 
   /////////////////////////////////////
