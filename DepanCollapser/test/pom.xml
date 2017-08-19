@@ -2,9 +2,9 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.pnambic.depan</groupId>
-    <artifactId>depan-neon-test-parent</artifactId>
+    <artifactId>depan-oxygen-test-parent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <relativePath>../../depan-neon-test-parent</relativePath>
+    <relativePath>../../depan-oxygen-test-parent</relativePath>
   </parent>
 
   <artifactId>com.google.devtools.depan.collapser-test</artifactId>

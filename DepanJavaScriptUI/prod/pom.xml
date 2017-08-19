@@ -3,9 +3,9 @@
 
   <parent>
     <groupId>com.pnambic.depan</groupId>
-    <artifactId>depan-neon-parent</artifactId>
+    <artifactId>depan-oxygen-parent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <relativePath>../../depan-neon-parent</relativePath>
+    <relativePath>../../depan-oxygen-parent</relativePath>
   </parent>
 
   <artifactId>com.google.devtools.depan.javascript.ui</artifactId>

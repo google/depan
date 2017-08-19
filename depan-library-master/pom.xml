@@ -13,12 +13,12 @@
   <packaging>pom</packaging>
 
   <name>DepAn Library Master</name>
-  <description>Aggregation project for DepAn Neon library builds</description>
+  <description>Aggregation project for DepAn Oxygen library builds</description>
 
   <modules>
     <!-- Overall build context -->
     <module>../depan-parent</module>
-    <module>../depan-neon-target</module>
+    <module>../depan-oxygen-target</module>
     <module>../depan-library-parent</module>
 
     <!-- Pre-packaged OSGi 3rd Party Bundles -->
