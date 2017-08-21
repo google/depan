@@ -3,7 +3,7 @@
   <parent>
     <groupId>com.pnambic.depan</groupId>
     <artifactId>depan-parent</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>0.0.3-SNAPSHOT</version>
     <relativePath>../depan-parent</relativePath>
   </parent>
 
