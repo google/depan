@@ -27,12 +27,6 @@
       <artifactId>guava</artifactId>
       <version>${guava.version}</version>
     </dependency>
-
-    <dependency>
-      <groupId>joda-time</groupId>
-      <artifactId>joda-time</artifactId>
-      <version>${joda-time.version}</version>
-    </dependency>
   </dependencies>
 
   <build>

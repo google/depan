@@ -35,7 +35,7 @@ import org.eclipse.swt.widgets.DateTime;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import java.util.Calendar;
+import java.time.ZonedDateTime;
 import java.util.Collection;
 
 /**
@@ -248,13 +248,13 @@ public class MigrationTaskEditor extends MigrationTaskAdapter {
     quarter.setText(migrationTask.getOkrQuarter());
     updatedBy.setText(migrationTask.getUpdatedBy());
 
-    Calendar date = migrationTask.getUpdatedCalendar();
+    ZonedDateTime date = migrationTask.getUpdatedDate();
     if (null == date) {
-      date = Calendar.getInstance();
+      date = ZonedDateTime.now();
     }
-    updateDate.setYear(date.get(Calendar.YEAR));
-    updateDate.setMonth(date.get(Calendar.MONTH));
-    updateDate.setDay(date.get(Calendar.DAY_OF_MONTH));
+    updateDate.setYear(date.getYear());
+    updateDate.setMonth(date.getMonthValue());
+    updateDate.setDay(date.getDayOfMonth());
   }
 
   /**

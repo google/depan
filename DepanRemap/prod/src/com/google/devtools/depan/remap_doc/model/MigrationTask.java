@@ -18,9 +18,7 @@ package com.google.devtools.depan.remap_doc.model;
 
 import com.google.common.collect.Lists;
 
-import org.joda.time.DateTime;
-
-import java.util.Calendar;
+import java.time.ZonedDateTime;
 import java.util.Collection;
 
 /**
@@ -39,7 +37,7 @@ public class MigrationTask {
   
   private String updatedBy;
   
-  private DateTime updatedDate;
+  private ZonedDateTime updatedDate;
   
   private Collection<String> engineers = Lists.newArrayList();  
   
@@ -69,7 +67,7 @@ public class MigrationTask {
     return updatedBy;
   }
 
-  public DateTime getUpdatedDate() {
+  public ZonedDateTime getUpdatedDate() {
     return updatedDate;
   }
 
@@ -89,7 +87,7 @@ public class MigrationTask {
     this.updatedBy = updatedBy;
   }
 
-  public void setUpdatedDate(DateTime updatedDate) {
+  public void setUpdatedDate(ZonedDateTime updatedDate) {
     this.updatedDate = updatedDate;
   }
 
@@ -111,15 +109,6 @@ public class MigrationTask {
 
   public void addMigrationGroup(MigrationGroup group) {
     getMigrationGroups().add(group);
-  }
-
-  public Calendar getUpdatedCalendar() {
-    if (null == updatedDate ) {
-      return null;
-    }
-    Calendar calendar = Calendar.getInstance();
-    calendar.setTime(updatedDate.toDate());
-    return calendar;
   }
 
   /**

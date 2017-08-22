@@ -27,11 +27,6 @@
       <artifactId>depan-xstream-library</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>joda-time</groupId>
-      <artifactId>joda-time</artifactId>
-    </dependency>
-
     <!-- DepAn plugin dependencies -->
     <dependency>
       <groupId>com.pnambic.depan</groupId>

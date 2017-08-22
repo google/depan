@@ -22,12 +22,11 @@ import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.nodes.filters.model.ContextKey;
 import com.google.devtools.depan.test.TestUtils;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -51,7 +50,8 @@ public class ComposeFilterTest {
 
   @Test
   public void testMatchingNodes() {
-    Set<GraphNode> nodes = Sets.newHashSet(TestUtils.buildNodes(5));
+    Set<GraphNode> nodes =
+        new HashSet<>(Arrays.asList(TestUtils.buildNodes(5)));
     MockFilter mock = new MockFilter();
     mock.compute = nodes;
 
@@ -71,9 +71,9 @@ public class ComposeFilterTest {
   @Test
   public void testOverlapNodes() {
     GraphNode[] rawNodes = TestUtils.buildNodes(5);
-    List<GraphNode> nodes = Lists.newArrayList(rawNodes);
-    Set<GraphNode> lower = Sets.newHashSet(nodes.subList(0, 3));
-    Set<GraphNode> upper = Sets.newHashSet(nodes.subList(2, 5));
+    List<GraphNode> nodes = Arrays.asList(rawNodes);
+    Set<GraphNode> lower = new HashSet<>(nodes.subList(0, 3));
+    Set<GraphNode> upper = new HashSet<>(nodes.subList(2, 5));
 
     MockFilter mock = new MockFilter();
     mock.compute = upper;
@@ -83,15 +83,15 @@ public class ComposeFilterTest {
 
     test.setMode(ComposeMode.INTERSECT);
     assertEquals("[012] * [234] = [2]",
-        Sets.newHashSet(nodes.subList(2, 3)), test.computeNodes(lower));
+        new HashSet<>(nodes.subList(2, 3)), test.computeNodes(lower));
 
     test.setMode(ComposeMode.SUBTRACT);
     assertEquals("[012] - [234] = [01]",
-        Sets.newHashSet(nodes.subList(0, 2)), test.computeNodes(lower));
+        new HashSet<>(nodes.subList(0, 2)), test.computeNodes(lower));
 
     test.setMode(ComposeMode.UNION);
     assertEquals("[012] * [234] = [01234]",
-        Sets.newHashSet(nodes), test.computeNodes(lower));
+        new HashSet<>(nodes), test.computeNodes(lower));
   }
 
   public enum TestKey implements ContextKey {
