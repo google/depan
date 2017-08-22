@@ -6,21 +6,22 @@ Bundle-Version: 2.1.0.qualifier
 Bundle-Vendor: Pnambic Computing
 Bundle-Activator: com.google.devtools.depan.maven.eclipse.MavenActivator
 Bundle-ActivationPolicy: lazy
-Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.core.resources,
+Require-Bundle: org.eclipse.core.resources,
+ org.eclipse.core.runtime,
+ org.slf4j.api,
  org.eclipse.jface,
  org.eclipse.ui.workbench,
  com.google.devtools.depan.core,
  com.google.devtools.depan.builder,
  com.google.devtools.depan.persistence,
+ com.google.devtools.depan.edges,
  com.google.devtools.depan.graph_doc,
  com.google.devtools.depan.platform.ui,
  com.google.devtools.depan.edges.ui,
+ com.google.devtools.depan.nodes.ui,
  com.google.devtools.depan.graph_doc.ui,
  com.google.devtools.depan.view_doc,
  com.google.devtools.depan.remap,
  com.google.devtools.depan.maven,
  com.google.devtools.depan.graphml,
- com.google.guava,
- com.google.devtools.depan.nodes.ui,
- com.google.devtools.depan.edges
+ com.google.guava

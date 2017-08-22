@@ -16,8 +16,8 @@
 
 package com.google.devtools.depan.eclipse.ui.nodes;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provide a common logger for the entire view/tools
@@ -29,16 +29,9 @@ import java.util.logging.Logger;
 public class NodesUILogger {
 
   public static final Logger LOG =
-      Logger.getLogger(NodesUILogger.class.getName());
+      LoggerFactory.getLogger(NodesUILogger.class.getName());
 
   private NodesUILogger() {
     // Prevent instantiation.
-  }
-
-  /**
-   * Bizarre that this is not part of standard java.util.logging.
-   */
-  public static final void logException(String msg, Exception err) {
-    LOG.log(Level.SEVERE, msg, err);
   }
 }

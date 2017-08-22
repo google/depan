@@ -5,7 +5,8 @@ Bundle-SymbolicName: com.google.devtools.depan.graphml;singleton:=true
 Bundle-Version: 2.1.0.qualifier
 Bundle-Vendor: Pnambic Computing
 Bundle-ActivationPolicy: lazy
-Require-Bundle: com.google.devtools.depan.core,
+Require-Bundle: org.slf4j.api,
+ com.google.devtools.depan.core,
  com.google.devtools.depan.builder,
  com.google.devtools.depan.persistence,
  com.google.guava

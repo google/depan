@@ -115,7 +115,7 @@ public class PushDownJsonHandler {
         top().withNull();
         break;
       default:
-        PushJsonLogger.LOG.warning(fmtToken(tkn, parser.getText()));
+        PushJsonLogger.LOG.warn(fmtToken(tkn, parser.getText()));
         break;
       }
 

@@ -16,8 +16,8 @@
 
 package com.google.devtools.depan.maven;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A common logger for DepAn's Maven components.
@@ -26,13 +26,9 @@ public class MavenLogger {
 
   // Common logger for this package
   public static final Logger LOG =
-      Logger.getLogger(MavenLogger.class.getPackage().getName());
+      LoggerFactory.getLogger(MavenLogger.class.getPackage().getName());
 
   private MavenLogger() {
     // Prevent instantiation.
-  }
-
-  public static void logException(String msg, Throwable err) {
-    LOG.log(Level.SEVERE, msg, err);
   }
 }

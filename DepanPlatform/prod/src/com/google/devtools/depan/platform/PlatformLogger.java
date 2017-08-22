@@ -16,8 +16,8 @@
 
 package com.google.devtools.depan.platform;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provide a common logger for the entire view/tools
@@ -32,16 +32,9 @@ import java.util.logging.Logger;
 public class PlatformLogger {
 
   public static final Logger LOG =
-      Logger.getLogger(PlatformLogger.class.getName());
+      LoggerFactory.getLogger(PlatformLogger.class.getName());
 
   private PlatformLogger() {
     // Prevent instantiation.
-  }
-
-  /**
-   * Bizarre that this is not part of standard java.util.logging.
-   */
-  public static final void logException(String msg, Exception err) {
-    LOG.log(Level.SEVERE, msg, err);
   }
 }

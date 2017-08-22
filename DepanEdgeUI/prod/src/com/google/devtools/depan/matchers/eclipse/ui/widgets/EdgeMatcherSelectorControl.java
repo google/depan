@@ -66,7 +66,7 @@ public class EdgeMatcherSelectorControl extends Composite {
 
     @Override
     public void captureException(RuntimeException errAny) {
-      EdgeUILogger.logException(
+      EdgeUILogger.LOG.error(
           "Exception in selection handler for edge selector control", errAny);
     }
   }

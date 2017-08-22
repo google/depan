@@ -16,8 +16,8 @@
 
 package com.google.devtools.depan.graphml.builder;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Collection of logging and GraphML utilities.
@@ -32,9 +32,5 @@ public class GraphMLLogger {
 
   // Common logger for this package
   public static final Logger LOG =
-      Logger.getLogger(GraphMLLogger.class.getPackage().getName());
-
-  public static void logException(String msg, Throwable err) {
-    LOG.log(Level.SEVERE, msg, err);
-  }
+      LoggerFactory.getLogger(GraphMLLogger.class.getPackage().getName());
 }

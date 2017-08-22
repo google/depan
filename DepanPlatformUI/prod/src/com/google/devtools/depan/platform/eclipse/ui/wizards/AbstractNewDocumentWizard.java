@@ -106,7 +106,7 @@ public abstract class AbstractNewDocumentWizard<T> extends Wizard
       throw new InvocationTargetException(e);
     } catch (IOException errIo) {
       String msg = "Unable to store " + filename;
-      PersistenceLogger.logException(msg, errIo);
+      PersistenceLogger.LOG.error(msg, errIo);
       throw new InvocationTargetException(errIo, msg);
     } finally {
       monitor.done();

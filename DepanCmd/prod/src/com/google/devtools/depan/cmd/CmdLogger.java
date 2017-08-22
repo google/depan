@@ -16,8 +16,8 @@
 
 package com.google.devtools.depan.cmd;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provide a common logger for the command line plugin.
@@ -27,16 +27,9 @@ import java.util.logging.Logger;
 public class CmdLogger {
 
   public static final Logger LOG =
-      Logger.getLogger(CmdLogger.class.getName());
+      LoggerFactory.getLogger(CmdLogger.class.getName());
 
   private CmdLogger() {
     // Prevent instantiation.
-  }
-
-  /**
-   * Bizarre that this is not part of standard java.util.logging.
-   */
-  public static final void logException(String msg, Exception err) {
-    LOG.log(Level.SEVERE, msg, err);
   }
 }

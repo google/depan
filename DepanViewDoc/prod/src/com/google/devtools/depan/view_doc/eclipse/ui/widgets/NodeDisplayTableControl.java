@@ -380,9 +380,9 @@ public class NodeDisplayTableControl extends Composite {
       Point2D location = Point2dUtils.newPoint2D(newX, posY);
       posRepo.setLocation(node, location);
     } catch (NumberFormatException errNum) {
-      ViewDocLogger.logException("Bad number format for X position", errNum);
+      ViewDocLogger.LOG.error("Bad number format for X position", errNum);
     } catch (RuntimeException err) {
-      ViewDocLogger.logException("Bad update value for X position", err);
+      ViewDocLogger.LOG.error("Bad update value for X position", err);
     }
   }
 
@@ -396,9 +396,9 @@ public class NodeDisplayTableControl extends Composite {
       Point2D location = Point2dUtils.newPoint2D(posX, newY);
       posRepo.setLocation(node, location);
     } catch (NumberFormatException errNum) {
-      ViewDocLogger.logException("Bad number format for Y position", errNum);
+      ViewDocLogger.LOG.error("Bad number format for Y position", errNum);
     } catch (RuntimeException err) {
-      ViewDocLogger.logException("Bad update value for Y position", err);
+      ViewDocLogger.LOG.error("Bad update value for Y position", err);
     }
   }
 

@@ -34,7 +34,7 @@ public class SubtractCommand extends AbstractCommandExec {
   @Override
   public void exec() {
     if (getArgs().size() < 2) {
-      CmdLogger.LOG.warning(
+      CmdLogger.LOG.warn(
           "The subtract command requires at least two arguments:"
           + " a destination and a base graph model term (the minuend)."
           + " Nodes from additional terms are removed from the result.");

@@ -84,15 +84,16 @@ public class PomTools {
     exec.evalEffectivePom(context);
 
     if (0 != exec.getExitCode()) {
-      MavenLogger.LOG.warning("Err " + exec.getExitCode()
-          + " getting effective POM for " + moduleFile.getPath()
-          + nl() + nl() + "Maven Console output >" +  nl() + exec.getOut());
+      MavenLogger.LOG.warn(
+          "Err {}  getting effective POM for {}\n\nMaven Console output >\n{}",
+          exec.getExitCode(), moduleFile.getPath(), exec.getOut());
     }
 
     String effPom = exec.getEffPom();
     if (Strings.isNullOrEmpty(effPom)) {
-      MavenLogger.LOG.warning("Empty effective POM for " + moduleFile.getPath()
-      + nl() + nl() + "Maven Console output >" +  nl() + exec.getOut());
+      MavenLogger.LOG.warn(
+          "Empty effective POM for {}\n\nMaven Console output >\n",
+          moduleFile.getPath(), exec.getOut());
     }
 
     StringReader reader = new StringReader(effPom);
@@ -110,6 +111,6 @@ public class PomTools {
       return new InputSource(stream);
     }
 
-    MavenLogger.LOG.warning("Unexpected processing for " + pomFile.getPath());
+    MavenLogger.LOG.warn("Unexpected processing for {}", pomFile.getPath());
     return null;
   }}

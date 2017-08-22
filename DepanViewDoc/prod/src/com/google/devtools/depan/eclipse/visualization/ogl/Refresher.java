@@ -20,8 +20,8 @@ import com.google.common.base.Preconditions;
 
 import org.eclipse.swt.opengl.GLCanvas;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A refresher that periodically repaints a GLScene.
@@ -29,8 +29,8 @@ import java.util.logging.Logger;
  * @author Yohann Coppel
  */
 public class Refresher extends Thread {
-  private static Logger logger =
-      Logger.getLogger(Refresher.class.getName());
+  private static Logger LOG =
+      LoggerFactory.getLogger(Refresher.class.getName());
 
   public static final int DELAY = 10;
 
@@ -94,7 +94,7 @@ public class Refresher extends Thread {
       try {
         Thread.sleep(DELAY);
       } catch (InterruptedException err) {
-        logger.log(Level.SEVERE, "Rendering loop interrupted", err);
+        LOG.error("Rendering loop interrupted", err);
       }
     }
   }

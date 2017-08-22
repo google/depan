@@ -56,7 +56,7 @@ public abstract class AbstractDocXmlPersist<T> {
   }
 
   protected void logException(String msg, Exception errIo) {
-    PersistenceLogger.logException(msg, errIo);
+    PersistenceLogger.LOG.error(msg, errIo);
   }
 
   protected String logException(String pattern, URI uri, Exception errIo) {

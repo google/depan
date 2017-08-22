@@ -83,8 +83,8 @@ public class MavenGraphFactory implements GraphFactory {
     if (SYSTEM_EDGE.equals(info)) {
       return MavenRelation.SYSTEM_SCOPE;
     }
-    GraphMLLogger.LOG.warning("Unable to translate EdgeLabel " + info
-        + " into a DepAn Relation");
+    GraphMLLogger.LOG.warn(
+        "Unable to translate EdgeLabel {} into a DepAn Relation", info);
     return null;
   }
 }

@@ -135,8 +135,8 @@ public class GraphMLContext {
   private void logBadEdge(String source, String target, String edgeLabel) {
     String dbgSource = getDbgLabel(source);
     String dbgTarget = getDbgLabel(target);
-    GraphMLLogger.LOG.warning("Unable to build edge for " + edgeLabel
-        + " from " + dbgSource + " to " + dbgTarget + ".");
+    GraphMLLogger.LOG.warn("Unable to build edge for {} from {} to {}.",
+        edgeLabel, dbgSource, dbgTarget);
   }
 
   private String getDbgLabel(String key) {

@@ -100,8 +100,7 @@ public abstract class ContributionRegistry<T> {
         ContributionEntry<T> entry = buildEntry(bundleId, element);
         String entryId = entry.getId();
         if (Strings.isNullOrEmpty(entryId)) {
-          LOG.warning("Empty entry id in " + bundleId  + 
-              " for " + extensionId);
+          LOG.warn("Empty entry id in {} for {}", bundleId, extensionId);
         }
         entries.put(entryId, entry);
 

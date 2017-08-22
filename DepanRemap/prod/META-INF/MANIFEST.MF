@@ -4,8 +4,9 @@ Bundle-Name: DepanRemap
 Bundle-SymbolicName: com.google.devtools.depan.remap;singleton:=true
 Bundle-Version: 2.1.0.qualifier
 Bundle-Vendor: Pnambic Computing
-Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.core.resources,
+Require-Bundle: org.eclipse.core.resources,
+ org.eclipse.core.runtime,
+ org.slf4j.api,
  org.eclipse.jface,
  org.eclipse.ui.ide,
  org.eclipse.ui.workbench,

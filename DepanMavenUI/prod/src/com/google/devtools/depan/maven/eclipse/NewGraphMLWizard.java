@@ -107,8 +107,8 @@ public class NewGraphMLWizard extends AbstractAnalysisWizard {
     try {
       processModule(context, page.getPathFile());
     } catch (Exception err) {
-      MavenLogger.logException(
-          "Unable to analyze GraphML at " + page.getPathText(), err);
+      MavenLogger.LOG.error(
+          "Unable to analyze GraphML at {}", page.getPathText(), err);
     }
 
     GraphModel resultGraph = graphBuilder.createGraphModel();

@@ -86,8 +86,8 @@ public class RelationRegistry extends
 
   @Override
   protected void reportException(String entryId, Exception err) {
-    PlatformLogger.logException(
-        "Relation registry load failure for " + entryId, err);
+    PlatformLogger.LOG.error(
+        "Relation registry load failure for {}", entryId, err);
   }
 
   @Override

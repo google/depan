@@ -175,8 +175,7 @@ public abstract class GLScene {
 
       return result;
     } catch (Throwable errGl) {
-      GLLogger.logException(
-          "Unable to create GL Context", errGl);
+      GLLogger.LOG.error("Unable to create GL Context", errGl);
       errGl.printStackTrace();
       throw new RuntimeException(errGl);
     }
@@ -217,9 +216,8 @@ public abstract class GLScene {
       int zoomVal = Integer.parseInt(zoomText);
       return zoomVal / ZOOM_BASE;
     } catch (NumberFormatException errNumb) {
-      GLLogger.LOG.warning(
-          "Bad DPI scaling term " + zoomText
-          + ". Using 1.0 for OGL scaling");
+      GLLogger.LOG.warn(
+          "Bad DPI scaling term {}. Using 1.0 for OGL scaling", zoomText);
     }
     return 1.0;
   }
@@ -867,8 +865,8 @@ public abstract class GLScene {
       return EMPTY_HIT_LIST;
     }
     if (hits < 0) {
-      GLLogger.LOG.warning("Too many hits!!" +
-          " IntBuffer capacity = " + buffer.capacity());
+      GLLogger.LOG.warn(
+          "Too many hits!! IntBuffer capacity = {}", buffer.capacity());
       return EMPTY_HIT_LIST;
     }
     int[] hitsResults = new int[hits];
@@ -886,7 +884,7 @@ public abstract class GLScene {
         offset++;
       }
     }
-    GLLogger.LOG.fine("hits = " + hits + "; offset = " + offset);
+    GLLogger.LOG.trace("hits = {}; offset = {}", hits, offset);
     return hitsResults;
   }
 

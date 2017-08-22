@@ -6,6 +6,7 @@ Bundle-Version: 2.1.0.qualifier
 Bundle-ClassPath: .
 Require-Bundle: org.eclipse.core.resources,
  org.eclipse.core.runtime,
+ org.slf4j.api,
  org.eclipse.jface,
  org.eclipse.ui,
  com.google.devtools.depan.core,

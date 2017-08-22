@@ -92,7 +92,7 @@ public abstract class AbstractCommandExec implements CommandExec {
 
   protected void failWithMessage(String msg) {
     result = new Integer(1);
-    CmdLogger.LOG.warning(msg);
+    CmdLogger.LOG.warn(msg);
   }
 
   protected URI buildLocation(String outName) {
@@ -109,11 +109,11 @@ public abstract class AbstractCommandExec implements CommandExec {
    */
   protected GraphDocument buildGraphDoc(URI graphUri) {
     try {
-      CmdLogger.LOG.info("Loading GraphDoc from " + graphUri);
+      CmdLogger.LOG.info("Loading GraphDoc from {}", graphUri);
       GraphModelXmlPersist loader = GraphModelXmlPersist.build(true);
       return loader.load(graphUri);
     } catch (RuntimeException err) {
-      CmdLogger.logException("Unable to load GraphDoc from " + graphUri, err);
+      CmdLogger.LOG.error("Unable to load GraphDoc from {}", graphUri, err);
     }
     return null;
   }

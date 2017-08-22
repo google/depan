@@ -27,8 +27,6 @@ import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
-import java.text.MessageFormat;
-
 /**
  * {@link XStream} converter to handle {@link ViewExtension}s.
  * The {@link ViewExtension} instances are serialized by their
@@ -73,9 +71,8 @@ public class ViewExtensionConverter implements Converter {
           ViewExtensionRegistry.getRegistryExtension(extId);
       return result;
     } catch (RuntimeException err) {
-      String msg = MessageFormat.format(
-          "Unable to locate extension {0}.", extId);
-      ViewDocLogger.logException(msg, err);
+      ViewDocLogger.LOG.error(
+          "Unable to locate extension {}.", extId, err);
       throw err;
     }
   }
@@ -84,7 +81,7 @@ public class ViewExtensionConverter implements Converter {
     try {
       return reader.getAttribute(VIEW_EXT_ATTR);
     } catch (RuntimeException err) {
-      ViewDocLogger.logException("Unable to locate extension id", err);
+      ViewDocLogger.LOG.error("Unable to locate extension id", err);
       throw err;
     }
   }

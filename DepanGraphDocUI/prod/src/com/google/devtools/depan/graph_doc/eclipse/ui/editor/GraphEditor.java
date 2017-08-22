@@ -117,7 +117,7 @@ public class GraphEditor extends MultiPageEditorPart {
     // load the graph
     file = ((IFileEditorInput) input).getFile();
 
-    GraphDocLogger.LOG.info("Reading " + file.getRawLocationURI());
+    GraphDocLogger.LOG.info("Reading {}", file.getRawLocationURI());
     graph = ResourceCache.fetchGraphDocument(file);
     GraphDocLogger.LOG.info("  DONE");
 

@@ -314,7 +314,7 @@ public class NodeListEditor extends EditorPart {
       try {
         page.openEditor(input, NodeListEditor.ID);
       } catch (PartInitException errInit) {
-        GraphDocLogger.logException("Unable to start NodeListEditor", errInit);
+        GraphDocLogger.LOG.error("Unable to start NodeListEditor", errInit);
       }
     }
   }

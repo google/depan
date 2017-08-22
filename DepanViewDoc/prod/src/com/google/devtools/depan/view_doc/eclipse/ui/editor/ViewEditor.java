@@ -378,7 +378,7 @@ public class ViewEditor extends MultiPageEditorPart {
 
     @Override
     public void captureException(RuntimeException errAny) {
-      ViewDocLogger.logException("Listener dispatch failure", errAny);
+      ViewDocLogger.LOG.error("Listener dispatch failure", errAny);
     }
   }
 
@@ -557,7 +557,7 @@ public class ViewEditor extends MultiPageEditorPart {
       createDiagramPage();
       createDetailsPage();
     } catch (Exception err) {
-      ViewDocLogger.logException("Unable to create View pages", err);
+      ViewDocLogger.LOG.error("Unable to create View pages", err);
     }
   }
 
@@ -589,7 +589,7 @@ public class ViewEditor extends MultiPageEditorPart {
     try {
       return new View(parent, getPartName(), new RendererChangeReceiver(this));
     } catch (Exception err) {
-      ViewDocLogger.logException("Unable to create View pages", err);
+      ViewDocLogger.LOG.error("Unable to create View pages", err);
       throw err;
     }
   }
@@ -696,7 +696,7 @@ public class ViewEditor extends MultiPageEditorPart {
         String msg = MessageFormat.format(
             "Unable to load view from {0}",
             viewFile.getFullPath().toString());
-        ViewDocLogger.logException(msg, err);
+        ViewDocLogger.LOG.error(msg, err);
         throw new PartInitException(msg);
       }
       return;
@@ -1299,7 +1299,7 @@ public class ViewEditor extends MultiPageEditorPart {
 
       @Override
       public void captureException(RuntimeException errAny) {
-        ViewDocLogger.logException(
+        ViewDocLogger.LOG.error(
             "Drawing bounds update bounds", errAny);
       }
     });
@@ -1570,6 +1570,10 @@ public class ViewEditor extends MultiPageEditorPart {
     ViewExtensionRegistry.prepareRegistryView(this);
  }
 
+  /**
+   * @param optionId
+   * @param value
+   */
   private void handleOptionChange(String optionId, String value) {
     markDirty();
     if (OptionPreferences.STROKEHIGHLIGHT_ID.equals(optionId)) {
@@ -1599,9 +1603,8 @@ public class ViewEditor extends MultiPageEditorPart {
       updateNodeRatioMode(value);
       return;
     }
-    ViewDocLogger.LOG.info(MessageFormat.format(
-        "Unrecognized option $1 cannot be set to value $2",
-         optionId, value));
+    ViewDocLogger.LOG.info(
+        "Unrecognized option {} cannot be set to value {}", optionId, value);
   }
 
   private void updateNodeStrokeHighlight(boolean enable) {
@@ -1857,7 +1860,7 @@ public class ViewEditor extends MultiPageEditorPart {
       try {
         page.openEditor(input, ViewEditor.ID);
       } catch (PartInitException errInit) {
-        ViewDocLogger.logException("Unable to start NodeListEditor", errInit);
+        ViewDocLogger.LOG.error("Unable to start NodeListEditor", errInit);
       }
     }
   }

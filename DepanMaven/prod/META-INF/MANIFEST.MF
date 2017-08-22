@@ -7,15 +7,16 @@ Bundle-Vendor: Pnambic Computing
 Bundle-Activator: com.google.devtools.depan.maven.MavenPluginActivator
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.core.runtime,
+ org.slf4j.api,
  com.google.devtools.depan.core,
  com.google.devtools.depan.builder,
  com.google.devtools.depan.persistence,
  com.google.devtools.depan.platform,
- com.google.guava,
- depan-xstream-library,
- com.google.devtools.depan.graphml,
  com.google.devtools.depan.graph_doc,
- com.google.devtools.depan.filesystem
+ com.google.devtools.depan.filesystem,
+ com.google.devtools.depan.graphml,
+ com.google.guava,
+ depan-xstream-library
 Export-Package: com.google.devtools.depan.maven,
  com.google.devtools.depan.maven.builder,
  com.google.devtools.depan.maven.graph,

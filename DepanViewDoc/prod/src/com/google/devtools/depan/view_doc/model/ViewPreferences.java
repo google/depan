@@ -139,7 +139,7 @@ public class ViewPreferences {
 
     @Override
     public void captureException(RuntimeException errAny) {
-      ViewDocLogger.LOG.warning(errAny.toString());
+      ViewDocLogger.LOG.warn(errAny.toString());
     }
   }
 
@@ -167,7 +167,7 @@ public class ViewPreferences {
 
     @Override
     public void captureException(RuntimeException errAny) {
-      ViewDocLogger.LOG.warning(errAny.toString());
+      ViewDocLogger.LOG.warn(errAny.toString());
     }
   }
 

@@ -16,8 +16,8 @@
 
 package com.google.devtools.depan.remap_doc.eclipse;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provide a common logger for the entire view/tools
@@ -32,16 +32,9 @@ import java.util.logging.Logger;
 public class RemapLogger {
 
   public static final Logger LOG =
-      Logger.getLogger(RemapLogger.class.getName());
+      LoggerFactory.getLogger(RemapLogger.class.getName());
 
   private RemapLogger() {
     // Prevent instantiation.
-  }
-
-  /**
-   * Bizarre that this is not part of standard java.util.logging.
-   */
-  public static final void logException(String msg, Exception err) {
-    LOG.log(Level.SEVERE, msg, err);
   }
 }

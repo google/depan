@@ -15,6 +15,7 @@
  */
 package com.google.devtools.depan.eclipse.ui.nodes.viewers;
 
+import com.google.devtools.depan.eclipse.ui.nodes.NodesUILogger;
 import com.google.devtools.depan.eclipse.ui.nodes.cache.HierarchyCache;
 import com.google.devtools.depan.eclipse.ui.nodes.trees.GraphData;
 import com.google.devtools.depan.graph.api.EdgeMatcher;
@@ -29,8 +30,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
-import java.util.logging.Logger;
-
 /**
  * A composite control for obtaining a user selected hierarchy.
  *
@@ -39,9 +38,6 @@ import java.util.logging.Logger;
  * @author <a href="mailto:leeca@pnambic.com">Lee Carver</a>
  */
 public class HierarchyViewer<T> extends Composite {
-
-  private static final Logger logger =
-      Logger.getLogger(HierarchyViewer.class.getName());
 
   private HierarchyCache<T> hierarchies;
 
@@ -122,7 +118,7 @@ public class HierarchyViewer<T> extends Composite {
 
     @Override
     public void captureException(RuntimeException errAny) {
-      logger.warning(errAny.toString());
+      NodesUILogger.LOG.warn(errAny.toString());
     }
   }
 

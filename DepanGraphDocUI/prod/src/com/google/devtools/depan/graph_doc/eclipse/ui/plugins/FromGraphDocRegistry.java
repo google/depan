@@ -26,7 +26,6 @@ import com.google.common.collect.Maps;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 
-import java.text.MessageFormat;
 import java.util.Map;
 
 /**
@@ -71,8 +70,8 @@ public class FromGraphDocRegistry extends
 
   @Override
   protected void reportException(String entryId, Exception err) {
-    PlatformLogger.logException(
-        "Relation registry load failure for " + entryId, err);
+    PlatformLogger.LOG.error(
+        "Relation registry load failure for {}", entryId, err);
   }
 
   /////////////////////////////////////
@@ -86,9 +85,8 @@ public class FromGraphDocRegistry extends
       if (!result.containsKey(label)) {
         result.put(label, fromGraphDoc);
       } else {
-        String msg = MessageFormat.format(
-            "Duplicate FromGraphDoc contribution for label {0}", label);
-        GraphDocLogger.LOG.warning(msg);
+        GraphDocLogger.LOG.warn(
+            "Duplicate FromGraphDoc contribution for label {}", label);
       }
     }
 

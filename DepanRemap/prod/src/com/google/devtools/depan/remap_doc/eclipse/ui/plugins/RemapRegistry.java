@@ -76,8 +76,8 @@ public class RemapRegistry extends
 
   @Override
   protected void reportException(String entryId, Exception err) {
-    RemapLogger.logException(
-        "Remap registry load failure for " + entryId, err);
+    RemapLogger.LOG.error(
+        "Remap registry load failure for {}", entryId, err);
   }
 
   /////////////////////////////////////

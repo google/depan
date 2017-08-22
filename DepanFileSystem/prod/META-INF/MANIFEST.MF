@@ -4,6 +4,7 @@ Bundle-Name: DepanFileSystem
 Bundle-SymbolicName: com.google.devtools.depan.filesystem;singleton:=true
 Bundle-Version: 2.1.0.qualifier
 Require-Bundle: org.eclipse.core.runtime,
+ org.slf4j.api,
  com.google.devtools.depan.core,
  com.google.devtools.depan.builder,
  com.google.devtools.depan.platform,

@@ -71,8 +71,8 @@ public class ModulesLoader extends NestingElementHandler {
       try {
         processModule(context, master, modulePath);
       } catch (Exception err) {
-        MavenLogger.logException(
-            "Unable to process dependent module " + modulePath, err);
+        MavenLogger.LOG.error(
+            "Unable to process dependent module {}", modulePath, err);
       }
     }
   }

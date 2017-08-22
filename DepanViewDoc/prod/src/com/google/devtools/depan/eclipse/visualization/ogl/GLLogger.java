@@ -16,8 +16,8 @@
 
 package com.google.devtools.depan.eclipse.visualization.ogl;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provide a common logger for the OGL rendering layer.
@@ -28,16 +28,9 @@ import java.util.logging.Logger;
 public class GLLogger {
 
   public static final Logger LOG =
-      Logger.getLogger(GLLogger.class.getName());
+      LoggerFactory.getLogger(GLLogger.class.getName());
 
   private GLLogger() {
     // Prevent instantiation.
-  }
-
-  /**
-   * Bizarre that this is not part of standard java.util.logging.
-   */
-  public static final void logException(String msg, Throwable err) {
-    LOG.log(Level.SEVERE, msg, err);
   }
 }

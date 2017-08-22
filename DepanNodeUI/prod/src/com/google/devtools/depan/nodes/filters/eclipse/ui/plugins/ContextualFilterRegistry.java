@@ -73,8 +73,8 @@ public class ContextualFilterRegistry extends
 
   @Override
   protected void reportException(String entryId, Exception err) {
-    PlatformLogger.logException(
-        "Contextual filter registry load failure for " + entryId, err);
+    PlatformLogger.LOG.error(
+        "Contextual filter registry load failure for {}", entryId, err);
   }
 
   /////////////////////////////////////

@@ -16,8 +16,8 @@
 
 package com.google.devtools.depan.pushjson;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provide a common logger for the entire pushjson package.
@@ -27,16 +27,9 @@ import java.util.logging.Logger;
 public class PushJsonLogger {
 
   public static final Logger LOG =
-      Logger.getLogger(PushJsonLogger.class.getName());
+      LoggerFactory.getLogger(PushJsonLogger.class.getName());
 
   private PushJsonLogger() {
     // Prevent instantiation.
-  }
-
-  /**
-   * Bizarre that this is not part of standard java.util.logging.
-   */
-  public static final void logException(String msg, Exception err) {
-    LOG.log(Level.SEVERE, msg, err);
   }
 }

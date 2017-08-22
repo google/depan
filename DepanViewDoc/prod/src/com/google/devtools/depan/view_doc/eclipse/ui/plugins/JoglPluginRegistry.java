@@ -96,8 +96,8 @@ public class JoglPluginRegistry
 
   @Override
   protected void reportException(String entryId, Exception err) {
-    ViewDocLogger.logException(
-        "View OGL registry load failure for " + entryId, err);
+    ViewDocLogger.LOG.error(
+        "View OGL registry load failure for {}", entryId, err);
   }
 
   /////////////////////////////////////

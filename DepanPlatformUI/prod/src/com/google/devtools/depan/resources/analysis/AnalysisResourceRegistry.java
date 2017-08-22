@@ -71,8 +71,8 @@ public class AnalysisResourceRegistry
 
   @Override
   protected void reportException(String entryId, Exception err) {
-    PlatformLogger.logException(
-        "Analysis resource registry load failure for " + entryId, err);
+    PlatformLogger.LOG.error(
+        "Analysis resource registry load failure for {}", entryId, err);
   }
 
   private void installResources() {

@@ -26,7 +26,6 @@ import com.google.common.collect.Maps;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 
-import java.text.MessageFormat;
 import java.util.Map;
 
 /**
@@ -71,7 +70,7 @@ public class FromViewDocRegistry extends
 
   @Override
   protected void reportException(String entryId, Exception err) {
-    PlatformLogger.logException(
+    PlatformLogger.LOG.error(
         "FromViewDoc load failure for " + entryId, err);
   }
 
@@ -86,9 +85,8 @@ public class FromViewDocRegistry extends
       if (!result.containsKey(label)) {
         result.put(label, fromGraphDoc);
       } else {
-        String msg = MessageFormat.format(
-            "Duplicate FromViewDoc contribution for label {0}", label);
-        ViewDocLogger.LOG.warning(msg);
+        ViewDocLogger.LOG.warn(
+            "Duplicate FromViewDoc contribution for label {}", label);
       }
     }
 

@@ -4,14 +4,15 @@ Bundle-Name: DepanPlatform
 Bundle-SymbolicName: com.google.devtools.depan.view_doc.depan_layouts;singleton:=true
 Bundle-Version: 2.1.0.qualifier
 Bundle-Vendor: Pnambic Computing
-Require-Bundle: com.google.guava,
- org.eclipse.core.runtime,
+Require-Bundle: org.eclipse.core.runtime,
+ org.slf4j.api,
  com.google.devtools.depan.core,
- com.google.devtools.depan.nodes,
  com.google.devtools.depan.edges,
+ com.google.devtools.depan.nodes,
  com.google.devtools.depan.persistence,
- com.google.devtools.depan.graph_doc,
+ com.google.devtools.depan.platform.ui,
  com.google.devtools.depan.edges.ui,
+ com.google.devtools.depan.graph_doc,
  com.google.devtools.depan.view_doc,
- com.google.devtools.depan.platform.ui
+ com.google.guava
 Bundle-ClassPath: .

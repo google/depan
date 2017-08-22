@@ -13,7 +13,8 @@ Require-Bundle: org.eclipse.core.runtime,
  com.google.devtools.depan.core,
  com.google.devtools.depan.platform,
  com.google.devtools.depan.persistence,
- com.google.guava
+ com.google.guava,
+ org.slf4j.api
 Bundle-ClassPath: .
 Export-Package: com.google.devtools.depan.platform,
  com.google.devtools.depan.platform.eclipse.ui.tables,

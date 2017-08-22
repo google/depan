@@ -30,7 +30,6 @@ import com.google.common.collect.Lists;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 
-import java.text.MessageFormat;
 import java.util.Collection;
 
 /**
@@ -75,8 +74,8 @@ public class ViewExtensionRegistry
 
   @Override
   protected void reportException(String entryId, Exception err) {
-    ViewDocLogger.logException(
-        "View extension registry load failure for " + entryId, err);
+    ViewDocLogger.LOG.error(
+        "View extension registry load failure for {}", entryId, err);
   }
 
   private ViewExtension getExtension(String extensionId) {
@@ -101,10 +100,9 @@ public class ViewExtensionRegistry
       try {
         entry.getInstance().prepareView(editor);
       } catch (Exception err) {
-        String msg = MessageFormat.format(
-            "Unable to prepare extension {0} for editor {1}",
-            entry.getId(), editor.getBaseName());
-        ViewDocLogger.logException(msg , err);
+        ViewDocLogger.LOG.error(
+            "Unable to prepare extension {} for editor {}",
+            entry.getId(), editor.getBaseName() , err);
       }
     }
   }

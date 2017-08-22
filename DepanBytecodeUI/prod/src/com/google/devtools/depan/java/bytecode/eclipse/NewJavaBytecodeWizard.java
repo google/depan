@@ -35,11 +35,12 @@ import com.google.common.collect.Lists;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.logging.Logger;
 import java.util.zip.ZipFile;
 
 /**
@@ -49,8 +50,8 @@ import java.util.zip.ZipFile;
  */
 public class NewJavaBytecodeWizard extends AbstractAnalysisWizard {
 
-  private static final Logger logger =
-      Logger.getLogger(NewJavaBytecodeWizard.class.getName());
+  private static final Logger LOG =
+      LoggerFactory.getLogger(NewJavaBytecodeWizard.class.getName());
 
   private final ClassAnalysisStats analysisStats = new ClassAnalysisStats();
 
@@ -126,9 +127,10 @@ public class NewJavaBytecodeWizard extends AbstractAnalysisWizard {
       readTree(classPath, asmFactory, builder, quickProgress);
     }
 
-    logger.info(
-        analysisStats.getClassesLoaded() + "/" + analysisStats.getClassesTotal()
-        + " classes loaded. " + analysisStats.getClassesFailed() + " failed.");
+    LOG.info(
+        "{}/{} classes loaded. {} failed.",
+        analysisStats.getClassesLoaded(), analysisStats.getClassesTotal(),
+        analysisStats.getClassesFailed());
 
     monitor.worked(1);
 

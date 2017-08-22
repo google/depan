@@ -165,7 +165,7 @@ public abstract class HierarchicalLayoutTool {
    * Debugging support to display assignments for nodes.
    */
   protected void logAssignNode(GraphNode node, int level, int offset) {
-    LOG.info("[" + level + ", " + offset + "]: " + node);
+    LOG.info("[{}, {}]: {}", level, offset, node);
   }
 
   protected Collection<GraphNode> getNodeSuccessors(GraphNode node) {

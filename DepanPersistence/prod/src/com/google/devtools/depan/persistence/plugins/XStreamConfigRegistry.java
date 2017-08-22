@@ -76,8 +76,8 @@ public class XStreamConfigRegistry extends
 
   @Override
   protected void reportException(String entryId, Exception err) {
-    PersistenceLogger.logException(
-        "XStream configuration load failure for " + entryId, err);
+    PersistenceLogger.LOG.error(
+        "XStream configuration load failure for {}", entryId, err);
   }
 
   private void configXStream(XStream xstream) {

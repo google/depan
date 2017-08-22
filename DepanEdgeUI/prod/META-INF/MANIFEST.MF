@@ -6,6 +6,7 @@ Bundle-Version: 2.1.0.qualifier
 Bundle-Vendor: Pnambic Computing
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
+ org.slf4j.api,
  org.eclipse.jface,
  org.eclipse.ui,
  org.eclipse.ui.ide,
@@ -14,10 +15,10 @@ Require-Bundle: org.eclipse.core.runtime,
  com.google.devtools.depan.persistence,
  com.google.devtools.depan.platform,
  com.google.devtools.depan.platform.ui,
- depan-xstream-library,
- com.google.guava,
  com.google.devtools.depan.edges.ui,
- com.google.devtools.depan.graph_doc
+ com.google.devtools.depan.graph_doc,
+ depan-xstream-library,
+ com.google.guava
 Bundle-ClassPath: .
 Export-Package: com.google.devtools.depan.matchers.eclipse.ui.widgets,
  com.google.devtools.depan.matchers.eclipse.ui.wizards,

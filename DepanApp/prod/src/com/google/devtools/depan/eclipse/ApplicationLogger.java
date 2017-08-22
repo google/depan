@@ -16,8 +16,8 @@
 
 package com.google.devtools.depan.eclipse;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provide a common logger for the application level operations.
@@ -27,16 +27,9 @@ import java.util.logging.Logger;
 public class ApplicationLogger {
 
   public static final Logger LOG =
-      Logger.getLogger(ApplicationLogger.class.getName());
+      LoggerFactory.getLogger(ApplicationLogger.class.getName());
 
   private ApplicationLogger() {
     // Prevent instantiation.
-  }
-
-  /**
-   * Bizarre that this is not part of standard java.util.logging.
-   */
-  public static final void logException(String msg, Exception err) {
-    LOG.log(Level.SEVERE, msg, err);
   }
 }

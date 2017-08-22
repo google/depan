@@ -22,9 +22,11 @@ import com.google.devtools.depan.filesystem.graph.FileSystemRelation;
 import com.google.devtools.depan.model.GraphNode;
 import com.google.devtools.depan.model.builder.chain.DependenciesListener;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Logger;
 
 /**
  * Populate a GraphModel based on the contents of an accessible
@@ -34,8 +36,8 @@ import java.util.logging.Logger;
  */
 public class TreeLoader {
 
-  private static final Logger logger =
-      Logger.getLogger(TreeLoader.class.getName());
+  private static final Logger LOG =
+      LoggerFactory.getLogger(TreeLoader.class.getName());
 
   private final DependenciesListener builder;
   private final String prefixPath;
@@ -120,7 +122,7 @@ public class TreeLoader {
     }
 
     // Hmmm .. something unexpected
-    logger.info("Unable to load tree from " + treePath);
+    LOG.info("Unable to load tree from {}", treePath);
   }
 
   private void traverseTree(GraphNode rootNode, File rootFile) {
@@ -152,10 +154,9 @@ public class TreeLoader {
         traverseTree(dir, child);
         return;
       }
-      logger.warning(
-            "Unknown file system object " + child.getCanonicalPath());
+      LOG.warn("Unknown file system object {}", child.getCanonicalPath());
     } catch (IOException e) {
-      logger.severe("Unable to access tree entity " + child.getPath());
+      LOG.error("Unable to access tree entity {}", child.getPath());
     }
   }
 

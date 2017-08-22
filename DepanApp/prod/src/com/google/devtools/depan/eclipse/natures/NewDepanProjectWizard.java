@@ -64,7 +64,7 @@ public class NewDepanProjectWizard extends BasicNewProjectResourceWizard {
       buildAnalysisResources();
       buildWorkResources();
     } catch (CoreException errCore) {
-      ApplicationLogger.logException("Failed to create new project", errCore);
+      ApplicationLogger.LOG.error("Failed to create new project", errCore);
     }
 
     return true;
@@ -111,7 +111,7 @@ public class NewDepanProjectWizard extends BasicNewProjectResourceWizard {
     } catch (CoreException errCore) {
       String msg = MessageFormat.format(
           "Unable to create project folder {0}", rsrcFolder.getFullPath());
-      ApplicationLogger.logException(msg, errCore);
+      ApplicationLogger.LOG.error(msg, errCore);
     }
   }
 }

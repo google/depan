@@ -24,7 +24,8 @@ import org.objectweb.asm.ClassVisitor;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Connect an ASM {@code ClassVisitor} to the bytecode stream.
@@ -33,8 +34,8 @@ import java.util.logging.Logger;
  */
 public class ClassFileReader {
 
-  private static final Logger logger =
-      Logger.getLogger(ClassFileReader.class.getName());
+  private static final Logger LOG =
+      LoggerFactory.getLogger(ClassFileReader.class.getName());
 
   private final AsmFactory asmFactory;
 
@@ -70,10 +71,10 @@ public class ClassFileReader {
       analysisStats.incrClassesLoaded();
       return;
     } catch (IOException ioErr) {
-      logger.warning(
-          "Unable to load class information for " + fileNode.getId());
+      LOG.warn(
+          "Unable to load class information for {}", fileNode.getId());
     } catch (ArrayIndexOutOfBoundsException bndException) {
-      logger.info("Unreadable class file for " + fileNode.getId());
+      LOG.info("Unreadable class file for {}", fileNode.getId());
     }
 
     analysisStats.incrClassesFailed();

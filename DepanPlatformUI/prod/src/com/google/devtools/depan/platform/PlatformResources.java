@@ -90,7 +90,7 @@ public final class PlatformResources {
     } catch (RuntimeException errAny) {
       String msg = MessageFormat.format(
           "Unable to open image from descriptor {0}", descriptor);
-      PlatformLogger.logException(msg , errAny);
+      PlatformLogger.LOG.error(msg , errAny);
     }
 
     return null;

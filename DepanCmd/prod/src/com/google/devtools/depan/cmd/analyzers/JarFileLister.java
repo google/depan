@@ -27,7 +27,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
@@ -40,8 +41,8 @@ import java.util.zip.ZipFile;
  */
 public class JarFileLister {
 
-  private static final Logger logger =
-      Logger.getLogger(JarFileLister.class.getName());
+  private static final Logger LOG =
+      LoggerFactory.getLogger(JarFileLister.class.getName());
 
   private final ZipFile zipFile;
 
@@ -118,7 +119,7 @@ public class JarFileLister {
           InputStream inputStream = zipFile.getInputStream(entry);
           reader.readClassFile(getBuilder(), (FileElement) entryNode, inputStream);
         } catch (IOException e1) {
-          logger.severe("Error while reading file " + name + ".");
+          LOG.error("Error while reading file {}.", name);
         }
       }
     }
@@ -126,8 +127,7 @@ public class JarFileLister {
     try {
       zipFile.close();
     } catch (IOException e) {
-      logger.warning(
-          "Error when closing zip file " + zipFile.getName() + ".");
+      LOG.warn("Error when closing zip file {}.", zipFile.getName());
     }
   }
 

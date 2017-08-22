@@ -112,7 +112,7 @@ public class EdgeMatcherTableControl extends Composite {
 
     @Override
     public void captureException(RuntimeException errAny) {
-      EdgeUILogger.logException("Listener dispatch failure", errAny);
+      EdgeUILogger.LOG.error("Listener dispatch failure", errAny);
     }
   };
 

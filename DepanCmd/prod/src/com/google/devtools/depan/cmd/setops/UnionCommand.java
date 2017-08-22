@@ -32,7 +32,7 @@ public class UnionCommand extends AbstractCommandExec {
   @Override
   public void exec() {
     if (getArgs().size() < 2) {
-      CmdLogger.LOG.warning(
+      CmdLogger.LOG.warn(
           "The union command requires a destination and at least one input");
     }
 
@@ -52,12 +52,12 @@ public class UnionCommand extends AbstractCommandExec {
 
   private void mergeURI(MergeGraphDoc builder, URI mergeUri) {
     try {
-      CmdLogger.LOG.info("Loading GraphDoc from " + mergeUri);
+      CmdLogger.LOG.info("Loading GraphDoc from {}", mergeUri);
       GraphModelXmlPersist loader = GraphModelXmlPersist.build(true);
       GraphDocument nextDoc = loader.load(mergeUri);
       builder.merge(nextDoc);
     } catch (RuntimeException err) {
-      CmdLogger.logException("Unable to load GraphDoc from " + mergeUri, err);
+      CmdLogger.LOG.error("Unable to load GraphDoc from {}", mergeUri, err);
     }
   }
 }

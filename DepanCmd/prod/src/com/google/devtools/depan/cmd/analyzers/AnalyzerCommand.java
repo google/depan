@@ -71,7 +71,7 @@ public class AnalyzerCommand extends AbstractCommandExec {
     try {
       performAnalysis(analyzer, location);
     } catch (IOException errIo) {
-      CmdLogger.logException("File system dependency analysis failed", errIo);
+      CmdLogger.LOG.error("File system dependency analysis failed", errIo);
     }
   }
 
@@ -86,7 +86,7 @@ public class AnalyzerCommand extends AbstractCommandExec {
     try {
       performAnalysis(analyzer, location);
     } catch (IOException errIo) {
-      CmdLogger.logException("GraphML dependency analysis failed", errIo);
+      CmdLogger.LOG.error("GraphML dependency analysis failed", errIo);
     }
   }
 
@@ -114,7 +114,7 @@ public class AnalyzerCommand extends AbstractCommandExec {
 
       performAnalysis(analyzer, location);
     } catch (IOException errIo) {
-      CmdLogger.logException("Java dependency analysis failed", errIo);
+      CmdLogger.LOG.error("Java dependency analysis failed", errIo);
     }
   }
 
@@ -140,7 +140,7 @@ public class AnalyzerCommand extends AbstractCommandExec {
     try {
       performAnalysis(analyzer, location);
     } catch (IOException errIo) {
-      CmdLogger.logException("Maven dependency analysis failed", errIo);
+      CmdLogger.LOG.error("Maven dependency analysis failed", errIo);
     }
   }
 

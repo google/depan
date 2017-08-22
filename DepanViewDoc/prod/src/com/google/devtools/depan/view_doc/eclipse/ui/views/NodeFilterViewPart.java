@@ -298,10 +298,8 @@ public class NodeFilterViewPart extends AbstractViewDocViewPart {
       checkKeys.remove(entry.getKey());
     }
     if (!checkKeys.isEmpty()) {
-      String msg = MessageFormat.format(
-          "Filter {0} has unresolved context keys {2}",
+      ViewDocLogger.LOG.warn("Filter {} has unresolved context keys {}",
           filter.getName(), Joiner.on(", ").join(checkKeys));
-      ViewDocLogger.LOG.warning(msg );
     }
     return new MapContext(result);
   }
@@ -372,9 +370,9 @@ public class NodeFilterViewPart extends AbstractViewDocViewPart {
     } catch (IllegalArgumentException ex) {
       // bad layout. don't do anything for the layout, but still finish the
       // creation of the view.
-      ViewDocLogger.LOG.warning("Bad layout selected.");
+      ViewDocLogger.LOG.warn("Bad layout selected.");
     } catch (Exception errView) {
-      ViewDocLogger.logException("Unable to create view", errView);
+      ViewDocLogger.LOG.error("Unable to create view", errView);
     }
   }
 

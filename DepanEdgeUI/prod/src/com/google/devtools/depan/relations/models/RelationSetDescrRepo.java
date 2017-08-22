@@ -51,7 +51,7 @@ public class RelationSetDescrRepo
 
     @Override
     public void captureException(RuntimeException errAny) {
-      EdgeUILogger.logException(
+      EdgeUILogger.LOG.error(
           "Exception during RelationSet update", errAny);
     }
   };

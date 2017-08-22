@@ -109,7 +109,7 @@ public class NodeListDocumentConverter
     try {
       if (!isNodeList(reader)) {
         PersistenceLogger.LOG.info(
-            "Can't load nodes from section " + reader.getNodeName());
+            "Can't load nodes from section {}", reader.getNodeName());
 
         return Collections.emptySet();
       }

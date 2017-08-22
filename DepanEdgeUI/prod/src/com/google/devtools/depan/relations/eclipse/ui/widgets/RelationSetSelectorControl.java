@@ -69,7 +69,7 @@ public class RelationSetSelectorControl extends Composite {
 
     @Override
     public void captureException(RuntimeException errAny) {
-      EdgeUILogger.logException(
+      EdgeUILogger.LOG.error(
           "Exception in selection handler for relation set selector control",
           errAny);
     }

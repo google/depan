@@ -190,9 +190,9 @@ public class NodeListCommandViewer extends CheckNodeTreeView {
     } catch (IllegalArgumentException ex) {
       // bad layout. don't do anything for the layout, but still finish the
       // creation of the view.
-      GraphDocLogger.LOG.warning("Bad layout selected.");
+      GraphDocLogger.LOG.warn("Bad layout selected.");
     } catch (Exception errView) {
-      GraphDocLogger.logException("Unable to create view", errView);
+      GraphDocLogger.LOG.error("Unable to create view", errView);
     }
   }
 }

@@ -41,7 +41,7 @@ public class Application implements IApplication {
 
     Object result = cli.getResult();
     if (IApplication.EXIT_OK != result) {
-      CmdLogger.LOG.warning("Depan Cmd failure with result: " + result);
+      CmdLogger.LOG.error("Depan Cmd failure with result: {}", result);
     }
     return result;
   }

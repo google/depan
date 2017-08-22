@@ -60,8 +60,8 @@ public class GraphMLAnalyst implements DependencyAnalyst {
     try {
       processModule(context);
     } catch (Exception err) {
-      MavenLogger.logException(
-          "Unable to analyze GraphML at " + graphMLPath, err);
+      MavenLogger.LOG.error(
+          "Unable to analyze GraphML at {}", graphMLPath, err);
     }
     GraphModel resultGraph = graphBuilder.createGraphModel();
 

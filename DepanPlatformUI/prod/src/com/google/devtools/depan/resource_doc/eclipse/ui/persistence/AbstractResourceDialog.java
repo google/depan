@@ -115,7 +115,7 @@ public abstract class AbstractResourceDialog<T extends PropertyDocument<?>>
     try {
       result = rsrcLoc.getDocumentReference();
     } catch (CoreException errCore) {
-      PlatformLogger.logException("Resource load error", errCore);
+      PlatformLogger.LOG.error("Resource load error", errCore);
       result = null;
     }
 

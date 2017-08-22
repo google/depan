@@ -41,11 +41,11 @@ public class LoggingElementHandler implements ElementHandler {
   }
 
   private void reportEvent(String event) {
-    PushJsonLogger.LOG.info(getLoggedName() + " @" + event);
+    PushJsonLogger.LOG.info("{} @{}", getLoggedName(), event);
   }
 
   private void reportValue(String method, String value) {
-    PushJsonLogger.LOG.info(getLoggedName() + ": " + method + " = " + value);
+    PushJsonLogger.LOG.info("{}: {} = {}", getLoggedName(), method, value);
   }
 
   protected String getLoggedName() {
@@ -70,7 +70,7 @@ public class LoggingElementHandler implements ElementHandler {
   @Override
   public void fieldName(String text) {
     loggedField = text;
-    PushJsonLogger.LOG.info(parentPath + " >> fieldName " + text);
+    PushJsonLogger.LOG.info("{} >> fieldName {}", parentPath, text);
   }
 
   @Override

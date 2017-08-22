@@ -55,7 +55,7 @@ public class RelationDisplayDocumentRepo
 
     @Override
     public void captureException(RuntimeException errAny) {
-      PersistenceLogger.logException(
+      PersistenceLogger.LOG.error(
           "Exception during EdgeDisplay document update", errAny);
     }
   };

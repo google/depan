@@ -119,7 +119,7 @@ public class ScenePrefsViewPart extends AbstractViewDocViewPart {
           size /= 100.0f; // we have percents, we need a /1 scale.
           applyZoom(size);
         } catch (NumberFormatException ex) {
-          ViewDocLogger.LOG.warning("Zoom value must be float.");
+          ViewDocLogger.LOG.warn("Zoom value must be float.");
         }
       }
     });
@@ -141,7 +141,7 @@ public class ScenePrefsViewPart extends AbstractViewDocViewPart {
           size /= 100.0f; // we have percents, we need a /1 scale.
           scaleLayout(size);
         } catch (NumberFormatException ex) {
-          ViewDocLogger.LOG.warning("Scaling value must be float.");
+          ViewDocLogger.LOG.warn("Scaling value must be float.");
         }
       }
     });

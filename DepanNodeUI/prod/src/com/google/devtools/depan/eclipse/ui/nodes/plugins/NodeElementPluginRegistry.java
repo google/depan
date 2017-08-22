@@ -96,8 +96,8 @@ public class NodeElementPluginRegistry
 
   @Override
   protected void reportException(String entryId, Exception err) {
-    NodesUILogger.logException(
-        "NodeElement registry load failure for " + entryId, err);
+    NodesUILogger.LOG.error(
+        "NodeElement registry load failure for {}", entryId, err);
   }
 
   /////////////////////////////////////

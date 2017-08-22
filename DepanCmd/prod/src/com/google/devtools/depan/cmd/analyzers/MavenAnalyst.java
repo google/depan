@@ -63,7 +63,7 @@ public class MavenAnalyst implements DependencyAnalyst {
     try {
       processModule(builder);
     } catch (Exception err) {
-      CmdLogger.logException(
+      CmdLogger.LOG.error(
           "Unable to analyze Maven POM at " + getPathText(), err);
     }
 

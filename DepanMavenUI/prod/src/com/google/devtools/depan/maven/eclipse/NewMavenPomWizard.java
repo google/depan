@@ -112,8 +112,8 @@ public class NewMavenPomWizard extends AbstractAnalysisWizard {
     try {
       processModule(builder, page.getPathFile());
     } catch (Exception err) {
-      MavenLogger.logException(
-          "Unable to analyze Maven POM at " + page.getPathText(), err);
+      MavenLogger.LOG.error(
+          "Unable to analyze Maven POM at {}", page.getPathText(), err);
     }
 
     monitor.worked(1);

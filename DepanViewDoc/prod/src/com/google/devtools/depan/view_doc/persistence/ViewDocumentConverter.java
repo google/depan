@@ -148,7 +148,7 @@ public class ViewDocumentConverter
     try {
       if (!isViewNodes(reader)) {
         PersistenceLogger.LOG.info(
-            "Can't load nodes from section " + reader.getNodeName());
+            "Can't load nodes from section {}", reader.getNodeName());
 
         return Collections.emptySet();
       }

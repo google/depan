@@ -28,7 +28,7 @@ public class UnrecognizedCommand extends AbstractCommandExec {
 
   @Override
   public void exec() {
-    CmdLogger.LOG.warning(buildMessage());
+    CmdLogger.LOG.warn(buildMessage());
   }
 
   @Override

@@ -106,11 +106,12 @@ public class NewSubtractNodesWizard
    */
   private GraphDocument buildGraphDoc(URI graphUri) {
     try {
-      PersistenceLogger.LOG.info("Loading GraphDoc from " + graphUri);
+      PersistenceLogger.LOG.info("Loading GraphDoc from {}", graphUri);
       GraphModelXmlPersist loader = GraphModelXmlPersist.build(true);
       return loader.load(graphUri);
     } catch (RuntimeException err) {
-      PersistenceLogger.logException("Unable to load GraphDoc from " + graphUri, err);
+      PersistenceLogger.LOG.error(
+          "Unable to load GraphDoc from {}", graphUri, err);
     }
     return null;
   }

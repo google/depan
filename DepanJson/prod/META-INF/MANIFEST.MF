@@ -4,7 +4,8 @@ Bundle-Name: DepanJson
 Bundle-SymbolicName: com.google.devtools.depan.json;singleton:=true
 Bundle-Version: 2.1.0.qualifier
 Bundle-Vendor: Pnambic Computing
-Require-Bundle: depan-json-library,
+Require-Bundle: org.slf4j.api,
+ depan-json-library,
  com.google.guava;bundle-version="18.0.0"
 Bundle-ClassPath: .
 Export-Package: com.google.devtools.depan.pushjson

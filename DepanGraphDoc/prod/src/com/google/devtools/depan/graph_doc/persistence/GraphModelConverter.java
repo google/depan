@@ -31,7 +31,8 @@ import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import com.thoughtworks.xstream.mapper.Mapper;
 
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Custom {@code XStream} converter for {@code GraphModel}s.
@@ -42,8 +43,8 @@ public class GraphModelConverter implements Converter {
 
   public static final String GRAPH_DEF_TAG = "graph-model";
 
-  private static final Logger logger =
-      Logger.getLogger(GraphModelConverter.class.getName());
+  private static final Logger LOG =
+      LoggerFactory.getLogger(GraphModelConverter.class.getName());
 
   private final Mapper mapper;
 
@@ -128,7 +129,7 @@ public class GraphModelConverter implements Converter {
               (GraphEdge) context.convertAnother(null, childClass);
           builder.addEdge(edge);
         } else {
-          logger.info("Skipped object with tag " + childName);
+          LOG.info("Skipped object with tag {}", childName);
         }
 
         reader.moveUp();
