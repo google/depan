@@ -8,6 +8,7 @@
   </parent>
 
   <artifactId>depan-jung-library</artifactId>
+  <version>0.0.2-SNAPSHOT</version>
   <packaging>bundle</packaging>
 
   <name>DepAn JUNG Library</name>
@@ -15,7 +16,7 @@
 
   <properties>
     <collections-generic.version>4.01</collections-generic.version>
-    <jung.version>2.0.1</jung.version>
+    <jung.version>2.1.1</jung.version>
   </properties>
 
   <dependencies>
@@ -25,12 +26,6 @@
       <version>${collections-generic.version}</version>
     </dependency>
 
-    <dependency>
-      <groupId>net.sf.jung</groupId>
-      <artifactId>jung2</artifactId>
-      <version>${jung.version}</version>
-      <type>pom</type>
-    </dependency>
     <dependency>
       <groupId>net.sf.jung</groupId>
       <artifactId>jung-algorithms</artifactId>

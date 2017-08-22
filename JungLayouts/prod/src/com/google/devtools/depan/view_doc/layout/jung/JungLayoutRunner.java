@@ -56,7 +56,7 @@ public abstract class JungLayoutRunner implements LayoutRunner {
     Map<GraphNode, Point2D> result =
         Maps.newHashMapWithExpectedSize(nodes.size());
     for (GraphNode node : nodes) {
-      Point2D position = jungLayout.transform(node);
+      Point2D position = jungLayout.apply(node);
       result.put(node, position);
     }
 

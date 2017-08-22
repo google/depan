@@ -8,13 +8,14 @@
   </parent>
 
   <artifactId>depan-json-library</artifactId>
+  <version>0.0.2-SNAPSHOT</version>
   <packaging>bundle</packaging>
 
   <name>Depan JSON Library</name>
   <description>JSON libraries (jackson) packaged for DepAn</description>
 
   <properties>
-    <json.version>2.8.9</json.version>
+    <json.version>2.9.0</json.version>
   </properties>
 
   <dependencies>

@@ -21,9 +21,9 @@
     <!-- DepAn Packaged libraries -->
     <depan.asm.version>0.0.1-SNAPSHOT</depan.asm.version>
     <depan.jogl.version>0.0.1-SNAPSHOT</depan.jogl.version>
-    <depan.json.version>0.0.1-SNAPSHOT</depan.json.version>
-    <depan.jung.version>0.0.1-SNAPSHOT</depan.jung.version>
-    <depan.xstream.version>0.0.1-SNAPSHOT</depan.xstream.version>
+    <depan.json.version>0.0.2-SNAPSHOT</depan.json.version>
+    <depan.jung.version>0.0.2-SNAPSHOT</depan.jung.version>
+    <depan.xstream.version>0.0.2-SNAPSHOT</depan.xstream.version>
   </properties>
 
   <dependencyManagement>
@@ -57,7 +57,7 @@
       <dependency>
         <groupId>com.pnambic.depan</groupId>
         <artifactId>depan-jung-library</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>${depan.jung.version}</version>
       </dependency>
 
       <dependency>
