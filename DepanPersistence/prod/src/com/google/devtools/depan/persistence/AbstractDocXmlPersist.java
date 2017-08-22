@@ -47,29 +47,28 @@ public abstract class AbstractDocXmlPersist<T> {
   // Hook methods for derived classes
   protected abstract T coerceLoad(Object load);
 
-  protected abstract String logLoadException(URI uri, Exception err);
+  protected abstract String buildLoadErrorMsg(URI uri);
 
-  public abstract String logSaveException(URI uri, Exception err);
+  public abstract String buildSaveErrorMsg(URI uri);
 
   protected String format(String pattern, Object... arguments) {
     return MessageFormat.format(pattern, arguments);
   }
 
-  protected void logException(String msg, Exception errIo) {
+  private void logException(String msg, Exception errIo) {
     PersistenceLogger.LOG.error(msg, errIo);
   }
 
-  protected String logException(String pattern, URI uri, Exception errIo) {
-    String result = format(pattern, uri);
-    logException(result, errIo);
-    return result;
+  protected String formatErrorMsg(String pattern, URI uri) {
+    return MessageFormat.format(pattern, uri);
   }
 
   public T load(URI uri) {
     try {
       return coerceLoad(xmlPersist.load(uri));
     } catch (IOException errIo) {
-      String msg = logLoadException(uri, errIo);
+      String msg = buildLoadErrorMsg(uri);
+      logException(msg, errIo);
       throw new RuntimeException(msg, errIo);
     }
   }
@@ -78,14 +77,15 @@ public abstract class AbstractDocXmlPersist<T> {
     try {
       xmlPersist.save(uri, doc);
     } catch (IOException errIo) {
-      String msg = logSaveException(uri, errIo);
+      String msg = buildSaveErrorMsg(uri);
+      logException(msg, errIo);
       throw new RuntimeException(msg, errIo);
     }
   }
 
   /**
    * Cancels the {@code monitor} if there is an exception,
-   * but reports no worked steps on the supplied  {@code monitor}.
+   * but reports no worked steps on the supplied {@code monitor}.
    */
   public void saveDocument(
       IFile file, T docInfo,
@@ -98,27 +98,8 @@ public abstract class AbstractDocXmlPersist<T> {
       if (null != monitor) {
         monitor.setCanceled(true);
       }
-      this.logSaveException(location, err);
-    }
-  }
-
-  /**
-   * Cancels the {@code monitor} if there is an exception,
-   * but reports no worked steps on the supplied  {@code monitor}.
-   */
-  public static <T> void saveDocument(
-      IFile file, T docInfo,
-      AbstractDocXmlPersist<T> persist,
-      IProgressMonitor monitor) {
-    URI location = file.getLocationURI();
-    try {
-      persist.save(location, docInfo);
-      file.refreshLocal(IResource.DEPTH_ZERO, monitor);
-    } catch (Exception err) {
-      if (null != monitor) {
-        monitor.setCanceled(true);
-      }
-      persist.logSaveException(location, err);
+      String msg = buildSaveErrorMsg(location);
+      logException(msg, err);
     }
   }
 }

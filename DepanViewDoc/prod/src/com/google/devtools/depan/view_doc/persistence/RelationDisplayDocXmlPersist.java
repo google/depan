@@ -53,14 +53,14 @@ public class RelationDisplayDocXmlPersist
   }
 
   @Override
-  protected String logLoadException(URI uri, Exception err) {
-    return logException(
-        "Unable to load relation display properties from {0}", uri, err);
+  protected String buildLoadErrorMsg(URI uri) {
+    return formatErrorMsg(
+        "Unable to load relation display properties from {0}", uri);
   }
 
   @Override
-  public String logSaveException(URI uri, Exception err) {
-    return logException(
-        "Unable to load relation display properties to {0}", uri, err);
+  public String buildSaveErrorMsg(URI uri) {
+    return formatErrorMsg(
+        "Unable to load relation display properties to {0}", uri);
   }
 }

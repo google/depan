@@ -53,12 +53,12 @@ public class RelationSetDescriptorXmlPersist
   }
 
   @Override
-  protected String logLoadException(URI uri, Exception err) {
-    return logException("Unable to load RelationSet from {0}", uri, err);
+  protected String buildLoadErrorMsg(URI uri) {
+    return formatErrorMsg("Unable to load RelationSet from {0}", uri);
   }
 
   @Override
-  public String logSaveException(URI uri, Exception err) {
-    return logException("Unable to save RelationSet to {0}", uri, err);
+  public String buildSaveErrorMsg(URI uri) {
+    return formatErrorMsg("Unable to save RelationSet to {0}", uri);
   }
 }

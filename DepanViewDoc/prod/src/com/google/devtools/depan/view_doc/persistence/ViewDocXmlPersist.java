@@ -52,15 +52,14 @@ public class ViewDocXmlPersist extends AbstractDocXmlPersist<ViewDocument> {
   }
 
   @Override
-  protected String logLoadException(URI uri, Exception err) {
-    return logException("Unable to load View document from {0}", uri, err);
+  protected String buildLoadErrorMsg(URI uri) {
+    return formatErrorMsg("Unable to load View document from {0}", uri);
   }
 
   @Override
-  public String logSaveException(URI uri, Exception err) {
+  public String buildSaveErrorMsg(URI uri) {
     String msg = MessageFormat.format("Unable to {0} View document to {1}",
         opLabel, uri.toString());
-    logException(msg, err);
     return msg;
   }
 }
