@@ -28,38 +28,49 @@ import java.math.BigInteger;
  */
 public class LoggingElementHandler implements ElementHandler {
 
-  private final String parentPath;
+  private final String selfPath;
 
   private String loggedField;
 
-  public LoggingElementHandler(String parentPath) {
-    this.parentPath = parentPath;
+  public LoggingElementHandler(String selfPath) {
+    this.selfPath = selfPath;
   }
 
   public LoggingElementHandler() {
     this("ROOT");
   }
 
-  private void reportEvent(String event) {
-    PushJsonLogger.LOG.info("{} @{}", getLoggedName(), event);
+  protected void reportEvent(String event) {
+    PushJsonLogger.LOG.info("{} @{}", getFieldName(), event);
   }
 
-  private void reportValue(String method, String value) {
-    PushJsonLogger.LOG.info("{}: {} = {}", getLoggedName(), method, value);
+  protected void reportValue(String method, String value) {
+    PushJsonLogger.LOG.info("{}: {} = {}", getFieldName(), method, value);
   }
 
-  protected String getLoggedName() {
-    return parentPath + "." + loggedField;
+  protected String getSelfName() {
+    return selfPath;
+  }
+
+  protected String getFieldName() {
+    return selfPath + "." + loggedField;
   }
 
   protected void setLoggedField(String fieldName) {
     this.loggedField = fieldName;
   }
 
+  /**
+   * Overrideable, typically for self-nested handlers.
+   */
+  protected LoggingElementHandler buildNewElementHandler() {
+    return new LoggingElementHandler(getFieldName());
+  }
+
   @Override
   public ElementHandler newObject() {
     reportEvent("newObject");
-    return new LoggingElementHandler(getLoggedName());
+    return buildNewElementHandler();
   }
 
   @Override
@@ -70,7 +81,7 @@ public class LoggingElementHandler implements ElementHandler {
   @Override
   public void fieldName(String text) {
     loggedField = text;
-    PushJsonLogger.LOG.info("{} >> fieldName {}", parentPath, text);
+    PushJsonLogger.LOG.info("{} >> fieldName {}", selfPath, text);
   }
 
   @Override
