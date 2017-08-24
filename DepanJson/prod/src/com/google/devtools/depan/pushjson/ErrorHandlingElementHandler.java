@@ -76,6 +76,10 @@ public class ErrorHandlingElementHandler extends LoggingElementHandler {
       super(selfPath, errors);
     }
 
+    public Nestable(String selfPath) {
+      super(selfPath);
+    }
+
     protected LoggingElementHandler buildNewElementHandler() {
       return new Nestable(getFieldName(), getAccumulator());
     }

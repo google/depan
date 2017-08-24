@@ -17,7 +17,7 @@
 
   <properties>
     <!-- OSGi packaged libraries -->
-    <guava.version>18.0</guava.version>
+    <guava.version>23.0</guava.version>
   </properties>
 
   <dependencies>

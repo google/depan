@@ -63,6 +63,9 @@
               org.apache.commons.collections15,
               org.apache.commons.collections15.map
             </Export-Package>
+            <Require-Bundle>
+              com.google.guava
+            </Require-Bundle>
             <_nouses>true</_nouses>
             <_removeheaders>
               Embed-Dependency,
