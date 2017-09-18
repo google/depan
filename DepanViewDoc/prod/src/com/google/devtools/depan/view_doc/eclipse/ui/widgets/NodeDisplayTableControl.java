@@ -653,7 +653,7 @@ public class NodeDisplayTableControl extends Composite {
         return getXPos(node);
       }
       if (COL_YPOS.equals(property)) {
-        return getXPos(node);
+        return getYPos(node);
       }
       NodeDisplayProperty nodeProp = getDisplayProperty(node);
       if (COL_COLOR.equals(property)) {
