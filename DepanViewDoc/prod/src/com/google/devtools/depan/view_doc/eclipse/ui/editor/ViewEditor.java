@@ -124,8 +124,10 @@ import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 
@@ -1378,6 +1380,10 @@ public class ViewEditor extends MultiPageEditorPart {
 
     Collection<GraphNode> removeNodes = subtractNodes(previous, current);
     Collection<GraphNode> extendNodes = subtractNodes(current, previous);
+
+    if (isOptionChecked(OptionPreferences.ONLY_SELECTED_NODE_EDGES_ID)) {
+      setVisibleSelectedNodeEdges();
+    }
     if (author != renderer) {
       renderer.updateSelectedNodes(removeNodes, extendNodes);
     }
@@ -1568,6 +1574,9 @@ public class ViewEditor extends MultiPageEditorPart {
     updateNodeRatioMode(
         viewInfo.getOption(OptionPreferences.STRETCHRATIO_ID));
     ViewExtensionRegistry.prepareRegistryView(this);
+
+    updateOnlySelectedNodeEdges(
+        isOptionChecked(OptionPreferences.ONLY_SELECTED_NODE_EDGES_ID));
  }
 
   /**
@@ -1601,6 +1610,10 @@ public class ViewEditor extends MultiPageEditorPart {
     }
     if (OptionPreferences.STRETCHRATIO_ID.equals(optionId)) {
       updateNodeRatioMode(value);
+      return;
+    }
+    if (OptionPreferences.ONLY_SELECTED_NODE_EDGES_ID.equals(optionId)) {
+      updateOnlySelectedNodeEdges(Boolean.parseBoolean(value));
       return;
     }
     ViewDocLogger.LOG.info(
@@ -1639,6 +1652,37 @@ public class ViewEditor extends MultiPageEditorPart {
     NodeRatioMode mode =
         ViewExtensionRegistry.getRegistryGetNodeRatioMode(value);
     renderer.setNodeRatioMode(mode);
+  }
+
+  private void updateOnlySelectedNodeEdges(boolean onlySelected) {
+    if (onlySelected) {
+      setVisibleSelectedNodeEdges();
+      return;
+    }
+
+    setVisibleAllNodeEdges();
+  }
+
+  private void setVisibleSelectedNodeEdges() {
+    Set<GraphNode> nodes =  new HashSet<>(viewInfo.getSelectedNodes());
+
+    for (GraphEdge edge : viewGraph.getEdges()) {
+      if (!nodes.contains(edge.getHead())) {
+        renderer.setEdgeVisible(edge, false);
+        continue;
+      }
+      if (nodes.contains(edge.getTail())) {
+        renderer.setEdgeVisible(edge, false);
+        continue;
+      }
+      renderer.setEdgeVisible(edge, true);
+    }
+  }
+
+  private void setVisibleAllNodeEdges() {
+    for (GraphEdge edge : viewGraph.getEdges()) {
+      renderer.setEdgeVisible(edge, true);
+    }
   }
 
   private void updateOptionDescription(String value) {

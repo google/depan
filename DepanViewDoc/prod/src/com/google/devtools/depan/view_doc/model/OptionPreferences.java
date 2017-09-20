@@ -26,6 +26,9 @@ import java.util.Map;
 public class OptionPreferences {
   public static final String OPTION_DESCRIPTION = "option/description";
 
+  public static final String ONLY_SELECTED_NODE_EDGES_ID =
+      "com.google.devtools.depan.view_doc.eclipse.ui.option.only_selected_node_edges";
+
   // rendering options
   public static final String STROKEHIGHLIGHT_ID =
       "com.google.devtools.depan.view_doc.eclipse.ui.option.StrokeHighlight";
@@ -55,6 +58,7 @@ public class OptionPreferences {
   private static Map<String, String> buildDefaultOptions() {
     Map<String, String> result = Maps.newHashMap();
     result.put(OPTION_DESCRIPTION, "");
+    result.put(ONLY_SELECTED_NODE_EDGES_ID, Boolean.FALSE.toString());
     result.put(STROKEHIGHLIGHT_ID, Boolean.TRUE.toString());
     result.put(SHAPE_ID, Boolean.TRUE.toString());
 

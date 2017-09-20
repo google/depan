@@ -28,11 +28,16 @@ import com.google.devtools.depan.resources.DirectDocumentReference;
 import com.google.devtools.depan.resources.PropertyDocumentReference;
 import com.google.devtools.depan.view_doc.eclipse.ViewDocResources;
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
+import com.google.devtools.depan.view_doc.model.OptionPreferences;
 import com.google.devtools.depan.view_doc.model.ViewPrefsListener;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Group;
 
 import java.util.Collection;
 
@@ -47,6 +52,8 @@ public class VisibleRelationsViewPart extends AbstractViewDocViewPart {
 
   /////////////////////////////////////
   // UX Elements
+
+  private Button onlySelected;
 
   /**
    * The {@code RelationSetEditorControl} that controls the UX.
@@ -137,6 +144,7 @@ public class VisibleRelationsViewPart extends AbstractViewDocViewPart {
       this.displayRelations = displayRelations;
     }
 
+    @Override
     public void relationSetVisibleChanged(
         PropertyDocumentReference<RelationSetDescriptor> visRelSet) {
       RelationSet doc = visRelSet.getDocument().getInfo();
@@ -167,11 +175,41 @@ public class VisibleRelationsViewPart extends AbstractViewDocViewPart {
   protected void createGui(Composite parent) {
     Composite result = Widgets.buildGridContainer(parent, 1);
 
+    Composite visibleControls = createControls(result);
+    visibleControls.setLayoutData(Widgets.buildHorzFillData());
+
     relationSetEditor = new RelationSetEditorControl(result);
     relationSetEditor.setLayoutData(Widgets.buildGrabFillData());
 
     RelationSetSaveLoadControl saves = new ControlSaveLoadControl(result);
     saves.setLayoutData(Widgets.buildHorzFillData());
+  }
+
+  /**
+   * @param result
+   * @return
+   */
+  private Composite createControls(Composite parent) {
+    Group result = Widgets.buildGridGroup(parent, "Filters", 1);
+
+    onlySelected = Widgets.buildCompactCheckButton(result, "Only selected nodes");
+    onlySelected.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        handleOnlySelected();
+      }
+    });
+
+    return result;
+  }
+
+  private void handleOnlySelected() {
+    ViewEditor editor = getEditor();
+    if (editor != null) {
+      boolean value = onlySelected.getSelection();
+      editor.setBooleanOption(
+          OptionPreferences.ONLY_SELECTED_NODE_EDGES_ID, value);
+    }
   }
 
   @Override
@@ -192,6 +230,9 @@ public class VisibleRelationsViewPart extends AbstractViewDocViewPart {
 
     relationSetEditor.setRelationSetSelectorInput(
         editor.getVisibleRelationSet(), editor.getResourceProject());
+
+    onlySelected.setSelection(
+        editor.isOptionChecked(OptionPreferences.ONLY_SELECTED_NODE_EDGES_ID));
   }
 
   @Override
