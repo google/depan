@@ -244,4 +244,12 @@ public class NodeRenderingProperty extends RenderingProperty {
     }
     return false;
   }
+
+  @Override
+  public String toString() {
+    MessageBuilder result = new MessageBuilder();
+    result.fmtValue(node.getId());
+    result.fmtBoolean(isVisible, "hidden", "visible");
+    return result.build();
+  }
 }

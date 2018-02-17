@@ -16,6 +16,7 @@
 
 package com.google.devtools.depan.view_doc.eclipse.ui.views;
 
+import com.google.devtools.depan.platform.eclipse.ui.widgets.Widgets;
 import com.google.devtools.depan.view_doc.eclipse.ViewDocLogger;
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.DrawingListener;
 import com.google.devtools.depan.view_doc.eclipse.ui.editor.ViewEditor;
@@ -89,6 +90,9 @@ public class ScenePrefsViewPart extends AbstractViewDocViewPart {
 
     Composite info = setupInfo(baseComposite);
     info.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+
+    // Composite debug = setupDebug(baseComposite);
+    // debug.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
   }
 
   @Override
@@ -269,7 +273,7 @@ public class ScenePrefsViewPart extends AbstractViewDocViewPart {
   private Composite setupInfo(Composite parent) {
 
     Group result = new Group(parent, SWT.NONE);
-    
+
     GridLayout layout = new GridLayout(1, true);
     result.setLayout(layout);
 
@@ -326,6 +330,21 @@ public class ScenePrefsViewPart extends AbstractViewDocViewPart {
     };
 
     return baseComposite;
+  }
+
+  @SuppressWarnings("unused")
+  private Composite setupDebug(Composite parent) {
+    Composite result = Widgets.buildGridGroup(parent, "Debug", 2);
+    Button dumpBtn = Widgets.buildCompactPushButton(result, "Dump Rendering Properties");
+    Label dumpLbl = Widgets.buildCompactLabel(result, "Display all the rendering properties");
+
+    dumpBtn.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        dumpRenderingProperties();
+      }
+    });
+    return result;
   }
 
   private void layoutRow(Label label, Label forDrawing, Label forViewPort) {
@@ -465,4 +484,12 @@ public class ScenePrefsViewPart extends AbstractViewDocViewPart {
     }
     getEditor().scaleToViewport();
   }
+
+  private void dumpRenderingProperties() {
+    if (!hasEditor()) {
+      return;
+    }
+    getEditor().dumpRenderingProperties();
+  }
+
 }

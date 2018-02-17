@@ -18,9 +18,11 @@ package com.google.devtools.depan.eclipse.visualization;
 
 import com.google.devtools.depan.eclipse.visualization.ogl.ArrowHead;
 import com.google.devtools.depan.eclipse.visualization.ogl.Arrowheads;
+import com.google.devtools.depan.eclipse.visualization.ogl.EdgeRenderingProperty;
 import com.google.devtools.depan.eclipse.visualization.ogl.GLPanel;
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeColorSupplier;
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeRatioSupplier;
+import com.google.devtools.depan.eclipse.visualization.ogl.NodeRenderingProperty;
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeShapeSupplier;
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeSizeSupplier;
 import com.google.devtools.depan.eclipse.visualization.ogl.RendererChangeListener;
@@ -425,5 +427,13 @@ public class View {
 
   public void finishSteps() {
     glPanel.finishSteps();
+  }
+
+  public NodeRenderingProperty[] getNodeProperties() {
+    return glPanel.getNodeProperties();
+  }
+
+  public EdgeRenderingProperty[] getEdgeProperties() {
+    return glPanel.getEdgeProperties();
   }
 }

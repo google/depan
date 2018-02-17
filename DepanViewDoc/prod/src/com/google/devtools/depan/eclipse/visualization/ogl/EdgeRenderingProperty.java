@@ -132,4 +132,13 @@ public class EdgeRenderingProperty extends RenderingProperty {
     }
     return null;
   }
+
+  @Override
+  public String toString() {
+    MessageBuilder result = new MessageBuilder();
+    result.fmtValue("head", node1.node.getId());
+    result.fmtValue("tail", node2.node.getId());
+    result.fmtBoolean(isVisible, "hidden", "visible");
+    return result.build();
+  }
 }

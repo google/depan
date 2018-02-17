@@ -26,8 +26,10 @@ import com.google.devtools.depan.eclipse.ui.nodes.trees.ViewerRoot;
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeTreeProvider;
 import com.google.devtools.depan.eclipse.ui.nodes.viewers.NodeViewerProvider;
 import com.google.devtools.depan.eclipse.visualization.View;
+import com.google.devtools.depan.eclipse.visualization.ogl.EdgeRenderingProperty;
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeColorSupplier;
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeRatioSupplier;
+import com.google.devtools.depan.eclipse.visualization.ogl.NodeRenderingProperty;
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeShapeSupplier;
 import com.google.devtools.depan.eclipse.visualization.ogl.NodeSizeSupplier;
 import com.google.devtools.depan.eclipse.visualization.ogl.RendererChangeListener;
@@ -1694,6 +1696,17 @@ public class ViewEditor extends MultiPageEditorPart {
   /////////////////////////////////////
   // Receiver for notifications from the ViewDocument
   // Most events are mapped to standard re-dispatch methods.
+
+  public void dumpRenderingProperties() {
+    System.out.println("\nNode Rendering properties:");
+    for (NodeRenderingProperty node : renderer.getNodeProperties()) {
+      System.out.println(node.toString());
+    }
+    System.out.println("\nEdge Rendering properties:");
+    for (EdgeRenderingProperty edge : renderer.getEdgeProperties()) {
+      System.out.println(edge.toString());
+    }
+  }
 
   /**
    * Handle notifications from ViewDocument (mostly UserPreferences) that

@@ -711,4 +711,12 @@ public class GLPanel extends GLScene {
   public void handleEvent(RendererEvent event) {
     getRendererCallback().handleEvent(event);
   }
+
+  public NodeRenderingProperty[] getNodeProperties() {
+    return nodesProperties;
+  }
+
+  public EdgeRenderingProperty[] getEdgeProperties() {
+    return edgesProperties;
+  }
 }
