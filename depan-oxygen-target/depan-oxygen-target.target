@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?pde version="3.8"?><target name="DepAn RCP Target" sequenceNumber="20">
+<?pde version="3.8"?><target name="DepAn RCP Target" sequenceNumber="21">
 <locations>
 <location path="${resource_loc:/depan-osgi-library/target/dependency}" type="Directory"/>
 <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
-<unit id="org.eclipse.equinox.sdk.feature.group" version="3.13.0.v20170531-1133"/>
-<unit id="org.eclipse.jdt.source.feature.group" version="3.13.0.v20170612-0950"/>
-<unit id="org.eclipse.platform.sdk" version="4.7.0.I20170612-0950"/>
+<unit id="org.eclipse.equinox.sdk.feature.group" version="3.13.2.v20171108-1834"/>
+<unit id="org.eclipse.jdt.source.feature.group" version="3.13.2.v20171130-0906"/>
+<unit id="org.eclipse.platform.sdk" version="4.7.2.M20171130-0510"/>
 <repository location="http://download.eclipse.org/releases/oxygen"/>
 </location>
 </locations>
