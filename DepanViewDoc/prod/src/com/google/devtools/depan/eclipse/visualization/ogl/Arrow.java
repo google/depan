@@ -51,20 +51,9 @@ public class Arrow extends OpenGLShape {
    * not in the middle of the shape.
    *
    * @param gl GL object where to draw this shape.
-   * @param center1 origin point of the arrow
-   * @param center2 target point for this arrow
-   * @param shape1 shape at the starting point
-   * @param shape2
-   * @param deviation
-   * @return mid-point of connection
+   * @param arcInfo the arc to draw.
    */
-  public Point2D linkShapes(GL2 gl, Point2D headPoint, Point2D tailPoint,
-      GLEntity headShape, GLEntity tailShape, float deviation) {
-
-    ArcBuilder builder = new ArcBuilder(headPoint, tailPoint);
-    builder.calcSegments();
-    int headSeg = builder.getHeadSegment(headShape);
-    int tailSeg = builder.getTailSegment(tailShape);
+  public void linkShapes(GL2 gl, ArcInfo arcInfo) {
 
     // enable GL_LINE_STIPPLE if edge must be dashed
     if (dashed) {
@@ -72,16 +61,14 @@ public class Arrow extends OpenGLShape {
       gl.glLineStipple(1, (short) 0xf0f0);
     }
 
-    drawCurve(gl, builder, headSeg, tailSeg);
+    drawCurve(gl, arcInfo);
 
     // now disable GL_LINE_STIPPLE if it was enabled
     if (dashed) {
       gl.glDisable(GL2.GL_LINE_STIPPLE);
     }
 
-    drawHead(gl, builder, tailSeg);
-
-    return builder.midpoint(headSeg, tailSeg);
+    drawHead(gl, arcInfo);
   }
 
   @Override
@@ -135,19 +122,20 @@ public class Arrow extends OpenGLShape {
     head = arrowhead;
   }
 
-  private void drawCurve(GL2 gl, ArcBuilder builder, int headSeg, int tailSeg) {
+  // private void drawCurve(GL2 gl, ArcBuilder builder, int headSeg, int tailSeg) {
+  private void drawCurve(GL2 gl, ArcInfo arcInfo) {
 
     gl.glBegin(GL2.GL_LINE_STRIP);
-    for (int segIndex = headSeg; segIndex <= tailSeg; segIndex++) {
-      Point2D point = builder.getPoint(segIndex);
+    for (int segIndex = arcInfo.headSeg; segIndex <= arcInfo.tailSeg; segIndex++) {
+      Point2D point = arcInfo.getPoint(segIndex);
       gl.glVertex2d(point.getX(), point.getY());
     }
     gl.glEnd();
   }
 
-  private void drawHead(GL2 gl, ArcBuilder builder, int tailSeg) {
-    Vec2 tail = new Vec2(builder.getPoint(tailSeg));
-    Vec2 next = new Vec2(builder.getPoint(tailSeg - 1));
+  private void drawHead(GL2 gl, ArcInfo arcInfo) {
+    Vec2 tail = new Vec2(arcInfo.getPoint(arcInfo.tailSeg));
+    Vec2 next = new Vec2(arcInfo.getPoint(arcInfo.tailSeg - 1));
     Vec2 dir = tail.minus(next);
 
     double slope = dir.y / dir.x;

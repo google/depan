@@ -103,4 +103,19 @@ public class Vec2 {
   public String toString() {
     return "(" + x + ":" + y + ")";
   }
+
+  @Override
+  public boolean equals(Object other) {
+    if ( !(other instanceof Vec2)) {
+      return false;
+    }
+    Vec2 otherVec = (Vec2) other;
+    if (this.x != otherVec.x) {
+      return false;
+    }
+    if (this.y != otherVec.y) {
+      return false;
+    }
+    return true;
+  }
 }

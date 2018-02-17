@@ -47,6 +47,9 @@ public class EdgeRenderingProperty extends RenderingProperty {
   public float p2X;
   public float p2Y;
 
+  /** Cache of arc points */
+  public ArcInfo arcInfo;
+
   /**
    * Deviation for the edge (how curved it is).
    */
@@ -140,5 +143,21 @@ public class EdgeRenderingProperty extends RenderingProperty {
     result.fmtValue("tail", node2.node.getId());
     result.fmtBoolean(isVisible, "hidden", "visible");
     return result.build();
+  }
+
+  public ArcInfo getArcFor(
+      Vec2 headVec, Vec2 tailVec, GLEntity headShape, GLEntity tailShape) {
+    if (!matchArcCache(headVec, tailVec, headShape, tailShape)) {
+      arcInfo = ArcInfo.buildArcInfo(headVec, tailVec, headShape, tailShape);
+    }
+    return arcInfo;
+  }
+
+  private boolean matchArcCache(
+      Vec2 headVec, Vec2 tailVec, GLEntity headShape, GLEntity tailShape) {
+    if (arcInfo == null) {
+      return false;
+    }
+    return arcInfo.isFor(headVec, tailVec, headShape, tailShape);
   }
 }

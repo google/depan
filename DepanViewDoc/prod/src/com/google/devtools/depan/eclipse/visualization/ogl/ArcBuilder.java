@@ -25,14 +25,14 @@ public class ArcBuilder {
 
   private static float FLOAT_DIAMETER = (float) (Math.PI * 2.0d);
 
-  private final Point2D point1;
-  private final Point2D point2;
+  private final Vec2 vec1;
+  private final Vec2 vec2;
 
   private Point2D[] arcPoints;
 
-  public ArcBuilder(Point2D point1, Point2D point2) {
-    this.point1 = point1;
-    this.point2 = point2;
+  public ArcBuilder(Vec2 vec1, Vec2 vec2) {
+    this.vec1 = vec1;
+    this.vec2 = vec2;
   }
 
   public Point2D getPoint(int index) {
@@ -58,9 +58,6 @@ public class ArcBuilder {
   }
 
   public void calcSegments() {
-    Vec2 vec1 = new Vec2(point1);
-    Vec2 vec2 = new Vec2(point2);
-
     Vec2 dir = vec2.minus(vec1);
 
     Vec2 offset = new Vec2(-dir.y, dir.x).div(1.05f);

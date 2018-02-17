@@ -149,12 +149,6 @@ public class DrawingPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
     GL2 gl = scene.gl;
     gl.glPushName(property.shapeId);
     if (property.strokeWidth > 0.0f) {
-      gl.glLineWidth(property.strokeWidth);
-      gl.glColor4f(property.strokeColor.getRed() / 255f,
-          property.strokeColor.getGreen() / 255f,
-          property.strokeColor.getBlue() / 255f,
-          property.strokeColor.getAlpha() / 255f);
-
       // get the real endpoints for the edge. Necessary to have the
       // real shapes if the nodes are collapsed.
       NodeRenderingProperty node1 = property.node1.isCompletelyCollapsed() ?
@@ -162,15 +156,24 @@ public class DrawingPlugin implements NodeRenderingPlugin, EdgeRenderingPlugin {
       NodeRenderingProperty node2 = property.node2.isCompletelyCollapsed() ?
           property.node2.collapsedUnder : property.node2;
 
-      Point2D middle = ((Arrow) property.shape).linkShapes(gl,
-          new Point2D.Float(property.p1X * GLConstants.FACTOR,
-              property.p1Y * GLConstants.FACTOR),
-          new Point2D.Float(property.p2X * GLConstants.FACTOR,
-              property.p2Y * GLConstants.FACTOR),
-          node1.shape, node2.shape, property.deviation);
+      Vec2 headVec = new Vec2(
+          property.p1X * GLConstants.FACTOR, property.p1Y * GLConstants.FACTOR);
+      Vec2 tailVec = new Vec2(
+          property.p2X * GLConstants.FACTOR, property.p2Y * GLConstants.FACTOR);
+
+      ArcInfo arcInfo =
+          property.getArcFor(headVec, tailVec, node1.shape, node2.shape);
+
+      gl.glLineWidth(property.strokeWidth);
+      gl.glColor4f(property.strokeColor.getRed() / 255f,
+          property.strokeColor.getGreen() / 255f,
+          property.strokeColor.getBlue() / 255f,
+          property.strokeColor.getAlpha() / 255f);
+
+      ((Arrow) property.shape).linkShapes(gl, arcInfo);
 
       if (property.isTextVisible) {
-        paintLabel(property, middle);
+        paintLabel(property, arcInfo.midpoint());
       }
     }
     gl.glPopName();
