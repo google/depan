@@ -16,8 +16,6 @@
 
 package com.google.devtools.depan.eclipse.visualization.ogl;
 
-import com.google.devtools.depan.view_doc.model.NodeShapeMode;
-
 /**
  * Provide shapes for nodes.
  * 
@@ -44,9 +42,9 @@ public interface NodeShapeSupplier {
 
   public static final NodeShapeSupplier DEFAULT = new NodeShapeSupplier() {
 
-        @Override
-        public GLEntity getShape() {
-          return NodeShapeMode.DEFAULT_SHAPE;
-        }
-      };
+    @Override
+    public GLEntity getShape() {
+      return ShapeFactory.createEllipse();
+    }
+  };
 }
