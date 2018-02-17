@@ -46,10 +46,24 @@ public class Vec2 {
     return (float) Math.sqrt(x * x + y * y);
   }
 
-  public void normalize() {
+  public float normalize() {
     float l = length();
     x /= l;
     y /= l;
+    return l;
+  }
+
+  /**
+   * Convert vector into radians.
+   * Must be normalized first
+   * ({@link #normalize()} or {@link #getNormalized()}).
+   */
+  public float radians() {
+    double result = Math.acos(x);
+    if (y < 0) {
+      result = (2.0 * Math.PI) - result;
+    }
+    return (float) result;
   }
 
   public Vec2 getNormalized() {

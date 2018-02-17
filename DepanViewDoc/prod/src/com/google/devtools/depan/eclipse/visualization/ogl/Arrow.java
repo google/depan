@@ -19,7 +19,6 @@ package com.google.devtools.depan.eclipse.visualization.ogl;
 import com.jogamp.opengl.GL2;
 
 import java.awt.geom.Point2D;
-import java.awt.geom.QuadCurve2D;
 
 /**
  * An arrow shape: the line, and the head.
@@ -28,7 +27,6 @@ import java.awt.geom.QuadCurve2D;
  *
  */
 public class Arrow extends OpenGLShape {
-
   /**
    * Arrow head of this arrow.
    */
@@ -58,59 +56,32 @@ public class Arrow extends OpenGLShape {
    * @param shape1 shape at the starting point
    * @param shape2
    * @param deviation
-   * @return
+   * @return mid-point of connection
    */
-  public Point2D linkShapes(GL2 gl, Point2D center1, Point2D center2,
-      GLEntity shape1, GLEntity shape2, float deviation) {
-    Vec2 c1 = new Vec2(center1);
-    Vec2 c2 = new Vec2(center2);
+  public Point2D linkShapes(GL2 gl, Point2D headPoint, Point2D tailPoint,
+      GLEntity headShape, GLEntity tailShape, float deviation) {
 
-    Vec2 dir = c2.minus(c1);
-    Vec2 norm = new Vec2(dir.y, -dir.x).mult(deviation);
-    Vec2 middle = c1.plus(c2).div(2.0f).plus(norm);
-
-    QuadCurve2D curve = new QuadCurve2D.Float(c1.x, c1.y, middle.x, middle.y,
-        c2.x, c2.y);
-    QuadCurve2D last = new QuadCurve2D.Float();
+    ArcBuilder builder = new ArcBuilder(headPoint, tailPoint);
+    builder.calcSegments();
+    int headSeg = builder.getHeadSegment(headShape);
+    int tailSeg = builder.getTailSegment(tailShape);
 
     // enable GL_LINE_STIPPLE if edge must be dashed
     if (dashed) {
       gl.glEnable(GL2.GL_LINE_STIPPLE);
       gl.glLineStipple(1, (short) 0xf0f0);
     }
-    boolean ok = drawCurve(gl, center1, center2, curve, shape1, shape2, last);
+
+    drawCurve(gl, builder, headSeg, tailSeg);
 
     // now disable GL_LINE_STIPPLE if it was enabled
     if (dashed) {
       gl.glDisable(GL2.GL_LINE_STIPPLE);
     }
 
-    if (ok) {
-      // draw the head at the last position, trying to orient it so that it
-      // follows the last segment of the "line".
-      double x1 = last.getP1().getX();
-      double y1 = last.getP1().getY();
-      double x2 = last.getP2().getX();
-      double y2 = last.getP2().getY();
+    drawHead(gl, builder, tailSeg);
 
-      double slope = (y2 - y1) / (x2 - x1);
-      double angle = (float) Math.tanh(slope) - Math.PI / 2.0;
-      if (x2 < x1) {
-        angle += Math.PI;
-      }
-
-      head.setTranslation((float) (last.getP2().getX()), (float) (last.getP2()
-          .getY()), 0f);
-      head.setScale(8f, 8f, 8f);
-      head.setRotation(angle);
-      head.fill(gl);
-    }
-
-    QuadCurve2D left = new QuadCurve2D.Float();
-    QuadCurve2D right = new QuadCurve2D.Float();
-    curve.subdivide(left, right);
-
-    return right.getP1(); // new Point2D.Float(middle.x, middle.y);
+    return builder.midpoint(headSeg, tailSeg);
   }
 
   @Override
@@ -123,95 +94,6 @@ public class Arrow extends OpenGLShape {
   public void setScale(float x, float y, float z) {
     super.setScale(x, y, z);
     head.setScale(x, y, z);
-  }
-
-  /**
-   * Link the two points with the given curve, by subdividing, until the length
-   * of each segment is lower or equal to AWTShape.LINE_FLATNESS. The last curve
-   * painted is returned in the last argument, <code>curve</code>. It can
-   * be used to know the real endpoint, ad the edge of the second curve.
-   *
-   * @param gl GL object to draw
-   * @param center1 start point
-   * @param center2 end point
-   * @param curve curve to follow
-   * @param shape1 shape at starting point
-   * @param shape2 shape at end point
-   * @param last last curve painted.
-   * @return
-   */
-  public boolean drawCurve(GL2 gl, Point2D center1, Point2D center2,
-      QuadCurve2D curve, GLEntity shape1, GLEntity shape2, QuadCurve2D last) {
-    double p1X = curve.getP1().getX();
-    double p1Y = curve.getP1().getY();
-    double p2X = curve.getP2().getX();
-    double p2Y = curve.getP2().getY();
-
-    // different cases to handle are represented visually with the following
-    // convertion: [ ] represent a shape, and --- a segment.
-    // [ ---]--- is a segment with starting point inside a shape, end endpoint
-    // outside...
-
-    if (shape1.contains(p2X, p2Y)) {
-      // [ -- ] [ ]
-      // first shape contains end point. don't do anything.
-      return false;
-    }
-    if (shape2.contains(p1X, p1Y)) {
-      // [ ] [ -- ]
-      // second shape contains starting point. don't do anything
-      return false;
-    }
-    if (shape1.contains(p1X, p1Y)) {
-      if (shape2.contains(p2X, p2Y)) {
-        // [ ---]----[--- ]
-        // subdivide to conquer...
-        return divideAndDraw(gl, center1, center2, curve, shape1, shape2,
-            last);
-      } else {
-        // [ ---]-- [ ]
-        if (new Vec2(curve.getP2()).minus(new Vec2(curve.getP1())).length()
-            < AWTShape.lineFlatness) {
-          // segment small enough
-          AWTShape.draw(gl, curve);
-          return false;
-        } else {
-          // segment to large. divide it.
-          divideAndDraw(gl, center1, center2, curve, shape1, shape2, last);
-          return false;
-        }
-      }
-    } else if (shape2.contains(p2X, p2Y)) {
-      // [ ] --[--- ]
-      if (new Vec2(curve.getP2()).minus(new Vec2(curve.getP1())).length()
-          < AWTShape.lineFlatness) {
-        // segment small enough
-        last.setCurve(curve);
-        AWTShape.draw(gl, curve);
-        return true;
-      } else {
-        // segment to large. divide it.
-        return divideAndDraw(gl, center1, center2, curve, shape1, shape2,
-            last);
-      }
-    } else {
-      // [ ] -- [ ]
-      AWTShape.draw(gl, curve);
-    }
-    return false;
-  }
-
-  /**
-   * Divide the given curve in two half, and call drawCurve on each part.
-   */
-  public boolean divideAndDraw(GL2 gl, Point2D center1, Point2D center2,
-      QuadCurve2D curve, GLEntity shape1, GLEntity shape2, QuadCurve2D last) {
-    QuadCurve2D left = new QuadCurve2D.Float();
-    QuadCurve2D right = new QuadCurve2D.Float();
-    curve.subdivide(left, right);
-    boolean resL = drawCurve(gl, center1, center2, left, shape1, shape2, last);
-    boolean resR = drawCurve(gl, center1, center2, right, shape1, shape2, last);
-    return resL || resR;
   }
 
   @Override
@@ -251,5 +133,32 @@ public class Arrow extends OpenGLShape {
    */
   public void setArrowhead(ArrowHead arrowhead) {
     head = arrowhead;
+  }
+
+  private void drawCurve(GL2 gl, ArcBuilder builder, int headSeg, int tailSeg) {
+
+    gl.glBegin(GL2.GL_LINE_STRIP);
+    for (int segIndex = headSeg; segIndex <= tailSeg; segIndex++) {
+      Point2D point = builder.getPoint(segIndex);
+      gl.glVertex2d(point.getX(), point.getY());
+    }
+    gl.glEnd();
+  }
+
+  private void drawHead(GL2 gl, ArcBuilder builder, int tailSeg) {
+    Vec2 tail = new Vec2(builder.getPoint(tailSeg));
+    Vec2 next = new Vec2(builder.getPoint(tailSeg - 1));
+    Vec2 dir = tail.minus(next);
+
+    double slope = dir.y / dir.x;
+    double angle = (float) Math.tanh(slope) - Math.PI / 2.0;
+    if (tail.x < next.x) {
+      angle += Math.PI;
+    }
+
+    head.setTranslation((float) (tail.x), (float) (tail.y), 0f);
+    head.setScale(8f, 8f, 8f);
+    head.setRotation(angle);
+    head.fill(gl);
   }
 }
